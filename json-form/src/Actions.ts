@@ -38,7 +38,7 @@ import * as TPM from 'tea-pop-menu';
 import { createMenu, MenuAction } from './ContextMenuActions';
 import { Box } from 'tea-pop-core';
 import { Debouncer } from './Debouncer';
-import * as JsFacade from './JsFacade';
+import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
 export function actionDeleteValue(
   model: Model,

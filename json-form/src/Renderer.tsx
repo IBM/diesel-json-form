@@ -29,7 +29,7 @@ import {
 } from './JsonValue';
 import { Model } from './Model';
 import { JsPath } from './JsPath';
-import { JsValidationError } from './JsFacade';
+import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 import { box, Dim, pos } from 'tea-pop-core';
 import {
   Button,

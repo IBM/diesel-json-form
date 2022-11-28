@@ -1,10 +1,10 @@
 {
-  "name": "@diesel/json-form",
+  "name": "@diesel-parser/json-form",
   "version": "0.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@diesel/json-schema-facade-ts": "^0.1.0",
+    "@diesel-parser/json-schema-facade-ts": "^0.3.0",
     "i18next": "^20.6.1",
     "tea-pop-core": "^4.1.2",
     "tea-pop-menu": "^4.1.2"

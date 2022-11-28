@@ -231,7 +231,10 @@ export function parseJsonValue(json: string): Result<string, JsonValue> {
     const x = JSON.parse(json);
     return valueFromAny(x);
   } catch (e) {
-    return err(e.message);
+    if (e instanceof Error) {
+      return err(e.message);
+    }
+    return err('unhandled error ' + e);
   }
 }
 

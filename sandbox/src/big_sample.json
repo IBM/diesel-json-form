@@ -1,0 +1,941 @@
+{
+  "$id": "http://_082283706.performance.test1.testdm.testDM.Input",
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "object",
+  "$comment": "Generated from Java class _082283706.performance.test1.testdm.testDM.Input",
+  "additionalProperties": false,
+  "properties": {
+    "input": {
+      "$ref": "#/definitions/_082283706.performance.test1.data.Large"
+    },
+    "input2": {
+      "$ref": "#/definitions/_082283706.performance.test1.data.Large2"
+    },
+    "input3": {
+      "$ref": "#/definitions/_082283706.performance.test1.data.Large3"
+    }
+  },
+  "definitions": {
+    "_082283706.performance.test1.data.Large": {
+      "type": "object",
+      "$comment": "Generated from Java class _082283706.performance.test1.data.Large",
+      "additionalProperties": false,
+      "properties": {
+        "newAttribute": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute1": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute10": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute11": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute12": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute13": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute14": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute15": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute16": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute17": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute18": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute19": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute2": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute20": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute21": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute22": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute23": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute24": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute25": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute26": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute27": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute28": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute29": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute3": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute30": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute31": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute32": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute33": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute34": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute35": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute36": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute37": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute38": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute39": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute4": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute40": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute41": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute42": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute43": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute44": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute45": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute46": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute47": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute48": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute49": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute5": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute6": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute7": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute8": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute9": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "_082283706.performance.test1.data.Large2": {
+      "type": "object",
+      "$comment": "Generated from Java class _082283706.performance.test1.data.Large2",
+      "additionalProperties": false,
+      "properties": {
+        "newAttribute": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute1": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute10": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute11": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute12": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute13": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute14": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute15": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute16": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute17": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute18": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute19": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute2": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute20": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute21": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute22": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute23": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute24": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute25": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute26": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute27": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute28": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute29": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute3": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute30": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute31": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute32": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute33": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute34": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute35": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute36": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute37": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute38": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute39": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute4": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute40": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute41": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute42": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute43": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute44": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute45": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute46": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute47": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute48": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute49": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute5": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute6": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute7": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute8": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute9": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "_082283706.performance.test1.data.Large3": {
+      "type": "object",
+      "$comment": "Generated from Java class _082283706.performance.test1.data.Large3",
+      "additionalProperties": false,
+      "properties": {
+        "newAttribute": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute1": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute10": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute11": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute12": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute13": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute14": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute15": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute16": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute17": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute18": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute19": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute2": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute20": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute21": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute22": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute23": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute24": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute25": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute26": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute27": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute28": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute29": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute3": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute30": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute31": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute32": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute33": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute34": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute35": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute36": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute37": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute38": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute39": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute4": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute40": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute41": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute42": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute43": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute44": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute45": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute46": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute47": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute48": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute49": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute5": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute6": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute7": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute8": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newAttribute9": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
