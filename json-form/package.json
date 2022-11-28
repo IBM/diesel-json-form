@@ -1,0 +1,58 @@
+{
+  "name": "@diesel/json-form",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@diesel/json-schema-facade-ts": "^0.1.0",
+    "i18next": "^20.6.1",
+    "tea-pop-core": "^4.1.2",
+    "tea-pop-menu": "^4.1.2"
+  },
+  "peerDependencies": {
+    "@carbon/icons-react": "^10.22.0",
+    "@carbon/themes": "^10.21.0",
+    "carbon-components": "^10.25.0",
+    "carbon-components-react": "^7.25.0",
+    "carbon-icons": "^7.0.0",
+    "react": "^16.14.0",
+    "react-tea-cup": "^2.1.0",
+    "tea-cup-core": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/carbon-components-react": "^7.25.2",
+    "@types/carbon__icons-react": "^10.23.0",
+    "@types/jest": "^26.0.20",
+    "@types/react": "^16.9.56",
+    "@types/react-dom": "^16.9.8",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "24.9.0",
+    "node-sass": "^7.0.1",
+    "node-sass-package-importer": "^5.3.2",
+    "npm-scripts-watcher": "^1.0.2",
+    "prettier": "2.0.5",
+    "ts-jest": "24.0.2",
+    "typescript": "~3.8.0"
+  },
+  "scripts": {
+    "build": "yarn clean && yarn build:ts && yarn build:scss",
+    "build:ts": "tsc",
+    "build:scss": "node-sass --importer ../node_modules/node-sass-package-importer/dist/cli.js src/JsonEditor.scss dist/JsonEditor.css",
+    "clean": "rimraf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "watch": "npm-scripts-watcher",
+    "prettify": "prettier --write .",
+    "lint": "eslint '**/*.{js,ts,tsx}'",
+    "lint:fix": "eslint '**/*.{js,ts,tsx}' --fix"
+  },
+  "watch": {
+    "src/**/!(*.test|*.spec).{ts,tsx}": [
+      "build:ts"
+    ],
+    "src/**/*.scss": [
+      "build:scss"
+    ]
+  }
+}

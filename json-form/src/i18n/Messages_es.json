@@ -1,0 +1,26 @@
+{
+  "documentRoot": "Raíz de documento",
+  "propertyAlreadyExists": "La propiedad ya existe",
+  "propertyNamePlaceholder": "nombre de propiedad de tipo...",
+  "propertyNameLabel": "nombre de propiedad en {{path}}",
+  "emptyObject": "Objeto vacío",
+  "emptyArray": "Matriz vacía",
+  "stringValuePlaceholder": "Especificar una serie de texto",
+  "stringValueLabel": "serie de texto de {{path}}",
+  "stringValueComboLabel": "seleccionar serie de texto de {{path}}",
+  "numberValueLabel": "número de {{path}}",
+  "booleanValueLabel": "comprobar booleano de {{path}}",
+  "dateValueLabel": "fecha de {{path}}",
+  "timeValueLabel": "hora de {{path}}",
+  "contextMenu": {
+    "move": "Mover",
+    "moveUp": "Arriba",
+    "moveDown": "Abajo",
+    "propose": "Proponer",
+    "delete": "Suprimir",
+    "changeType": "Cambiar tipo",
+    "addElement": "Añadir elemento",
+    "addProperty": "Añadir propiedad..."
+  },
+  "icon.openMenu": "Abrir menú"
+}

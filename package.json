@@ -1,0 +1,9 @@
+{
+  "name": "diesel-json-form-parent",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "json-form",
+    "sandbox"
+  ]
+}

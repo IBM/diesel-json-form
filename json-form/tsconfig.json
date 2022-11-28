@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "strict": true,
+    "module": "commonjs",
+    "outDir": "dist",
+    "declaration": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "resolveJsonModule": true
+  },
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/test",
+    "**/*.tests.ts?",
+    "**/*.spec.ts?"
+  ]
+}

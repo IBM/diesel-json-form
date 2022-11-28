@@ -1,0 +1,26 @@
+{
+  "documentRoot": "文档根",
+  "propertyAlreadyExists": "属性已存在",
+  "propertyNamePlaceholder": "输入属性名称...",
+  "propertyNameLabel": "{{path}} 中的属性名称",
+  "emptyObject": "空对象",
+  "emptyArray": "空数组",
+  "stringValuePlaceholder": "输入文本字符串",
+  "stringValueLabel": "{{path}} 的文本字符串",
+  "stringValueComboLabel": "选择 {{path}} 的文本字符串",
+  "numberValueLabel": "{{path}} 的数量",
+  "booleanValueLabel": "检查 {{path}} 的布尔值",
+  "dateValueLabel": "{{path}} 的日期",
+  "timeValueLabel": "{{path}} 的时间",
+  "contextMenu": {
+    "move": "移动",
+    "moveUp": "向上",
+    "moveDown": "向下",
+    "propose": "建议",
+    "delete": "删除",
+    "changeType": "更改类型",
+    "addElement": "添加元素",
+    "addProperty": "添加属性..."
+  },
+  "icon.openMenu": "打开菜单"
+}

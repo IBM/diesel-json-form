@@ -1,0 +1,26 @@
+{
+  "documentRoot": "Document root",
+  "propertyAlreadyExists": "Property already exists",
+  "propertyNamePlaceholder": "type property name...",
+  "propertyNameLabel": "property name in {{path}}",
+  "emptyObject": "Empty object",
+  "emptyArray": "Empty array",
+  "stringValuePlaceholder": "Enter a text string",
+  "stringValueLabel": "text string of {{path}}",
+  "stringValueComboLabel": "select text string of {{path}}",
+  "numberValueLabel": "number of {{path}}",
+  "booleanValueLabel": "check boolean of {{path}}",
+  "dateValueLabel": "date of {{path}}",
+  "timeValueLabel": "time of {{path}}",
+  "contextMenu": {
+    "move": "Move",
+    "moveUp": "Up",
+    "moveDown": "Down",
+    "propose": "Propose",
+    "delete": "Delete",
+    "changeType": "Change type",
+    "addElement": "Add element",
+    "addProperty": "Add property..."
+  },
+  "icon.openMenu": "Open menu"
+}

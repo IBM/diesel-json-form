@@ -1,0 +1,26 @@
+{
+  "documentRoot": "文件根目錄",
+  "propertyAlreadyExists": "內容已存在",
+  "propertyNamePlaceholder": "輸入內容名稱...",
+  "propertyNameLabel": "{{path}} 中的內容名稱",
+  "emptyObject": "空物件",
+  "emptyArray": "空白的陣列",
+  "stringValuePlaceholder": "輸入字串",
+  "stringValueLabel": "{{path}} 的字串",
+  "stringValueComboLabel": "選取 {{path}} 的字串",
+  "numberValueLabel": "{{path}} 數目",
+  "booleanValueLabel": "檢查 {{path}} 的 Boolean 值",
+  "dateValueLabel": "{{path}} 的日期",
+  "timeValueLabel": "{{path}} 的時間",
+  "contextMenu": {
+    "move": "移動",
+    "moveUp": "往上",
+    "moveDown": "向下",
+    "propose": "提出",
+    "delete": "刪除",
+    "changeType": "變更類型",
+    "addElement": "新增元素",
+    "addProperty": "新增內容..."
+  },
+  "icon.openMenu": "開啟功能表"
+}

@@ -1,0 +1,26 @@
+{
+  "documentRoot": "Racine de document",
+  "propertyAlreadyExists": "Cette propriété existe déjà",
+  "propertyNamePlaceholder": "nom de la propriété de type...",
+  "propertyNameLabel": "nom de propriété dans {{path}}",
+  "emptyObject": "Objet vide",
+  "emptyArray": "Tableau vide",
+  "stringValuePlaceholder": "Entrer une chaîne de texte",
+  "stringValueLabel": "chaîne de texte de {{path}}",
+  "stringValueComboLabel": "sélectionner une chaîne de texte de {{path}}",
+  "numberValueLabel": "nombre de {{path}}",
+  "booleanValueLabel": "vérifier la valeur booléenne de {{path}}",
+  "dateValueLabel": "date de {{path}}",
+  "timeValueLabel": "heure de {{path}}",
+  "contextMenu": {
+    "move": "Déplacer",
+    "moveUp": "Opérationnelle",
+    "moveDown": "En panne",
+    "propose": "Proposer",
+    "delete": "Supprimer",
+    "changeType": "Changer de type",
+    "addElement": "Ajouter un élément",
+    "addProperty": "Ajouter une propriété..."
+  },
+  "icon.openMenu": "Ouvrir le menu"
+}

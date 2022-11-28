@@ -1,0 +1,19 @@
+target/
+node_modules/
+
+.idea/
+*.iml
+.vscode/
+# vscode generated files
+ensime-langserver.log
+pc.stdout.log
+.bloop/
+.metals/
+.bsp
+metals.sbt
+
+async-profiler/
+diesel-samples/jvm/profile*
+
+*gpcreds.json
+yarn.lock
