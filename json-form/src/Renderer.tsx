@@ -121,7 +121,7 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
                 key: e.key,
               });
             }}
-            invalidText={t('propertyAlreadyExists')}
+            invalidText={t<string>('propertyAlreadyExists')}
             invalid={addingState.isDuplicate}
           />
           <div className={'buttons-row'}>

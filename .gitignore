@@ -16,4 +16,3 @@ async-profiler/
 diesel-samples/jvm/profile*
 
 *gpcreds.json
-yarn.lock

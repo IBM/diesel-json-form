@@ -55,7 +55,7 @@ import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
 import { executeContextMenuAction } from './ContextMenu';
 import { OutMsg, outValueChanged } from './OutMsg';
-import * as JsFacade from './JsFacade';
+import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
 export function init(
   language: string,
@@ -278,7 +278,7 @@ export interface JsonEditorProps {
   readonly onChange?: (value: JsonValue) => void;
 }
 
-export function JsonEditor(props: JsonEditorProps) {
+export function JsonEditor(props: JsonEditorProps): React.ReactNode {
   return (
     <Program
       init={() =>
