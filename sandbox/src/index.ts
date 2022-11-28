@@ -32,8 +32,8 @@ const initialValue = {};
 ed1.value = JSON.stringify(initialSchema, null, '  ');
 ed2.value = JSON.stringify(initialValue, null, '  ');
 
-ed1.addEventListener('change', (instance) => {
-  debugger;
+ed1.addEventListener('input', (instance) => {
+  console.log("ed1 change");
   sendJsonStr();
 });
 
@@ -46,15 +46,16 @@ function getValue() {
 }
 
 function sendJsonStr() {
-  debugger;
   const schema = getSchema();
   const value = getValue();
+  console.log("send JSON str", schema, value);
   JsonForm.sendJsonPort.send([schema, value]);
 }
 
 const syncPanesCb: HTMLInputElement = document.getElementById('syncPanes') as HTMLInputElement;
 
-ed2.addEventListener('change', () => {
+ed2.addEventListener('input', () => {
+  console.log("ed2 change");
   if (syncPanesCb.checked) {
     sendJsonStr();
   }
