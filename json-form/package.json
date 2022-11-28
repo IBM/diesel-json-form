@@ -36,7 +36,7 @@
     "typescript": "~3.8.0"
   },
   "scripts": {
-    "build": "yarn clean && yarn build:ts && yarn build:scss",
+    "build": "yarn clean && yarn build:ts && yarn test && yarn build:scss",
     "build:ts": "tsc",
     "build:scss": "node-sass --importer ../node_modules/node-sass-package-importer/dist/cli.js src/JsonEditor.scss dist/JsonEditor.css",
     "clean": "rimraf dist",
