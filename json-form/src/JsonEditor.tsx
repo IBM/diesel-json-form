@@ -278,7 +278,7 @@ export interface JsonEditorProps {
   readonly onChange?: (value: JsonValue) => void;
 }
 
-export function JsonEditor(props: JsonEditorProps): React.ReactNode {
+export function JsonEditor(props: JsonEditorProps): React.ReactElement {
   return (
     <Program
       init={() =>

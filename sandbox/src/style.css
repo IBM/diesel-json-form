@@ -64,6 +64,11 @@
   position: relative;
 }
 
+.editor-wrapper textarea {
+  height: 100%;
+  width: 100%;
+}
+
 .IntelliMirrorEditor {
   position: absolute;
   top: 0;

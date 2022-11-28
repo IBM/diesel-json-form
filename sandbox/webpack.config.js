@@ -43,16 +43,5 @@ module.exports = {
             filename: './index.html',
             inject: false,
         }),
-        new CopyPlugin({
-            patterns: [{
-                from: 'public', to: '.'
-            }, {
-                from: require.resolve('@diesel/json-worker/dist/diesel-json-worker.js'),
-                to: '.'
-            },{
-                from: '../schemaWorker/dist/schemaWorker.js',
-                to: '.'
-            }],
-        }),
     ],
 };
