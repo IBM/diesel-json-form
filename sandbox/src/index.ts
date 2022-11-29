@@ -23,43 +23,41 @@ import big_sample from './big_sample.json';
 import React from 'react';
 
 
-const ed1 = document.querySelector('#editor1') as HTMLTextAreaElement;
-const ed2 = document.querySelector('#editor2') as HTMLTextAreaElement;
+const initialValue = `{
+  "hello": "world"
+}`
+const initialSchema = `{
+  "type": "boolean"
+}`
 
-const initialSchema = {};
-const initialValue = {};
 
-ed1.value = JSON.stringify(initialSchema, null, '  ');
-ed2.value = JSON.stringify(initialValue, null, '  ');
 
-ed1.addEventListener('input', (instance) => {
-  console.log("ed1 change");
-  sendJsonStr();
-});
-
-function getSchema() {
-  return JsonForm.parseJsonValue(ed1.value).toMaybe();
+function getParsed(value: string) {
+  return JsonForm.parseJsonValue(value).toMaybe();
 }
 
-function getValue() {
-  return JsonForm.parseJsonValue(ed2.value).toMaybe().withDefault(JsonForm.jvNull);
+function replaceSchemaBy(value: string) {
+  const transaction = viewSchema.state.update({
+    changes: { from: 0, to: viewSchema.state.doc.length, insert: value }
+  })
+  viewSchema.dispatch(transaction)
 }
 
-function sendJsonStr() {
-  const schema = getSchema();
-  const value = getValue();
-  console.log("send JSON str", schema, value);
-  JsonForm.sendJsonPort.send([schema, value]);
+function replaceValueBy(value: string) {
+  const transaction = view.state.update({
+    changes: { from: 0, to: view.state.doc.length, insert: value }
+  })
+  view.dispatch(transaction)
+}
+
+function sendJsonStr(schema: string, value: string) {
+  const schema1 = getParsed(schema);
+  const value1 = getParsed(value).withDefault(JsonForm.jvNull);
+  console.log("send JSON str", schema1, value1);
+  JsonForm.sendJsonPort.send([schema1, value1]);
 }
 
 const syncPanesCb: HTMLInputElement = document.getElementById('syncPanes') as HTMLInputElement;
-
-ed2.addEventListener('input', () => {
-  console.log("ed2 change");
-  if (syncPanesCb.checked) {
-    sendJsonStr();
-  }
-});
 
 const sampleSchemaSelect = document.getElementById('sampleSchemaSelect') as HTMLSelectElement;
 
@@ -352,8 +350,8 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 sampleSchemaSelect.addEventListener('change', () => {
-  ed1.value = sampleSchemaSelect.value;
-  sendJsonStr();
+  replaceSchemaBy(sampleSchemaSelect.value)
+  sendJsonStr(viewSchema.state.doc.sliceString(0), view.state.doc.sliceString(0));
 });
 
 const schema = JsonForm.valueFromAny(initialSchema).toMaybe();
@@ -396,7 +394,7 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
         console.log('value changed');
         if (syncPanesCb.checked) {
           const va = JsonForm.valueToAny(value);
-          ed2.value = JSON.stringify(va, null, '  ');
+          replaceValueBy(JSON.stringify(va, null, '  '));
         }
       },
       strictMode,
@@ -404,3 +402,184 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
     jsonForm,
   );
 }
+
+// CODEMIRROR
+
+import { autocompletion, Completion, CompletionResult } from "@codemirror/next/autocomplete"
+import { CompletionConfig } from "@codemirror/next/autocomplete/src/config"
+import { basicSetup, EditorState, EditorView } from "@codemirror/next/basic-setup"
+import { closeBrackets } from "@codemirror/next/closebrackets"
+import { json } from "@codemirror/next/lang-json"
+import { Diagnostic, linter, lintKeymap } from "@codemirror/next/lint"
+import { bracketMatching } from "@codemirror/next/matchbrackets"
+import { keymap } from "@codemirror/next/view"
+import { StateEffectType, StateEffect, StateField, EditorSelection } from '@codemirror/next/state';
+
+// see https://codemirror.net/6/docs/ref/
+
+
+type TypedJson = string
+
+const schemaUpdate: StateEffectType<TypedJson> = StateEffect.define()
+
+const typedJsonSchemaField: StateField<TypedJson> = StateField.define({
+  create(state) {
+    // TODO parse state.doc.sliceString(0)
+    return state.doc.sliceString(0)
+  },
+  update(value, tr) {
+    if (tr.docChanged) {
+      // TODO parse state.doc.sliceString(0)
+      value = tr.state.doc.sliceString(0)
+      sendJsonStr(value, view.state.doc.sliceString(0))
+    }
+    return value
+  }
+})
+
+const typedJsonField: StateField<TypedJson> = StateField.define({
+  create(state) {
+    // TODO parse state.doc.sliceString(0)
+    return state.doc.sliceString(0)
+  },
+  update(value, tr) {
+    const schema: string = tr.effects.find(e => e.is(schemaUpdate))?.value
+    if (schema) {
+      // TODO update schema in parser
+      value = value + schema
+    }
+    if (tr.docChanged) {
+      // TODO parse state.doc.sliceString(0)
+      value = tr.state.doc.sliceString(0)
+      sendJsonStr(schema as string, value)
+    }
+    return value
+  }
+})
+
+const state = EditorState.create({
+  doc: initialValue,
+  extensions: [
+    basicSetup,
+    json(),
+    bracketMatching(),
+    closeBrackets(),
+    typedJsonField,
+    autocompletion(autocompleteConfig(typedJsonField)),
+    linter(linterFun(typedJsonField)),
+    // lintGutter(),
+    keymap.of(lintKeymap)
+    // keymap.of(completionKeymap)
+  ],
+});
+
+const stateSchema = EditorState.create({
+  doc: initialSchema,
+  extensions: [
+    basicSetup,
+    json(),
+    bracketMatching(),
+    closeBrackets(),
+    typedJsonSchemaField,
+    autocompletion(autocompleteConfig(typedJsonSchemaField)),
+    linter(linterFun(typedJsonSchemaField)),
+    // lintGutter(),
+    keymap.of(lintKeymap),
+    // keymap.of(completionKeymap)
+    EditorView.updateListener.of(update => {
+      if (update.docChanged) {
+        const pos = view.state.selection.mainIndex
+        const transaction = view.state.update({
+          effects: [schemaUpdate.of(update.state.field(typedJsonSchemaField))],
+          changes: [
+            // noop triggers linter, but keeps caret
+            { from: pos, to: pos + 1, insert: view.state.doc.slice(pos, pos + 1) },
+          ]
+        })
+        view.dispatch(transaction)
+      }
+    })
+  ],
+});
+
+function autocompleteConfig(field: StateField<TypedJson>): CompletionConfig {
+  return {
+    activateOnTyping: false,
+    defaultKeymap: true,
+    override: [context => {
+      return new Promise(resolve => {
+        const typedJson = context.state.field(field)
+        const suggestions: string[] = [] // TODO get suggestionsa
+        if (suggestions.length === 0) {
+          return resolve(null)
+        }
+        // const theSuggestion = suggestions[0]
+        // const theStart = theSuggestion.start
+        // const theEnd = theSuggestion.end
+        // const options = theSuggestion.suggestions.map(suggestion => {
+        //   const value = suggestion.value
+        //   const label = JSON.stringify(value).slice(0, 21)
+        //   const pretty = JSON.stringify(value, null, 2)
+        //   return ({
+        //     label,
+        //     info: pretty,
+        //     apply: (view: EditorView, completion: Completion, from1: number, to1: number) => {
+        //       const insert = completion.info as string
+        //       const from = theStart !== 0 ? theStart : from1
+        //       const to = theStart !== 0 ? theEnd : to1
+        //       const replace = view.state.update({
+        //         changes: [
+        //           { from, to, insert }
+        //         ],
+        //         selection: EditorSelection.cursor(from + (insert?.length ?? 0))
+        //       });
+        //       view.update([replace])
+        //     }
+        //   });
+        // }).slice(0, 42)
+        // return resolve({
+        //   from: theStart !== 0 ? theStart : context.pos,
+        //   to: context.pos,
+        //   options
+        // });
+      });
+    }]
+  }
+}
+
+function linterFun(field: StateField<TypedJson>) {
+  return (view: EditorView) => {
+    const typedJson = view.state.field(field)
+    // const markers = [] // TODO get markers
+    const diagnostics: Diagnostic[] = []
+    // markers.map(marker => ({
+    //   from: marker.start,
+    //   to: marker.end - 1,
+    //   message: marker.message,
+    //   severity: "error", // TODO from marker.severity,
+    //   source: marker.pointer
+    // }));
+    return diagnostics;
+  }
+}
+
+const view = new EditorView({
+  state,
+  parent: document.querySelector("#editor2") || undefined
+});
+
+const viewSchema = new EditorView({
+  state: stateSchema,
+  parent: document.querySelector("#editor1") || undefined
+});
+
+view.setState(view.state.update({
+  effects: [schemaUpdate.of(viewSchema.state.field(typedJsonSchemaField))]
+}).state);
+
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).view = view;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).viewSchema = viewSchema
