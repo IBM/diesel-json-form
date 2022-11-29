@@ -24,13 +24,13 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run: |
-        export LATEST_CHROME_RELEASE_MAJOR=`google-chrome --version | sed -e "s/Google Chrome //" -e "s/\..*//"`
-        export LATEST_CHROME_RELEASE=$(wget -q https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$LATEST_CHROME_RELEASE_MAJOR -O -)
-        wget https://chromedriver.storage.googleapis.com/$LATEST_CHROME_RELEASE/chromedriver_linux64.zip -O /tmp/chromedriver.zip
-        unzip /tmp/chromedriver.zip -d /tmp/
-        sudo mv /tmp/chromedriver /usr/bin/chromedriver
-        /usr/bin/chromedriver --version
-        google-chrome --version
+          export LATEST_CHROME_RELEASE_MAJOR=`google-chrome --version | sed -e "s/Google Chrome //" -e "s/\..*//"`
+          export LATEST_CHROME_RELEASE=$(wget -q https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$LATEST_CHROME_RELEASE_MAJOR -O -)
+          wget https://chromedriver.storage.googleapis.com/$LATEST_CHROME_RELEASE/chromedriver_linux64.zip -O /tmp/chromedriver.zip
+          unzip /tmp/chromedriver.zip -d /tmp/
+          sudo mv /tmp/chromedriver /usr/bin/chromedriver
+          /usr/bin/chromedriver --version
+          google-chrome --version
       - run: xvfb-run --server-args="-screen 0 1920x1200x16" mvn clean install
 
   deploy:
