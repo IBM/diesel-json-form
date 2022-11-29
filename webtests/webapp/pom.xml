@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.ibm.cloud.diesel</groupId>
+        <artifactId>diesel-json-webtests</artifactId>
+        <version>LATEST-SNAPSHOT</version>
+    </parent>
+    <artifactId>diesel-json-webtests-webapp</artifactId>
+    <name>diesel-json-webtests-webapp</name>
+    <packaging>war</packaging>
+    <properties>
+        <chromeDriver>${webdriver.chrome.driver}</chromeDriver>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.ibm.cloud.diesel</groupId>
+            <artifactId>diesel-json-webtests-helpers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.pojosontheweb</groupId>
+            <artifactId>monte-repack</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jetty-skip-tests</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                </property>
+            </activation>
+            <properties>
+                <jetty.skip>true</jetty.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>jetty-skip-it-tests</id>
+            <activation>
+                <property>
+                    <name>skipITs</name>
+                </property>
+            </activation>
+            <properties>
+                <jetty.skip>true</jetty.skip>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/it/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M7</version>
+                <executions>
+                    <execution>
+                        <id>webtests</id>
+                        <goals>
+                            <goal>verify</goal>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <systemProperties>
+                        <webtests.browser>chrome</webtests.browser>
+                        <webtests.findr.verbose>true</webtests.findr.verbose>
+                        <webtests.video.enabled>true</webtests.video.enabled>
+                        <webtests.video.dir>${project.build.directory}/videos</webtests.video.dir>
+                        <!--                        <webtests.video.failures.only>true</webtests.video.failures.only>-->
+                        <webdriver.chrome.driver>${chromeDriver}</webdriver.chrome.driver>
+                        <webtests.findr.timeout>30</webtests.findr.timeout>
+                    </systemProperties>
+                    <environmentVariables>
+                        <TZ>Europe/Paris</TZ>
+                    </environmentVariables>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <trimStackTrace>false</trimStackTrace>
+                    <includes>
+                        <include>**/*Test.class</include>
+                    </includes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <!-- https://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html#using-multiple-webapp-root-directories -->
+                <!-- For local development use
+                    mvn jetty:run
+                -->
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.49.v20220914</version>
+                <configuration>
+                    <httpConnector>
+                        <port>3000</port>
+                    </httpConnector>
+                    <webApp>
+                        <contextPath>/</contextPath>
+                        <!-- do not scan jars -->
+                        <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
+                        <resourceBases>
+                            <resourceBase>${project.basedir}/../../frontend/dist</resourceBase>
+                        </resourceBases>
+                    </webApp>
+                    <skip></skip>
+                    <scanIntervalSeconds>13</scanIntervalSeconds>
+                    <stopPort>9966</stopPort>
+                    <stopKey>stop-jetty</stopKey>
+                    <stopWait>10</stopWait>
+                    <!-- use with jetty:run-forked (runs at port 8080) -->
+                    <jvmArgs>-Xdebug -agentlib:jdwp=transport=dt_socket,address=9999,server=y,suspend=n</jvmArgs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>start-jetty</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <scanIntervalSeconds>0</scanIntervalSeconds>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop-jetty</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
