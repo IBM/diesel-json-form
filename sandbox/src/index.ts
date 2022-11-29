@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom';
 import * as JsonForm from '@diesel-parser/json-form';
 import big_sample from './big_sample.json';
 import React from 'react';
+import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
 
 const ed1 = document.querySelector('#editor1') as HTMLTextAreaElement;
@@ -404,3 +405,6 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
     jsonForm,
   );
 }
+
+const p: JsFacade.DieselParserFacade = JsFacade.getJsonParser({}); 
+console.log(p);
