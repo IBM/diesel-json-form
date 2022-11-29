@@ -1,6 +1,5 @@
 package diesel.json;
 
-import com.ibm.bdsl.web.editor.test.FIntelliMirror;
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
 import com.pojosontheweb.selenium.formz.Select;
@@ -16,9 +15,9 @@ public class FSandbox extends AbstractPageObject {
         return this;
     }
 
-    public final FIntelliMirror schemaEditor = new FIntelliMirror(getFindr(), ".sub.schema .IntelliMirrorEditor");
+    public final FEditor schemaEditor = new FEditor(getFindr(), "editor1");
 
-    public final FIntelliMirror jsonEditor = new FIntelliMirror(getFindr(), ".sub.value .IntelliMirrorEditor");
+    public final FEditor jsonEditor = new FEditor(getFindr(), "editor2");
 
     public final FJsonForm jsonForm = new FJsonForm(getFindr(), "#json-form");
 }

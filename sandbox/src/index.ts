@@ -319,6 +319,12 @@ const Example_DateTime = JSON.stringify(
   '  ',
 );
 
+const Example_DateTimeWithExample = `{
+  "type": [ "string", "null" ],
+  "format": "date-time",
+  "examples": [ "2022-11-28T09:27:17Z" ]
+}`;
+
 const samples = [
   ['All', '{}'],
   ['Long', Sample_Long],
@@ -332,6 +338,7 @@ const samples = [
   ['Date', Example_Date],
   ['Time', Example_Time],
   ['DateTime', Example_DateTime],
+  ['DateTimeExample', Example_DateTimeWithExample],
   ['BigSample', JSON.stringify(big_sample, null, '  ')],
 ];
 

@@ -19,6 +19,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.pojosontheweb</groupId>
             <artifactId>monte-repack</artifactId>
             <version>1.1</version>
@@ -158,7 +164,7 @@
                         <!-- do not scan jars -->
                         <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
                         <resourceBases>
-                            <resourceBase>${project.basedir}/../../frontend/dist</resourceBase>
+                            <resourceBase>${project.basedir}/../../sandbox/dist</resourceBase>
                         </resourceBases>
                     </webApp>
                     <skip></skip>
