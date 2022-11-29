@@ -16,6 +16,15 @@ jobs:
           root: ~/repo
           paths: .
 
+  webtests:
+    <<: *defaults
+    docker:
+      - image: cimg/openjdk:11.0.12
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run: mvn clean install
+
   deploy:
     <<: *defaults
     steps:
@@ -34,9 +43,15 @@ workflows:
           filters:
             tags:
               only: /\d+\.\d+\.\d+/
-      - deploy:
+      - webtests:
           requires:
             - build
+          filters:
+            tags:
+              only: /\d+\.\d+\.\d+/
+      - deploy:
+          requires:
+            - webtests
           filters:
             tags:
               only: /\d+\.\d+\.\d+/
