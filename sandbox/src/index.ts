@@ -31,8 +31,6 @@ const initialSchema = `{
   "type": "boolean"
 }`
 
-
-
 function getParsed(value: string) {
   return JsonForm.parseJsonValue(value).toMaybe();
 }
@@ -415,44 +413,37 @@ import { Diagnostic, linter, lintKeymap } from "@codemirror/next/lint"
 import { bracketMatching } from "@codemirror/next/matchbrackets"
 import { keymap } from "@codemirror/next/view"
 import { StateEffectType, StateEffect, StateField, EditorSelection } from '@codemirror/next/state';
+import { makeCategorizer } from '@codemirror/next/state/src/charcategory';
 
 // see https://codemirror.net/6/docs/ref/
 
 
-type TypedJson = string
+const schemaUpdate: StateEffectType<string> = StateEffect.define()
 
-const schemaUpdate: StateEffectType<TypedJson> = StateEffect.define()
-
-const typedJsonSchemaField: StateField<TypedJson> = StateField.define({
+const schemaField: StateField<JsFacade.DieselParserFacade> = StateField.define({
   create(state) {
-    // TODO parse state.doc.sliceString(0)
-    return state.doc.sliceString(0)
+    return JsFacade.getJsonParser({});
   },
   update(value, tr) {
     if (tr.docChanged) {
-      // TODO parse state.doc.sliceString(0)
-      value = tr.state.doc.sliceString(0)
-      sendJsonStr(value, view.state.doc.sliceString(0))
+      sendJsonStr(tr.state.doc.sliceString(0), view.state.doc.sliceString(0))
     }
     return value
   }
 })
 
-const typedJsonField: StateField<TypedJson> = StateField.define({
+const valueField: StateField<JsFacade.DieselParserFacade> = StateField.define({
   create(state) {
-    // TODO parse state.doc.sliceString(0)
-    return state.doc.sliceString(0)
+    return JsFacade.getJsonParser(initialSchema);
   },
   update(value, tr) {
-    const schema: string = tr.effects.find(e => e.is(schemaUpdate))?.value
+    const schema = tr.effects.find(e => e.is(schemaUpdate))?.value
     if (schema) {
-      // TODO update schema in parser
-      value = value + schema
+      const schemaJson = JSON.parse(schema)
+      value = JsFacade.getJsonParser(schemaJson);
     }
     if (tr.docChanged) {
-      // TODO parse state.doc.sliceString(0)
-      value = tr.state.doc.sliceString(0)
-      sendJsonStr(schema as string, value)
+      sendJsonStr(schema as string, tr.state.doc.sliceString(0))
     }
     return value
   }
@@ -465,9 +456,9 @@ const state = EditorState.create({
     json(),
     bracketMatching(),
     closeBrackets(),
-    typedJsonField,
-    autocompletion(autocompleteConfig(typedJsonField)),
-    linter(linterFun(typedJsonField)),
+    valueField,
+    autocompletion(autocompleteConfig(valueField)),
+    linter(linterFun(valueField)),
     // lintGutter(),
     keymap.of(lintKeymap)
     // keymap.of(completionKeymap)
@@ -481,9 +472,9 @@ const stateSchema = EditorState.create({
     json(),
     bracketMatching(),
     closeBrackets(),
-    typedJsonSchemaField,
-    autocompletion(autocompleteConfig(typedJsonSchemaField)),
-    linter(linterFun(typedJsonSchemaField)),
+    schemaField,
+    autocompletion(autocompleteConfig(schemaField)),
+    linter(linterFun(schemaField)),
     // lintGutter(),
     keymap.of(lintKeymap),
     // keymap.of(completionKeymap)
@@ -491,7 +482,7 @@ const stateSchema = EditorState.create({
       if (update.docChanged) {
         const pos = view.state.selection.mainIndex
         const transaction = view.state.update({
-          effects: [schemaUpdate.of(update.state.field(typedJsonSchemaField))],
+          effects: [schemaUpdate.of(update.state.doc.sliceString(0))],
           changes: [
             // noop triggers linter, but keeps caret
             { from: pos, to: pos + 1, insert: view.state.doc.slice(pos, pos + 1) },
@@ -503,7 +494,7 @@ const stateSchema = EditorState.create({
   ],
 });
 
-function autocompleteConfig(field: StateField<TypedJson>): CompletionConfig {
+function autocompleteConfig(field: StateField<JsFacade.DieselParserFacade>): CompletionConfig {
   return {
     activateOnTyping: false,
     defaultKeymap: true,
@@ -548,18 +539,35 @@ function autocompleteConfig(field: StateField<TypedJson>): CompletionConfig {
   }
 }
 
-function linterFun(field: StateField<TypedJson>) {
+function toSeverity(severity: string): Diagnostic['severity'] {
+  switch (severity) {
+    case 'info':
+      return 'info';
+    case 'warning':
+      return 'warning';
+    case 'error':
+      return 'error';
+    default:
+      return 'info';
+  }
+}
+
+function linterFun(field: StateField<JsFacade.DieselParserFacade>) {
   return (view: EditorView) => {
-    const typedJson = view.state.field(field)
-    // const markers = [] // TODO get markers
-    const diagnostics: Diagnostic[] = []
-    // markers.map(marker => ({
-    //   from: marker.start,
-    //   to: marker.end - 1,
-    //   message: marker.message,
-    //   severity: "error", // TODO from marker.severity,
-    //   source: marker.pointer
-    // }));
+    const parser = view.state.field(field)
+    const request = JsFacade.DieselParsers.createParseRequest(view.state.doc.sliceString(0))
+    const response = parser.parse(request)
+    if (!response.success) {
+      return []
+    }
+    const markers = response.markers
+    const diagnostics: Diagnostic[] = markers.map(marker => ({
+      from: marker.offset,
+      to: marker.offset + marker.length,
+      message: marker.getMessage('en'),
+      severity: toSeverity(marker.severity),
+      // source: 
+    }));
     return diagnostics;
   }
 }
@@ -575,7 +583,7 @@ const viewSchema = new EditorView({
 });
 
 view.setState(view.state.update({
-  effects: [schemaUpdate.of(viewSchema.state.field(typedJsonSchemaField))]
+  effects: [schemaUpdate.of(viewSchema.state.doc.sliceString(0))]
 }).state);
 
 
