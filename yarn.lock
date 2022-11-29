@@ -309,6 +309,27 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+"@codemirror/next@^0.16.0":
+  version "0.16.0"
+  resolved "https://eu.artifactory.swg-devops.com/artifactory/api/npm/hyc-odm-npm-virtual/@codemirror/next/-/next-0.16.0.tgz?dl=https%3A%2F%2Fregistry.npmjs.org%2F%40codemirror%2Fnext%2F-%2Fnext-0.16.0.tgz#b96e99d73fc4254648ca925c56d594c906282de3"
+  integrity sha512-l45zvRlWL1wBHse8OSCXYIxQbeYaIO/DPcqyzUQQBYYdk/tM8ZaCmDqLS15dvLbN2EFkj8RgURg0srDlO6aYJw==
+  dependencies:
+    crelt "^1.0.5"
+    lezer "^0.13.0"
+    lezer-cpp "^0.13.0"
+    lezer-css "^0.13.0"
+    lezer-html "^0.13.0"
+    lezer-java "^0.13.0"
+    lezer-javascript "^0.13.0"
+    lezer-json "^0.13.0"
+    lezer-markdown "^0.13.0"
+    lezer-python "^0.13.0"
+    lezer-rust "^0.13.0"
+    lezer-tree "^0.13.0"
+    lezer-xml "^0.13.0"
+    style-mod "^3.2.0"
+    w3c-keyname "^2.2.4"
+
 "@diesel-parser/json-schema-facade-js@^0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-js/-/json-schema-facade-js-0.5.0.tgz#f921ec51bd308e3e4fab55848a7c76a271b0ff08"
