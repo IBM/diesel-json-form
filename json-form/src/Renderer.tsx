@@ -405,18 +405,19 @@ function ViewStringDefault(p: ViewValueProps<JvString>): React.ReactElement {
 
 function ViewString(p: ViewValueProps<JvString>): React.ReactElement {
   const fmtPath = p.path.format();
-  const proposals = p.model.comboBoxes.get(fmtPath) ?? [];
-  if (proposals.length === 0) {
-    const formats = p.model.formats.get(fmtPath) ?? [];
-    if (formats.length === 0) {
+
+  const formats = p.model.formats.get(fmtPath) ?? [];
+  if (formats.length === 0) {
+    // no formats, check for proposals (enum, examples etc)
+    const proposals = p.model.comboBoxes.get(fmtPath) ?? [];
+    if (proposals.length === 0) {
       return <ViewStringDefault {...p} />;
     } else {
-      // we have formats !
-      return <ViewStringWithFormats {...p} formats={formats} />;
+      return ViewStringWithCombo({ ...p, proposals });
     }
   } else {
-    // we have proposals
-    return ViewStringWithCombo({ ...p, proposals });
+    // we have formats !
+    return <ViewStringWithFormats {...p} formats={formats} />;
   }
 }
 
