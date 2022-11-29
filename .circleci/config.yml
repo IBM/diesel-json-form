@@ -30,6 +30,8 @@ jobs:
           unzip /tmp/chromedriver.zip -d /tmp/
           sudo mv /tmp/chromedriver /usr/bin/chromedriver
           /usr/bin/chromedriver --version
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb
           google-chrome --version
       - run: xvfb-run --server-args="-screen 0 1920x1200x16" mvn clean install
 
