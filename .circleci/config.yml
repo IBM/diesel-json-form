@@ -23,7 +23,16 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/repo
-      - run: mvn clean install
+      - run: export LATEST_CHROME_RELEASE_MAJOR=`google-chrome --version | sed -e "s/Google Chrome //" -e "s/\..*//"`
+      - run: export LATEST_CHROME_RELEASE=$(wget -q https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$LATEST_CHROME_RELEASE_MAJOR -O -)
+      - run: wget https://chromedriver.storage.googleapis.com/$LATEST_CHROME_RELEASE/chromedriver_linux64.zip -O /tmp/chromedriver.zip
+      - run: unzip /tmp/chromedriver.zip -d /tmp/
+      - run: sudo mv /tmp/chromedriver /usr/bin/chromedriver
+      - run: /usr/bin/chromedriver --version
+      - run: wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i google-chrome-stable_current_amd64.deb
+      - run: google-chrome --version
+      - run: xvfb-run --server-args="-screen 0 1920x1200x16" mvn clean install
 
   deploy:
     <<: *defaults

@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom';
 import * as JsonForm from '@diesel-parser/json-form';
 import big_sample from './big_sample.json';
 import React from 'react';
+import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
 
 const initialValue = `{
