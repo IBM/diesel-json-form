@@ -404,7 +404,7 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
 
 // CODEMIRROR
 
-import { autocompletion, Completion, CompletionResult } from "@codemirror/next/autocomplete"
+import { autocompletion, Completion, CompletionResult, completionStatus } from "@codemirror/next/autocomplete"
 import { CompletionConfig } from "@codemirror/next/autocomplete/src/config"
 import { basicSetup, EditorState, EditorView } from "@codemirror/next/basic-setup"
 import { closeBrackets } from "@codemirror/next/closebrackets"
@@ -500,40 +500,39 @@ function autocompleteConfig(field: StateField<JsFacade.DieselParserFacade>): Com
     defaultKeymap: true,
     override: [context => {
       return new Promise(resolve => {
-        const typedJson = context.state.field(field)
-        const suggestions: string[] = [] // TODO get suggestionsa
-        if (suggestions.length === 0) {
+        const parser = context.state.field(field)
+        const request = JsFacade.DieselParsers.createPredictRequest(context.state.doc.sliceString(0), context.pos)
+        const response = parser.predict(request)
+        if (!response.success && response.proposals.length > 0) {
           return resolve(null)
         }
-        // const theSuggestion = suggestions[0]
+        // const theFirst = response.proposals[0]
         // const theStart = theSuggestion.start
         // const theEnd = theSuggestion.end
-        // const options = theSuggestion.suggestions.map(suggestion => {
-        //   const value = suggestion.value
-        //   const label = JSON.stringify(value).slice(0, 21)
-        //   const pretty = JSON.stringify(value, null, 2)
-        //   return ({
-        //     label,
-        //     info: pretty,
-        //     apply: (view: EditorView, completion: Completion, from1: number, to1: number) => {
-        //       const insert = completion.info as string
-        //       const from = theStart !== 0 ? theStart : from1
-        //       const to = theStart !== 0 ? theEnd : to1
-        //       const replace = view.state.update({
-        //         changes: [
-        //           { from, to, insert }
-        //         ],
-        //         selection: EditorSelection.cursor(from + (insert?.length ?? 0))
-        //       });
-        //       view.update([replace])
-        //     }
-        //   });
-        // }).slice(0, 42)
-        // return resolve({
-        //   from: theStart !== 0 ? theStart : context.pos,
-        //   to: context.pos,
-        //   options
-        // });
+        const options = response.proposals.map(proposal => {
+          const value = proposal.text
+          return ({
+            label: value,
+            // info: value,
+            apply: (view: EditorView, completion: Completion, from1: number, to1: number) => {
+              const insert = completion.label
+              const from = proposal.replace?.offset ?? from1 //theStart !== 0 ? theStart : from1
+              const to = (proposal.replace?.length && (from + proposal.replace?.length)) || to1 //theStart !== 0 ? theEnd : to1
+              const replace = view.state.update({
+                changes: [
+                  { from, to, insert }
+                ],
+                selection: EditorSelection.cursor(from + (insert?.length ?? 0))
+              });
+              view.update([replace])
+            }
+          });
+        })
+        return resolve({
+          from: context.pos, //theStart !== 0 ? theStart : context.pos,
+          to: context.pos,
+          options
+        });
       });
     }]
   }
