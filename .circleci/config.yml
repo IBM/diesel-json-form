@@ -44,6 +44,20 @@ jobs:
       - store_artifacts:
           path: ~/repo/webtests/target/videos
 
+  docs-deploy:
+    <<: *defaults
+
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Add github.com to known hosts
+          command: mkdir ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - run: git config user.email "vankeisb-ci@rvkb.com"
+      - run: git config user.name "vankeisb-ci"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: yarn --cwd sandbox gh-pages
 
   deploy:
     <<: *defaults
@@ -69,6 +83,13 @@ workflows:
           filters:
             tags:
               only: /\d+\.\d+\.\d+/
+      - docs-deploy:
+          requires:
+            - build
+            - webtests
+          filters:
+            branches:
+              only: develop              
       - deploy:
           requires:
             - webtests
