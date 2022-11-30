@@ -508,12 +508,8 @@ function autocompleteConfig(field: StateField<JsFacade.DieselParserFacade>): Com
         if (!response.success && response.proposals.length > 0) {
           return resolve(null)
         }
-        // TODO remove hack: lastSpace
-        const lastSpace = context.state.doc.sliceString(0).lastIndexOf(" ", context.pos)
         const minReplace = response.proposals.map(proposal => proposal.replace?.offset ?? context.pos).reduce((min, v) => v < min ? v : min)
-        const theStart = minReplace < context.pos
-          ? minReplace
-          : lastSpace > -1 ? lastSpace : context.pos
+        const theStart = minReplace < context.pos ? minReplace : context.pos
         const options = response.proposals.map(proposal => {
           const value = proposal.text
           return ({
@@ -536,7 +532,7 @@ function autocompleteConfig(field: StateField<JsFacade.DieselParserFacade>): Com
         })
         return resolve({
           from: theStart,
-          to: context.pos,
+          to: theStart, // avoid CodeMirror filtering
           options
         });
       });
