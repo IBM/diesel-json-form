@@ -414,6 +414,8 @@ import { bracketMatching } from "@codemirror/next/matchbrackets"
 import { keymap } from "@codemirror/next/view"
 import { StateEffectType, StateEffect, StateField, EditorSelection } from '@codemirror/next/state';
 import { makeCategorizer } from '@codemirror/next/state/src/charcategory';
+import { contentAttributes } from '@codemirror/next/view/src/extension';
+import { maybeOf } from 'tea-cup-core';
 
 // see https://codemirror.net/6/docs/ref/
 
@@ -506,9 +508,12 @@ function autocompleteConfig(field: StateField<JsFacade.DieselParserFacade>): Com
         if (!response.success && response.proposals.length > 0) {
           return resolve(null)
         }
-        // const theFirst = response.proposals[0]
-        // const theStart = theSuggestion.start
-        // const theEnd = theSuggestion.end
+        // TODO remove hack: lastSpace
+        const lastSpace = context.state.doc.sliceString(0).lastIndexOf(" ", context.pos)
+        const minReplace = response.proposals.map(proposal => proposal.replace?.offset ?? context.pos).reduce((min, v) => v < min ? v : min)
+        const theStart = minReplace < context.pos
+          ? minReplace
+          : lastSpace > -1 ? lastSpace : context.pos
         const options = response.proposals.map(proposal => {
           const value = proposal.text
           return ({
@@ -516,8 +521,9 @@ function autocompleteConfig(field: StateField<JsFacade.DieselParserFacade>): Com
             // info: value,
             apply: (view: EditorView, completion: Completion, from1: number, to1: number) => {
               const insert = completion.label
-              const from = proposal.replace?.offset ?? from1 //theStart !== 0 ? theStart : from1
-              const to = (proposal.replace?.length && (from + proposal.replace?.length)) || to1 //theStart !== 0 ? theEnd : to1
+              const [from, to] = maybeOf(proposal.replace)
+                .map(replace => [replace.offset, replace.offset + replace.length])
+                .withDefault([from1, to1])
               const replace = view.state.update({
                 changes: [
                   { from, to, insert }
@@ -529,7 +535,7 @@ function autocompleteConfig(field: StateField<JsFacade.DieselParserFacade>): Com
           });
         })
         return resolve({
-          from: context.pos, //theStart !== 0 ? theStart : context.pos,
+          from: theStart,
           to: context.pos,
           options
         });
