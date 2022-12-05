@@ -84,6 +84,11 @@ export const editor2 = monaco.editor.create(document.getElementById('editor2')!,
     model: model2
 });
 
+// @ts-ignore
+window['editor1'] = editor1;
+// @ts-ignore
+window['editor2'] = editor2;
+
 const docs = vscode.workspace.textDocuments;
 const vscodeDocument1 = docs[0];
 const vscodeDocument2 = docs[1];
