@@ -5,5 +5,8 @@
   "workspaces": [
     "json-form",
     "sandbox"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "4.8.4"
+  }
 }

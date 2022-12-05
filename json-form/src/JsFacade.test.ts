@@ -18,7 +18,7 @@ import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
 describe('JsFacade', () => {
   test('should return schema validation markers when parsing', () => {
-    const parseRequest = JsFacade.DieselParsers.createParseRequest('true');
+    const parseRequest = { text: 'true' };
     const parser = JsFacade.getJsonParser({ type: 'string' });
     const res = parser.parse(parseRequest);
     expect(res.success).toBe(true);

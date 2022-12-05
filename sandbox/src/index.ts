@@ -21,25 +21,27 @@ import ReactDOM from 'react-dom';
 import * as JsonForm from '@diesel-parser/json-form';
 import big_sample from './big_sample.json';
 import React from 'react';
-import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
+import { YALLA } from "./text-editor"
 
-const ed1 = document.querySelector('#editor1') as HTMLTextAreaElement;
+console.log(YALLA);
+
+// const ed1 = document.querySelector('#editor1') as HTMLTextAreaElement;
 const ed2 = document.querySelector('#editor2') as HTMLTextAreaElement;
 
 const initialSchema = {};
 const initialValue = {};
 
-ed1.value = JSON.stringify(initialSchema, null, '  ');
+// ed1.value = JSON.stringify(initialSchema, null, '  ');
 ed2.value = JSON.stringify(initialValue, null, '  ');
 
-ed1.addEventListener('input', (instance) => {
-  console.log("ed1 change");
-  sendJsonStr();
-});
+// ed1.addEventListener('input', (instance) => {
+//   console.log("ed1 change");
+//   sendJsonStr();
+// });
 
 function getSchema() {
-  return JsonForm.parseJsonValue(ed1.value).toMaybe();
+  return JsonForm.parseJsonValue("{}").toMaybe();
 }
 
 function getValue() {
@@ -352,10 +354,10 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-sampleSchemaSelect.addEventListener('change', () => {
-  ed1.value = sampleSchemaSelect.value;
-  sendJsonStr();
-});
+// sampleSchemaSelect.addEventListener('change', () => {
+//   ed1.value = sampleSchemaSelect.value;
+//   sendJsonStr();
+// });
 
 const schema = JsonForm.valueFromAny(initialSchema).toMaybe();
 const valueRes = JsonForm.valueFromAny(initialValue);
@@ -405,6 +407,3 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
     jsonForm,
   );
 }
-
-const p: JsFacade.DieselParserFacade = JsFacade.getJsonParser({}); 
-console.log(p);
