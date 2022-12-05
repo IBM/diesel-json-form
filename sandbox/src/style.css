@@ -121,3 +121,7 @@ footer.sandbox .gas-station {
 #json-form {
   flex-grow: 1;
 }
+
+#editor1, #editor2 {
+  height: 100%;
+}

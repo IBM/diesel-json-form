@@ -21,29 +21,24 @@ import ReactDOM from 'react-dom';
 import * as JsonForm from '@diesel-parser/json-form';
 import big_sample from './big_sample.json';
 import React from 'react';
-import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
-
-const ed1 = document.querySelector('#editor1') as HTMLTextAreaElement;
-const ed2 = document.querySelector('#editor2') as HTMLTextAreaElement;
+import { editor1, editor2 } from "./text-editor"
 
 const initialSchema = {};
 const initialValue = {};
 
-ed1.value = JSON.stringify(initialSchema, null, '  ');
-ed2.value = JSON.stringify(initialValue, null, '  ');
-
-ed1.addEventListener('input', (instance) => {
-  console.log("ed1 change");
+editor1.getModel()?.onDidChangeContent(e => {
   sendJsonStr();
 });
 
 function getSchema() {
-  return JsonForm.parseJsonValue(ed1.value).toMaybe();
+  const value = editor1.getValue();
+  return JsonForm.parseJsonValue(value).toMaybe();
 }
 
 function getValue() {
-  return JsonForm.parseJsonValue(ed2.value).toMaybe().withDefault(JsonForm.jvNull);
+  const v = editor2.getValue();
+  return JsonForm.parseJsonValue(v).toMaybe().withDefault(JsonForm.jvNull);
 }
 
 function sendJsonStr() {
@@ -55,7 +50,7 @@ function sendJsonStr() {
 
 const syncPanesCb: HTMLInputElement = document.getElementById('syncPanes') as HTMLInputElement;
 
-ed2.addEventListener('input', () => {
+editor2.getModel()?.onDidChangeContent(e => {
   console.log("ed2 change");
   if (syncPanesCb.checked) {
     sendJsonStr();
@@ -353,7 +348,7 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 sampleSchemaSelect.addEventListener('change', () => {
-  ed1.value = sampleSchemaSelect.value;
+  editor1.setValue(sampleSchemaSelect.value);
   sendJsonStr();
 });
 
@@ -397,7 +392,7 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
         console.log('value changed');
         if (syncPanesCb.checked) {
           const va = JsonForm.valueToAny(value);
-          ed2.value = JSON.stringify(va, null, '  ');
+          editor2.setValue(JSON.stringify(va, null, '  '));
         }
       },
       strictMode,
@@ -405,6 +400,3 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
     jsonForm,
   );
 }
-
-const p: JsFacade.DieselParserFacade = JsFacade.getJsonParser({}); 
-console.log(p);
