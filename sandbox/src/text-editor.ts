@@ -31,32 +31,36 @@ import 'monaco-editor/esm/vs/editor/standalone/browser/toggleHighContrast/toggle
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import * as vscode from 'vscode';
 
-// import {DieselMonaco} from '@diesel-parser/monaco';
-
 import * as JsonFacade from '@diesel-parser/json-schema-facade-ts';
-
-export const YALLA = "yalla";
-
+import {DieselMonaco} from '@diesel-parser/monaco';
 import {buildWorkerDefinition} from 'monaco-editor-workers';
-import * as TsFacade from '@diesel-parser/ts-facade';
+import {DieselParserFacade} from '@diesel-parser/ts-facade';
 
 buildWorkerDefinition('.', new URL('', window.location.href).href, false);
 
-const LANGUAGE_ID = 'json';
-const MODEL_URI1 = 'inmemory://editor1.json';
+const LANGUAGE_ID1 = 'json1';
+const LANGUAGE_ID2 = 'json2';
+const MODEL_URI1 = 'inmemory://editor1.json1';
 const MONACO_URI1 = monaco.Uri.parse(MODEL_URI1);
-const MODEL_URI2 = 'inmemory://editor2.json';
+const MODEL_URI2 = 'inmemory://editor2.json2';
 const MONACO_URI2 = monaco.Uri.parse(MODEL_URI2);
 
 monaco.languages.register({
-    id: LANGUAGE_ID,
-    extensions: ['.json'],
-    aliases: ['JSON', 'json'],
+    id: LANGUAGE_ID1,
+    extensions: ['.json1'],
+    aliases: ['JSON1', 'json1'],
     mimetypes: ['application/json']
 });
 
-const model1 = monaco.editor.createModel('{}', LANGUAGE_ID, MONACO_URI1);
-const model2 = monaco.editor.createModel('{}', LANGUAGE_ID, MONACO_URI2);
+monaco.languages.register({
+    id: LANGUAGE_ID2,
+    extensions: ['.json2'],
+    aliases: ['JSON2', 'json2'],
+    mimetypes: ['application/json']
+});
+
+const model1 = monaco.editor.createModel('{}', LANGUAGE_ID1, MONACO_URI1);
+const model2 = monaco.editor.createModel('{}', LANGUAGE_ID2, MONACO_URI2);
 
 const options = {
     glyphMargin: false,
@@ -70,13 +74,81 @@ const options = {
     }
 };
 
-monaco.editor.create(document.getElementById('editor1')!, {
+export const editor1 = monaco.editor.create(document.getElementById('editor1')!, {
     ...options,
     model: model1
 });
 
-const vscodeDocument = vscode.workspace.textDocuments[0];
+export const editor2 = monaco.editor.create(document.getElementById('editor2')!, {
+    ...options,
+    model: model2
+});
 
-// const dieselParser: DieselParserFacade = JsonFacade.getJsonParser({});
+const docs = vscode.workspace.textDocuments;
+const vscodeDocument1 = docs[0];
+const vscodeDocument2 = docs[1];
 
-// console.log(dieselParser);
+const INITIAL_VALUE = {}; 
+
+const parser1: DieselParserFacade = JsonFacade.getJsonParser(INITIAL_VALUE);
+let parser2 : DieselParserFacade = JsonFacade.getJsonParser(INITIAL_VALUE);
+
+model1.onDidChangeContent(e => {
+    try {
+        const newSchema = JSON.parse(model1.getValue());
+        parser2 = JsonFacade.getJsonParser(newSchema);
+    } catch (e) {
+        parser2 = JsonFacade.getJsonParser(INITIAL_VALUE);
+    }
+});
+
+function getTokenType(styleName: string): string | undefined {
+    switch (styleName) {
+        case "number":
+        case "string":
+        case "keyword":
+            return styleName;
+        case "attr":
+            return "property";
+    }
+    return undefined;
+}
+
+const TOKEN_TYPES = ['number', 'string', 'keyword', 'property'];
+
+const dieselMonaco1 = new DieselMonaco(
+    MODEL_URI1,
+    MONACO_URI1,
+    LANGUAGE_ID1,
+    () => parser1,
+    undefined,
+    TOKEN_TYPES,
+    getTokenType,
+    vscodeDocument1
+);
+
+const dieselMonaco2 = new DieselMonaco(
+    MODEL_URI2,
+    MONACO_URI2,
+    LANGUAGE_ID2,
+    () => parser2,
+    undefined,
+    TOKEN_TYPES,
+    getTokenType,
+    vscodeDocument2
+);
+
+dieselMonaco1.registerCompletion();
+dieselMonaco1.registerSemanticHighlight();
+model1.onDidChangeContent((_event) => {
+    dieselMonaco1.validateDocument();
+});
+dieselMonaco1.validateDocument();
+
+dieselMonaco2.registerCompletion();
+dieselMonaco2.registerSemanticHighlight();
+model2.onDidChangeContent((_event) => {
+    dieselMonaco2.validateDocument();
+});
+dieselMonaco2.validateDocument();
+

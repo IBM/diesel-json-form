@@ -122,6 +122,6 @@ footer.sandbox .gas-station {
   flex-grow: 1;
 }
 
-#editor1 {
+#editor1, #editor2 {
   height: 100%;
 }

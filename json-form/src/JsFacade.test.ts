@@ -31,4 +31,22 @@ describe('JsFacade', () => {
       'Invalid type: expected string',
     );
   });
+  test('should predict based on schema', () => {
+    const predictRequest = { text: '{}', offset: 1 };
+    const parser = JsFacade.getJsonParser({
+      type: 'object',
+      properties: {
+        foo: {
+          type: 'string',
+        },
+      },
+    });
+    const res = parser.predict(predictRequest);
+    expect(res.success).toBe(true);
+    expect(res.error).toBeUndefined;
+    expect(res.proposals.length).toBe(3);
+    expect(res.proposals[0].text).toBe('}');
+    expect(res.proposals[1].text).toBe('"foo"');
+    expect(res.proposals[2].text).toBe('""');
+  });
 });
