@@ -55,5 +55,10 @@ module.exports = {
             filename: './index.html',
             inject: false,
         }),
+        new CopyPlugin({
+            patterns: [
+                { from: "./public", to: "." }
+            ],
+        })
     ],
 };

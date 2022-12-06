@@ -13,16 +13,16 @@
     "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
   },
   "dependencies": {
-    "monaco-editor-workers": "0.34.2",
-    "@diesel-parser/monaco": "~0.1.0",
     "@carbon/icon-helpers": "^10.28.0",
     "@carbon/icons": "^10.28.0",
     "@carbon/icons-react": "~10.22.0",
     "@carbon/themes": "~10.21.0",
     "@diesel-parser/json-form": "^0.1.0",
+    "@diesel-parser/monaco": "~0.1.0",
     "carbon-components": "~10.25.0",
     "carbon-components-react": "~7.25.0",
     "carbon-icons": "~7.0.0",
+    "monaco-editor-workers": "0.34.2",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-tea-cup": "^2.1.0",
@@ -32,23 +32,23 @@
   },
   "devDependencies": {
     "@diesel-parser/ts-facade": "~0.16.2",
-    "shx": "~0.3.4",
     "@types/vscode": "~1.69.1",
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
-    "copy-webpack-plugin": "^9.0.0",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^5.2.6",
-    "file-loader": "^6.2.0",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "file-loader": "^6.2.0",
+    "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
     "prettier": "~2.2.0",
+    "shx": "~0.3.4",
     "style-loader": "^2.0.0",
     "ts-loader": "^9.2.2",
     "webpack": "^5.37.1",
     "webpack-cli": "^4.7.0",
-    "webpack-dev-server": "^3.11.2",
-    "gh-pages": "^3.1.0"
+    "webpack-dev-server": "^3.11.2"
   }
 }
