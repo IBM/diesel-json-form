@@ -77,6 +77,8 @@ workflows:
           filters:
             tags:
               only: /v\d+\.\d+\.\d+/
+            branches:
+              ignore: /gh-pages/
       - webtests:
           requires:
             - build
