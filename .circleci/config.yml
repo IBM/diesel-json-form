@@ -76,16 +76,15 @@ workflows:
       - build:
           filters:
             tags:
-              only: /\d+\.\d+\.\d+/
+              only: /v\d+\.\d+\.\d+/
       - webtests:
           requires:
             - build
           filters:
             tags:
-              only: /\d+\.\d+\.\d+/
+              only: /v\d+\.\d+\.\d+/
       - docs-deploy:
           requires:
-            - build
             - webtests
           filters:
             branches:
@@ -95,7 +94,7 @@ workflows:
             - webtests
           filters:
             tags:
-              only: /\d+\.\d+\.\d+/
+              only: /v\d+\.\d+\.\d+/
             branches:
               ignore: /.*/
 
