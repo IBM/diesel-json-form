@@ -20,7 +20,9 @@
     "delete": "削除",
     "changeType": "タイプの変更",
     "addElement": "エレメントを追加します",
-    "addProperty": "プロパティーの追加..."
+    "addProperty": "プロパティーの追加 ..."
   },
-  "icon.openMenu": "メニューを開く"
+  "icon.openMenu": "メニューを開く",
+  "icon.expand": "展開",
+  "icon.collapse": "省略表示"
 }
