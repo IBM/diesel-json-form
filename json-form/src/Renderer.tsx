@@ -268,7 +268,9 @@ function ExpandCollapseButton(props: ExpandCollapseButtonProps) {
     <Button
       kind={'ghost'}
       renderIcon={props.collapsed ? ChevronUp16 : ChevronDown16}
-      iconDescription={props.t('icon.openMenu')}
+      iconDescription={props.t(
+        props.collapsed ? 'icon.expand' : 'icon.collapse',
+      )}
       // disabled={disabled}
       size={'sm'}
       tooltipPosition={'right'}
