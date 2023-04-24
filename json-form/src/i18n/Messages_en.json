@@ -22,5 +22,7 @@
     "addElement": "Add element",
     "addProperty": "Add property..."
   },
-  "icon.openMenu": "Open menu"
+  "icon.openMenu": "Open menu",
+  "icon.expand": "Expand",
+  "icon.collapse": "Collapse"
 }

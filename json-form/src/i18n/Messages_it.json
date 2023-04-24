@@ -1,7 +1,7 @@
 {
   "documentRoot": "Root del documento",
   "propertyAlreadyExists": "La proprietà esiste già",
-  "propertyNamePlaceholder": "nome proprietà tipo...",
+  "propertyNamePlaceholder": "nome proprietà tipo ...",
   "propertyNameLabel": "nome di proprietà in {{path}}",
   "emptyObject": "Oggetto vuoto",
   "emptyArray": "Array vuoto",
@@ -20,7 +20,9 @@
     "delete": "Elimina",
     "changeType": "Modifica tipo",
     "addElement": "Aggiungi elemento",
-    "addProperty": "Aggiungi proprietà..."
+    "addProperty": "Aggiungi proprietà ..."
   },
-  "icon.openMenu": "Apri menu"
+  "icon.openMenu": "Apri menu",
+  "icon.expand": "Espandi",
+  "icon.collapse": "Comprimi"
 }
