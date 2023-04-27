@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "typescript": "4.8.4",
-    "bomlint": "^1.2.3"
+    "bomlint": "^1.2.3",
+    "prettier": "~2.2.0"
   }
 }
