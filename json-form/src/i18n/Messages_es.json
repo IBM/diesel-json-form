@@ -20,9 +20,7 @@
     "delete": "Suprimir",
     "changeType": "Cambiar tipo",
     "addElement": "Añadir elemento",
-    "addProperty": "Añadir propiedad ..."
+    "addProperty": "Añadir propiedad..."
   },
-  "icon.openMenu": "Abrir menú",
-  "icon.expand": "Expandir",
-  "icon.collapse": "Contraer"
+  "icon.openMenu": "Abrir menú"
 }

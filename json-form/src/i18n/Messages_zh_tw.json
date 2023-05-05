@@ -1,11 +1,11 @@
 {
   "documentRoot": "文件根目錄",
   "propertyAlreadyExists": "內容已存在",
-  "propertyNamePlaceholder": "輸入內容名稱 ...",
+  "propertyNamePlaceholder": "輸入內容名稱...",
   "propertyNameLabel": "{{path}} 中的內容名稱",
   "emptyObject": "空物件",
   "emptyArray": "空白的陣列",
-  "stringValuePlaceholder": "輸入字串",
+  "stringValuePlaceholder": "輸入文字字串",
   "stringValueLabel": "{{path}} 的字串",
   "stringValueComboLabel": "選取 {{path}} 的字串",
   "numberValueLabel": "{{path}} 數目",
@@ -20,9 +20,7 @@
     "delete": "刪除",
     "changeType": "變更類型",
     "addElement": "新增元素",
-    "addProperty": "新增內容 ..."
+    "addProperty": "新增內容..."
   },
-  "icon.openMenu": "開啟功能表",
-  "icon.expand": "展開",
-  "icon.collapse": "收合"
+  "icon.openMenu": "開啟功能表"
 }

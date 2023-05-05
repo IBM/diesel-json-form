@@ -20,9 +20,7 @@
     "delete": "删除",
     "changeType": "更改类型",
     "addElement": "添加元素",
-    "addProperty": "添加属性 ..."
+    "addProperty": "添加属性..."
   },
-  "icon.openMenu": "打开菜单",
-  "icon.expand": "展开",
-  "icon.collapse": "折叠"
+  "icon.openMenu": "打开菜单"
 }
