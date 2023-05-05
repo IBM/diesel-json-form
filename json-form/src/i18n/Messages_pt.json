@@ -1,7 +1,7 @@
 {
   "documentRoot": "Raiz do documento",
   "propertyAlreadyExists": "A propriedade já existe",
-  "propertyNamePlaceholder": "nome da propriedade de tipo ...",
+  "propertyNamePlaceholder": "nome da propriedade de tipo...",
   "propertyNameLabel": "nome da propriedade em {{path}}",
   "emptyObject": "Objeto vazio",
   "emptyArray": "Matriz vazia",
