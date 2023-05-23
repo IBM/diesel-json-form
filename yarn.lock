@@ -7438,20 +7438,20 @@ tea-pop-core@^4.1.1:
   resolved "https://registry.yarnpkg.com/tea-pop-core/-/tea-pop-core-4.2.1.tgz#286bbcbfaf0faa0b3e48f77b77b5d4b0c73c1be5"
   integrity sha512-je55nw4CfF8iqOMbYvJgez5UJdhoaPZmDeGzotNRRCXYKDlqdSkLfdhxtVzCOdXypm2durtueDzpQ00aqJ2s5w==
 
-tea-pop-core@^4.1.2:
-  version "4.1.2"
-  resolved "https://registry.npmjs.org/tea-pop-core/-/tea-pop-core-4.1.2.tgz"
-  integrity "sha1-OGD5BIKqa9vNlenJO2fGbMOnR9o= sha512-JpYB4BmTLdc07TEz7L+JtrZPXcgmv1sgXkUTC5NVlNOK6Sns3OLDPtR/Y1FJFl9B7eufNJLmUVJGbGKgh/d/Dw=="
+tea-pop-core@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/tea-pop-core/-/tea-pop-core-5.0.0.tgz#87f4702b643ebb97d519051323655c9acb050912"
+  integrity sha512-TQaQICA22d10Z7uoC7ZV8IxzfvzHTRzth648Gx/A9PABCNB1sOexqf58oeJfPN59DmybjzStL0WdWcJyODFtIg==
 
 tea-pop-menu@^4.1.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/tea-pop-menu/-/tea-pop-menu-4.2.1.tgz#32c9480c21d2aece385d5cc701d0397a29888ff0"
   integrity sha512-wwSOe9s71icjuxOQK/lc8M3YixeesNq9jF2Cp9/ngYN7MnOywTz05DAFQSx4UBHlKFGCNKYkdAFKi5naR4dd6w==
 
-tea-pop-menu@^4.1.2:
-  version "4.1.2"
-  resolved "https://registry.npmjs.org/tea-pop-menu/-/tea-pop-menu-4.1.2.tgz"
-  integrity "sha1-ruhuqcKUNGD8vRUFUuOrN6H6rLA= sha512-cooAqC8g0K3nL7+7F158U46jddMYOFWDxrpL/EA7Hw0u8Glt9cTkbhX4ctJZ9QeoQJlh8ECavGTtwJn+W9JHxg=="
+tea-pop-menu@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/tea-pop-menu/-/tea-pop-menu-5.0.0.tgz#05e16b0ea45371ffb82961f8f62a3c3c6244e1cd"
+  integrity sha512-ICBDNzityM7C4ZRGYDEr0mOBEIZ7AK1xZd5PTPxp+K5tWL6YQimVCIWyznwIM6+8Qa1O2vjlhbYZv5eS+f4uUw==
 
 terser-webpack-plugin@^5.1.3:
   version "5.3.6"
