@@ -347,17 +347,17 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@diesel-parser/json-schema-facade-js@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-js/-/json-schema-facade-js-0.9.0.tgz#5c65b60149b87f5284bd974f1fcd81060ea2562d"
-  integrity sha512-t6ePOGsVciACgGnQmIdNx36M+0NYYVV73rxQ4OAst2gHPRuo5tXyfBbeDZgUAlZdbHCLEJPrawrN1cmw8qiQxg==
+"@diesel-parser/json-schema-facade-js@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-js/-/json-schema-facade-js-0.9.1.tgz#97f48832299ada612e87b0678e1b14f510245688"
+  integrity sha512-TJtMRbleNcqkS2/9NT0Nv+dYjfxxB3R5oqNUIRPwS3qkG/EExmUpCLoKiLc/j4YzfIrR0laNRIlwarnwzXlh2g==
 
-"@diesel-parser/json-schema-facade-ts@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-ts/-/json-schema-facade-ts-0.9.0.tgz#92d0152981b85a7d95e6c9742a2f21fdc70cce54"
-  integrity sha512-/vdUpCVvQdp0XMPy7ONOWgDmaR66FYkjhWZ6FCv0R02ixW0aAQ9tyDnWxsXgG6qCV4//5HNnyoEq0dRHRUFvYA==
+"@diesel-parser/json-schema-facade-ts@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-ts/-/json-schema-facade-ts-0.9.1.tgz#8f751f1788944fe5f373936083b6428a8973525c"
+  integrity sha512-W5PqICcaPoE0d5IUmQ31l/kuTyPlhF6uF9hyvUYbUL9rUOpnmBSP9bmKtDmhVB+AhS1uh+zSiIjIEMlyecClKA==
   dependencies:
-    "@diesel-parser/json-schema-facade-js" "^0.9.0"
+    "@diesel-parser/json-schema-facade-js" "^0.9.1"
 
 "@diesel-parser/monaco@~0.1.0":
   version "0.1.0"
