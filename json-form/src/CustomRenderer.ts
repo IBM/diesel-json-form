@@ -3,7 +3,7 @@ import { JsonValue } from './JsonValue';
 import React from 'react';
 
 export interface CustomRenderer<Mo, Ms> {
-  reinit(value: JsonValue, model: Maybe<Mo>): [Mo, Cmd<Ms>];
+  reinit(value: JsonValue, model: Maybe<Mo>, schema: any): [Mo, Cmd<Ms>];
   view(dispatch: Dispatcher<Ms>, model: Mo): React.ReactElement;
   update(msg: Ms, model: Mo): [Mo, Cmd<Ms>, Maybe<JsonValue>];
 }

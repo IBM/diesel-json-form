@@ -38,7 +38,7 @@ import {
   Model,
   updateAddingPropertyName,
 } from './Model';
-import { getValueAt, JsonValue, setValueAt, valueToAny } from './JsonValue';
+import { getValueAt, JsonValue, valueToAny } from './JsonValue';
 import { ArrayCounter, MenuTrigger, ViewJsonValue } from './Renderer';
 import { JsPath } from './JsPath';
 import {
@@ -50,7 +50,6 @@ import {
   actionToggleExpandCollapsePath,
   actionTriggerClicked,
   actionUpdateValue,
-  setRoot,
 } from './Actions';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
@@ -80,14 +79,15 @@ function reInitCustomRenderers(
 ): [Model, Cmd<Msg>] {
   return model.validationResult
     .map((validationResult) => {
-      const rendererKeys = JsFacade.getRendererKeys(validationResult);
+      const renderers = JsFacade.getRenderers(validationResult);
       const newCustomRenderers: Map<
         string,
         Maybe<CustomRendererModel>
       > = new Map();
       const cmds: Cmd<Msg>[] = [];
-      for (const [path, key] of rendererKeys) {
-        if (key !== undefined) {
+      for (const [path, rendererDef] of renderers) {
+        if (rendererDef !== undefined) {
+          const key = rendererDef.key;
           const renderer = customRendererFactory.getRenderer(key);
           if (renderer.type === 'Just') {
             const existingModel = model.customRenderers.get(path);
@@ -101,6 +101,7 @@ function reInitCustomRenderers(
               const mac = renderer.value.reinit(
                 jValue.value,
                 m.map((x) => x.rendererModel),
+                rendererDef.schemaValue,
               );
               const customRendererModel: CustomRendererModel = {
                 rendererModel: mac[0],

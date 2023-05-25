@@ -4,7 +4,17 @@ import {
   jvString,
   valueType,
 } from "@diesel-parser/json-form";
-import { Cmd, Dispatcher, just, Maybe, noCmd, nothing } from "tea-cup-core";
+import {
+  Cmd,
+  Dispatcher,
+  just,
+  Maybe,
+  maybeOf,
+  noCmd,
+  nothing,
+  Decode as D,
+  Decoder,
+} from "tea-cup-core";
 import * as React from "react";
 
 export type Msg =
@@ -15,14 +25,25 @@ export type Msg =
 export interface Model {
   readonly value: string;
   readonly isMouseOver: boolean;
+  readonly myConfigProp: Maybe<number>;
 }
 
+const MyConfigPropDecoder: Decoder<number> = D.at(
+  ["renderer", "myConfigProp"],
+  D.num
+);
+
 export const MyStringRenderer: CustomRenderer<Model, Msg> = {
-  reinit: function (value: JsonValue, model: Maybe<Model>): [Model, Cmd<Msg>] {
+  reinit: function (
+    value: JsonValue,
+    model: Maybe<Model>,
+    schema: any
+  ): [Model, Cmd<Msg>] {
     const strValue = value.tag === "jv-string" ? value.value : "NOT A STRING";
     const m: Model = model.withDefaultSupply(() => ({
       value: strValue,
       isMouseOver: false,
+      myConfigProp: MyConfigPropDecoder.decodeValue(schema).toMaybe(),
     }));
     return noCmd(m);
   },
@@ -40,6 +61,12 @@ export const MyStringRenderer: CustomRenderer<Model, Msg> = {
         <button onClick={() => dispatch({ tag: "button-clicked" })}>
           Concat !
         </button>
+        <p>
+          Config prop{" "}
+          {model.myConfigProp
+            .map((x) => "set to " + x)
+            .withDefault("is undefined")}
+        </p>
       </div>
     );
   },

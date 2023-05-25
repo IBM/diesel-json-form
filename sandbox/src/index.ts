@@ -295,9 +295,17 @@ const Example_Unwrapping = `{
   }
 }`;
 
-const Example_Renderer = `{
+const Example_Renderer1 = `{
     "type": "string",
     "renderer": "MyStringRenderer"
+}`;
+
+const Example_Renderer2 = `{
+    "type": "string",
+    "renderer": {
+        "key": "MyStringRenderer",
+        "myConfigProp": 123
+    }
 }`;
 
 const Example_Date = JSON.stringify(
@@ -348,7 +356,8 @@ const samples = [
   ["DateTime", Example_DateTime],
   ["DateTimeExample", Example_DateTimeWithExample],
   ["BigSample", JSON.stringify(big_sample, null, "  ")],
-  ["Renderer", Example_Renderer],
+  ["Renderer1", Example_Renderer1],
+  ["Renderer2", Example_Renderer2],
 ];
 
 samples
