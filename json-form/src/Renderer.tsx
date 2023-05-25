@@ -75,7 +75,6 @@ export function ViewJsonValue(
       const renderer = customRendererFactory.getRenderer(m.key);
       if (renderer.type === 'Just') {
         return renderer.value.view(
-          value,
           (msg: any) =>
             p.dispatch({
               tag: 'renderer-child-msg',

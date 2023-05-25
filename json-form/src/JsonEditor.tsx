@@ -38,7 +38,7 @@ import {
   Model,
   updateAddingPropertyName,
 } from './Model';
-import { getValueAt, JsonValue, valueToAny } from './JsonValue';
+import { getValueAt, JsonValue, setValueAt, valueToAny } from './JsonValue';
 import { ArrayCounter, MenuTrigger, ViewJsonValue } from './Renderer';
 import { JsPath } from './JsPath';
 import {
@@ -50,6 +50,7 @@ import {
   actionToggleExpandCollapsePath,
   actionTriggerClicked,
   actionUpdateValue,
+  setRoot,
 } from './Actions';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
@@ -97,7 +98,10 @@ function reInitCustomRenderers(
               JsPath.parse(path),
             );
             if (jValue.type === 'Just') {
-              const mac = renderer.value.reinit(jValue.value, m);
+              const mac = renderer.value.reinit(
+                jValue.value,
+                m.map((x) => x.rendererModel),
+              );
               const customRendererModel: CustomRendererModel = {
                 rendererModel: mac[0],
                 key,
@@ -344,9 +348,23 @@ export function update(
                 path: msg.path,
               };
             });
-            return noOut(Tuple.t2n(newModel, cmd));
-
-            // TODO handle out msg (value changed)
+            const newValue: Maybe<JsonValue> = maco[2];
+            switch (newValue.type) {
+              case 'Nothing': {
+                return noOut(Tuple.t2n(newModel, cmd));
+              }
+              case 'Just': {
+                const mac2 = actionUpdateValue(
+                  newModel,
+                  JsPath.parse(msg.path),
+                  newValue.value,
+                );
+                return withOutValueChanged(model, [
+                  mac2[0],
+                  Cmd.batch([cmd, mac2[1]]),
+                ]);
+              }
+            }
           }
         }
       }

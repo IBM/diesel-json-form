@@ -1,38 +1,47 @@
-import { CustomRenderer, JsonValue, valueType } from "@diesel-parser/json-form";
-import { Cmd, Dispatcher, Maybe, noCmd, nothing } from "tea-cup-core";
+import {
+  CustomRenderer,
+  JsonValue,
+  jvString,
+  valueType,
+} from "@diesel-parser/json-form";
+import { Cmd, Dispatcher, just, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
 
-export type Msg = { tag: "mouse-enter" } | { tag: "mouse-leave" };
+export type Msg =
+  | { tag: "mouse-enter" }
+  | { tag: "mouse-leave" }
+  | { tag: "button-clicked" };
 
 export interface Model {
+  readonly value: string;
   readonly isMouseOver: boolean;
 }
 
 export const MyStringRenderer: CustomRenderer<Model, Msg> = {
   reinit: function (value: JsonValue, model: Maybe<Model>): [Model, Cmd<Msg>] {
-    const m: Model = model.withDefaultSupply(() => ({ isMouseOver: false }));
+    const strValue = value.tag === "jv-string" ? value.value : "NOT A STRING";
+    const m: Model = model.withDefaultSupply(() => ({
+      value: strValue,
+      isMouseOver: false,
+    }));
     return noCmd(m);
   },
-  view: function (
-    value: JsonValue,
-    dispatch: Dispatcher<Msg>,
-    model: Model
-  ): React.ReactElement {
-    if (value.tag === "jv-string") {
-      return (
-        <div
-          className={"my-string"}
-          onMouseEnter={() => dispatch({ tag: "mouse-enter" })}
-          onMouseLeave={() => dispatch({ tag: "mouse-leave" })}
-          style={{
-            backgroundColor: model.isMouseOver ? "red" : "green",
-          }}
-        >
-          STRING : {value.value}
-        </div>
-      );
-    }
-    return <p>NOT A STRING</p>;
+  view: function (dispatch: Dispatcher<Msg>, model: Model): React.ReactElement {
+    return (
+      <div
+        className={"my-string"}
+        onMouseEnter={() => dispatch({ tag: "mouse-enter" })}
+        onMouseLeave={() => dispatch({ tag: "mouse-leave" })}
+        style={{
+          backgroundColor: model.isMouseOver ? "red" : "green",
+        }}
+      >
+        {model.value}
+        <button onClick={() => dispatch({ tag: "button-clicked" })}>
+          Concat !
+        </button>
+      </div>
+    );
   },
   update: function (
     msg: Msg,
@@ -44,6 +53,10 @@ export const MyStringRenderer: CustomRenderer<Model, Msg> = {
       }
       case "mouse-leave": {
         return noOutNoCmd({ ...model, isMouseOver: false });
+      }
+      case "button-clicked": {
+        const value = model.value + "X";
+        return [{ ...model, value }, Cmd.none(), just(jvString(value))];
       }
     }
   },
