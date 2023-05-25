@@ -19,7 +19,6 @@ export interface Model {
   readonly errors: ReadonlyArray<JsValidationError>;
   readonly value: number;
   readonly mouseOver: Maybe<number>;
-  readonly path: JsPath;
 }
 
 export const RatingRenderer: CustomRenderer<Model, Msg> = {
@@ -36,7 +35,6 @@ export const RatingRenderer: CustomRenderer<Model, Msg> = {
       errors,
       value: v,
       mouseOver: nothing,
-      path,
     };
     return noCmd(newModel);
   },
