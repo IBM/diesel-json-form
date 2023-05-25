@@ -37,6 +37,7 @@
   "scripts": {
     "build": "yarn clean && yarn build:ts && yarn test && yarn build:scss",
     "build:ts": "tsc",
+    "watch:ts": "tsc -w",
     "build:scss": "node-sass --importer ../node_modules/node-sass-package-importer/dist/cli.js src/JsonEditor.scss dist/JsonEditor.css",
     "clean": "rimraf dist",
     "test": "jest",

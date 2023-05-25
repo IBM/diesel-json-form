@@ -20,7 +20,10 @@ import { JsPath } from './JsPath';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import { JsValidationError, JsValidationResult } from '@diesel-parser/json-schema-facade-ts';
+import {
+  JsValidationError,
+  JsValidationResult,
+} from '@diesel-parser/json-schema-facade-ts';
 import { TFunction } from 'i18next';
 import { initMyI18n } from './i18n/MyI18n';
 
@@ -38,6 +41,12 @@ export interface Model {
   readonly t: TFunction;
   readonly lang: string;
   readonly strictMode: boolean;
+  readonly customRenderers: ReadonlyMap<string, Maybe<CustomRendererModel>>;
+}
+
+export interface CustomRendererModel {
+  readonly key: string;
+  readonly rendererModel: any;
 }
 
 export interface AddingState {
@@ -254,6 +263,7 @@ export function initialModel(
     comboBoxes: new Map(),
     formats: new Map(),
     strictMode,
+    customRenderers: new Map(),
   };
 
   return computeAll(doValidate(model));

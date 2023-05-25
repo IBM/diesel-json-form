@@ -32,12 +32,13 @@ import { DevTools, Program } from 'react-tea-cup';
 import { contextMenuMsg, Msg, setJsonStr, setStrictModeMsg } from './Msg';
 import {
   computeAll,
+  CustomRendererModel,
   doValidate,
   initialModel,
   Model,
   updateAddingPropertyName,
 } from './Model';
-import { JsonValue, valueToAny } from './JsonValue';
+import { getValueAt, JsonValue, valueToAny } from './JsonValue';
 import { ArrayCounter, MenuTrigger, ViewJsonValue } from './Renderer';
 import { JsPath } from './JsPath';
 import {
@@ -56,20 +57,77 @@ import { contextMenuRenderer } from './ContextMenuRenderer';
 import { executeContextMenuAction } from './ContextMenu';
 import { OutMsg, outValueChanged } from './OutMsg';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
+import { CustomRendererFactory } from './CustomRenderer';
 
 export function init(
   language: string,
   schema: Maybe<JsonValue>,
   initialValue: JsonValue,
   strictMode: boolean,
+  customRendererFactory?: CustomRendererFactory,
 ): [Model, Cmd<Msg>] {
   JsFacade.setLang(language);
-  return noCmd(initialModel(language, schema, initialValue, strictMode));
+  const model = initialModel(language, schema, initialValue, strictMode);
+  return customRendererFactory
+    ? reInitCustomRenderers(model, customRendererFactory)
+    : noCmd(model);
+}
+
+function reInitCustomRenderers(
+  model: Model,
+  customRendererFactory: CustomRendererFactory,
+): [Model, Cmd<Msg>] {
+  return model.validationResult
+    .map((validationResult) => {
+      const rendererKeys = JsFacade.getRendererKeys(validationResult);
+      const newCustomRenderers: Map<
+        string,
+        Maybe<CustomRendererModel>
+      > = new Map();
+      const cmds: Cmd<Msg>[] = [];
+      for (const [path, key] of rendererKeys) {
+        if (key !== undefined) {
+          const renderer = customRendererFactory.getRenderer(key);
+          if (renderer.type === 'Just') {
+            const existingModel = model.customRenderers.get(path);
+            const m: Maybe<CustomRendererModel> =
+              existingModel === undefined ? nothing : existingModel;
+            const jValue: Maybe<JsonValue> = getValueAt(
+              model.root.b,
+              JsPath.parse(path),
+            );
+            if (jValue.type === 'Just') {
+              const mac = renderer.value.reinit(jValue.value, m);
+              const customRendererModel: CustomRendererModel = {
+                rendererModel: mac[0],
+                key,
+              };
+              newCustomRenderers.set(path, just(customRendererModel));
+              const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
+                return {
+                  tag: 'renderer-child-msg',
+                  path,
+                  msg,
+                };
+              });
+              cmds.push(cmd);
+            }
+          }
+        }
+      }
+      const newModel: Model = {
+        ...model,
+        customRenderers: newCustomRenderers,
+      };
+      return Tuple.t2n(newModel, Cmd.batch(cmds));
+    })
+    .withDefaultSupply(() => noCmd(model));
 }
 
 export interface ViewJsonEditorProps {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
+  readonly customRendererFactory?: CustomRendererFactory;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
@@ -92,6 +150,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
           path={JsPath.empty}
           value={model.root.b}
           dispatch={dispatch}
+          customRendererFactory={props.customRendererFactory}
         />
       </div>
       {model.menuModel
@@ -137,6 +196,7 @@ function withOutValueChanged(
 export function update(
   msg: Msg,
   model: Model,
+  customRendererFactory?: CustomRendererFactory,
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
     case 'delete-property':
@@ -220,7 +280,15 @@ export function update(
         actionAddElementToArray(model, msg.path),
       );
     case 'set-json-str': {
-      return noOut(init(model.lang, msg.schema, msg.json, model.strictMode));
+      return noOut(
+        init(
+          model.lang,
+          msg.schema,
+          msg.json,
+          model.strictMode,
+          customRendererFactory,
+        ),
+      );
     }
     case 'toggle-expand-collapse': {
       return noOut(actionToggleExpandCollapsePath(model, msg.path));
@@ -237,7 +305,52 @@ export function update(
       return noOut(noCmd(setStrictMode(model, msg.strictMode)));
     case 'recompute-metadata': {
       const newModel = computeAll(doValidate(model));
-      return withOutValueChanged(model, noCmd(newModel));
+      return withOutValueChanged(
+        model,
+        customRendererFactory
+          ? reInitCustomRenderers(newModel, customRendererFactory)
+          : noCmd(newModel),
+      );
+    }
+    case 'renderer-child-msg': {
+      if (customRendererFactory) {
+        const rendererModel = model.customRenderers.get(msg.path);
+        if (rendererModel && rendererModel.type === 'Just') {
+          const renderer = customRendererFactory.getRenderer(
+            rendererModel.value.key,
+          );
+          if (renderer.type === 'Just') {
+            const maco = renderer.value.update(
+              msg.msg,
+              rendererModel.value.rendererModel,
+            );
+            const newCustomRenderers: Map<
+              string,
+              Maybe<CustomRendererModel>
+            > = new Map(model.customRenderers);
+            const newCustomRendererModel: CustomRendererModel = {
+              ...rendererModel.value,
+              rendererModel: maco[0],
+            };
+            newCustomRenderers.set(msg.path, just(newCustomRendererModel));
+            const newModel: Model = {
+              ...model,
+              customRenderers: newCustomRenderers,
+            };
+            const cmd: Cmd<Msg> = maco[1].map((childMsg) => {
+              return {
+                tag: 'renderer-child-msg',
+                msg: childMsg,
+                path: msg.path,
+              };
+            });
+            return noOut(Tuple.t2n(newModel, cmd));
+
+            // TODO handle out msg (value changed)
+          }
+        }
+      }
+      return noOut(noCmd(model));
     }
   }
 }
@@ -276,19 +389,30 @@ export interface JsonEditorProps {
   readonly language: string;
   readonly strictMode: boolean;
   readonly onChange?: (value: JsonValue) => void;
+  readonly customRendererFactory?: CustomRendererFactory;
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
   return (
     <Program
       init={() =>
-        init(props.language, props.schema, props.value, props.strictMode)
+        init(
+          props.language,
+          props.schema,
+          props.value,
+          props.strictMode,
+          props.customRendererFactory,
+        )
       }
       view={(dispatch, model) => (
-        <ViewJsonEditor dispatch={dispatch} model={model} />
+        <ViewJsonEditor
+          dispatch={dispatch}
+          model={model}
+          customRendererFactory={props.customRendererFactory}
+        />
       )}
       update={(msg, model) => {
-        const maco = update(msg, model);
+        const maco = update(msg, model, props.customRendererFactory);
         maco[2].forEach((outMsg) => {
           switch (outMsg.tag) {
             case 'value-changed': {

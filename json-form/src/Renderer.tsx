@@ -27,7 +27,7 @@ import {
   jvString,
   JvString,
 } from './JsonValue';
-import { Model } from './Model';
+import { CustomRendererModel, Model } from './Model';
 import { JsPath } from './JsPath';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 import { box, Dim, pos } from 'tea-pop-core';
@@ -49,6 +49,7 @@ import ChevronUp16 from '@carbon/icons-react/lib/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--vertical/16';
 import Add16 from '@carbon/icons-react/lib/add/16';
 import { TFunction } from 'i18next';
+import { CustomRendererFactory } from './CustomRenderer';
 
 export interface BaseProps {
   readonly dispatch: Dispatcher<Msg>;
@@ -58,12 +59,35 @@ export interface ViewValueProps<T extends JsonValue> extends BaseProps {
   readonly model: Model;
   readonly path: JsPath;
   readonly value: T;
+  readonly customRendererFactory?: CustomRendererFactory;
 }
 
 export function ViewJsonValue(
   p: ViewValueProps<JsonValue>,
 ): React.ReactElement {
-  const { value } = p;
+  const { value, customRendererFactory } = p;
+
+  const path = p.path.format();
+  if (customRendererFactory) {
+    const customRendererModel = p.model.customRenderers.get(path);
+    if (customRendererModel && customRendererModel.type === 'Just') {
+      const m: CustomRendererModel = customRendererModel.value;
+      const renderer = customRendererFactory.getRenderer(m.key);
+      if (renderer.type === 'Just') {
+        return renderer.value.view(
+          value,
+          (msg: any) =>
+            p.dispatch({
+              tag: 'renderer-child-msg',
+              path,
+              msg,
+            }),
+          m.rendererModel,
+        );
+      }
+    }
+  }
+
   const content = () => {
     switch (value.tag) {
       case 'jv-array':
