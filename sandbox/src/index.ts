@@ -23,9 +23,11 @@ import big_sample from "./big_sample.json";
 
 import { editor1, editor2 } from "./text-editor";
 import { MyStringRenderer } from "./MyStringRenderer";
+import { RatingRenderer } from "./RatingRenderer";
 
 const MyCustomRendererFactory = new CustomRendererFactory();
 MyCustomRendererFactory.addRenderer("MyStringRenderer", MyStringRenderer);
+MyCustomRendererFactory.addRenderer("RatingRenderer", RatingRenderer);
 
 const initialSchema = {};
 const initialValue = {};
@@ -308,6 +310,22 @@ const Example_Renderer2 = `{
     }
 }`;
 
+const Example_Renderer3 = JSON.stringify(
+  {
+    properties: {
+      name: {
+        type: "string",
+      },
+      rating: {
+        type: "number",
+        renderer: "RatingRenderer",
+      },
+    },
+  },
+  null,
+  "  "
+);
+
 const Example_Date = JSON.stringify(
   {
     type: "string",
@@ -358,6 +376,7 @@ const samples = [
   ["BigSample", JSON.stringify(big_sample, null, "  ")],
   ["Renderer1", Example_Renderer1],
   ["Renderer2", Example_Renderer2],
+  ["RendererRating", Example_Renderer3],
 ];
 
 samples
