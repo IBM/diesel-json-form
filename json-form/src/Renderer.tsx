@@ -721,11 +721,11 @@ export const onMenuTriggerClick = (
   }
 };
 
-interface ViewErrorsProps {
+export interface ViewErrorsProps {
   errors: ReadonlyArray<JsValidationError>;
 }
 
-function ViewErrors(props: ViewErrorsProps) {
+export function ViewErrors(props: ViewErrorsProps) {
   return props.errors.length > 0 ? (
     <div className="form-errors">
       {props.errors.map((e) => e.message).join(', ')}
@@ -735,7 +735,9 @@ function ViewErrors(props: ViewErrorsProps) {
   );
 }
 
-const WrapErrors: React.FunctionComponent<ViewValueProps<JsonValue>> = (p) => {
+export const WrapErrors: React.FunctionComponent<ViewValueProps<JsonValue>> = (
+  p,
+) => {
   const errorsAtPath = getErrorsAtPath(p);
   return (
     <>

@@ -1,22 +1,14 @@
 import {
   CustomRenderer,
   JsonValue,
+  JsPath,
   jvNumber,
-  jvString,
-  valueType,
+  Model as FormModel,
+  ViewErrors,
 } from "@diesel-parser/json-form";
-import {
-  Cmd,
-  Dispatcher,
-  just,
-  Maybe,
-  maybeOf,
-  noCmd,
-  nothing,
-  Decode as D,
-  Decoder,
-} from "tea-cup-core";
+import { Cmd, Dispatcher, just, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
+import { JsValidationError } from "../../../diesel-json/ts-facade";
 
 export type Msg =
   | { tag: "mouse-enter"; index: number }
@@ -24,22 +16,29 @@ export type Msg =
   | { tag: "rating-clicked"; index: number };
 
 export interface Model {
+  readonly errors: ReadonlyArray<JsValidationError>;
   readonly value: number;
   readonly mouseOver: Maybe<number>;
+  readonly path: JsPath;
 }
 
 export const RatingRenderer: CustomRenderer<Model, Msg> = {
   reinit: function (
+    path: JsPath,
+    formModel: FormModel,
     value: JsonValue,
     model: Maybe<Model>,
     schema: any
   ): [Model, Cmd<Msg>] {
     const v = value.tag === "jv-number" ? value.value : -1;
-    const m: Model = model.withDefaultSupply(() => ({
+    const errors = formModel.errors.get(path.format()) ?? [];
+    const newModel: Model = {
+      errors,
       value: v,
       mouseOver: nothing,
-    }));
-    return noCmd(m);
+      path,
+    };
+    return noCmd(newModel);
   },
   view: function (dispatch: Dispatcher<Msg>, model: Model): React.ReactElement {
     const box = (index: number) => {
@@ -65,19 +64,22 @@ export const RatingRenderer: CustomRenderer<Model, Msg> = {
     };
 
     return (
-      <div
-        className={"rating"}
-        style={{
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
-        {box(1)}
-        {box(2)}
-        {box(3)}
-        {box(4)}
-        {box(5)}
-      </div>
+      <>
+        <div
+          className={"rating"}
+          style={{
+            display: "flex",
+            flexDirection: "row",
+          }}
+        >
+          {box(1)}
+          {box(2)}
+          {box(3)}
+          {box(4)}
+          {box(5)}
+        </div>
+        <ViewErrors errors={model.errors} />
+      </>
     );
   },
   update: function (

@@ -3,6 +3,8 @@ import {
   JsonValue,
   jvString,
   valueType,
+  Model as FormModel,
+  JsPath,
 } from "@diesel-parser/json-form";
 import {
   Cmd,
@@ -35,6 +37,8 @@ const MyConfigPropDecoder: Decoder<number> = D.at(
 
 export const MyStringRenderer: CustomRenderer<Model, Msg> = {
   reinit: function (
+    path: JsPath,
+    formModel: FormModel,
     value: JsonValue,
     model: Maybe<Model>,
     schema: any

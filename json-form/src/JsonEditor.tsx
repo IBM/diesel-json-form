@@ -99,6 +99,8 @@ function reInitCustomRenderers(
             );
             if (jValue.type === 'Just') {
               const mac = renderer.value.reinit(
+                JsPath.parse(path),
+                model,
                 jValue.value,
                 m.map((x) => x.rendererModel),
                 rendererDef.schemaValue,
