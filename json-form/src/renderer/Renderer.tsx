@@ -85,10 +85,6 @@ export class RendererFactory {
   }
 }
 
-export interface BaseProps {
-  readonly dispatch: Dispatcher<Msg>;
-}
-
 export function ViewJsonValue(
   p: ViewValueProps<JsonValue>,
 ): React.ReactElement {
