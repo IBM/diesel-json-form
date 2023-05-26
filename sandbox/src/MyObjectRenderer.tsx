@@ -30,7 +30,7 @@ export const MyObjectRenderer: CustomRenderer<Model, Msg> = {
     return noCmd(newModel);
   },
   view: function (args: RendererViewArgs<Model, Msg>): React.ReactElement {
-    const { model } = args;
+    const { model, formView, path } = args;
     if (model.value.properties.length === 0) {
       return <p>Empty object</p>;
     }
@@ -40,7 +40,7 @@ export const MyObjectRenderer: CustomRenderer<Model, Msg> = {
           {model.value.properties.map((p) => (
             <tr key={p.name}>
               <th>{p.name}</th>
-              <td>{p.value.tag}</td>
+              <td>{formView(path.append(p.name), p.value)}</td>
             </tr>
           ))}
         </tbody>

@@ -15,6 +15,8 @@ export interface RendererInitArgs<Model> {
 export interface RendererViewArgs<Model, Msg> {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
+  readonly path: JsPath;
+  readonly formView: (path: JsPath, value: JsonValue) => React.ReactElement;
 }
 
 export interface CustomRenderer<Model, Msg> {

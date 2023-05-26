@@ -82,6 +82,16 @@ export function ViewJsonValue(
               msg,
             }),
           model: m.rendererModel,
+          path: p.path,
+          formView: (path: JsPath, value: JsonValue) => (
+            <ViewJsonValue
+              model={p.model}
+              path={path}
+              value={value}
+              dispatch={p.dispatch}
+              customRendererFactory={customRendererFactory}
+            />
+          ),
         });
       }
     }
