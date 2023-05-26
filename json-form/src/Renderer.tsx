@@ -74,15 +74,15 @@ export function ViewJsonValue(
       const m: CustomRendererModel = customRendererModel.value;
       const renderer = customRendererFactory.getRenderer(m.key);
       if (renderer.type === 'Just') {
-        return renderer.value.view(
-          (msg: any) =>
+        return renderer.value.view({
+          dispatch: (msg: any) =>
             p.dispatch({
               tag: 'renderer-child-msg',
               path,
               msg,
             }),
-          m.rendererModel,
-        );
+          model: m.rendererModel,
+        });
       }
     }
   }
