@@ -4,27 +4,27 @@ import { Model as FormModel } from './Model';
 import React from 'react';
 import { JsPath } from './JsPath';
 
-export interface CustomRenderer<Mo, Ms> {
+export interface CustomRenderer<Model, Msg> {
   reinit(
     path: JsPath,
     formModel: FormModel,
     value: JsonValue,
-    model: Maybe<Mo>,
+    model: Maybe<Model>,
     schema: any,
-  ): [Mo, Cmd<Ms>];
-  view(dispatch: Dispatcher<Ms>, model: Mo): React.ReactElement;
-  update(msg: Ms, model: Mo): [Mo, Cmd<Ms>, Maybe<JsonValue>];
+  ): [Model, Cmd<Msg>];
+  view(dispatch: Dispatcher<Msg>, model: Model): React.ReactElement;
+  update(msg: Msg, model: Model): [Model, Cmd<Msg>, Maybe<JsonValue>];
 }
 
 export class CustomRendererFactory {
   private renderers: Map<string, CustomRenderer<any, any>> = new Map();
 
-  addRenderer<Mo, Ms>(key: string, renderer: CustomRenderer<Mo, Ms>) {
+  addRenderer<Model, Msg>(key: string, renderer: CustomRenderer<Model, Msg>) {
     this.renderers.set(key, renderer);
   }
 
-  getRenderer<Mo, Ms>(key: string): Maybe<CustomRenderer<Mo, Ms>> {
+  getRenderer<Model, Msg>(key: string): Maybe<CustomRenderer<Model, Msg>> {
     const renderer = this.renderers.get(key);
-    return maybeOf(renderer as CustomRenderer<Mo, Ms>);
+    return maybeOf(renderer as CustomRenderer<Model, Msg>);
   }
 }

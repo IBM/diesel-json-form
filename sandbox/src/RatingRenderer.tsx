@@ -8,7 +8,7 @@ import {
 } from "@diesel-parser/json-form";
 import { Cmd, Dispatcher, just, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
-import { JsValidationError } from "../../../diesel-json/ts-facade";
+import { JsValidationError } from "@diesel-parser/json-schema-facade-ts";
 
 export type Msg =
   | { tag: "mouse-enter"; index: number }
