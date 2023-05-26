@@ -1,5 +1,5 @@
 import {
-  CustomRenderer,
+  Renderer,
   JsonValue,
   jvNumber,
   RendererInitArgs,
@@ -21,7 +21,7 @@ export interface Model {
   readonly mouseOver: Maybe<number>;
 }
 
-export const RatingRenderer: CustomRenderer<Model, Msg> = {
+export const RatingRenderer: Renderer<Model, Msg> = {
   reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value, formModel, path } = args;
     const v = value.tag === "jv-number" ? value.value : -1;

@@ -1,23 +1,18 @@
 import {
-  CustomRenderer,
+  Renderer,
   JsonValue,
   jvString,
-  valueType,
-  Model as FormModel,
-  JsPath,
   RendererInitArgs,
   RendererViewArgs,
 } from "@diesel-parser/json-form";
 import {
   Cmd,
-  Dispatcher,
-  just,
-  Maybe,
-  maybeOf,
-  noCmd,
-  nothing,
   Decode as D,
   Decoder,
+  just,
+  Maybe,
+  noCmd,
+  nothing,
 } from "tea-cup-core";
 import * as React from "react";
 
@@ -37,7 +32,7 @@ const MyConfigPropDecoder: Decoder<number> = D.at(
   D.num
 );
 
-export const MyStringRenderer: CustomRenderer<Model, Msg> = {
+export const MyStringRenderer: Renderer<Model, Msg> = {
   reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value, model, schema } = args;
     const strValue = value.tag === "jv-string" ? value.value : "NOT A STRING";

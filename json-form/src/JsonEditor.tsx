@@ -57,14 +57,14 @@ import { contextMenuRenderer } from './ContextMenuRenderer';
 import { executeContextMenuAction } from './ContextMenu';
 import { OutMsg, outValueChanged } from './OutMsg';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import { CustomRendererFactory } from './CustomRenderer';
+import { RendererFactory } from './renderer/Renderer';
 
 export function init(
   language: string,
   schema: Maybe<JsonValue>,
   initialValue: JsonValue,
   strictMode: boolean,
-  customRendererFactory?: CustomRendererFactory,
+  customRendererFactory?: RendererFactory,
 ): [Model, Cmd<Msg>] {
   JsFacade.setLang(language);
   const model = initialModel(language, schema, initialValue, strictMode);
@@ -75,7 +75,7 @@ export function init(
 
 function reInitCustomRenderers(
   model: Model,
-  customRendererFactory: CustomRendererFactory,
+  customRendererFactory: RendererFactory,
 ): [Model, Cmd<Msg>] {
   return model.validationResult
     .map((validationResult) => {
@@ -134,7 +134,7 @@ function reInitCustomRenderers(
 export interface ViewJsonEditorProps {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
-  readonly customRendererFactory?: CustomRendererFactory;
+  readonly customRendererFactory?: RendererFactory;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
@@ -203,7 +203,7 @@ function withOutValueChanged(
 export function update(
   msg: Msg,
   model: Model,
-  customRendererFactory?: CustomRendererFactory,
+  customRendererFactory?: RendererFactory,
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
     case 'delete-property':
@@ -410,7 +410,7 @@ export interface JsonEditorProps {
   readonly language: string;
   readonly strictMode: boolean;
   readonly onChange?: (value: JsonValue) => void;
-  readonly customRendererFactory?: CustomRendererFactory;
+  readonly customRendererFactory?: RendererFactory;
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {

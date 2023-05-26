@@ -20,5 +20,4 @@ export * from './JsPath';
 export * from './JsonEditor';
 export * from './OutMsg';
 export * from './Msg';
-export * from './CustomRenderer';
 export * from './renderer/Renderer';

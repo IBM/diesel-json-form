@@ -18,7 +18,7 @@ import "./style.css";
 import "@diesel-parser/json-form/dist/JsonEditor.css";
 import ReactDOM from "react-dom";
 import * as JsonForm from "@diesel-parser/json-form";
-import { CustomRendererFactory } from "@diesel-parser/json-form";
+import { RendererFactory } from "@diesel-parser/json-form";
 import big_sample from "./big_sample.json";
 
 import { editor1, editor2 } from "./text-editor";
@@ -26,7 +26,7 @@ import { MyStringRenderer } from "./MyStringRenderer";
 import { RatingRenderer } from "./RatingRenderer";
 import { MyObjectRenderer } from "./MyObjectRenderer";
 
-const MyCustomRendererFactory = new CustomRendererFactory();
+const MyCustomRendererFactory = new RendererFactory();
 MyCustomRendererFactory.addRenderer("MyStringRenderer", MyStringRenderer);
 MyCustomRendererFactory.addRenderer("RatingRenderer", RatingRenderer);
 MyCustomRendererFactory.addRenderer("MyObjectRenderer", MyObjectRenderer);

@@ -1,12 +1,12 @@
 import {
-  CustomRenderer,
+  Renderer,
   JsonValue,
   jvObject,
   JvObject,
   RendererInitArgs,
   RendererViewArgs,
 } from "@diesel-parser/json-form";
-import { Cmd, Dispatcher, Maybe, noCmd, nothing } from "tea-cup-core";
+import { Cmd, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
 
 export type Msg = string;
@@ -15,7 +15,7 @@ export interface Model {
   readonly value: JvObject;
 }
 
-export const MyObjectRenderer: CustomRenderer<Model, Msg> = {
+export const MyObjectRenderer: Renderer<Model, Msg> = {
   reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value } = args;
     let newModel = {

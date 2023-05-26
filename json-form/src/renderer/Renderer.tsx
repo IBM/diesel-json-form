@@ -15,7 +15,7 @@
  */
 
 import * as React from 'react';
-import { Dispatcher, maybeOf } from 'tea-cup-core';
+import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-core';
 import { Msg } from '../Msg';
 import {
   JsonValue,
@@ -27,7 +27,7 @@ import {
   jvString,
   JvString,
 } from '../JsonValue';
-import { CustomRendererModel, Model } from '../Model';
+import { CustomRendererModel, Model as FormModel, Model } from '../Model';
 import { JsPath } from '../JsPath';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 import { box, Dim, pos } from 'tea-pop-core';
@@ -49,7 +49,40 @@ import ChevronUp16 from '@carbon/icons-react/lib/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--vertical/16';
 import Add16 from '@carbon/icons-react/lib/add/16';
 import { TFunction } from 'i18next';
-import { CustomRendererFactory } from '../CustomRenderer';
+
+export interface RendererInitArgs<Model> {
+  readonly path: JsPath;
+  readonly formModel: FormModel;
+  readonly value: JsonValue;
+  readonly model: Maybe<Model>;
+  readonly schema: any;
+}
+
+export interface RendererViewArgs<Model, Msg> {
+  readonly dispatch: Dispatcher<Msg>;
+  readonly model: Model;
+  readonly path: JsPath;
+  readonly formView: (path: JsPath, value: JsonValue) => React.ReactElement;
+}
+
+export interface Renderer<Model, Msg> {
+  reinit(args: RendererInitArgs<Model>): [Model, Cmd<Msg>];
+  view(args: RendererViewArgs<Model, Msg>): React.ReactElement;
+  update(msg: Msg, model: Model): [Model, Cmd<Msg>, Maybe<JsonValue>];
+}
+
+export class RendererFactory {
+  private renderers: Map<string, Renderer<any, any>> = new Map();
+
+  addRenderer<Model, Msg>(key: string, renderer: Renderer<Model, Msg>) {
+    this.renderers.set(key, renderer);
+  }
+
+  getRenderer<Model, Msg>(key: string): Maybe<Renderer<Model, Msg>> {
+    const renderer = this.renderers.get(key);
+    return maybeOf(renderer as Renderer<Model, Msg>);
+  }
+}
 
 export interface BaseProps {
   readonly dispatch: Dispatcher<Msg>;
@@ -59,7 +92,7 @@ export interface ViewValueProps<T extends JsonValue> extends BaseProps {
   readonly model: Model;
   readonly path: JsPath;
   readonly value: T;
-  readonly customRendererFactory?: CustomRendererFactory;
+  readonly customRendererFactory?: RendererFactory;
 }
 
 export function ViewJsonValue(
