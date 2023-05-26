@@ -1,9 +1,8 @@
 import {
   CustomRenderer,
   JsonValue,
-  JsPath,
   jvNumber,
-  Model as FormModel,
+  RendererInitProps,
   ViewErrors,
 } from "@diesel-parser/json-form";
 import { Cmd, Dispatcher, just, Maybe, noCmd, nothing } from "tea-cup-core";
@@ -22,13 +21,8 @@ export interface Model {
 }
 
 export const RatingRenderer: CustomRenderer<Model, Msg> = {
-  reinit: function (
-    path: JsPath,
-    formModel: FormModel,
-    value: JsonValue,
-    model: Maybe<Model>,
-    schema: any
-  ): [Model, Cmd<Msg>] {
+  reinit: function (args: RendererInitProps<Model>): [Model, Cmd<Msg>] {
+    const { value, formModel, path } = args;
     const v = value.tag === "jv-number" ? value.value : -1;
     const errors = formModel.errors.get(path.format()) ?? [];
     const newModel: Model = {

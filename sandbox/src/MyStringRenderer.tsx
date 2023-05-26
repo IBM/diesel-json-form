@@ -5,6 +5,7 @@ import {
   valueType,
   Model as FormModel,
   JsPath,
+  RendererInitProps,
 } from "@diesel-parser/json-form";
 import {
   Cmd,
@@ -36,13 +37,8 @@ const MyConfigPropDecoder: Decoder<number> = D.at(
 );
 
 export const MyStringRenderer: CustomRenderer<Model, Msg> = {
-  reinit: function (
-    path: JsPath,
-    formModel: FormModel,
-    value: JsonValue,
-    model: Maybe<Model>,
-    schema: any
-  ): [Model, Cmd<Msg>] {
+  reinit: function (args: RendererInitProps<Model>): [Model, Cmd<Msg>] {
+    const { value, model, schema } = args;
     const strValue = value.tag === "jv-string" ? value.value : "NOT A STRING";
     const m: Model = model.withDefaultSupply(() => ({
       value: strValue,

@@ -98,13 +98,13 @@ function reInitCustomRenderers(
               JsPath.parse(path),
             );
             if (jValue.type === 'Just') {
-              const mac = renderer.value.reinit(
-                JsPath.parse(path),
-                model,
-                jValue.value,
-                m.map((x) => x.rendererModel),
-                rendererDef.schemaValue,
-              );
+              const mac = renderer.value.reinit({
+                path: JsPath.parse(path),
+                formModel: model,
+                value: jValue.value,
+                model: m.map((x) => x.rendererModel),
+                schema: rendererDef.schemaValue,
+              });
               const customRendererModel: CustomRendererModel = {
                 rendererModel: mac[0],
                 key,

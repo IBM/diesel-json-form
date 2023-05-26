@@ -5,6 +5,7 @@ import {
   jvObject,
   JvObject,
   Model as FormModel,
+  RendererInitProps,
 } from "@diesel-parser/json-form";
 import { Cmd, Dispatcher, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
@@ -16,13 +17,8 @@ export interface Model {
 }
 
 export const MyObjectRenderer: CustomRenderer<Model, Msg> = {
-  reinit: function (
-    path: JsPath,
-    formModel: FormModel,
-    value: JsonValue,
-    model: Maybe<Model>,
-    schema: any
-  ): [Model, Cmd<Msg>] {
+  reinit: function (args: RendererInitProps<Model>): [Model, Cmd<Msg>] {
+    const { value } = args;
     let newModel = {
       value: jvObject(),
     };
@@ -50,8 +46,6 @@ export const MyObjectRenderer: CustomRenderer<Model, Msg> = {
         </tbody>
       </table>
     );
-
-    return <p>Object !</p>;
   },
   update: function (
     msg: Msg,
