@@ -16,7 +16,7 @@
 
 import * as React from 'react';
 import { Dispatcher, maybeOf } from 'tea-cup-core';
-import { Msg } from './Msg';
+import { Msg } from '../Msg';
 import {
   JsonValue,
   JvArray,
@@ -26,9 +26,9 @@ import {
   JvObject,
   jvString,
   JvString,
-} from './JsonValue';
-import { CustomRendererModel, Model } from './Model';
-import { JsPath } from './JsPath';
+} from '../JsonValue';
+import { CustomRendererModel, Model } from '../Model';
+import { JsPath } from '../JsPath';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 import { box, Dim, pos } from 'tea-pop-core';
 import {
@@ -49,7 +49,7 @@ import ChevronUp16 from '@carbon/icons-react/lib/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--vertical/16';
 import Add16 from '@carbon/icons-react/lib/add/16';
 import { TFunction } from 'i18next';
-import { CustomRendererFactory } from './CustomRenderer';
+import { CustomRendererFactory } from '../CustomRenderer';
 
 export interface BaseProps {
   readonly dispatch: Dispatcher<Msg>;

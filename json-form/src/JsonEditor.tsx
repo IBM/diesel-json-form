@@ -39,7 +39,7 @@ import {
   updateAddingPropertyName,
 } from './Model';
 import { getValueAt, JsonValue, valueToAny } from './JsonValue';
-import { ArrayCounter, MenuTrigger, ViewJsonValue } from './Renderer';
+import { ArrayCounter, MenuTrigger, ViewJsonValue } from './renderer/Renderer';
 import { JsPath } from './JsPath';
 import {
   actionAddElementToArray,
