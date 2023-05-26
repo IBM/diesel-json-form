@@ -6,7 +6,7 @@ import {
   RendererViewArgs,
   ViewErrors,
 } from "@diesel-parser/json-form";
-import { Cmd, Dispatcher, just, Maybe, noCmd, nothing } from "tea-cup-core";
+import { Cmd, just, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
 import { JsValidationError } from "@diesel-parser/json-schema-facade-ts";
 
