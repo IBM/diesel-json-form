@@ -26,10 +26,10 @@ import { MyStringRenderer } from "./MyStringRenderer";
 import { RatingRenderer } from "./RatingRenderer";
 import { MyObjectRenderer } from "./MyObjectRenderer";
 
-const MyCustomRendererFactory = new RendererFactory();
-MyCustomRendererFactory.addRenderer("MyStringRenderer", MyStringRenderer);
-MyCustomRendererFactory.addRenderer("RatingRenderer", RatingRenderer);
-MyCustomRendererFactory.addRenderer("MyObjectRenderer", MyObjectRenderer);
+const MyRendererFactory = new RendererFactory();
+MyRendererFactory.addRenderer("MyStringRenderer", MyStringRenderer);
+MyRendererFactory.addRenderer("RatingRenderer", RatingRenderer);
+MyRendererFactory.addRenderer("MyObjectRenderer", MyObjectRenderer);
 
 const initialSchema = {};
 const initialValue = {};
@@ -456,7 +456,7 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
         }
       },
       strictMode,
-      customRendererFactory: MyCustomRendererFactory,
+      rendererFactory: MyRendererFactory,
     }),
     jsonForm
   );

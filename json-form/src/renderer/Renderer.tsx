@@ -49,6 +49,7 @@ import ChevronUp16 from '@carbon/icons-react/lib/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--vertical/16';
 import Add16 from '@carbon/icons-react/lib/add/16';
 import { TFunction } from 'i18next';
+import { ViewValueProps } from './ViewValueProps';
 
 export interface RendererInitArgs<Model> {
   readonly path: JsPath;
@@ -88,24 +89,17 @@ export interface BaseProps {
   readonly dispatch: Dispatcher<Msg>;
 }
 
-export interface ViewValueProps<T extends JsonValue> extends BaseProps {
-  readonly model: Model;
-  readonly path: JsPath;
-  readonly value: T;
-  readonly customRendererFactory?: RendererFactory;
-}
-
 export function ViewJsonValue(
   p: ViewValueProps<JsonValue>,
 ): React.ReactElement {
-  const { value, customRendererFactory } = p;
+  const { value, rendererFactory } = p;
 
   const path = p.path.format();
-  if (customRendererFactory) {
+  if (rendererFactory) {
     const customRendererModel = p.model.customRenderers.get(path);
     if (customRendererModel && customRendererModel.type === 'Just') {
       const m: CustomRendererModel = customRendererModel.value;
-      const renderer = customRendererFactory.getRenderer(m.key);
+      const renderer = rendererFactory.getRenderer(m.key);
       if (renderer.type === 'Just') {
         return renderer.value.view({
           dispatch: (msg: any) =>
@@ -122,7 +116,7 @@ export function ViewJsonValue(
               path={path}
               value={value}
               dispatch={p.dispatch}
-              customRendererFactory={customRendererFactory}
+              rendererFactory={rendererFactory}
             />
           ),
         });
