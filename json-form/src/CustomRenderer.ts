@@ -4,7 +4,7 @@ import { Model as FormModel } from './Model';
 import React from 'react';
 import { JsPath } from './JsPath';
 
-export interface RendererInitProps<Model> {
+export interface RendererInitArgs<Model> {
   readonly path: JsPath;
   readonly formModel: FormModel;
   readonly value: JsonValue;
@@ -12,9 +12,14 @@ export interface RendererInitProps<Model> {
   readonly schema: any;
 }
 
+export interface RendererViewArgs<Model, Msg> {
+  readonly dispatch: Dispatcher<Msg>;
+  readonly model: Model;
+}
+
 export interface CustomRenderer<Model, Msg> {
-  reinit(args: RendererInitProps<Model>): [Model, Cmd<Msg>];
-  view(dispatch: Dispatcher<Msg>, model: Model): React.ReactElement;
+  reinit(args: RendererInitArgs<Model>): [Model, Cmd<Msg>];
+  view(args: RendererViewArgs<Model, Msg>): React.ReactElement;
   update(msg: Msg, model: Model): [Model, Cmd<Msg>, Maybe<JsonValue>];
 }
 

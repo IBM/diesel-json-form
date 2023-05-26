@@ -2,7 +2,8 @@ import {
   CustomRenderer,
   JsonValue,
   jvNumber,
-  RendererInitProps,
+  RendererInitArgs,
+  RendererViewArgs,
   ViewErrors,
 } from "@diesel-parser/json-form";
 import { Cmd, Dispatcher, just, Maybe, noCmd, nothing } from "tea-cup-core";
@@ -21,7 +22,7 @@ export interface Model {
 }
 
 export const RatingRenderer: CustomRenderer<Model, Msg> = {
-  reinit: function (args: RendererInitProps<Model>): [Model, Cmd<Msg>] {
+  reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value, formModel, path } = args;
     const v = value.tag === "jv-number" ? value.value : -1;
     const errors = formModel.errors.get(path.format()) ?? [];
@@ -32,7 +33,8 @@ export const RatingRenderer: CustomRenderer<Model, Msg> = {
     };
     return noCmd(newModel);
   },
-  view: function (dispatch: Dispatcher<Msg>, model: Model): React.ReactElement {
+  view: function (args: RendererViewArgs<Model, Msg>): React.ReactElement {
+    const { model, dispatch } = args;
     const box = (index: number) => {
       const checked = index <= model.value;
       return (

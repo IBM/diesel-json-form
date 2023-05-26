@@ -5,7 +5,8 @@ import {
   valueType,
   Model as FormModel,
   JsPath,
-  RendererInitProps,
+  RendererInitArgs,
+  RendererViewArgs,
 } from "@diesel-parser/json-form";
 import {
   Cmd,
@@ -37,7 +38,7 @@ const MyConfigPropDecoder: Decoder<number> = D.at(
 );
 
 export const MyStringRenderer: CustomRenderer<Model, Msg> = {
-  reinit: function (args: RendererInitProps<Model>): [Model, Cmd<Msg>] {
+  reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value, model, schema } = args;
     const strValue = value.tag === "jv-string" ? value.value : "NOT A STRING";
     const m: Model = model.withDefaultSupply(() => ({
@@ -47,7 +48,8 @@ export const MyStringRenderer: CustomRenderer<Model, Msg> = {
     }));
     return noCmd(m);
   },
-  view: function (dispatch: Dispatcher<Msg>, model: Model): React.ReactElement {
+  view: function (args: RendererViewArgs<Model, Msg>): React.ReactElement {
+    const { dispatch, model } = args;
     return (
       <div
         className={"my-string"}

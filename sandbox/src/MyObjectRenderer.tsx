@@ -1,11 +1,10 @@
 import {
   CustomRenderer,
   JsonValue,
-  JsPath,
   jvObject,
   JvObject,
-  Model as FormModel,
-  RendererInitProps,
+  RendererInitArgs,
+  RendererViewArgs,
 } from "@diesel-parser/json-form";
 import { Cmd, Dispatcher, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
@@ -17,7 +16,7 @@ export interface Model {
 }
 
 export const MyObjectRenderer: CustomRenderer<Model, Msg> = {
-  reinit: function (args: RendererInitProps<Model>): [Model, Cmd<Msg>] {
+  reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value } = args;
     let newModel = {
       value: jvObject(),
@@ -30,7 +29,8 @@ export const MyObjectRenderer: CustomRenderer<Model, Msg> = {
     }
     return noCmd(newModel);
   },
-  view: function (dispatch: Dispatcher<Msg>, model: Model): React.ReactElement {
+  view: function (args: RendererViewArgs<Model, Msg>): React.ReactElement {
+    const { model } = args;
     if (model.value.properties.length === 0) {
       return <p>Empty object</p>;
     }
