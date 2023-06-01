@@ -15,8 +15,8 @@
  */
 
 import * as React from 'react';
-import { Dispatcher, maybeOf } from 'tea-cup-core';
-import { Msg } from './Msg';
+import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-core';
+import { Msg } from '../Msg';
 import {
   JsonValue,
   JvArray,
@@ -26,9 +26,9 @@ import {
   JvObject,
   jvString,
   JvString,
-} from './JsonValue';
-import { Model } from './Model';
-import { JsPath } from './JsPath';
+} from '../JsonValue';
+import { CustomRendererModel, Model as FormModel, Model } from '../Model';
+import { JsPath } from '../JsPath';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 import { box, Dim, pos } from 'tea-pop-core';
 import {
@@ -49,21 +49,77 @@ import ChevronUp16 from '@carbon/icons-react/lib/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--vertical/16';
 import Add16 from '@carbon/icons-react/lib/add/16';
 import { TFunction } from 'i18next';
+import { ViewValueProps } from './ViewValueProps';
 
-export interface BaseProps {
-  readonly dispatch: Dispatcher<Msg>;
+export interface RendererInitArgs<Model> {
+  readonly path: JsPath;
+  readonly formModel: FormModel;
+  readonly value: JsonValue;
+  readonly model: Maybe<Model>;
+  readonly schema: any;
 }
 
-export interface ViewValueProps<T extends JsonValue> extends BaseProps {
+export interface RendererViewArgs<Model, Msg> {
+  readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
   readonly path: JsPath;
-  readonly value: T;
+  readonly formView: (path: JsPath, value: JsonValue) => React.ReactElement;
+}
+
+export interface Renderer<Model, Msg> {
+  reinit(args: RendererInitArgs<Model>): [Model, Cmd<Msg>];
+  view(args: RendererViewArgs<Model, Msg>): React.ReactElement;
+  update(msg: Msg, model: Model): [Model, Cmd<Msg>, Maybe<JsonValue>];
+}
+
+export class RendererFactory {
+  private renderers: Map<string, Renderer<any, any>> = new Map();
+
+  addRenderer<Model, Msg>(key: string, renderer: Renderer<Model, Msg>) {
+    this.renderers.set(key, renderer);
+  }
+
+  getRenderer<Model, Msg>(key: string): Maybe<Renderer<Model, Msg>> {
+    const renderer = this.renderers.get(key);
+    return maybeOf(renderer as Renderer<Model, Msg>);
+  }
 }
 
 export function ViewJsonValue(
   p: ViewValueProps<JsonValue>,
 ): React.ReactElement {
-  const { value } = p;
+  const { value, rendererFactory } = p;
+
+  const path = p.path.format();
+  if (rendererFactory) {
+    const customRendererModel = p.model.customRenderers.get(path);
+    if (customRendererModel && customRendererModel.type === 'Just') {
+      const m: CustomRendererModel = customRendererModel.value;
+      const renderer = rendererFactory.getRenderer(m.key);
+      if (renderer.type === 'Just') {
+        return renderer.value.view({
+          dispatch: (msg: any) =>
+            p.dispatch({
+              tag: 'renderer-child-msg',
+              path,
+              msg,
+            }),
+          model: m.rendererModel,
+          path: p.path,
+          formView: (path: JsPath, value: JsonValue) => (
+            <ViewJsonValue
+              model={p.model}
+              path={path}
+              value={value}
+              dispatch={p.dispatch}
+              rendererFactory={rendererFactory}
+            />
+          ),
+        });
+      }
+    }
+  }
+
   const content = () => {
     switch (value.tag) {
       case 'jv-array':
@@ -698,11 +754,11 @@ export const onMenuTriggerClick = (
   }
 };
 
-interface ViewErrorsProps {
+export interface ViewErrorsProps {
   errors: ReadonlyArray<JsValidationError>;
 }
 
-function ViewErrors(props: ViewErrorsProps) {
+export function ViewErrors(props: ViewErrorsProps) {
   return props.errors.length > 0 ? (
     <div className="form-errors">
       {props.errors.map((e) => e.message).join(', ')}
@@ -712,7 +768,9 @@ function ViewErrors(props: ViewErrorsProps) {
   );
 }
 
-const WrapErrors: React.FunctionComponent<ViewValueProps<JsonValue>> = (p) => {
+export const WrapErrors: React.FunctionComponent<ViewValueProps<JsonValue>> = (
+  p,
+) => {
   const errorsAtPath = getErrorsAtPath(p);
   return (
     <>

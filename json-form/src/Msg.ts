@@ -40,7 +40,8 @@ export type Msg =
   | ToggleExpandCollapse
   | AddPropertyButtonClicked
   | RecomputeMetadata
-  | NoOp;
+  | NoOp
+  | { tag: 'renderer-child-msg'; path: string; msg: any };
 
 export interface AddPropertyButtonClicked extends HasPath {
   tag: 'add-property-btn-clicked';

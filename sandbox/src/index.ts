@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
+import "./style.css";
+import "@diesel-parser/json-form/dist/JsonEditor.css";
+import ReactDOM from "react-dom";
+import * as JsonForm from "@diesel-parser/json-form";
+import { RendererFactory } from "@diesel-parser/json-form";
+import big_sample from "./big_sample.json";
 
-import './style.css';
-import '@diesel-parser/json-form/dist/JsonEditor.css';
-import ReactDOM from 'react-dom';
-import * as JsonForm from '@diesel-parser/json-form';
-import big_sample from './big_sample.json';
-import React from 'react';
+import { editor1, editor2 } from "./text-editor";
+import { MyStringRenderer } from "./MyStringRenderer";
+import { RatingRenderer } from "./RatingRenderer";
+import { MyObjectRenderer } from "./MyObjectRenderer";
 
-import { editor1, editor2 } from "./text-editor"
+const MyRendererFactory = new RendererFactory();
+MyRendererFactory.addRenderer("MyStringRenderer", MyStringRenderer);
+MyRendererFactory.addRenderer("RatingRenderer", RatingRenderer);
+MyRendererFactory.addRenderer("MyObjectRenderer", MyObjectRenderer);
 
 const initialSchema = {};
 const initialValue = {};
 
-editor1.getModel()?.onDidChangeContent(e => {
+editor1.getModel()?.onDidChangeContent((e) => {
   sendJsonStr();
 });
 
@@ -48,16 +55,20 @@ function sendJsonStr() {
   JsonForm.sendJsonPort.send([schema, value]);
 }
 
-const syncPanesCb: HTMLInputElement = document.getElementById('syncPanes') as HTMLInputElement;
+const syncPanesCb: HTMLInputElement = document.getElementById(
+  "syncPanes"
+) as HTMLInputElement;
 
-editor2.getModel()?.onDidChangeContent(e => {
+editor2.getModel()?.onDidChangeContent((e) => {
   console.log("ed2 change");
   if (syncPanesCb.checked) {
     sendJsonStr();
   }
 });
 
-const sampleSchemaSelect = document.getElementById('sampleSchemaSelect') as HTMLSelectElement;
+const sampleSchemaSelect = document.getElementById(
+  "sampleSchemaSelect"
+) as HTMLSelectElement;
 
 const Sample_Long = `{
   "type": [
@@ -288,31 +299,74 @@ const Example_Unwrapping = `{
   }
 }`;
 
-const Example_Date = JSON.stringify(
+const Example_Renderer1 = `{
+    "type": "string",
+    "renderer": "MyStringRenderer"
+}`;
+
+const Example_Renderer2 = `{
+    "type": "string",
+    "renderer": {
+        "key": "MyStringRenderer",
+        "myConfigProp": 123
+    }
+}`;
+
+const Example_Renderer3 = JSON.stringify(
   {
-    type: 'string',
-    format: 'date',
+    properties: {
+      name: {
+        type: "string",
+      },
+      rating: {
+        type: "number",
+        renderer: "RatingRenderer",
+      },
+    },
   },
   null,
-  '  ',
+  "  "
+);
+
+const Example_Renderer4 = `
+{
+  "renderer": "MyObjectRenderer",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "renderer": "RatingRenderer"
+    }
+  }
+}`;
+
+const Example_Date = JSON.stringify(
+  {
+    type: "string",
+    format: "date",
+  },
+  null,
+  "  "
 );
 
 const Example_Time = JSON.stringify(
   {
-    type: 'string',
-    format: 'time',
+    type: "string",
+    format: "time",
   },
   null,
-  '  ',
+  "  "
 );
 
 const Example_DateTime = JSON.stringify(
   {
-    type: 'string',
-    format: 'date-time',
+    type: "string",
+    format: "date-time",
   },
   null,
-  '  ',
+  "  "
 );
 
 const Example_DateTimeWithExample = `{
@@ -322,32 +376,36 @@ const Example_DateTimeWithExample = `{
 }`;
 
 const samples = [
-  ['All', '{}'],
-  ['Long', Sample_Long],
-  ['String', Sample_String],
-  ['EnumArray', Sample_EnumArray],
-  ['BeanContainingOtherBean', Sample_BeanContainingOtherBean],
-  ['Inheritance', Sample_Inheritance],
-  ['Polymorphism', Example_Polymorphism],
-  ['Cycle', Example_Cycle],
-  ['Unwrapping', Example_Unwrapping],
-  ['Date', Example_Date],
-  ['Time', Example_Time],
-  ['DateTime', Example_DateTime],
-  ['DateTimeExample', Example_DateTimeWithExample],
-  ['BigSample', JSON.stringify(big_sample, null, '  ')],
+  ["All", "{}"],
+  ["Long", Sample_Long],
+  ["String", Sample_String],
+  ["EnumArray", Sample_EnumArray],
+  ["BeanContainingOtherBean", Sample_BeanContainingOtherBean],
+  ["Inheritance", Sample_Inheritance],
+  ["Polymorphism", Example_Polymorphism],
+  ["Cycle", Example_Cycle],
+  ["Unwrapping", Example_Unwrapping],
+  ["Date", Example_Date],
+  ["Time", Example_Time],
+  ["DateTime", Example_DateTime],
+  ["DateTimeExample", Example_DateTimeWithExample],
+  ["BigSample", JSON.stringify(big_sample, null, "  ")],
+  ["Renderer1", Example_Renderer1],
+  ["Renderer2", Example_Renderer2],
+  ["RendererRating", Example_Renderer3],
+  ["RendererObject", Example_Renderer4],
 ];
 
 samples
   .map((s) => {
-    const e = document.createElement('option');
+    const e = document.createElement("option");
     e.value = s[1];
     e.innerHTML = s[0];
     return e;
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-sampleSchemaSelect.addEventListener('change', () => {
+sampleSchemaSelect.addEventListener("change", () => {
   editor1.setValue(sampleSchemaSelect.value);
   sendJsonStr();
 });
@@ -355,28 +413,30 @@ sampleSchemaSelect.addEventListener('change', () => {
 const schema = JsonForm.valueFromAny(initialSchema).toMaybe();
 const valueRes = JsonForm.valueFromAny(initialValue);
 
-const jsonForm = document.getElementById('json-form');
+const jsonForm = document.getElementById("json-form");
 if (!jsonForm) {
-  throw new Error('json-form elem not found');
+  throw new Error("json-form elem not found");
 }
 
 const strictMode = false;
-const strictModeCb: HTMLInputElement = document.getElementById('strictMode') as HTMLInputElement;
+const strictModeCb: HTMLInputElement = document.getElementById(
+  "strictMode"
+) as HTMLInputElement;
 strictModeCb.checked = strictMode;
-strictModeCb.addEventListener('change', () => {
+strictModeCb.addEventListener("change", () => {
   // ReactDOM.unmountComponentAtNode(jsonForm);
   // initJsonForm(getSchema(), getValue(), strictModeCb.checked)
   JsonForm.setStrictModePort.send(strictModeCb.checked);
 });
 
 switch (valueRes.tag) {
-  case 'Err': {
-    const errNode = document.createElement('div');
+  case "Err": {
+    const errNode = document.createElement("div");
     errNode.appendChild(document.createTextNode(valueRes.err));
     jsonForm.appendChild(errNode);
     break;
   }
-  case 'Ok': {
+  case "Ok": {
     initJsonForm(schema, valueRes.value, strictMode);
     break;
   }
@@ -389,14 +449,15 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
       value,
       language: navigator.language,
       onChange: (value: JsonForm.JsonValue) => {
-        console.log('value changed');
+        console.log("value changed");
         if (syncPanesCb.checked) {
           const va = JsonForm.valueToAny(value);
-          editor2.setValue(JSON.stringify(va, null, '  '));
+          editor2.setValue(JSON.stringify(va, null, "  "));
         }
       },
       strictMode,
+      rendererFactory: MyRendererFactory,
     }),
-    jsonForm,
+    jsonForm
   );
 }
