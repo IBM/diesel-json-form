@@ -25,16 +25,14 @@ export type Msg =
 
 export interface RendererMsg<M> {
   tag: 'renderer-msg';
-  path: JsPath;
   msg: M;
 }
 
-export function rendererMsg<M>(path: JsPath): (msg: M) => Msg {
-  return (m) => ({
+export function rendererMsg<M>(msg: M): Msg {
+  return {
     tag: 'renderer-msg',
-    path,
-    msg: m,
-  });
+    msg,
+  };
 }
 
 export function setJsonStr(schemaAndJson: [Maybe<JsonValue>, JsonValue]): Msg {

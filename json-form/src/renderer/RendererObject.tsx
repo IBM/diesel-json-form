@@ -1,12 +1,26 @@
 import {
   JsonValue,
   JsonValueType,
-  jvBool,
-  valueToAny,
+  jvNull,
+  jvObject,
   valueType,
 } from '../JsonValue';
-import { Renderer, RendererInitArgs, RendererViewArgs } from './Renderer';
-import { Cmd, map, Maybe, noCmd, nothing, Tuple } from 'tea-cup-core';
+import {
+  Renderer,
+  RendererInitArgs,
+  RendererUpdateArgs,
+  RendererViewArgs,
+} from './Renderer';
+import {
+  Cmd,
+  just,
+  map,
+  Maybe,
+  maybeOf,
+  noCmd,
+  nothing,
+  Tuple,
+} from 'tea-cup-core';
 import * as React from 'react';
 import { RendererModel } from '../Model';
 
@@ -23,7 +37,8 @@ function propRendererMsg(propertyName: string): (m: any) => Msg {
 export interface Property {
   readonly name: string;
   readonly type: JsonValueType;
-  readonly model: Maybe<RendererModel>;
+  readonly rendererModel: Maybe<RendererModel>;
+  readonly value: JsonValue;
 }
 
 export interface Model {
@@ -60,14 +75,15 @@ export const RendererObject: Renderer<Model, Msg> = {
           const cmd: Cmd<Msg> = mac[1].map(propRendererMsg(propName));
           const newProp: Property = {
             name,
-            model: mac[0],
+            rendererModel: just(mac[0]),
             type: valueType(jvProp.value),
+            value: jvProp.value,
           };
           return new Tuple(newProp, cmd);
         })
         .withDefaultSupply(() => {
           return new Tuple(
-            { name, model: nothing, type: 'null' },
+            { name, rendererModel: nothing, type: 'null', value: jvNull },
             Cmd.none<Msg>(),
           );
         });
@@ -82,8 +98,72 @@ export const RendererObject: Renderer<Model, Msg> = {
     return Tuple.t2n(newModel, cmds);
   },
 
-  update(msg: Msg, model: Model): [Model, Cmd<Msg>, Maybe<JsonValue>] {
-    return [model, Cmd.none(), nothing];
+  update(
+    args: RendererUpdateArgs<Model, Msg>,
+  ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
+    const { model, msg, rendererFactory } = args;
+    switch (msg.tag) {
+      case 'prop-renderer-msg': {
+        const property: Maybe<Property> = maybeOf(
+          model.properties.find((p) => p.name === msg.propertyName),
+        );
+        const renderer: Maybe<Renderer<any, any>> = property.andThen((p) =>
+          rendererFactory.getRenderer(p.type),
+        );
+        const propertyRendererModel: Maybe<RendererModel> = property.andThen(
+          (p) => p.rendererModel,
+        );
+        const maco: Maybe<[any, Cmd<any>, Maybe<JsonValue>]> = renderer.andThen(
+          (renderer) => {
+            return propertyRendererModel.map((rendererModel) => {
+              return renderer.update({
+                model: just(rendererModel),
+                rendererFactory,
+                msg: msg.msg,
+              });
+            });
+          },
+        );
+
+        const newProperties: ReadonlyArray<Property> = model.properties.map(
+          (p) => {
+            if (p.name === msg.propertyName && maco.type === 'Just') {
+              return {
+                ...p,
+                rendererModel: just(maco.value[0]),
+              };
+            }
+            return p;
+          },
+        );
+
+        const cmd: Cmd<Msg> = maco
+          .map((maco) => {
+            return maco[1].map(propRendererMsg(msg.propertyName));
+          })
+          .withDefaultSupply(() => Cmd.none());
+
+        const newPropertyValue: Maybe<JsonValue> = maco.andThen((x) => x[2]);
+
+        const out: Maybe<JsonValue> = newPropertyValue.map(
+          (newPropertyValue) => {
+            return jvObject(
+              newProperties.map((p) => {
+                if (p.name === msg.propertyName) {
+                  return {
+                    name: p.name,
+                    value: newPropertyValue,
+                  };
+                }
+                return p;
+              }),
+            );
+          },
+        );
+
+        return [{ ...model, properties: newProperties }, cmd, out];
+      }
+    }
   },
 
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
@@ -97,11 +177,13 @@ export const RendererObject: Renderer<Model, Msg> = {
           <th>{property.name}</th>
           <td>
             {mbRenderer
-              .map((renderer) => {
-                return renderer.view({
-                  model: property.model,
-                  rendererFactory,
-                  dispatch: map(dispatch, propRendererMsg(property.name)),
+              .andThen((renderer) => {
+                return property.rendererModel.map((rendererModel) => {
+                  return renderer.view({
+                    model: rendererModel,
+                    rendererFactory,
+                    dispatch: map(dispatch, propRendererMsg(property.name)),
+                  });
                 });
               })
               .withDefaultSupply(() => (

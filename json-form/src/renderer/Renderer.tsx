@@ -34,8 +34,16 @@ export interface RendererViewArgs<Model, Msg> {
   readonly rendererFactory: RendererFactory;
 }
 
+export interface RendererUpdateArgs<Model, Msg> {
+  readonly msg: Msg;
+  readonly model: Model;
+  readonly rendererFactory: RendererFactory;
+}
+
 export interface Renderer<Model, Msg> {
   init(args: RendererInitArgs): [Model, Cmd<Msg>];
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement;
-  update(msg: Msg, model: Model): [Model, Cmd<Msg>, Maybe<JsonValue>];
+  update(
+    args: RendererUpdateArgs<Model, Msg>,
+  ): [Model, Cmd<Msg>, Maybe<JsonValue>];
 }

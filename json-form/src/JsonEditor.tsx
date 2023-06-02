@@ -51,12 +51,10 @@ export function init(
 
   const rootRenderer = rendererFactory.getRenderer(valueType(initialValue));
 
-  const path = JsPath.empty;
-
   return rootRenderer
     .map((renderer) => {
       const rmac = renderer.init({
-        path,
+        path: JsPath.empty,
         value: initialValue,
         validationResult: model.validationResult,
         rendererFactory,
@@ -65,7 +63,7 @@ export function init(
         ...model,
         rootRendererModel: just(rmac[0]),
       };
-      const cmd: Cmd<Msg> = rmac[1].map(rendererMsg(path));
+      const cmd: Cmd<Msg> = rmac[1].map(rendererMsg);
       return Tuple.t2n(newModel, cmd);
     })
     .withDefaultSupply(() => {
@@ -90,7 +88,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
               .getRenderer(valueType(model.root.b))
               .map((renderer) => {
                 return renderer.view({
-                  dispatch: map(dispatch, rendererMsg(JsPath.empty)),
+                  dispatch: map(dispatch, rendererMsg),
                   model: rendererModel,
                   rendererFactory,
                 });
@@ -144,6 +142,30 @@ export function update(
           rendererFactory,
         ),
       );
+    }
+    case 'renderer-msg': {
+      const res: Maybe<[
+        Model,
+        Cmd<Msg>,
+        Maybe<OutMsg>,
+      ]> = model.rootRendererModel.andThen((rendererModel) => {
+        return rendererFactory
+          .getRenderer(valueType(model.root.b))
+          .map((renderer) => {
+            const maco = renderer.update({
+              msg: msg.msg,
+              model: rendererModel,
+              rendererFactory,
+            });
+            const newModel: Model = {
+              ...model,
+              rootRendererModel: just(maco[0]),
+            };
+            const cmd: Cmd<Msg> = maco[1].map(rendererMsg);
+            return [newModel, cmd, maco[2].map(outValueChanged)];
+          });
+      });
+      return res.withDefaultSupply(() => [model, Cmd.none(), nothing]);
     }
   }
   return noOut(noCmd(model));

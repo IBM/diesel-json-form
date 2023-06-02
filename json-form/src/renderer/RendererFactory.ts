@@ -2,6 +2,7 @@ import { Maybe, maybeOf } from 'tea-cup-core';
 import { Renderer } from './Renderer';
 import { JsonValueType } from '../JsonValue';
 import { RendererObject } from './RendererObject';
+import { RendererString } from './RendererString';
 
 export class RendererFactory {
   private renderers: Map<string, Renderer<any, any>> = new Map();
@@ -9,6 +10,7 @@ export class RendererFactory {
   constructor() {
     // add the builtin renderers
     this.addBuiltinRenderer('object', RendererObject);
+    this.addBuiltinRenderer('string', RendererString);
   }
 
   private addBuiltinRenderer<Model, Msg>(
