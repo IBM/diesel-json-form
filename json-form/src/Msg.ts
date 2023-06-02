@@ -15,41 +15,26 @@
  */
 
 import { JsPath } from './JsPath';
-import { JsonValue } from './JsonValue';
-import * as TPM from 'tea-pop-menu';
-import { Box } from 'tea-pop-core';
-import { MenuAction } from './ContextMenuActions';
 import { Maybe } from 'tea-cup-core';
-
-export interface HasPath {
-  readonly path: JsPath;
-}
+import { JsonValue } from './JsonValue';
 
 export type Msg =
-  | DeleteProperty
-  | UpdateProperty
-  | AddPropertyClicked
-  | { tag: 'new-property-name-changed'; value: string }
-  | { tag: 'new-property-name-key-down'; key: string }
-  | { tag: 'add-prop-ok-cancel-clicked'; ok: boolean }
-  | AddElemClicked
-  | ContextMenuMsg
-  | MenuTriggerClicked
+  | RendererMsg<any>
   | { tag: 'set-json-str'; schema: Maybe<JsonValue>; json: JsonValue }
-  | { tag: 'set-strict-mode'; strictMode: boolean }
-  | ToggleExpandCollapse
-  | AddPropertyButtonClicked
-  | RecomputeMetadata
-  | NoOp
-  | { tag: 'renderer-child-msg'; path: string; msg: any };
+  | { tag: 'set-strict-mode'; strictMode: boolean };
 
-export interface AddPropertyButtonClicked extends HasPath {
-  tag: 'add-property-btn-clicked';
-  readonly propertyName: string;
+export interface RendererMsg<M> {
+  tag: 'renderer-msg';
+  path: JsPath;
+  msg: M;
 }
 
-export interface ToggleExpandCollapse extends HasPath {
-  tag: 'toggle-expand-collapse';
+export function rendererMsg<M>(path: JsPath): (msg: M) => Msg {
+  return (m) => ({
+    tag: 'renderer-msg',
+    path,
+    msg: m,
+  });
 }
 
 export function setJsonStr(schemaAndJson: [Maybe<JsonValue>, JsonValue]): Msg {
@@ -65,50 +50,4 @@ export function setStrictModeMsg(strictMode: boolean): Msg {
     tag: 'set-strict-mode',
     strictMode,
   };
-}
-
-export interface MenuTriggerClicked extends HasPath {
-  tag: 'menu-trigger-clicked';
-  refBox: Box;
-}
-
-export interface ContextMenuMsg {
-  tag: 'menu-msg';
-  child: TPM.Msg<MenuAction>;
-}
-
-export function contextMenuMsg(child: TPM.Msg<MenuAction>): Msg {
-  return {
-    tag: 'menu-msg',
-    child,
-  };
-}
-
-export interface NoOp {
-  tag: 'no-op';
-}
-
-export const noOp: Msg = {
-  tag: 'no-op',
-};
-
-export interface DeleteProperty extends HasPath {
-  tag: 'delete-property';
-}
-
-export interface UpdateProperty extends HasPath {
-  tag: 'update-property';
-  value: JsonValue;
-}
-
-export interface AddPropertyClicked extends HasPath {
-  tag: 'add-property-clicked';
-}
-
-export interface AddElemClicked extends HasPath {
-  tag: 'add-elem-clicked';
-}
-
-export interface RecomputeMetadata {
-  tag: 'recompute-metadata';
 }

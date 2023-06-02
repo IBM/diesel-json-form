@@ -22,14 +22,14 @@ import { RendererFactory } from "@diesel-parser/json-form";
 import big_sample from "./big_sample.json";
 
 import { editor1, editor2 } from "./text-editor";
-import { MyStringRenderer } from "./MyStringRenderer";
-import { RatingRenderer } from "./RatingRenderer";
-import { MyObjectRenderer } from "./MyObjectRenderer";
+// import { MyStringRenderer } from "./MyStringRenderer";
+// import { RatingRenderer } from "./RatingRenderer";
+// import { MyObjectRenderer } from "./MyObjectRenderer";
 
 const MyRendererFactory = new RendererFactory();
-MyRendererFactory.addRenderer("MyStringRenderer", MyStringRenderer);
-MyRendererFactory.addRenderer("RatingRenderer", RatingRenderer);
-MyRendererFactory.addRenderer("MyObjectRenderer", MyObjectRenderer);
+// MyRendererFactory.addRenderer("MyStringRenderer", MyStringRenderer);
+// MyRendererFactory.addRenderer("RatingRenderer", RatingRenderer);
+// MyRendererFactory.addRenderer("MyObjectRenderer", MyObjectRenderer);
 
 const initialSchema = {};
 const initialValue = {};
