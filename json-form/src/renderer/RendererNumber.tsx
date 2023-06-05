@@ -1,0 +1,55 @@
+import {
+  Renderer,
+  RendererInitArgs,
+  RendererUpdateArgs,
+  RendererViewArgs,
+} from './Renderer';
+import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
+import { JsonValue, jvNumber } from '../JsonValue';
+import * as React from 'react';
+
+export type Msg = { tag: 'value-changed'; value: number };
+
+export interface Model {
+  readonly fieldValue: Maybe<number>;
+}
+
+export const RendererNumber: Renderer<Model, Msg> = {
+  init(args: RendererInitArgs): [Model, Cmd<Msg>] {
+    const model: Model = {
+      fieldValue:
+        args.value.tag === 'jv-number' ? just(args.value.value) : nothing,
+    };
+    return noCmd(model);
+  },
+  update(
+    args: RendererUpdateArgs<Model, Msg>,
+  ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
+    const { model, msg } = args;
+    switch (msg.tag) {
+      case 'value-changed': {
+        const newModel: Model = {
+          ...model,
+          fieldValue: just(msg.value),
+        };
+        return [newModel, Cmd.none(), just(jvNumber(msg.value))];
+      }
+    }
+  },
+  view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
+    return args.model.fieldValue
+      .map((value) => (
+        <input
+          type={'number'}
+          value={value}
+          onChange={(e) => {
+            args.dispatch({
+              tag: 'value-changed',
+              value: e.target.valueAsNumber,
+            });
+          }}
+        />
+      ))
+      .withDefaultSupply(() => <p>Not a string !</p>);
+  },
+};

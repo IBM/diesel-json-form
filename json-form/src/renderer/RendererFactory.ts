@@ -3,6 +3,10 @@ import { Renderer } from './Renderer';
 import { JsonValueType } from '../JsonValue';
 import { RendererObject } from './RendererObject';
 import { RendererString } from './RendererString';
+import { RendererBoolean } from './RendererBoolean';
+import { RendererNull } from './RendererNull';
+import { RendererNumber } from './RendererNumber';
+import { RendererArray } from './RendererArray';
 
 export class RendererFactory {
   private renderers: Map<string, Renderer<any, any>> = new Map();
@@ -10,7 +14,11 @@ export class RendererFactory {
   constructor() {
     // add the builtin renderers
     this.addBuiltinRenderer('object', RendererObject);
+    this.addBuiltinRenderer('array', RendererArray);
     this.addBuiltinRenderer('string', RendererString);
+    this.addBuiltinRenderer('number', RendererNumber);
+    this.addBuiltinRenderer('boolean', RendererBoolean);
+    this.addBuiltinRenderer('null', RendererNull);
   }
 
   private addBuiltinRenderer<Model, Msg>(
@@ -20,7 +28,7 @@ export class RendererFactory {
     this.addRenderer(valueType, renderer);
   }
 
-  addRenderer<Model, Msg>(key: string, renderer: Renderer<Model, Msg>) {
+  addRenderer<Model, Msg>(key: string, renderer: Renderer<Model, Msg>): void {
     this.renderers.set(key, renderer);
   }
 

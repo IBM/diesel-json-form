@@ -170,8 +170,6 @@ export const RendererObject: Renderer<Model, Msg> = {
     const { model, rendererFactory, dispatch } = args;
     const { properties } = model;
 
-    console.log('RendererObject.view()', properties);
-
     function viewProperty(property: Property) {
       const mbRenderer = rendererFactory.getRenderer(property.type);
       return (
@@ -181,7 +179,6 @@ export const RendererObject: Renderer<Model, Msg> = {
             {mbRenderer
               .andThen((renderer) => {
                 return property.rendererModel.map((rendererModel) => {
-                  console.log('renderProperty', rendererModel);
                   return renderer.view({
                     model: rendererModel,
                     rendererFactory,
@@ -202,7 +199,7 @@ export const RendererObject: Renderer<Model, Msg> = {
       <div>
         <div>{'{'}</div>
         <table>
-          <tbody>{properties.map((p) => viewProperty(p))}</tbody>
+          <tbody>{properties.map(viewProperty)}</tbody>
         </table>
         <div>{'}'}</div>
       </div>
