@@ -37,6 +37,7 @@ export const RendererString: Renderer<Model, Msg> = {
     }
   },
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
+    console.log('RendererString.view()', args.model);
     return args.model.fieldValue
       .map((value) => (
         <input
