@@ -69,6 +69,7 @@ export const RendererArray: Renderer<Model, Msg> = {
             path: path.append(jvElemIndex),
             rendererFactory,
             validationResult: args.validationResult,
+            t: args.t,
           });
           const cmd: Cmd<Msg> = mac[1].map(elemRendererMsg(jvElemIndex));
           const newElem: Elem = {
@@ -121,6 +122,7 @@ export const RendererArray: Renderer<Model, Msg> = {
                 model: rendererModel,
                 rendererFactory,
                 msg: msg.msg,
+                validationResult: args.validationResult,
               });
             });
           },
@@ -177,6 +179,8 @@ export const RendererArray: Renderer<Model, Msg> = {
                     model: rendererModel,
                     rendererFactory,
                     dispatch: map(dispatch, elemRendererMsg(elem.index)),
+                    t: args.t,
+                    validationResult: args.validationResult,
                   });
                 });
               })

@@ -29,7 +29,7 @@ import {
 } from 'tea-cup-core';
 import { DevTools, Program } from 'react-tea-cup';
 import { Msg, rendererMsg, setJsonStr, setStrictModeMsg } from './Msg';
-import { doValidate, initialModel, Model } from './Model';
+import { doValidate, initialModel, Model, toValueTuple } from './Model';
 import { JsonValue, valueToAny, valueType } from './JsonValue';
 import { OutMsg, outValueChanged } from './OutMsg';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
@@ -58,6 +58,7 @@ export function init(
         value: initialValue,
         validationResult: model.validationResult,
         rendererFactory,
+        t: model.t,
       });
       const newModel: Model = {
         ...model,
@@ -77,7 +78,7 @@ export interface ViewJsonEditorProps {
   readonly rendererFactory: RendererFactory;
 }
 
-export function ViewJsonEditor(props: ViewJsonEditorProps) {
+export function ViewJsonEditor(props: ViewJsonEditorProps): React.ReactElement {
   const { model, dispatch, rendererFactory } = props;
   return (
     <div className="diesel-json-editor">
@@ -91,6 +92,8 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
                   dispatch: map(dispatch, rendererMsg),
                   model: rendererModel,
                   rendererFactory,
+                  t: model.t,
+                  validationResult: model.validationResult,
                 });
               });
           })
@@ -156,13 +159,25 @@ export function update(
               msg: msg.msg,
               model: rendererModel,
               rendererFactory,
+              validationResult: model.validationResult,
             });
             const newModel: Model = {
               ...model,
               rootRendererModel: just(maco[0]),
             };
             const cmd: Cmd<Msg> = maco[1].map(rendererMsg);
-            return [newModel, cmd, maco[2].map(outValueChanged)];
+
+            const newRoot = maco[2].withDefault(model.root.b);
+            const newModel2: Model = {
+              ...newModel,
+              root: toValueTuple(newRoot),
+            };
+
+            const newModelValidated = maco[2].isJust()
+              ? doValidate(newModel2)
+              : newModel2;
+
+            return [newModelValidated, cmd, maco[2].map(outValueChanged)];
           });
       });
       return res.withDefaultSupply(() => [model, Cmd.none(), nothing]);

@@ -71,6 +71,7 @@ export const RendererObject: Renderer<Model, Msg> = {
             path: path.append(propName),
             rendererFactory,
             validationResult: args.validationResult,
+            t: args.t,
           });
           const cmd: Cmd<Msg> = mac[1].map(propRendererMsg(propName));
           const newProp: Property = {
@@ -120,6 +121,7 @@ export const RendererObject: Renderer<Model, Msg> = {
                 model: rendererModel,
                 rendererFactory,
                 msg: msg.msg,
+                validationResult: args.validationResult,
               });
             });
           },
@@ -183,6 +185,8 @@ export const RendererObject: Renderer<Model, Msg> = {
                     model: rendererModel,
                     rendererFactory,
                     dispatch: map(dispatch, propRendererMsg(property.name)),
+                    t: args.t,
+                    validationResult: args.validationResult,
                   });
                 });
               })

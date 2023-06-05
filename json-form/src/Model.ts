@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { just, Maybe, nothing, Result, Tuple } from 'tea-cup-core';
-import { JsonValue, valueFromAny, valueToAny } from './JsonValue';
-import { JsPath } from './JsPath';
+import { just, Maybe, nothing, Tuple } from 'tea-cup-core';
+import { JsonValue, valueToAny } from './JsonValue';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { JsValidationResult } from '@diesel-parser/json-schema-facade-ts';
 import { TFunction } from 'i18next';
@@ -37,6 +36,7 @@ export interface Model {
 export function doValidate(model: Model): Model {
   return model.schema
     .map((t) => {
+      debugger;
       const validationResult = just(JsFacade.validate(t.a, model.root.a));
       return {
         ...model,
@@ -46,7 +46,7 @@ export function doValidate(model: Model): Model {
     .withDefault(model);
 }
 
-function toValueTuple(v: JsonValue): Tuple<any, JsonValue> {
+export function toValueTuple(v: JsonValue): Tuple<any, JsonValue> {
   return new Tuple(valueToAny(v), v);
 }
 
@@ -68,17 +68,4 @@ export function initialModel(
   };
 
   return doValidate(model);
-}
-
-export function getProposals(
-  validationResult: JsValidationResult,
-  path: JsPath,
-): ReadonlyArray<JsonValue> {
-  const proposals = JsFacade.propose(validationResult, path.format(), 5);
-  return proposals.flatMap((proposalAny) => {
-    return valueFromAny(proposalAny).match(
-      (jsonValue) => [jsonValue],
-      () => [], // TODO error ignored not so good ?
-    );
-  });
 }

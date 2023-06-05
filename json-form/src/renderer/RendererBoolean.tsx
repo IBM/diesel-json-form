@@ -5,18 +5,28 @@ import {
   RendererViewArgs,
 } from './Renderer';
 import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
-import { JsonValue, jvBool, jvString } from '../JsonValue';
+import { JsonValue, jvBool } from '../JsonValue';
 import * as React from 'react';
+import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
+import { TFunction } from 'i18next';
+import { WrapErrors } from './utils/WrapErrors';
+import { Checkbox } from 'carbon-components-react';
+import { JsPath } from '../JsPath';
+import {
+  rendererModelBase,
+  RendererModelBase,
+} from './utils/RendererModelBase';
 
 export type Msg = { tag: 'value-changed'; value: boolean };
 
-export interface Model {
+export interface Model extends RendererModelBase {
   readonly fieldValue: Maybe<boolean>;
 }
 
 export const RendererBoolean: Renderer<Model, Msg> = {
   init(args: RendererInitArgs): [Model, Cmd<Msg>] {
     const model: Model = {
+      ...rendererModelBase(args),
       fieldValue:
         args.value.tag === 'jv-boolean' ? just(args.value.value) : nothing,
     };
@@ -37,16 +47,49 @@ export const RendererBoolean: Renderer<Model, Msg> = {
     }
   },
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
+    const { model } = args;
     return args.model.fieldValue
       .map((value) => (
-        <input
-          type={'checkbox'}
+        <ViewBoolean
+          errors={model.errors}
+          t={args.t}
+          path={model.path}
           checked={value}
-          onChange={(e) => {
-            args.dispatch({ tag: 'value-changed', value: e.target.checked });
+          disabled={false}
+          onChange={() => {
+            args.dispatch({ tag: 'value-changed', value: !value });
           }}
         />
       ))
       .withDefaultSupply(() => <p>Not a boolean !</p>);
   },
 };
+
+interface ViewBooleanProps {
+  readonly errors: readonly JsValidationError[];
+  readonly t: TFunction;
+  readonly path: JsPath;
+  readonly checked: boolean;
+  readonly disabled: boolean;
+  readonly onChange: () => void;
+}
+
+function ViewBoolean(p: ViewBooleanProps): React.ReactElement {
+  const { t, errors, path, checked, disabled, onChange } = p;
+  return (
+    <WrapErrors errors={errors}>
+      <div className="checkbox-wrapper">
+        <Checkbox
+          labelText={t('booleanValueLabel', {
+            path: path.format('.'),
+          }).toString()}
+          hideLabel={true}
+          id={'input-' + path.format('_')}
+          checked={checked}
+          disabled={disabled}
+          onChange={onChange}
+        />
+      </div>
+    </WrapErrors>
+  );
+}

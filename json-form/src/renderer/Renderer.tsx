@@ -20,24 +20,29 @@ import { JsonValue } from '../JsonValue';
 import { JsPath } from '../JsPath';
 import { JsValidationResult } from '../../../../diesel-json/ts-facade';
 import { RendererFactory } from './RendererFactory';
+import { TFunction } from 'i18next';
 
 export interface RendererInitArgs {
   readonly path: JsPath;
   readonly value: JsonValue;
   readonly validationResult: Maybe<JsValidationResult>;
   readonly rendererFactory: RendererFactory;
+  readonly t: TFunction;
 }
 
 export interface RendererViewArgs<Model, Msg> {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
+  readonly t: TFunction;
+  readonly validationResult: Maybe<JsValidationResult>;
 }
 
 export interface RendererUpdateArgs<Model, Msg> {
   readonly msg: Msg;
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
+  readonly validationResult: Maybe<JsValidationResult>;
 }
 
 export interface Renderer<Model, Msg> {
