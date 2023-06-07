@@ -2,6 +2,7 @@ import {
   JsonValue,
   JsonValueType,
   jvNull,
+  JvObject,
   jvObject,
   valueType,
 } from '../JsonValue';
@@ -13,6 +14,7 @@ import {
 } from './Renderer';
 import {
   Cmd,
+  Dispatcher,
   just,
   map,
   Maybe,
@@ -22,9 +24,22 @@ import {
   Tuple,
 } from 'tea-cup-core';
 import * as React from 'react';
-import { RendererModel } from '../Model';
+import { JsPath } from '../JsPath';
+import { TFunction } from 'i18next';
+import { Button, TextInput } from 'carbon-components-react';
+import { ExpandCollapseButton } from './utils/ExpandCollapseButton';
+import { ArrayCounter } from './utils/ArrayCounter';
+import { MenuTrigger } from './utils/MenuTrigger';
 
-export type Msg = { tag: 'prop-renderer-msg'; propertyName: string; msg: any };
+export type Msg =
+  | { tag: 'prop-renderer-msg'; propertyName: string; msg: unknown }
+  | {
+      tag: 'new-property-name-changed';
+      value: string;
+    }
+  | { tag: 'new-property-name-key-down'; key: string };
+// | { tag: 'add-prop-ok-cancel-clicked'; ok: boolean }
+// | { tag: 'expand-collapse-clicked'; propertyName: string };
 
 function propRendererMsg(propertyName: string): (m: any) => Msg {
   return (msg) => ({
@@ -37,12 +52,19 @@ function propRendererMsg(propertyName: string): (m: any) => Msg {
 export interface Property {
   readonly name: string;
   readonly type: JsonValueType;
-  readonly rendererModel: Maybe<RendererModel>;
+  readonly rendererModel: Maybe<unknown>;
   readonly value: JsonValue;
+  readonly collapsed: boolean;
+}
+
+export interface AddingState {
+  readonly addingPropName: string;
+  readonly isDuplicate: boolean;
 }
 
 export interface Model {
   readonly properties: ReadonlyArray<Property>;
+  readonly addingState: Maybe<AddingState>;
 }
 
 export const RendererObject: Renderer<Model, Msg> = {
@@ -51,6 +73,7 @@ export const RendererObject: Renderer<Model, Msg> = {
 
     const model: Model = {
       properties: [],
+      addingState: nothing,
     };
 
     // TODO return init error
@@ -73,18 +96,27 @@ export const RendererObject: Renderer<Model, Msg> = {
             validationResult: args.validationResult,
             t: args.t,
           });
+
           const cmd: Cmd<Msg> = mac[1].map(propRendererMsg(propName));
+          const type = valueType(jvProp.value);
           const newProp: Property = {
             name,
             rendererModel: just(mac[0]),
-            type: valueType(jvProp.value),
+            type,
             value: jvProp.value,
+            collapsed: type === 'array' || type === 'object',
           };
           return new Tuple(newProp, cmd);
         })
         .withDefaultSupply(() => {
           return new Tuple(
-            { name, rendererModel: nothing, type: 'null', value: jvNull },
+            {
+              name,
+              rendererModel: nothing,
+              type: 'null',
+              value: jvNull,
+              collapsed: false,
+            },
             Cmd.none<Msg>(),
           );
         });
@@ -111,7 +143,7 @@ export const RendererObject: Renderer<Model, Msg> = {
         const renderer: Maybe<Renderer<any, any>> = property.andThen((p) =>
           rendererFactory.getRenderer(p.type),
         );
-        const propertyRendererModel: Maybe<RendererModel> = property.andThen(
+        const propertyRendererModel: Maybe<unknown> = property.andThen(
           (p) => p.rendererModel,
         );
         const maco: Maybe<[any, Cmd<any>, Maybe<JsonValue>]> = renderer.andThen(
@@ -165,6 +197,14 @@ export const RendererObject: Renderer<Model, Msg> = {
 
         return [{ ...model, properties: newProperties }, cmd, out];
       }
+      case 'new-property-name-changed': {
+        // TODO
+        return [model, Cmd.none(), nothing];
+      }
+      case 'new-property-name-key-down': {
+        // TODO
+        return [model, Cmd.none(), nothing];
+      }
     }
   },
 
@@ -210,3 +250,159 @@ export const RendererObject: Renderer<Model, Msg> = {
     );
   },
 };
+
+interface ViewObjectProps {
+  readonly addingState: Maybe<AddingState>;
+  readonly dispatch: Dispatcher<Msg>;
+  readonly path: JsPath;
+  readonly t: TFunction;
+  readonly properties: readonly Property[];
+  readonly viewPropertyValue: (
+    path: JsPath,
+    value: JsonValue,
+  ) => React.ReactElement;
+}
+
+// function ViewObject(p: ViewObjectProps): React.ReactElement {
+//   const { addingState, dispatch, path, t, properties } = p;
+//   const isAddingProp = addingState.isJust();
+//
+//   const addSection = addingState
+//     .map((addingState) => {
+//       return (
+//         <div className="add-prop-form">
+//           <TextInput
+//             labelText={t('propertyNameLabel', {
+//               path: path.format('.'),
+//             }).toString()}
+//             hideLabel={true}
+//             id={'property-name-editor'}
+//             placeholder={t('propertyNamePlaceholder')}
+//             value={addingState.addingPropName}
+//             onChange={(e) =>
+//               dispatch({
+//                 tag: 'new-property-name-changed',
+//                 value: e.target.value,
+//               })
+//             }
+//             onKeyDown={(e) => {
+//               dispatch({
+//                 tag: 'new-property-name-key-down',
+//                 key: e.key,
+//               });
+//             }}
+//             invalidText={t<string>('propertyAlreadyExists')}
+//             invalid={addingState.isDuplicate}
+//           />
+//           <div className={'buttons-row'}>
+//             <div className="spacer" />
+//             <Button
+//               kind={'primary'}
+//               disabled={
+//                 addingState.addingPropName === '' || addingState.isDuplicate
+//               }
+//               onClick={() =>
+//                 dispatch({ tag: 'add-prop-ok-cancel-clicked', ok: true })
+//               }
+//             >
+//               Add
+//             </Button>
+//             <Button
+//               kind={'secondary'}
+//               onClick={() =>
+//                 dispatch({ tag: 'add-prop-ok-cancel-clicked', ok: false })
+//               }
+//             >
+//               Cancel
+//             </Button>
+//           </div>
+//         </div>
+//       );
+//     })
+//     .withDefault(<></>);
+//
+//   const existingPropertyNames = new Set(properties.map((p) => p.name));
+//
+//   return (
+//     <div className="jv-object">
+//       {properties.length === 0 ? (
+//         <div className="empty-obj">{t('emptyObject')}</div>
+//       ) : (
+//         <></>
+//       )}
+//       {properties.map((prop, propIndex) => {
+//         const propertyPath = p.path.append(prop.name);
+//         const propNameClass = ['object-prop'].concat(
+//           isAddingProp ? ['disabled'] : [''],
+//         );
+//         const isCollapsed = prop.collapsed;
+//         return (
+//           <div className={propNameClass.join(' ')} key={prop.name + propIndex}>
+//             <div className={'prop-name-row'}>
+//               <div className="prop-expand">
+//                 <ExpandCollapseButton
+//                   collapsed={isCollapsed}
+//                   onClick={() =>
+//                     dispatch({
+//                       tag: 'expand-collapse-clicked',
+//                       propertyName: prop.name,
+//                     })
+//                   }
+//                   t={t}
+//                 />
+//               </div>
+//               <div className={'prop-name'}>{prop.name}</div>
+//               <ArrayCounter value={prop.value} />
+//               <div className={'prop-menu'}>
+//                 <MenuTrigger
+//                   onClick={() => {
+//                     debugger;
+//                   }}
+//                   disabled={isAddingProp}
+//                   t={t}
+//                 />
+//               </div>
+//             </div>
+//             {isCollapsed ? (
+//               <></>
+//             ) : (
+//               <div className="prop-value">
+//                 {p.viewPropertyValue(propertyPath, prop.value)}
+//               </div>
+//             )}
+//           </div>
+//         );
+//       })}
+//       <ViewErrors errors={getErrorsAtPath(p)} />
+//       <div>{addSection}</div>
+//       <div>
+//         {maybeOf(model.propertiesToAdd.get(p.path.format()))
+//           .map((propNames) => (
+//             <>
+//               {propNames
+//                 .filter((propName) => !existingPropertyNames.has(propName))
+//                 .sort()
+//                 .map((propName) => (
+//                   <div className="add-prop-row" key={propName}>
+//                     <Button
+//                       renderIcon={Add16}
+//                       kind={'ghost'}
+//                       onClick={() =>
+//                         dispatch({
+//                           tag: 'add-property-btn-clicked',
+//                           path: p.path,
+//                           propertyName: propName,
+//                         })
+//                       }
+//                     >
+//                       {propName}
+//                     </Button>
+//                   </div>
+//                 ))}
+//             </>
+//           ))
+//           .withDefault(<></>)}
+//       </div>
+//     </div>
+//   );
+// }

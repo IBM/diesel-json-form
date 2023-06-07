@@ -21,13 +21,11 @@ import { JsValidationResult } from '@diesel-parser/json-schema-facade-ts';
 import { TFunction } from 'i18next';
 import { initMyI18n } from './i18n/MyI18n';
 
-export type RendererModel = any;
-
 export interface Model {
   readonly schema: Maybe<Tuple<any, JsonValue>>;
   readonly root: Tuple<any, JsonValue>;
   readonly validationResult: Maybe<JsValidationResult>;
-  readonly rootRendererModel: Maybe<RendererModel>;
+  readonly rootRendererModel: Maybe<unknown>;
   readonly t: TFunction;
   readonly lang: string;
   readonly strictMode: boolean;

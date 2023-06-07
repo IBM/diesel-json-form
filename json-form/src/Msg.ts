@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-import { JsPath } from './JsPath';
 import { Maybe } from 'tea-cup-core';
 import { JsonValue } from './JsonValue';
 
 export type Msg =
-  | RendererMsg<any>
+  | RendererMsg
   | { tag: 'set-json-str'; schema: Maybe<JsonValue>; json: JsonValue }
   | { tag: 'set-strict-mode'; strictMode: boolean };
 
-export interface RendererMsg<M> {
+export interface RendererMsg {
   tag: 'renderer-msg';
-  msg: M;
+  msg: unknown;
 }
 
-export function rendererMsg<M>(msg: M): Msg {
+export function rendererMsg(msg: unknown): Msg {
   return {
     tag: 'renderer-msg',
     msg,

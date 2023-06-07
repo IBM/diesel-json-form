@@ -9,7 +9,7 @@ import { RendererNumber } from './RendererNumber';
 import { RendererArray } from './RendererArray';
 
 export class RendererFactory {
-  private renderers: Map<string, Renderer<any, any>> = new Map();
+  private renderers: Map<string, Renderer<unknown, unknown>> = new Map();
 
   constructor() {
     // add the builtin renderers

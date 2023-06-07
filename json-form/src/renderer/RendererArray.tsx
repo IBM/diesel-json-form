@@ -22,11 +22,10 @@ import {
   Tuple,
 } from 'tea-cup-core';
 import * as React from 'react';
-import { RendererModel } from '../Model';
 
-export type Msg = { tag: 'elem-renderer-msg'; index: number; msg: any };
+export type Msg = { tag: 'elem-renderer-msg'; index: number; msg: unknown };
 
-function elemRendererMsg(index: number): (m: any) => Msg {
+function elemRendererMsg(index: number): (m: unknown) => Msg {
   return (msg) => ({
     tag: 'elem-renderer-msg',
     index,
@@ -37,7 +36,7 @@ function elemRendererMsg(index: number): (m: any) => Msg {
 export interface Elem {
   readonly index: number;
   readonly type: JsonValueType;
-  readonly rendererModel: Maybe<RendererModel>;
+  readonly rendererModel: Maybe<unknown>;
   readonly value: JsonValue;
 }
 
@@ -64,7 +63,7 @@ export const RendererArray: Renderer<Model, Msg> = {
       const mbRenderer = rendererFactory.getRenderer(valueType(jvElem));
       return mbRenderer
         .map((renderer) => {
-          const mac: [any, Cmd<any>] = renderer.init({
+          const mac: [unknown, Cmd<unknown>] = renderer.init({
             value: jvElem,
             path: path.append(jvElemIndex),
             rendererFactory,
@@ -109,24 +108,26 @@ export const RendererArray: Renderer<Model, Msg> = {
     switch (msg.tag) {
       case 'elem-renderer-msg': {
         const elem: Maybe<Elem> = maybeOf(model.elems[msg.index]);
-        const renderer: Maybe<Renderer<any, any>> = elem.andThen((e) =>
+        const renderer: Maybe<Renderer<unknown, unknown>> = elem.andThen((e) =>
           rendererFactory.getRenderer(e.type),
         );
-        const elemRendererModel: Maybe<RendererModel> = elem.andThen(
+        const elemRendererModel: Maybe<unknown> = elem.andThen(
           (p) => p.rendererModel,
         );
-        const maco: Maybe<[any, Cmd<any>, Maybe<JsonValue>]> = renderer.andThen(
-          (renderer) => {
-            return elemRendererModel.map((rendererModel) => {
-              return renderer.update({
-                model: rendererModel,
-                rendererFactory,
-                msg: msg.msg,
-                validationResult: args.validationResult,
-              });
+        const maco: Maybe<[
+          unknown,
+          Cmd<unknown>,
+          Maybe<JsonValue>,
+        ]> = renderer.andThen((renderer) => {
+          return elemRendererModel.map((rendererModel) => {
+            return renderer.update({
+              model: rendererModel,
+              rendererFactory,
+              msg: msg.msg,
+              validationResult: args.validationResult,
             });
-          },
-        );
+          });
+        });
 
         const newElems: ReadonlyArray<Elem> = model.elems.map((e) => {
           if (e.index === msg.index && maco.type === 'Just') {
