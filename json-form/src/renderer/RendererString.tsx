@@ -5,7 +5,7 @@ import {
   RendererViewArgs,
 } from './Renderer';
 import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
-import { JsonValue, jvString } from '../JsonValue';
+import { JsonValue, jvString, valueFromAny } from '../JsonValue';
 import * as React from 'react';
 import { JsPath } from '../JsPath';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
@@ -27,14 +27,46 @@ export type Msg = { tag: 'value-changed'; value: string };
 export interface Model {
   readonly fieldValue: Maybe<string>;
   readonly path: JsPath;
+  readonly proposals: readonly string[];
+  readonly formats: readonly string[];
+  readonly errors: readonly JsValidationError[];
 }
 
 export const RendererString: Renderer<Model, Msg> = {
   init(args: RendererInitArgs): [Model, Cmd<Msg>] {
+    const fmtPath = args.path.format();
+    const proposals: string[] = args.validationResult
+      .map((validationResult) =>
+        validationResult.propose(fmtPath, 1).flatMap((p) => {
+          const v = valueFromAny(p);
+          return v.match(
+            (v) => {
+              if (v.tag === 'jv-string' && v.value !== '') {
+                return [p];
+              }
+              return [];
+            },
+            () => [],
+          );
+        }),
+      )
+      .withDefault([]);
+
+    const formats: readonly string[] = args.validationResult
+      .map((validationResult) => validationResult.getFormats(fmtPath))
+      .withDefault([]);
+
+    const errors = args.validationResult
+      .map((validationResult) => validationResult.getErrors(fmtPath))
+      .withDefault([]);
+
     const model: Model = {
       fieldValue:
         args.value.tag === 'jv-string' ? just(args.value.value) : nothing,
       path: args.path,
+      proposals,
+      formats,
+      errors,
     };
     return noCmd(model);
   },
@@ -53,16 +85,8 @@ export const RendererString: Renderer<Model, Msg> = {
     }
   },
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
-    const { model, validationResult } = args;
-    const { path, fieldValue } = model;
-    const fmtPath = path.format();
-    const [formats, proposals, errors] = validationResult
-      .map((r) => [
-        r.getFormats(fmtPath),
-        r.propose(fmtPath, 1),
-        r.getErrors(fmtPath),
-      ])
-      .withDefault([[], [], []]);
+    const { model } = args;
+    const { path, fieldValue, errors, formats, proposals } = model;
     const { t, dispatch } = args;
     return fieldValue
       .map((value) => (

@@ -34,7 +34,6 @@ export interface Model {
 export function doValidate(model: Model): Model {
   return model.schema
     .map((t) => {
-      debugger;
       const validationResult = just(JsFacade.validate(t.a, model.root.a));
       return {
         ...model,

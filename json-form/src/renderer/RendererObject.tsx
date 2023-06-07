@@ -4,6 +4,7 @@ import {
   jvNull,
   JvObject,
   jvObject,
+  valueFromAny,
   valueType,
 } from '../JsonValue';
 import {
@@ -74,7 +75,7 @@ export interface AddingState {
 export interface Model {
   readonly properties: ReadonlyArray<Property>;
   readonly addingState: Maybe<AddingState>;
-  readonly propertiesToAdd: ReadonlyMap<string, readonly string[]>;
+  readonly propertiesToAdd: readonly string[];
   readonly path: JsPath;
 }
 
@@ -85,7 +86,7 @@ export const RendererObject: Renderer<Model, Msg> = {
     const model: Model = {
       properties: [],
       addingState: nothing,
-      propertiesToAdd: new Map(),
+      propertiesToAdd: [],
       path,
     };
 
@@ -102,7 +103,7 @@ export const RendererObject: Renderer<Model, Msg> = {
       return mbRenderer
         .map((renderer) => {
           const propName = jvProp.name;
-          const mac: [any, Cmd<any>] = renderer.init({
+          const mac: [unknown, Cmd<unknown>] = renderer.init({
             value: jvProp.value,
             path: path.append(propName),
             rendererFactory,
@@ -135,9 +136,36 @@ export const RendererObject: Renderer<Model, Msg> = {
         });
     });
 
+    const properties = propsAndCommands.map((x) => x.a);
+    const existingProps: Set<string> = new Set(properties.map((p) => p.name));
+
+    const propertiesToAdd: string[] = args.validationResult
+      .map((validationResult) => {
+        return validationResult.propose(path.format(), 1).flatMap((value) => {
+          const jsVal = valueFromAny(value);
+          return jsVal.match(
+            (jsVal) => {
+              if (jsVal.tag === 'jv-object') {
+                const proposedPropNames = jsVal.properties.map((p) => p.name);
+                const filteredProposals = proposedPropNames.filter(
+                  (p) => !existingProps.has(p),
+                );
+                filteredProposals.sort();
+                return filteredProposals;
+              } else {
+                return [];
+              }
+            },
+            () => [],
+          );
+        });
+      })
+      .withDefault([]);
+
     const newModel: Model = {
       ...model,
-      properties: propsAndCommands.map((x) => x.a),
+      propertiesToAdd,
+      properties,
     };
     const cmds = Cmd.batch(propsAndCommands.map((x) => x.b));
 
@@ -223,8 +251,20 @@ export const RendererObject: Renderer<Model, Msg> = {
         return [model, Cmd.none(), nothing];
       }
       case 'expand-collapse-clicked': {
-        // TODO
-        return [model, Cmd.none(), nothing];
+        const newModel: Model = {
+          ...model,
+          properties: model.properties.map((p) => {
+            if (p.name === msg.propertyName) {
+              return {
+                ...p,
+                collapsed: !p.collapsed,
+              };
+            } else {
+              return p;
+            }
+          }),
+        };
+        return [newModel, Cmd.none(), nothing];
       }
       case 'add-property-btn-clicked': {
         // TODO
@@ -258,7 +298,7 @@ interface ViewObjectProps {
   readonly t: TFunction;
   readonly properties: readonly Property[];
   readonly validationResult: Maybe<JsValidationResult>;
-  readonly propertiesToAdd: ReadonlyMap<string, ReadonlyArray<string>>;
+  readonly propertiesToAdd: readonly string[];
   readonly rendererFactory: RendererFactory;
 }
 
@@ -271,6 +311,7 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
     properties,
     rendererFactory,
     validationResult,
+    propertiesToAdd,
   } = p;
   const isAddingProp = addingState.isJust();
 
@@ -405,32 +446,23 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
       />
       <div>{addSection}</div>
       <div>
-        {maybeOf(p.propertiesToAdd.get(p.path.format()))
-          .map((propNames) => (
-            <>
-              {propNames
-                .filter((propName) => !existingPropertyNames.has(propName))
-                .sort()
-                .map((propName) => (
-                  <div className="add-prop-row" key={propName}>
-                    <Button
-                      renderIcon={Add16}
-                      kind={'ghost'}
-                      onClick={() =>
-                        dispatch({
-                          tag: 'add-property-btn-clicked',
-                          path: p.path,
-                          propertyName: propName,
-                        })
-                      }
-                    >
-                      {propName}
-                    </Button>
-                  </div>
-                ))}
-            </>
-          ))
-          .withDefault(<></>)}
+        {propertiesToAdd.map((propName) => (
+          <div className="add-prop-row" key={propName}>
+            <Button
+              renderIcon={Add16}
+              kind={'ghost'}
+              onClick={() =>
+                dispatch({
+                  tag: 'add-property-btn-clicked',
+                  path: p.path,
+                  propertyName: propName,
+                })
+              }
+            >
+              {propName}
+            </Button>
+          </div>
+        ))}
       </div>
     </div>
   );
