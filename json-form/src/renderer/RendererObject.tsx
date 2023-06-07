@@ -30,6 +30,10 @@ import { Button, TextInput } from 'carbon-components-react';
 import { ExpandCollapseButton } from './utils/ExpandCollapseButton';
 import { ArrayCounter } from './utils/ArrayCounter';
 import { MenuTrigger } from './utils/MenuTrigger';
+import { Add16 } from '@carbon/icons-react';
+import { ViewErrors } from './utils/ViewErrors';
+import { JsValidationResult } from '@diesel-parser/json-schema-facade-ts';
+import { RendererFactory } from './RendererFactory';
 
 export type Msg =
   | { tag: 'prop-renderer-msg'; propertyName: string; msg: unknown }
@@ -37,9 +41,14 @@ export type Msg =
       tag: 'new-property-name-changed';
       value: string;
     }
-  | { tag: 'new-property-name-key-down'; key: string };
-// | { tag: 'add-prop-ok-cancel-clicked'; ok: boolean }
-// | { tag: 'expand-collapse-clicked'; propertyName: string };
+  | { tag: 'new-property-name-key-down'; key: string }
+  | { tag: 'add-prop-ok-cancel-clicked'; ok: boolean }
+  | {
+      tag: 'add-property-btn-clicked';
+      path: JsPath;
+      propertyName: string;
+    }
+  | { tag: 'expand-collapse-clicked'; propertyName: string };
 
 function propRendererMsg(propertyName: string): (m: any) => Msg {
   return (msg) => ({
@@ -65,6 +74,8 @@ export interface AddingState {
 export interface Model {
   readonly properties: ReadonlyArray<Property>;
   readonly addingState: Maybe<AddingState>;
+  readonly propertiesToAdd: ReadonlyMap<string, readonly string[]>;
+  readonly path: JsPath;
 }
 
 export const RendererObject: Renderer<Model, Msg> = {
@@ -74,6 +85,8 @@ export const RendererObject: Renderer<Model, Msg> = {
     const model: Model = {
       properties: [],
       addingState: nothing,
+      propertiesToAdd: new Map(),
+      path,
     };
 
     // TODO return init error
@@ -205,48 +218,35 @@ export const RendererObject: Renderer<Model, Msg> = {
         // TODO
         return [model, Cmd.none(), nothing];
       }
+      case 'add-prop-ok-cancel-clicked': {
+        // TODO
+        return [model, Cmd.none(), nothing];
+      }
+      case 'expand-collapse-clicked': {
+        // TODO
+        return [model, Cmd.none(), nothing];
+      }
+      case 'add-property-btn-clicked': {
+        // TODO
+        return [model, Cmd.none(), nothing];
+      }
     }
   },
 
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
-    const { model, rendererFactory, dispatch } = args;
-    const { properties } = model;
-
-    function viewProperty(property: Property) {
-      const mbRenderer = rendererFactory.getRenderer(property.type);
-      return (
-        <tr key={property.name}>
-          <th>{property.name}</th>
-          <td>
-            {mbRenderer
-              .andThen((renderer) => {
-                return property.rendererModel.map((rendererModel) => {
-                  return renderer.view({
-                    model: rendererModel,
-                    rendererFactory,
-                    dispatch: map(dispatch, propRendererMsg(property.name)),
-                    t: args.t,
-                    validationResult: args.validationResult,
-                  });
-                });
-              })
-              .withDefaultSupply(() => (
-                // TODO
-                <p>No renderer for prop '{property.name}'</p>
-              ))}
-          </td>
-        </tr>
-      );
-    }
-
+    const { model, rendererFactory, dispatch, t, validationResult } = args;
+    const { properties, addingState, path, propertiesToAdd } = model;
     return (
-      <div>
-        <div>{'{'}</div>
-        <table>
-          <tbody>{properties.map(viewProperty)}</tbody>
-        </table>
-        <div>{'}'}</div>
-      </div>
+      <ViewObject
+        addingState={addingState}
+        dispatch={dispatch}
+        path={path}
+        t={t}
+        properties={properties}
+        validationResult={validationResult}
+        propertiesToAdd={propertiesToAdd}
+        rendererFactory={rendererFactory}
+      />
     );
   },
 };
@@ -257,152 +257,181 @@ interface ViewObjectProps {
   readonly path: JsPath;
   readonly t: TFunction;
   readonly properties: readonly Property[];
-  readonly viewPropertyValue: (
-    path: JsPath,
-    value: JsonValue,
-  ) => React.ReactElement;
+  readonly validationResult: Maybe<JsValidationResult>;
+  readonly propertiesToAdd: ReadonlyMap<string, ReadonlyArray<string>>;
+  readonly rendererFactory: RendererFactory;
 }
 
-// function ViewObject(p: ViewObjectProps): React.ReactElement {
-//   const { addingState, dispatch, path, t, properties } = p;
-//   const isAddingProp = addingState.isJust();
-//
-//   const addSection = addingState
-//     .map((addingState) => {
-//       return (
-//         <div className="add-prop-form">
-//           <TextInput
-//             labelText={t('propertyNameLabel', {
-//               path: path.format('.'),
-//             }).toString()}
-//             hideLabel={true}
-//             id={'property-name-editor'}
-//             placeholder={t('propertyNamePlaceholder')}
-//             value={addingState.addingPropName}
-//             onChange={(e) =>
-//               dispatch({
-//                 tag: 'new-property-name-changed',
-//                 value: e.target.value,
-//               })
-//             }
-//             onKeyDown={(e) => {
-//               dispatch({
-//                 tag: 'new-property-name-key-down',
-//                 key: e.key,
-//               });
-//             }}
-//             invalidText={t<string>('propertyAlreadyExists')}
-//             invalid={addingState.isDuplicate}
-//           />
-//           <div className={'buttons-row'}>
-//             <div className="spacer" />
-//             <Button
-//               kind={'primary'}
-//               disabled={
-//                 addingState.addingPropName === '' || addingState.isDuplicate
-//               }
-//               onClick={() =>
-//                 dispatch({ tag: 'add-prop-ok-cancel-clicked', ok: true })
-//               }
-//             >
-//               Add
-//             </Button>
-//             <Button
-//               kind={'secondary'}
-//               onClick={() =>
-//                 dispatch({ tag: 'add-prop-ok-cancel-clicked', ok: false })
-//               }
-//             >
-//               Cancel
-//             </Button>
-//           </div>
-//         </div>
-//       );
-//     })
-//     .withDefault(<></>);
-//
-//   const existingPropertyNames = new Set(properties.map((p) => p.name));
-//
-//   return (
-//     <div className="jv-object">
-//       {properties.length === 0 ? (
-//         <div className="empty-obj">{t('emptyObject')}</div>
-//       ) : (
-//         <></>
-//       )}
-//       {properties.map((prop, propIndex) => {
-//         const propertyPath = p.path.append(prop.name);
-//         const propNameClass = ['object-prop'].concat(
-//           isAddingProp ? ['disabled'] : [''],
-//         );
-//         const isCollapsed = prop.collapsed;
-//         return (
-//           <div className={propNameClass.join(' ')} key={prop.name + propIndex}>
-//             <div className={'prop-name-row'}>
-//               <div className="prop-expand">
-//                 <ExpandCollapseButton
-//                   collapsed={isCollapsed}
-//                   onClick={() =>
-//                     dispatch({
-//                       tag: 'expand-collapse-clicked',
-//                       propertyName: prop.name,
-//                     })
-//                   }
-//                   t={t}
-//                 />
-//               </div>
-//               <div className={'prop-name'}>{prop.name}</div>
-//               <ArrayCounter value={prop.value} />
-//               <div className={'prop-menu'}>
-//                 <MenuTrigger
-//                   onClick={() => {
-//                     debugger;
-//                   }}
-//                   disabled={isAddingProp}
-//                   t={t}
-//                 />
-//               </div>
-//             </div>
-//             {isCollapsed ? (
-//               <></>
-//             ) : (
-//               <div className="prop-value">
-//                 {p.viewPropertyValue(propertyPath, prop.value)}
-//               </div>
-//             )}
-//           </div>
-//         );
-//       })}
-//       <ViewErrors errors={getErrorsAtPath(p)} />
-//       <div>{addSection}</div>
-//       <div>
-//         {maybeOf(model.propertiesToAdd.get(p.path.format()))
-//           .map((propNames) => (
-//             <>
-//               {propNames
-//                 .filter((propName) => !existingPropertyNames.has(propName))
-//                 .sort()
-//                 .map((propName) => (
-//                   <div className="add-prop-row" key={propName}>
-//                     <Button
-//                       renderIcon={Add16}
-//                       kind={'ghost'}
-//                       onClick={() =>
-//                         dispatch({
-//                           tag: 'add-property-btn-clicked',
-//                           path: p.path,
-//                           propertyName: propName,
-//                         })
-//                       }
-//                     >
-//                       {propName}
-//                     </Button>
-//                   </div>
-//                 ))}
-//             </>
-//           ))
-//           .withDefault(<></>)}
-//       </div>
-//     </div>
-//   );
-// }
+function ViewObject(p: ViewObjectProps): React.ReactElement {
+  const {
+    addingState,
+    dispatch,
+    path,
+    t,
+    properties,
+    rendererFactory,
+    validationResult,
+  } = p;
+  const isAddingProp = addingState.isJust();
+
+  function viewProperty(property: Property) {
+    const mbRenderer = rendererFactory.getRenderer(property.type);
+    return mbRenderer
+      .andThen((renderer) => {
+        return property.rendererModel.map((rendererModel) => {
+          return renderer.view({
+            model: rendererModel,
+            rendererFactory,
+            dispatch: map(dispatch, propRendererMsg(property.name)),
+            t,
+            validationResult,
+          });
+        });
+      })
+      .withDefaultSupply(() => (
+        // TODO
+        <p>No renderer for prop '{property.name}'</p>
+      ));
+  }
+
+  const addSection = addingState
+    .map((addingState) => {
+      return (
+        <div className="add-prop-form">
+          <TextInput
+            labelText={t('propertyNameLabel', {
+              path: path.format('.'),
+            }).toString()}
+            hideLabel={true}
+            id={'property-name-editor'}
+            placeholder={t('propertyNamePlaceholder')}
+            value={addingState.addingPropName}
+            onChange={(e) =>
+              dispatch({
+                tag: 'new-property-name-changed',
+                value: e.target.value,
+              })
+            }
+            onKeyDown={(e) => {
+              dispatch({
+                tag: 'new-property-name-key-down',
+                key: e.key,
+              });
+            }}
+            invalidText={t<string>('propertyAlreadyExists')}
+            invalid={addingState.isDuplicate}
+          />
+          <div className={'buttons-row'}>
+            <div className="spacer" />
+            <Button
+              kind={'primary'}
+              disabled={
+                addingState.addingPropName === '' || addingState.isDuplicate
+              }
+              onClick={() =>
+                dispatch({ tag: 'add-prop-ok-cancel-clicked', ok: true })
+              }
+            >
+              Add
+            </Button>
+            <Button
+              kind={'secondary'}
+              onClick={() =>
+                dispatch({ tag: 'add-prop-ok-cancel-clicked', ok: false })
+              }
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      );
+    })
+    .withDefault(<></>);
+
+  const existingPropertyNames = new Set(properties.map((p) => p.name));
+
+  return (
+    <div className="jv-object">
+      {properties.length === 0 ? (
+        <div className="empty-obj">{t('emptyObject')}</div>
+      ) : (
+        <></>
+      )}
+      {properties.map((prop, propIndex) => {
+        const propertyPath = p.path.append(prop.name);
+        const propNameClass = ['object-prop'].concat(
+          isAddingProp ? ['disabled'] : [''],
+        );
+        const isCollapsed = prop.collapsed;
+        return (
+          <div className={propNameClass.join(' ')} key={prop.name + propIndex}>
+            <div className={'prop-name-row'}>
+              <div className="prop-expand">
+                <ExpandCollapseButton
+                  collapsed={isCollapsed}
+                  onClick={() =>
+                    dispatch({
+                      tag: 'expand-collapse-clicked',
+                      propertyName: prop.name,
+                    })
+                  }
+                  t={t}
+                />
+              </div>
+              <div className={'prop-name'}>{prop.name}</div>
+              <ArrayCounter value={prop.value} />
+              <div className={'prop-menu'}>
+                <MenuTrigger
+                  onClick={() => {
+                    debugger;
+                  }}
+                  disabled={isAddingProp}
+                  t={t}
+                />
+              </div>
+            </div>
+            {isCollapsed ? (
+              <></>
+            ) : (
+              <div className="prop-value">{viewProperty(prop)}</div>
+            )}
+          </div>
+        );
+      })}
+      <ViewErrors
+        errors={p.validationResult
+          .map((r) => r.getErrors(path.format()))
+          .withDefault([])}
+      />
+      <div>{addSection}</div>
+      <div>
+        {maybeOf(p.propertiesToAdd.get(p.path.format()))
+          .map((propNames) => (
+            <>
+              {propNames
+                .filter((propName) => !existingPropertyNames.has(propName))
+                .sort()
+                .map((propName) => (
+                  <div className="add-prop-row" key={propName}>
+                    <Button
+                      renderIcon={Add16}
+                      kind={'ghost'}
+                      onClick={() =>
+                        dispatch({
+                          tag: 'add-property-btn-clicked',
+                          path: p.path,
+                          propertyName: propName,
+                        })
+                      }
+                    >
+                      {propName}
+                    </Button>
+                  </div>
+                ))}
+            </>
+          ))
+          .withDefault(<></>)}
+      </div>
+    </div>
+  );
+}
