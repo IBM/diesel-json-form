@@ -48,12 +48,14 @@ export interface HasMenu {
 export interface TriggerMenuMsg {
   readonly tag: 'menu-trigger-clicked';
   readonly refBox: Box;
+  readonly path: JsPath;
 }
 
-export function triggerMenuMsg(refBox: Box): TriggerMenuMsg {
+export function triggerMenuMsg(refBox: Box, path: JsPath): TriggerMenuMsg {
   return {
     tag: 'menu-trigger-clicked',
     refBox,
+    path,
   };
 }
 
@@ -76,7 +78,6 @@ export function openMenu<T extends HasMenu, M>(
     ...t,
     menuModel: just(mac[0]),
   };
-  debugger;
   const cmd: Cmd<M> = mac[1].map(toMsg);
   return [newT, cmd];
 }

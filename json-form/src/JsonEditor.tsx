@@ -206,6 +206,8 @@ export function update(
       });
       return res.withDefaultSupply(() => [model, Cmd.none(), nothing]);
     }
+    case 'set-strict-mode':
+      return noOut(noCmd(setStrictMode(model, msg.strictMode)));
   }
   return noOut(noCmd(model));
   // case 'delete-property':
@@ -299,8 +301,6 @@ export function update(
   // }
   // case 'no-op':
   //   return noOut(noCmd(model));
-  // case 'set-strict-mode':
-  //   return noOut(noCmd(setStrictMode(model, msg.strictMode)));
   // case 'recompute-metadata': {
   //   const newModel = computeAll(doValidate(model));
   //   return withOutValueChanged(

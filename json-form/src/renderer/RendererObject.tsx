@@ -453,7 +453,7 @@ export const RendererObject: Renderer<Model, Msg> = {
         );
 
         const menu = createMenu({
-          path: model.path,
+          path: msg.path,
           root: args.root.b,
           strictMode,
           proposals,
@@ -684,7 +684,9 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
                 <MenuTrigger
                   disabled={isAddingProp}
                   t={t}
-                  onClick={(refBox) => dispatch(triggerMenuMsg(refBox))}
+                  onClick={(refBox) =>
+                    dispatch(triggerMenuMsg(refBox, path.append(prop.name)))
+                  }
                 />
               </div>
             </div>
