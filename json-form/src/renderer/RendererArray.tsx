@@ -6,6 +6,7 @@ import {
   valueType,
 } from '../JsonValue';
 import {
+  GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
   RendererUpdateArgs,
@@ -22,6 +23,11 @@ import {
   Tuple,
 } from 'tea-cup-core';
 import * as React from 'react';
+import {
+  rendererModelBase,
+  RendererModelBase,
+  setErrors,
+} from './utils/RendererModelBase';
 
 export type Msg = { tag: 'elem-renderer-msg'; index: number; msg: unknown };
 
@@ -40,15 +46,16 @@ export interface Elem {
   readonly value: JsonValue;
 }
 
-export interface Model {
+export interface Model extends RendererModelBase {
   readonly elems: ReadonlyArray<Elem>;
 }
 
 export const RendererArray: Renderer<Model, Msg> = {
   init(args: RendererInitArgs): [Model, Cmd<Msg>] {
-    const { value, rendererFactory, path } = args;
+    const { value, rendererFactory, path, validationResult } = args;
 
     const model: Model = {
+      ...rendererModelBase({ path, validationResult }),
       elems: [],
     };
 
@@ -101,6 +108,38 @@ export const RendererArray: Renderer<Model, Msg> = {
     return Tuple.t2n(newModel, cmds);
   },
 
+  gotValidationResult(args: GotValidationResultArgs<Model>): [Model, Cmd<Msg>] {
+    const { model, validationResult, rendererFactory } = args;
+    const x: Tuple<Elem, Cmd<Msg>>[] = model.elems.map((elem) =>
+      elem.rendererModel
+        .andThen((rendererModel) =>
+          rendererFactory.getRenderer(valueType(elem.value)).map((renderer) =>
+            Tuple.fromNative(
+              renderer.gotValidationResult({
+                validationResult,
+                model: rendererModel,
+                rendererFactory,
+              }),
+            )
+              .mapFirst((newRendererModel) => ({
+                ...elem,
+                rendererModel: just(newRendererModel),
+              }))
+              .mapSecond((c) => c.map(elemRendererMsg(elem.index))),
+          ),
+        )
+        .withDefault(new Tuple(elem, Cmd.none())),
+    );
+    const newModel: Model = setErrors(
+      {
+        ...model,
+        elems: x.map((t) => t.a),
+      },
+      validationResult,
+    );
+    return [newModel, Cmd.batch(x.map((t) => t.b))];
+  },
+
   update(
     args: RendererUpdateArgs<Model, Msg>,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
@@ -124,7 +163,7 @@ export const RendererArray: Renderer<Model, Msg> = {
               model: rendererModel,
               rendererFactory,
               msg: msg.msg,
-              validationResult: args.validationResult,
+              t: args.t,
             });
           });
         });
@@ -181,7 +220,6 @@ export const RendererArray: Renderer<Model, Msg> = {
                     rendererFactory,
                     dispatch: map(dispatch, elemRendererMsg(elem.index)),
                     t: args.t,
-                    validationResult: args.validationResult,
                   });
                 });
               })

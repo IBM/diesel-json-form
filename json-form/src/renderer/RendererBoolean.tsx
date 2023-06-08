@@ -1,4 +1,5 @@
 import {
+  GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
   RendererUpdateArgs,
@@ -15,6 +16,7 @@ import { JsPath } from '../JsPath';
 import {
   rendererModelBase,
   RendererModelBase,
+  setErrors,
 } from './utils/RendererModelBase';
 
 export type Msg = { tag: 'value-changed'; value: boolean };
@@ -31,6 +33,9 @@ export const RendererBoolean: Renderer<Model, Msg> = {
         args.value.tag === 'jv-boolean' ? just(args.value.value) : nothing,
     };
     return noCmd(model);
+  },
+  gotValidationResult(args: GotValidationResultArgs<Model>): [Model, Cmd<Msg>] {
+    return [setErrors(args.model, args.validationResult), Cmd.none()];
   },
   update(
     args: RendererUpdateArgs<Model, Msg>,

@@ -1,4 +1,5 @@
 import {
+  GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
   RendererUpdateArgs,
@@ -8,7 +9,10 @@ import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
 import { JsonValue, jvString, valueFromAny } from '../JsonValue';
 import * as React from 'react';
 import { JsPath } from '../JsPath';
-import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
+import {
+  JsValidationError,
+  JsValidationResult,
+} from '@diesel-parser/json-schema-facade-ts';
 import { TFunction } from 'i18next';
 import { errorsToInvalidText } from './utils/WrapErrors';
 import {
@@ -21,53 +25,67 @@ import {
   TimePickerSelect,
 } from 'carbon-components-react';
 import { allOffsets, MyDateTime, MyTime } from './utils/MyDateTime';
+import {
+  rendererModelBase,
+  RendererModelBase,
+  setErrors,
+} from './utils/RendererModelBase';
 
 export type Msg = { tag: 'value-changed'; value: string };
 
-export interface Model {
+export interface Model extends RendererModelBase {
   readonly fieldValue: Maybe<string>;
-  readonly path: JsPath;
   readonly proposals: readonly string[];
   readonly formats: readonly string[];
-  readonly errors: readonly JsValidationError[];
+}
+
+function recomputeValidationData(
+  model: Model,
+  validationResult: JsValidationResult,
+): Model {
+  const fmtPath = model.path.format();
+  const proposals: string[] = validationResult
+    .propose(fmtPath, 1)
+    .flatMap((p) => {
+      const v = valueFromAny(p);
+      return v.match(
+        (v) => {
+          if (v.tag === 'jv-string' && v.value !== '') {
+            return [p];
+          }
+          return [];
+        },
+        () => [],
+      );
+    });
+
+  const formats: readonly string[] = validationResult.getFormats(fmtPath);
+
+  return setErrors(
+    {
+      ...model,
+      formats,
+      proposals,
+    },
+    validationResult,
+  );
 }
 
 export const RendererString: Renderer<Model, Msg> = {
   init(args: RendererInitArgs): [Model, Cmd<Msg>] {
-    const fmtPath = args.path.format();
-    const proposals: string[] = args.validationResult
-      .map((validationResult) =>
-        validationResult.propose(fmtPath, 1).flatMap((p) => {
-          const v = valueFromAny(p);
-          return v.match(
-            (v) => {
-              if (v.tag === 'jv-string' && v.value !== '') {
-                return [p];
-              }
-              return [];
-            },
-            () => [],
-          );
-        }),
-      )
-      .withDefault([]);
-
-    const formats: readonly string[] = args.validationResult
-      .map((validationResult) => validationResult.getFormats(fmtPath))
-      .withDefault([]);
-
-    const errors = args.validationResult
-      .map((validationResult) => validationResult.getErrors(fmtPath))
-      .withDefault([]);
-
-    const model: Model = {
+    const { validationResult, path } = args;
+    const initialModel: Model = {
+      ...rendererModelBase({ validationResult, path }),
       fieldValue:
         args.value.tag === 'jv-string' ? just(args.value.value) : nothing,
-      path: args.path,
-      proposals,
-      formats,
-      errors,
+      proposals: [],
+      formats: [],
     };
+    const model: Model = args.validationResult
+      .map((validationResult) =>
+        recomputeValidationData(initialModel, validationResult),
+      )
+      .withDefault(initialModel);
     return noCmd(model);
   },
   update(
@@ -102,6 +120,12 @@ export const RendererString: Renderer<Model, Msg> = {
         />
       ))
       .withDefaultSupply(() => <p>Not a string !</p>);
+  },
+  gotValidationResult(args: GotValidationResultArgs<Model>): [Model, Cmd<Msg>] {
+    return [
+      recomputeValidationData(args.model, args.validationResult),
+      Cmd.none(),
+    ];
   },
 };
 

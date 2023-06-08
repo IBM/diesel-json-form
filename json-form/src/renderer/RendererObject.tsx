@@ -2,12 +2,12 @@ import {
   JsonValue,
   JsonValueType,
   jvNull,
-  JvObject,
   jvObject,
   valueFromAny,
   valueType,
 } from '../JsonValue';
 import {
+  GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
   RendererUpdateArgs,
@@ -33,8 +33,12 @@ import { ArrayCounter } from './utils/ArrayCounter';
 import { MenuTrigger } from './utils/MenuTrigger';
 import { Add16 } from '@carbon/icons-react';
 import { ViewErrors } from './utils/ViewErrors';
-import { JsValidationResult } from '@diesel-parser/json-schema-facade-ts';
+import {
+  JsValidationError,
+  JsValidationResult,
+} from '@diesel-parser/json-schema-facade-ts';
 import { RendererFactory } from './RendererFactory';
+import { RendererModelBase, setErrors } from './utils/RendererModelBase';
 
 export type Msg =
   | { tag: 'prop-renderer-msg'; propertyName: string; msg: unknown }
@@ -72,11 +76,50 @@ export interface AddingState {
   readonly isDuplicate: boolean;
 }
 
-export interface Model {
+export interface Model extends RendererModelBase {
   readonly properties: ReadonlyArray<Property>;
   readonly addingState: Maybe<AddingState>;
   readonly propertiesToAdd: readonly string[];
-  readonly path: JsPath;
+}
+
+function recomputeValidationData(
+  model: Model,
+  validationResult: JsValidationResult,
+): Model {
+  const { path, properties } = model;
+
+  const existingProps: Set<string> = new Set(properties.map((p) => p.name));
+
+  const fmtPath = path.format();
+
+  const propertiesToAdd: string[] = validationResult
+    .propose(fmtPath, 1)
+    .flatMap((value) => {
+      const jsVal = valueFromAny(value);
+      return jsVal.match(
+        (jsVal) => {
+          if (jsVal.tag === 'jv-object') {
+            const proposedPropNames = jsVal.properties.map((p) => p.name);
+            const filteredProposals = proposedPropNames.filter(
+              (p) => !existingProps.has(p),
+            );
+            filteredProposals.sort();
+            return filteredProposals;
+          } else {
+            return [];
+          }
+        },
+        () => [],
+      );
+    });
+
+  return setErrors(
+    {
+      ...model,
+      propertiesToAdd,
+    },
+    validationResult,
+  );
 }
 
 export const RendererObject: Renderer<Model, Msg> = {
@@ -88,6 +131,7 @@ export const RendererObject: Renderer<Model, Msg> = {
       addingState: nothing,
       propertiesToAdd: [],
       path,
+      errors: [],
     };
 
     // TODO return init error
@@ -137,45 +181,26 @@ export const RendererObject: Renderer<Model, Msg> = {
     });
 
     const properties = propsAndCommands.map((x) => x.a);
-    const existingProps: Set<string> = new Set(properties.map((p) => p.name));
-
-    const propertiesToAdd: string[] = args.validationResult
-      .map((validationResult) => {
-        return validationResult.propose(path.format(), 1).flatMap((value) => {
-          const jsVal = valueFromAny(value);
-          return jsVal.match(
-            (jsVal) => {
-              if (jsVal.tag === 'jv-object') {
-                const proposedPropNames = jsVal.properties.map((p) => p.name);
-                const filteredProposals = proposedPropNames.filter(
-                  (p) => !existingProps.has(p),
-                );
-                filteredProposals.sort();
-                return filteredProposals;
-              } else {
-                return [];
-              }
-            },
-            () => [],
-          );
-        });
-      })
-      .withDefault([]);
 
     const newModel: Model = {
       ...model,
-      propertiesToAdd,
       properties,
     };
     const cmds = Cmd.batch(propsAndCommands.map((x) => x.b));
 
-    return Tuple.t2n(newModel, cmds);
+    const newModel2: Model = args.validationResult
+      .map((validationResult) =>
+        recomputeValidationData(newModel, validationResult),
+      )
+      .withDefault(newModel);
+
+    return Tuple.t2n(newModel2, cmds);
   },
 
   update(
     args: RendererUpdateArgs<Model, Msg>,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
-    const { model, msg, rendererFactory } = args;
+    const { model, msg, rendererFactory, t } = args;
     switch (msg.tag) {
       case 'prop-renderer-msg': {
         const property: Maybe<Property> = maybeOf(
@@ -194,7 +219,7 @@ export const RendererObject: Renderer<Model, Msg> = {
                 model: rendererModel,
                 rendererFactory,
                 msg: msg.msg,
-                validationResult: args.validationResult,
+                t,
               });
             });
           },
@@ -273,9 +298,42 @@ export const RendererObject: Renderer<Model, Msg> = {
     }
   },
 
+  gotValidationResult(args: GotValidationResultArgs<Model>): [Model, Cmd<Msg>] {
+    const { model, validationResult, rendererFactory } = args;
+    const x: Tuple<Property, Cmd<Msg>>[] = model.properties.map((prop) =>
+      prop.rendererModel
+        .andThen((rendererModel) =>
+          rendererFactory.getRenderer(prop.type).map((renderer) => {
+            const mac: [unknown, Cmd<unknown>] = renderer.gotValidationResult({
+              model: rendererModel,
+              rendererFactory,
+              validationResult,
+            });
+            const newProperty: Property = {
+              ...prop,
+              rendererModel: just(mac[0]),
+            };
+            return new Tuple(
+              newProperty,
+              mac[1].map(propRendererMsg(prop.name)),
+            );
+          }),
+        )
+        .withDefault(new Tuple(prop, Cmd.none<Msg>())),
+    );
+    const newModel: Model = {
+      ...model,
+      properties: x.map((t) => t.a),
+    };
+    return [
+      recomputeValidationData(newModel, args.validationResult),
+      Cmd.batch(x.map((t) => t.b)),
+    ];
+  },
+
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
-    const { model, rendererFactory, dispatch, t, validationResult } = args;
-    const { properties, addingState, path, propertiesToAdd } = model;
+    const { model, rendererFactory, dispatch, t } = args;
+    const { properties, addingState, path, propertiesToAdd, errors } = model;
     return (
       <ViewObject
         addingState={addingState}
@@ -283,9 +341,9 @@ export const RendererObject: Renderer<Model, Msg> = {
         path={path}
         t={t}
         properties={properties}
-        validationResult={validationResult}
         propertiesToAdd={propertiesToAdd}
         rendererFactory={rendererFactory}
+        errors={errors}
       />
     );
   },
@@ -297,9 +355,9 @@ interface ViewObjectProps {
   readonly path: JsPath;
   readonly t: TFunction;
   readonly properties: readonly Property[];
-  readonly validationResult: Maybe<JsValidationResult>;
   readonly propertiesToAdd: readonly string[];
   readonly rendererFactory: RendererFactory;
+  readonly errors: readonly JsValidationError[];
 }
 
 function ViewObject(p: ViewObjectProps): React.ReactElement {
@@ -310,8 +368,8 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
     t,
     properties,
     rendererFactory,
-    validationResult,
     propertiesToAdd,
+    errors,
   } = p;
   const isAddingProp = addingState.isJust();
 
@@ -325,7 +383,6 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
             rendererFactory,
             dispatch: map(dispatch, propRendererMsg(property.name)),
             t,
-            validationResult,
           });
         });
       })
@@ -389,8 +446,6 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
     })
     .withDefault(<></>);
 
-  const existingPropertyNames = new Set(properties.map((p) => p.name));
-
   return (
     <div className="jv-object">
       {properties.length === 0 ? (
@@ -399,7 +454,6 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
         <></>
       )}
       {properties.map((prop, propIndex) => {
-        const propertyPath = p.path.append(prop.name);
         const propNameClass = ['object-prop'].concat(
           isAddingProp ? ['disabled'] : [''],
         );
@@ -424,6 +478,7 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
               <div className={'prop-menu'}>
                 <MenuTrigger
                   onClick={() => {
+                    // TODO
                     debugger;
                   }}
                   disabled={isAddingProp}
@@ -439,11 +494,7 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
           </div>
         );
       })}
-      <ViewErrors
-        errors={p.validationResult
-          .map((r) => r.getErrors(path.format()))
-          .withDefault([])}
-      />
+      <ViewErrors errors={errors} />
       <div>{addSection}</div>
       <div>
         {propertiesToAdd.map((propName) => (

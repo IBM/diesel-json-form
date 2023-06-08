@@ -18,7 +18,10 @@ import * as React from 'react';
 import { Cmd, Dispatcher, Maybe } from 'tea-cup-core';
 import { JsonValue } from '../JsonValue';
 import { JsPath } from '../JsPath';
-import { JsValidationResult } from '../../../../diesel-json/ts-facade';
+import {
+  JsValidationError,
+  JsValidationResult,
+} from '../../../../diesel-json/ts-facade';
 import { RendererFactory } from './RendererFactory';
 import { TFunction } from 'i18next';
 
@@ -35,14 +38,19 @@ export interface RendererViewArgs<Model, Msg> {
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
   readonly t: TFunction;
-  readonly validationResult: Maybe<JsValidationResult>;
 }
 
 export interface RendererUpdateArgs<Model, Msg> {
   readonly msg: Msg;
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
-  readonly validationResult: Maybe<JsValidationResult>;
+  readonly t: TFunction;
+}
+
+export interface GotValidationResultArgs<Model> {
+  readonly model: Model;
+  readonly validationResult: JsValidationResult;
+  readonly rendererFactory: RendererFactory;
 }
 
 export interface Renderer<Model, Msg> {
@@ -51,4 +59,5 @@ export interface Renderer<Model, Msg> {
   update(
     args: RendererUpdateArgs<Model, Msg>,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>];
+  gotValidationResult(args: GotValidationResultArgs<Model>): [Model, Cmd<Msg>];
 }

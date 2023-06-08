@@ -1,15 +1,17 @@
 import {
+  GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
   RendererUpdateArgs,
   RendererViewArgs,
 } from './Renderer';
 import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
-import { JsonValue, JvNumber, jvNumber } from '../JsonValue';
+import { JsonValue, jvNumber } from '../JsonValue';
 import * as React from 'react';
 import {
   rendererModelBase,
   RendererModelBase,
+  setErrors,
 } from './utils/RendererModelBase';
 import { JsPath } from '../JsPath';
 import { TFunction } from 'i18next';
@@ -45,6 +47,9 @@ export const RendererNumber: Renderer<Model, Msg> = {
         return [newModel, Cmd.none(), just(jvNumber(msg.value))];
       }
     }
+  },
+  gotValidationResult(args: GotValidationResultArgs<Model>): [Model, Cmd<Msg>] {
+    return [setErrors(args.model, args.validationResult), Cmd.none()];
   },
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
     const { model } = args;

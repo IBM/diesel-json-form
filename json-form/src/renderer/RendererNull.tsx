@@ -1,4 +1,5 @@
 import {
+  GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
   RendererUpdateArgs,
@@ -12,6 +13,7 @@ import { WrapErrors } from './utils/WrapErrors';
 import {
   rendererModelBase,
   RendererModelBase,
+  setErrors,
 } from './utils/RendererModelBase';
 
 export type Msg = 'null-msg';
@@ -31,6 +33,9 @@ export const RendererNull: Renderer<Model, Msg> = {
     args: RendererUpdateArgs<Model, Msg>,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
     return [args.model, Cmd.none(), nothing];
+  },
+  gotValidationResult(args: GotValidationResultArgs<Model>): [Model, Cmd<Msg>] {
+    return [setErrors(args.model, args.validationResult), Cmd.none()];
   },
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
     return args.model.nullValue

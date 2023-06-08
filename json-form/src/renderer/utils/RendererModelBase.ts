@@ -9,19 +9,27 @@ import { TFunction } from 'i18next';
 export interface RendererModelBase {
   readonly errors: readonly JsValidationError[];
   readonly path: JsPath;
-  readonly t: TFunction;
 }
 
 export function rendererModelBase(props: {
   validationResult: Maybe<JsValidationResult>;
   path: JsPath;
-  t: TFunction;
 }): RendererModelBase {
-  return {
-    errors: props.validationResult
-      .map((vr) => vr.getErrors(props.path.format()))
-      .withDefault([]),
+  const m: RendererModelBase = {
     path: props.path,
-    t: props.t,
+    errors: [],
+  };
+  return props.validationResult
+    .map((validationResult) => setErrors(m, validationResult))
+    .withDefault(m);
+}
+
+export function setErrors<T extends RendererModelBase>(
+  model: T,
+  validationResult: JsValidationResult,
+): T {
+  return {
+    ...model,
+    errors: validationResult.getErrors(model.path.format()),
   };
 }

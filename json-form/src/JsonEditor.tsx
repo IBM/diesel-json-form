@@ -93,7 +93,6 @@ export function ViewJsonEditor(props: ViewJsonEditorProps): React.ReactElement {
                   model: rendererModel,
                   rendererFactory,
                   t: model.t,
-                  validationResult: model.validationResult,
                 });
               });
           })
@@ -155,11 +154,12 @@ export function update(
         return rendererFactory
           .getRenderer(valueType(model.root.b))
           .map((renderer) => {
+            // call update for root renderer
             const maco = renderer.update({
               msg: msg.msg,
               model: rendererModel,
               rendererFactory,
-              validationResult: model.validationResult,
+              t: model.t,
             });
             const newModel: Model = {
               ...model,
@@ -177,7 +177,27 @@ export function update(
               ? doValidate(newModel2)
               : newModel2;
 
-            return [newModelValidated, cmd, maco[2].map(outValueChanged)];
+            // propagate validation downwards
+            const x: Tuple<Model, Cmd<Msg>> = newModelValidated.validationResult
+              .andThen((validationResult) =>
+                newModelValidated.rootRendererModel.map((rendererModel) =>
+                  Tuple.fromNative(
+                    renderer.gotValidationResult({
+                      model: rendererModel,
+                      rendererFactory,
+                      validationResult,
+                    }),
+                  )
+                    .mapFirst((m) => ({
+                      ...newModelValidated,
+                      rootRendererModel: just(m),
+                    }))
+                    .mapSecond((c) => c.map(rendererMsg)),
+                ),
+              )
+              .withDefault(new Tuple(newModelValidated, Cmd.none()));
+
+            return [x.a, Cmd.batch([cmd, x.b]), maco[2].map(outValueChanged)];
           });
       });
       return res.withDefaultSupply(() => [model, Cmd.none(), nothing]);
