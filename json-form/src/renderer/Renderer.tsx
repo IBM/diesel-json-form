@@ -15,7 +15,7 @@
  */
 
 import * as React from 'react';
-import { Cmd, Dispatcher, Maybe } from 'tea-cup-core';
+import { Cmd, Dispatcher, Maybe, Tuple } from 'tea-cup-core';
 import { JsonValue } from '../JsonValue';
 import { JsPath } from '../JsPath';
 import {
@@ -45,6 +45,9 @@ export interface RendererUpdateArgs<Model, Msg> {
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
   readonly t: TFunction;
+  readonly validationResult: Maybe<JsValidationResult>;
+  readonly root: Tuple<any, JsonValue>;
+  readonly schema: Maybe<Tuple<any, JsonValue>>;
 }
 
 export interface GotValidationResultArgs<Model> {

@@ -143,7 +143,14 @@ export const RendererArray: Renderer<Model, Msg> = {
   update(
     args: RendererUpdateArgs<Model, Msg>,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
-    const { model, msg, rendererFactory } = args;
+    const {
+      model,
+      msg,
+      rendererFactory,
+      validationResult,
+      root,
+      schema,
+    } = args;
     switch (msg.tag) {
       case 'elem-renderer-msg': {
         const elem: Maybe<Elem> = maybeOf(model.elems[msg.index]);
@@ -164,6 +171,9 @@ export const RendererArray: Renderer<Model, Msg> = {
               rendererFactory,
               msg: msg.msg,
               t: args.t,
+              validationResult,
+              root,
+              schema,
             });
           });
         });

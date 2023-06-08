@@ -2,8 +2,11 @@ import {
   JsonValue,
   JsonValueType,
   jvNull,
+  JvObject,
   jvObject,
+  setValueAt,
   valueFromAny,
+  valueToAny,
   valueType,
 } from '../JsonValue';
 import {
@@ -36,6 +39,7 @@ import { ViewErrors } from './utils/ViewErrors';
 import {
   JsValidationError,
   JsValidationResult,
+  validate,
 } from '@diesel-parser/json-schema-facade-ts';
 import { RendererFactory } from './RendererFactory';
 import { RendererModelBase, setErrors } from './utils/RendererModelBase';
@@ -50,7 +54,6 @@ export type Msg =
   | { tag: 'add-prop-ok-cancel-clicked'; ok: boolean }
   | {
       tag: 'add-property-btn-clicked';
-      path: JsPath;
       propertyName: string;
     }
   | { tag: 'expand-collapse-clicked'; propertyName: string };
@@ -120,6 +123,10 @@ function recomputeValidationData(
     },
     validationResult,
   );
+}
+
+function createObject(properties: readonly Property[]): JvObject {
+  return jvObject(properties.map((p) => ({ name: p.name, value: p.value })));
 }
 
 export const RendererObject: Renderer<Model, Msg> = {
@@ -200,7 +207,15 @@ export const RendererObject: Renderer<Model, Msg> = {
   update(
     args: RendererUpdateArgs<Model, Msg>,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
-    const { model, msg, rendererFactory, t } = args;
+    const {
+      model,
+      msg,
+      rendererFactory,
+      t,
+      validationResult,
+      root,
+      schema,
+    } = args;
     switch (msg.tag) {
       case 'prop-renderer-msg': {
         const property: Maybe<Property> = maybeOf(
@@ -220,6 +235,9 @@ export const RendererObject: Renderer<Model, Msg> = {
                 rendererFactory,
                 msg: msg.msg,
                 t,
+                validationResult,
+                root,
+                schema,
               });
             });
           },
@@ -292,8 +310,75 @@ export const RendererObject: Renderer<Model, Msg> = {
         return [newModel, Cmd.none(), nothing];
       }
       case 'add-property-btn-clicked': {
-        // TODO
-        return [model, Cmd.none(), nothing];
+        // create new value to propose
+        const newValue = jvObject([
+          ...model.properties.map((p) => ({
+            name: p.name,
+            value: p.value,
+          })),
+          { name: msg.propertyName, value: jvNull },
+        ]);
+        const newRootValue = setValueAt(args.root.b, model.path, newValue);
+        const newValidationResult = args.schema.map((t) =>
+          validate(t.a, valueToAny(newRootValue)),
+        );
+
+        const propPath = model.path.append(msg.propertyName);
+        const proposal = newValidationResult
+          .andThen((validationResult) =>
+            maybeOf(
+              validationResult.propose(propPath.format(), 1)[0],
+            ).andThen((p) => valueFromAny(p).toMaybe()),
+          )
+          .withDefault(jvNull);
+
+        const newProp: Property = {
+          name: msg.propertyName,
+          value: proposal,
+          type: valueType(proposal),
+          collapsed: false,
+          rendererModel: nothing,
+        };
+
+        debugger;
+
+        const mac: Tuple<Property, Cmd<Msg>> = rendererFactory
+          .getRenderer(valueType(proposal))
+          .map((renderer) => {
+            debugger;
+            return Tuple.fromNative(
+              renderer.init({
+                path: propPath,
+                value: proposal,
+                t: args.t,
+                validationResult: args.validationResult,
+                rendererFactory,
+              }),
+            )
+              .mapFirst((rendererModel) => ({
+                ...newProp,
+                rendererModel: just(rendererModel),
+              }))
+              .mapSecond((c) => c.map(propRendererMsg(msg.propertyName)));
+          })
+          .withDefault(new Tuple(newProp, Cmd.none()));
+        debugger;
+        const newProperties = [...model.properties, mac.a];
+        return [
+          {
+            ...model,
+            properties: newProperties,
+            propertiesToAdd: model.propertiesToAdd.filter(
+              (p) => p !== msg.propertyName,
+            ),
+          },
+          mac.b,
+          just(
+            jvObject(
+              newProperties.map((p) => ({ name: p.name, value: p.value })),
+            ),
+          ),
+        ];
       }
     }
   },
@@ -505,7 +590,6 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
               onClick={() =>
                 dispatch({
                   tag: 'add-property-btn-clicked',
-                  path: p.path,
                   propertyName: propName,
                 })
               }

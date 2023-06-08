@@ -160,6 +160,9 @@ export function update(
               model: rendererModel,
               rendererFactory,
               t: model.t,
+              validationResult: model.validationResult,
+              schema: model.schema,
+              root: model.root,
             });
             const newModel: Model = {
               ...model,
