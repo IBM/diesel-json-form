@@ -163,6 +163,7 @@ export function update(
               validationResult: model.validationResult,
               schema: model.schema,
               root: model.root,
+              strictMode: model.strictMode,
             });
             const newModel: Model = {
               ...model,

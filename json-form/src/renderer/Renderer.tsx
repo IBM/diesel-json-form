@@ -48,6 +48,7 @@ export interface RendererUpdateArgs<Model, Msg> {
   readonly validationResult: Maybe<JsValidationResult>;
   readonly root: Tuple<any, JsonValue>;
   readonly schema: Maybe<Tuple<any, JsonValue>>;
+  readonly strictMode: boolean;
 }
 
 export interface GotValidationResultArgs<Model> {

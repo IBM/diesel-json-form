@@ -150,6 +150,7 @@ export const RendererArray: Renderer<Model, Msg> = {
       validationResult,
       root,
       schema,
+      strictMode,
     } = args;
     switch (msg.tag) {
       case 'elem-renderer-msg': {
@@ -174,6 +175,7 @@ export const RendererArray: Renderer<Model, Msg> = {
               validationResult,
               root,
               schema,
+              strictMode,
             });
           });
         });

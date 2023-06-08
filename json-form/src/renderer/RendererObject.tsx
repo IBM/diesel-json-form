@@ -43,6 +43,18 @@ import {
 } from '@diesel-parser/json-schema-facade-ts';
 import { RendererFactory } from './RendererFactory';
 import { RendererModelBase, setErrors } from './utils/RendererModelBase';
+import * as TPM from 'tea-pop-menu';
+import {
+  createMenu,
+  FormMenuModel,
+  FormMenuMsg,
+  HasMenu,
+  openMenu,
+  triggerMenuMsg,
+  TriggerMenuMsg,
+} from './ContextMenuActions';
+import { contextMenuRenderer } from './ContextMenuRenderer';
+import { box, Dim, pos } from 'tea-pop-core';
 
 export type Msg =
   | { tag: 'prop-renderer-msg'; propertyName: string; msg: unknown }
@@ -56,7 +68,9 @@ export type Msg =
       tag: 'add-property-btn-clicked';
       propertyName: string;
     }
-  | { tag: 'expand-collapse-clicked'; propertyName: string };
+  | { tag: 'expand-collapse-clicked'; propertyName: string }
+  | { tag: 'menu-msg'; msg: FormMenuMsg }
+  | TriggerMenuMsg;
 
 function propRendererMsg(propertyName: string): (m: any) => Msg {
   return (msg) => ({
@@ -64,6 +78,13 @@ function propRendererMsg(propertyName: string): (m: any) => Msg {
     propertyName,
     msg,
   });
+}
+
+function menuMsg(msg: FormMenuMsg): Msg {
+  return {
+    tag: 'menu-msg',
+    msg,
+  };
 }
 
 export interface Property {
@@ -79,7 +100,7 @@ export interface AddingState {
   readonly isDuplicate: boolean;
 }
 
-export interface Model extends RendererModelBase {
+export interface Model extends RendererModelBase, HasMenu {
   readonly properties: ReadonlyArray<Property>;
   readonly addingState: Maybe<AddingState>;
   readonly propertiesToAdd: readonly string[];
@@ -139,6 +160,7 @@ export const RendererObject: Renderer<Model, Msg> = {
       propertiesToAdd: [],
       path,
       errors: [],
+      menuModel: nothing,
     };
 
     // TODO return init error
@@ -215,6 +237,7 @@ export const RendererObject: Renderer<Model, Msg> = {
       validationResult,
       root,
       schema,
+      strictMode,
     } = args;
     switch (msg.tag) {
       case 'prop-renderer-msg': {
@@ -238,6 +261,7 @@ export const RendererObject: Renderer<Model, Msg> = {
                 validationResult,
                 root,
                 schema,
+                strictMode,
               });
             });
           },
@@ -340,12 +364,9 @@ export const RendererObject: Renderer<Model, Msg> = {
           rendererModel: nothing,
         };
 
-        debugger;
-
         const mac: Tuple<Property, Cmd<Msg>> = rendererFactory
           .getRenderer(valueType(proposal))
           .map((renderer) => {
-            debugger;
             return Tuple.fromNative(
               renderer.init({
                 path: propPath,
@@ -362,7 +383,6 @@ export const RendererObject: Renderer<Model, Msg> = {
               .mapSecond((c) => c.map(propRendererMsg(msg.propertyName)));
           })
           .withDefault(new Tuple(newProp, Cmd.none()));
-        debugger;
         const newProperties = [...model.properties, mac.a];
         return [
           {
@@ -379,6 +399,50 @@ export const RendererObject: Renderer<Model, Msg> = {
             ),
           ),
         ];
+      }
+      case 'menu-msg': {
+        if (model.menuModel.type === 'Nothing') {
+          return [model, Cmd.none(), nothing];
+        }
+        const menuModel = model.menuModel.value;
+        const maco = TPM.update(msg.msg, menuModel);
+        if (maco[2].type === 'Just') {
+          const newModel: Model = {
+            ...model,
+            menuModel: nothing,
+          };
+          const out = maco[2].value;
+          if (out.tag === 'item-selected') {
+            debugger;
+          }
+          return [newModel, Cmd.none(), nothing];
+        } else {
+          const newModel: Model = {
+            ...model,
+            menuModel: just(maco[0]),
+          };
+          const cmd: Cmd<Msg> = maco[1].map(menuMsg);
+          return [newModel, cmd, nothing];
+        }
+      }
+      case 'menu-trigger-clicked': {
+        debugger;
+
+        const proposals: JsonValue[] = [];
+        const valueAtPath = jvObject(
+          model.properties.map((p) => ({ name: p.name, value: p.value })),
+        );
+
+        const menu = createMenu({
+          path: model.path,
+          root: args.root.b,
+          strictMode,
+          proposals,
+          valueAtPath,
+        });
+
+        const mac = openMenu(model, menu, msg.refBox, menuMsg);
+        return [mac[0], mac[1], nothing];
       }
     }
   },
@@ -418,7 +482,14 @@ export const RendererObject: Renderer<Model, Msg> = {
 
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement {
     const { model, rendererFactory, dispatch, t } = args;
-    const { properties, addingState, path, propertiesToAdd, errors } = model;
+    const {
+      properties,
+      addingState,
+      path,
+      propertiesToAdd,
+      errors,
+      menuModel,
+    } = model;
     return (
       <ViewObject
         addingState={addingState}
@@ -429,6 +500,7 @@ export const RendererObject: Renderer<Model, Msg> = {
         propertiesToAdd={propertiesToAdd}
         rendererFactory={rendererFactory}
         errors={errors}
+        menuModel={menuModel}
       />
     );
   },
@@ -443,6 +515,7 @@ interface ViewObjectProps {
   readonly propertiesToAdd: readonly string[];
   readonly rendererFactory: RendererFactory;
   readonly errors: readonly JsValidationError[];
+  readonly menuModel: Maybe<FormMenuModel>;
 }
 
 function ViewObject(p: ViewObjectProps): React.ReactElement {
@@ -455,6 +528,7 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
     rendererFactory,
     propertiesToAdd,
     errors,
+    menuModel,
   } = p;
   const isAddingProp = addingState.isJust();
 
@@ -526,6 +600,15 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
               Cancel
             </Button>
           </div>
+          {menuModel
+            .map((mm) => (
+              <TPM.ViewMenu
+                model={mm}
+                dispatch={map(dispatch, menuMsg)}
+                renderer={contextMenuRenderer(t)}
+              />
+            ))
+            .withDefault(<></>)}
         </div>
       );
     })
@@ -562,12 +645,9 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
               <ArrayCounter value={prop.value} />
               <div className={'prop-menu'}>
                 <MenuTrigger
-                  onClick={() => {
-                    // TODO
-                    debugger;
-                  }}
                   disabled={isAddingProp}
                   t={t}
+                  onClick={(refBox) => dispatch(triggerMenuMsg(refBox))}
                 />
               </div>
             </div>
