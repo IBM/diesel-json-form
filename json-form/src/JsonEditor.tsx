@@ -183,6 +183,7 @@ export function update(
 
             // propagate validation downwards
             const x: Tuple<Model, Cmd<Msg>> = newModelValidated.validationResult
+              .filter(() => maco[2].isJust())
               .andThen((validationResult) =>
                 newModelValidated.rootRendererModel.map((rendererModel) =>
                   Tuple.fromNative(

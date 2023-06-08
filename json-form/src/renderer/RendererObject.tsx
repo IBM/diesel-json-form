@@ -52,6 +52,7 @@ import {
   FormMenuModel,
   FormMenuMsg,
   HasMenu,
+  MenuAction,
   NoOp,
   noop,
   openMenu,
@@ -60,6 +61,7 @@ import {
 } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
 import { box, Dim, pos } from 'tea-pop-core';
+import { item } from 'tea-pop-menu';
 
 export type Msg =
   | { tag: 'prop-renderer-msg'; propertyName: string; msg: unknown }
@@ -422,7 +424,13 @@ export const RendererObject: Renderer<Model, Msg> = {
           };
           const out = maco[2].value;
           if (out.tag === 'item-selected') {
-            debugger;
+            return handleMenuAction(
+              newModel,
+              out.data,
+              rendererFactory,
+              t,
+              validationResult,
+            );
           }
           return [newModel, Cmd.none(), nothing];
         } else {
@@ -732,4 +740,141 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
       <textarea id={'dummy-textarea'} aria-label={'hidden textarea'} />
     </div>
   );
+}
+
+function withLastElem(
+  model: Model,
+  path: JsPath,
+  f: (lastElem: string) => [Model, Cmd<Msg>, Maybe<JsonValue>],
+): [Model, Cmd<Msg>, Maybe<JsonValue>] {
+  return path
+    .lastElem()
+    .map(f)
+    .withDefaultSupply(() => [model, Cmd.none(), nothing]);
+}
+
+function handleMenuAction(
+  model: Model,
+  menuAction: MenuAction,
+  rendererFactory: RendererFactory,
+  t: TFunction,
+  validationResult: Maybe<JsValidationResult>,
+): [Model, Cmd<Msg>, Maybe<JsonValue>] {
+  switch (menuAction.tag) {
+    case 'delete': {
+      return withLastElem(model, menuAction.path, (lastElem) =>
+        deleteProperty(model, lastElem),
+      );
+    }
+    case 'move-up': {
+      return withLastElem(model, menuAction.path, (lastElem) =>
+        moveProperty(model, lastElem, true),
+      );
+    }
+    case 'move-down': {
+      return withLastElem(model, menuAction.path, (lastElem) =>
+        moveProperty(model, lastElem, false),
+      );
+    }
+    case 'change-type': {
+      return withLastElem(model, menuAction.path, (lastElem) =>
+        changeType(
+          model,
+          lastElem,
+          menuAction.value,
+          rendererFactory,
+          t,
+          validationResult,
+        ),
+      );
+    }
+  }
+  return [model, Cmd.none(), nothing];
+}
+
+function deleteProperty(
+  model: Model,
+  propertyName: string,
+): [Model, Cmd<Msg>, Maybe<JsonValue>] {
+  const properties = model.properties.filter((p) => p.name !== propertyName);
+  const newValue = jvObject(
+    properties.map((p) => ({ name: p.name, value: p.value })),
+  );
+  return [{ ...model, properties }, Cmd.none(), just(newValue)];
+}
+
+function moveProperty(
+  model: Model,
+  propertyName: string,
+  up: boolean,
+): [Model, Cmd<Msg>, Maybe<JsonValue>] {
+  const properties = [...model.properties];
+  const propIndex = properties.findIndex((p) => p.name === propertyName);
+  const noop: [Model, Cmd<Msg>, Maybe<JsonValue>] = [
+    model,
+    Cmd.none(),
+    nothing,
+  ];
+  if (propIndex === -1) {
+    return noop;
+  }
+  if (propIndex === 0 && up) {
+    return noop;
+  }
+  if (propIndex === properties.length - 1 && !up) {
+    return noop;
+  }
+  const newPropIndex = up ? propIndex - 1 : propIndex + 1;
+  const p = properties[propIndex];
+  properties[propIndex] = properties[newPropIndex];
+  properties[newPropIndex] = p;
+  const newValue = jvObject(
+    properties.map((p) => ({ name: p.name, value: p.value })),
+  );
+  return [{ ...model, properties }, Cmd.none(), just(newValue)];
+}
+
+function changeType(
+  model: Model,
+  propertyName: string,
+  value: JsonValue,
+  rendererFactory: RendererFactory,
+  t: TFunction,
+  validationResult: Maybe<JsValidationResult>,
+): [Model, Cmd<Msg>, Maybe<JsonValue>] {
+  const propertiesAndCmds: Tuple<Property, Cmd<Msg>>[] = model.properties.map(
+    (p) => {
+      if (p.name === propertyName) {
+        const renderer = rendererFactory.getRenderer(valueType(value));
+        return renderer
+          .map<Tuple<Property, Cmd<Msg>>>((r) => {
+            const mac = r.init({
+              path: model.path.append(p.name),
+              rendererFactory,
+              t,
+              value,
+              validationResult,
+            });
+            const newProp: Property = {
+              ...p,
+              value,
+              type: valueType(value),
+              rendererModel: just(mac[0]),
+            };
+            return new Tuple(newProp, mac[1].map(propRendererMsg(p.name)));
+          })
+          .withDefaultSupply(() => new Tuple(p, Cmd.none()));
+      }
+      return new Tuple(p, Cmd.none());
+    },
+  );
+
+  const newValue = jvObject(
+    propertiesAndCmds.map((t) => ({ name: t.a.name, value: t.a.value })),
+  );
+  return [
+    { ...model, properties: propertiesAndCmds.map((t) => t.a) },
+    Cmd.batch(propertiesAndCmds.map((t) => t.b)),
+    just(newValue),
+  ];
 }
