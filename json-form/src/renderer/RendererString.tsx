@@ -2,10 +2,11 @@ import {
   GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
+  RendererSubsArgs,
   RendererUpdateArgs,
   RendererViewArgs,
 } from './Renderer';
-import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
+import { Cmd, just, Maybe, noCmd, nothing, Sub } from 'tea-cup-core';
 import { JsonValue, jvString, valueFromAny } from '../JsonValue';
 import * as React from 'react';
 import { JsPath } from '../JsPath';
@@ -126,6 +127,9 @@ export const RendererString: Renderer<Model, Msg> = {
       recomputeValidationData(args.model, args.validationResult),
       Cmd.none(),
     ];
+  },
+  subscriptions(): Sub<Msg> {
+    return Sub.none();
   },
 };
 

@@ -9,7 +9,7 @@ import { RendererNumber } from './RendererNumber';
 import { RendererArray } from './RendererArray';
 
 export class RendererFactory {
-  private renderers: Map<string, Renderer<unknown, unknown>> = new Map();
+  private renderers: Map<string, Renderer<any, any>> = new Map();
 
   constructor() {
     // add the builtin renderers
@@ -32,8 +32,8 @@ export class RendererFactory {
     this.renderers.set(key, renderer);
   }
 
-  getRenderer<Model, Msg>(key: string): Maybe<Renderer<Model, Msg>> {
+  getRenderer(key: string): Maybe<Renderer<unknown, unknown>> {
     const renderer = this.renderers.get(key);
-    return maybeOf(renderer as Renderer<Model, Msg>);
+    return maybeOf(renderer);
   }
 }

@@ -377,7 +377,10 @@ export const sendJsonPort = new Port<[Maybe<JsonValue>, JsonValue]>();
 
 export const setStrictModePort = new Port<boolean>();
 
-export function subscriptions(model: Model): Sub<Msg> {
+export function subscriptions(
+  model: Model,
+  rendererFactory: RendererFactory,
+): Sub<Msg> {
   // the menu's subs
   // const subMenu = model.menuModel
   //   .map((mm) => TPM.subscriptions(mm).map(contextMenuMsg))
@@ -385,7 +388,19 @@ export function subscriptions(model: Model): Sub<Msg> {
   // the ports subs
   const portSub = sendJsonPort.subscribe(setJsonStr);
   const setStrictModePortSub = setStrictModePort.subscribe(setStrictModeMsg);
-  return Sub.batch([portSub, setStrictModePortSub]);
+  const rendererSubs = model.rootRendererModel
+    .andThen((rendererModel) =>
+      rendererFactory.getRenderer(valueType(model.root.b)).map((renderer) =>
+        renderer
+          .subscriptions({
+            model: rendererModel,
+            rendererFactory,
+          })
+          .map(rendererMsg),
+      ),
+    )
+    .withDefaultSupply(() => Sub.none());
+  return Sub.batch([portSub, setStrictModePortSub, rendererSubs]);
 }
 
 export interface JsonEditorProps {
@@ -427,7 +442,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
         });
         return [maco[0], maco[1]];
       }}
-      subscriptions={subscriptions}
+      subscriptions={(model) => subscriptions(model, props.rendererFactory)}
       devTools={DevTools.init<Model, Msg>(window)}
     />
   );

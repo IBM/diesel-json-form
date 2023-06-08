@@ -13,6 +13,7 @@ import {
   GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
+  RendererSubsArgs,
   RendererUpdateArgs,
   RendererViewArgs,
 } from './Renderer';
@@ -25,6 +26,8 @@ import {
   maybeOf,
   noCmd,
   nothing,
+  Sub,
+  Task,
   Tuple,
 } from 'tea-cup-core';
 import * as React from 'react';
@@ -49,6 +52,8 @@ import {
   FormMenuModel,
   FormMenuMsg,
   HasMenu,
+  NoOp,
+  noop,
   openMenu,
   triggerMenuMsg,
   TriggerMenuMsg,
@@ -70,7 +75,8 @@ export type Msg =
     }
   | { tag: 'expand-collapse-clicked'; propertyName: string }
   | { tag: 'menu-msg'; msg: FormMenuMsg }
-  | TriggerMenuMsg;
+  | TriggerMenuMsg
+  | NoOp;
 
 function propRendererMsg(propertyName: string): (m: any) => Msg {
   return (msg) => ({
@@ -240,6 +246,9 @@ export const RendererObject: Renderer<Model, Msg> = {
       strictMode,
     } = args;
     switch (msg.tag) {
+      case 'noop': {
+        return [model, Cmd.none(), nothing];
+      }
       case 'prop-renderer-msg': {
         const property: Maybe<Property> = maybeOf(
           model.properties.find((p) => p.name === msg.propertyName),
@@ -426,7 +435,17 @@ export const RendererObject: Renderer<Model, Msg> = {
         }
       }
       case 'menu-trigger-clicked': {
-        debugger;
+        const focusMenuCmd: Cmd<Msg> = Task.attempt(
+          Task.fromLambda(() => {
+            const e = document.getElementById('dummy-textarea') as HTMLElement;
+            if (e) {
+              e.focus();
+            }
+          }),
+          () => {
+            return noop;
+          },
+        );
 
         const proposals: JsonValue[] = [];
         const valueAtPath = jvObject(
@@ -442,7 +461,7 @@ export const RendererObject: Renderer<Model, Msg> = {
         });
 
         const mac = openMenu(model, menu, msg.refBox, menuMsg);
-        return [mac[0], mac[1], nothing];
+        return [mac[0], Cmd.batch([mac[1], focusMenuCmd]), nothing];
       }
     }
   },
@@ -503,6 +522,33 @@ export const RendererObject: Renderer<Model, Msg> = {
         menuModel={menuModel}
       />
     );
+  },
+
+  subscriptions(args: RendererSubsArgs<Model>): Sub<Msg> {
+    const { rendererFactory, model } = args;
+    const propsAndModels: Tuple<
+      Property,
+      unknown
+    >[] = model.properties.flatMap((prop) =>
+      prop.rendererModel.map((rm) => [new Tuple(prop, rm)]).withDefault([]),
+    );
+
+    const subs: Sub<Msg>[] = propsAndModels.flatMap((t) =>
+      rendererFactory
+        .getRenderer(valueType(t.a.value))
+        .map((renderer) => [
+          renderer
+            .subscriptions({ rendererFactory, model: t.b })
+            .map(propRendererMsg(t.a.name)),
+        ])
+        .withDefault([]),
+    );
+
+    const menuSubs: Sub<Msg> = model.menuModel
+      .map((menuModel) => TPM.subscriptions(menuModel).map(menuMsg))
+      .withDefaultSupply(() => Sub.none());
+
+    return Sub.batch([...subs, menuSubs]);
   },
 };
 
@@ -600,15 +646,6 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
               Cancel
             </Button>
           </div>
-          {menuModel
-            .map((mm) => (
-              <TPM.ViewMenu
-                model={mm}
-                dispatch={map(dispatch, menuMsg)}
-                renderer={contextMenuRenderer(t)}
-              />
-            ))
-            .withDefault(<></>)}
         </div>
       );
     })
@@ -679,6 +716,18 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
           </div>
         ))}
       </div>
+      {menuModel
+        .map((mm) => (
+          <div className={'diesel-json-editor-menu'}>
+            <TPM.ViewMenu
+              model={mm}
+              dispatch={map(dispatch, menuMsg)}
+              renderer={contextMenuRenderer(t)}
+            />
+          </div>
+        ))
+        .withDefault(<></>)}
+      <textarea id={'dummy-textarea'} aria-label={'hidden textarea'} />
     </div>
   );
 }

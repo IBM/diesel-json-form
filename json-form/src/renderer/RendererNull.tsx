@@ -2,10 +2,11 @@ import {
   GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
+  RendererSubsArgs,
   RendererUpdateArgs,
   RendererViewArgs,
 } from './Renderer';
-import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
+import { Cmd, just, Maybe, noCmd, nothing, Sub } from 'tea-cup-core';
 import { JsonValue, jvNull, JvNull } from '../JsonValue';
 import * as React from 'react';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
@@ -41,6 +42,9 @@ export const RendererNull: Renderer<Model, Msg> = {
     return args.model.nullValue
       .map(() => <ViewNull errors={args.model.errors} />)
       .withDefaultSupply(() => <p>Not a null value !</p>);
+  },
+  subscriptions(args: RendererSubsArgs<Model>): Sub<Msg> {
+    return Sub.none();
   },
 };
 

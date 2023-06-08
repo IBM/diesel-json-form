@@ -57,6 +57,14 @@ export function triggerMenuMsg(refBox: Box): TriggerMenuMsg {
   };
 }
 
+export interface NoOp {
+  readonly tag: 'noop';
+}
+
+export const noop: NoOp = {
+  tag: 'noop',
+};
+
 export function openMenu<T extends HasMenu, M>(
   t: T,
   menu: Menu<MenuAction>,

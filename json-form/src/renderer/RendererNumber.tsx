@@ -2,10 +2,11 @@ import {
   GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
+  RendererSubsArgs,
   RendererUpdateArgs,
   RendererViewArgs,
 } from './Renderer';
-import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
+import { Cmd, just, Maybe, noCmd, nothing, Sub } from 'tea-cup-core';
 import { JsonValue, jvNumber } from '../JsonValue';
 import * as React from 'react';
 import {
@@ -70,6 +71,9 @@ export const RendererNumber: Renderer<Model, Msg> = {
         />
       ))
       .withDefaultSupply(() => <p>Not a string !</p>);
+  },
+  subscriptions(args: RendererSubsArgs<Model>): Sub<Msg> {
+    return Sub.none();
   },
 };
 

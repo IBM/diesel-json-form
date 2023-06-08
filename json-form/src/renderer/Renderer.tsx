@@ -15,7 +15,7 @@
  */
 
 import * as React from 'react';
-import { Cmd, Dispatcher, Maybe, Tuple } from 'tea-cup-core';
+import { Cmd, Dispatcher, Maybe, Sub, Tuple } from 'tea-cup-core';
 import { JsonValue } from '../JsonValue';
 import { JsPath } from '../JsPath';
 import {
@@ -57,6 +57,11 @@ export interface GotValidationResultArgs<Model> {
   readonly rendererFactory: RendererFactory;
 }
 
+export interface RendererSubsArgs<Model> {
+  readonly model: Model;
+  readonly rendererFactory: RendererFactory;
+}
+
 export interface Renderer<Model, Msg> {
   init(args: RendererInitArgs): [Model, Cmd<Msg>];
   view(args: RendererViewArgs<Model, Msg>): React.ReactElement;
@@ -64,4 +69,5 @@ export interface Renderer<Model, Msg> {
     args: RendererUpdateArgs<Model, Msg>,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>];
   gotValidationResult(args: GotValidationResultArgs<Model>): [Model, Cmd<Msg>];
+  subscriptions(args: RendererSubsArgs<Model>): Sub<Msg>;
 }

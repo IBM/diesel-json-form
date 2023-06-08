@@ -2,10 +2,11 @@ import {
   GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
+  RendererSubsArgs,
   RendererUpdateArgs,
   RendererViewArgs,
 } from './Renderer';
-import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
+import { Cmd, just, Maybe, noCmd, nothing, Sub } from 'tea-cup-core';
 import { JsonValue, jvBool } from '../JsonValue';
 import * as React from 'react';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
@@ -67,6 +68,9 @@ export const RendererBoolean: Renderer<Model, Msg> = {
         />
       ))
       .withDefaultSupply(() => <p>Not a boolean !</p>);
+  },
+  subscriptions(args: RendererSubsArgs<Model>): Sub<Msg> {
+    return Sub.none();
   },
 };
 

@@ -9,6 +9,7 @@ import {
   GotValidationResultArgs,
   Renderer,
   RendererInitArgs,
+  RendererSubsArgs,
   RendererUpdateArgs,
   RendererViewArgs,
 } from './Renderer';
@@ -20,6 +21,7 @@ import {
   maybeOf,
   noCmd,
   nothing,
+  Sub,
   Tuple,
 } from 'tea-cup-core';
 import * as React from 'react';
@@ -28,6 +30,7 @@ import {
   RendererModelBase,
   setErrors,
 } from './utils/RendererModelBase';
+import { Property } from './RendererObject';
 
 export type Msg = { tag: 'elem-renderer-msg'; index: number; msg: unknown };
 
@@ -253,5 +256,27 @@ export const RendererArray: Renderer<Model, Msg> = {
         <div>{']'}</div>
       </div>
     );
+  },
+
+  subscriptions(args: RendererSubsArgs<Model>): Sub<Msg> {
+    const elemsAndModels: Tuple<
+      Elem,
+      unknown
+    >[] = args.model.elems.flatMap((elem) =>
+      elem.rendererModel.map((rm) => [new Tuple(elem, rm)]).withDefault([]),
+    );
+    const { rendererFactory } = args;
+    const subs: Sub<Msg>[] = elemsAndModels.flatMap((t) =>
+      rendererFactory
+        .getRenderer(valueType(t.a.value))
+        .map((renderer) => [
+          renderer
+            .subscriptions({ rendererFactory, model: t.b })
+            .map(elemRendererMsg(t.a.index)),
+        ])
+        .withDefault([]),
+    );
+
+    return Sub.batch(subs);
   },
 };
