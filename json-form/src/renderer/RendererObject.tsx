@@ -60,8 +60,6 @@ import {
   TriggerMenuMsg,
 } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { box, Dim, pos } from 'tea-pop-core';
-import { item } from 'tea-pop-menu';
 
 export type Msg =
   | { tag: 'prop-renderer-msg'; propertyName: string; msg: unknown }
@@ -404,11 +402,7 @@ export const RendererObject: Renderer<Model, Msg> = {
             ),
           },
           mac.b,
-          just(
-            jvObject(
-              newProperties.map((p) => ({ name: p.name, value: p.value })),
-            ),
-          ),
+          just(createObject(newProperties)),
         ];
       }
       case 'menu-msg': {
@@ -465,9 +459,8 @@ export const RendererObject: Renderer<Model, Msg> = {
             ),
           )
           .withDefault([]);
-        const valueAtPath = jvObject(
-          model.properties.map((p) => ({ name: p.name, value: p.value })),
-        );
+
+        const valueAtPath = createObject(model.properties);
 
         const menu = createMenu({
           path: msg.path,
@@ -785,9 +778,10 @@ function handleMenuAction(
         moveProperty(model, lastElem, false),
       );
     }
-    case 'change-type': {
+    case 'change-type':
+    case 'proposal': {
       return withLastElem(model, menuAction.path, (lastElem) =>
-        changeType(
+        setPropertyValue(
           model,
           lastElem,
           menuAction.value,
@@ -806,9 +800,7 @@ function deleteProperty(
   propertyName: string,
 ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
   const properties = model.properties.filter((p) => p.name !== propertyName);
-  const newValue = jvObject(
-    properties.map((p) => ({ name: p.name, value: p.value })),
-  );
+  const newValue = createObject(properties);
   return [{ ...model, properties }, Cmd.none(), just(newValue)];
 }
 
@@ -837,13 +829,11 @@ function moveProperty(
   const p = properties[propIndex];
   properties[propIndex] = properties[newPropIndex];
   properties[newPropIndex] = p;
-  const newValue = jvObject(
-    properties.map((p) => ({ name: p.name, value: p.value })),
-  );
+  const newValue = createObject(properties);
   return [{ ...model, properties }, Cmd.none(), just(newValue)];
 }
 
-function changeType(
+function setPropertyValue(
   model: Model,
   propertyName: string,
   value: JsonValue,
@@ -878,9 +868,7 @@ function changeType(
     },
   );
 
-  const newValue = jvObject(
-    propertiesAndCmds.map((t) => ({ name: t.a.name, value: t.a.value })),
-  );
+  const newValue = createObject(propertiesAndCmds.map((t) => t.a));
   return [
     { ...model, properties: propertiesAndCmds.map((t) => t.a) },
     Cmd.batch(propertiesAndCmds.map((t) => t.b)),
