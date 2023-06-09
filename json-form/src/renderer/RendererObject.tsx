@@ -455,7 +455,16 @@ export const RendererObject: Renderer<Model, Msg> = {
           },
         );
 
-        const proposals: JsonValue[] = [];
+        const proposals: JsonValue[] = validationResult
+          .map((r) =>
+            r.propose(msg.path.format(), 1).flatMap((p) =>
+              valueFromAny(p)
+                .toMaybe()
+                .map((x) => [x])
+                .withDefault([]),
+            ),
+          )
+          .withDefault([]);
         const valueAtPath = jvObject(
           model.properties.map((p) => ({ name: p.name, value: p.value })),
         );
