@@ -1,4 +1,5 @@
 import {
+  getValueAt,
   JsonValue,
   JsonValueType,
   jvNull,
@@ -315,8 +316,29 @@ export const RendererObject: Renderer<Model, Msg> = {
         return [{ ...model, properties: newProperties }, cmd, out];
       }
       case 'new-property-name-changed': {
-        // TODO
-        return [model, Cmd.none(), nothing];
+        return model.addingState
+          .andThen<[Model, Cmd<Msg>, Maybe<JsonValue>]>((addingState) =>
+            getValueAt(args.root.b, model.path).andThen((parentValue) => {
+              debugger;
+              if (parentValue.tag === 'jv-object') {
+                const existingProps = parentValue.properties.map((p) => p.name);
+                const isDuplicate =
+                  existingProps.find((p) => p === msg.value) !== undefined;
+                const newAddingState = just({
+                  ...addingState,
+                  addingPropName: msg.value,
+                  isDuplicate,
+                });
+                return just([
+                  { ...model, addingState: newAddingState },
+                  Cmd.none(),
+                  nothing,
+                ]);
+              }
+              return nothing;
+            }),
+          )
+          .withDefaultSupply(() => [model, Cmd.none(), nothing]);
       }
       case 'new-property-name-key-down': {
         // TODO
@@ -460,14 +482,11 @@ export const RendererObject: Renderer<Model, Msg> = {
           )
           .withDefault([]);
 
-        const valueAtPath = createObject(model.properties);
-
         const menu = createMenu({
           path: msg.path,
           root: args.root.b,
           strictMode,
           proposals,
-          valueAtPath,
         });
 
         const mac = openMenu(model, menu, msg.refBox, menuMsg);
@@ -727,19 +746,19 @@ function ViewObject(p: ViewObjectProps): React.ReactElement {
             </Button>
           </div>
         ))}
+        {menuModel
+          .map((mm) => (
+            <div className={'diesel-json-editor-menu'}>
+              <TPM.ViewMenu
+                model={mm}
+                dispatch={map(dispatch, menuMsg)}
+                renderer={contextMenuRenderer(t)}
+              />
+            </div>
+          ))
+          .withDefault(<></>)}
+        <textarea id={'dummy-textarea'} aria-label={'hidden textarea'} />
       </div>
-      {menuModel
-        .map((mm) => (
-          <div className={'diesel-json-editor-menu'}>
-            <TPM.ViewMenu
-              model={mm}
-              dispatch={map(dispatch, menuMsg)}
-              renderer={contextMenuRenderer(t)}
-            />
-          </div>
-        ))
-        .withDefault(<></>)}
-      <textarea id={'dummy-textarea'} aria-label={'hidden textarea'} />
     </div>
   );
 }
@@ -790,6 +809,16 @@ function handleMenuAction(
           validationResult,
         ),
       );
+    }
+    case 'add': {
+      const newModel: Model = {
+        ...model,
+        addingState: just({
+          addingPropName: '',
+          isDuplicate: false,
+        }),
+      };
+      return [newModel, Cmd.none(), nothing];
     }
   }
   return [model, Cmd.none(), nothing];

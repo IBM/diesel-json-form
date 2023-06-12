@@ -123,7 +123,6 @@ function maMoveDown(path: JsPath): MenuAction {
 export interface MenuPropertyProps {
   readonly root: JsonValue;
   readonly path: JsPath;
-  readonly valueAtPath: JsonValue;
   readonly proposals: ReadonlyArray<JsonValue>;
   readonly strictMode: boolean;
 }
@@ -230,15 +229,24 @@ export function createProposeMenu(
 }
 
 export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
-  const { path, proposals, valueAtPath, root, strictMode } = props;
+  const { path, proposals, root, strictMode } = props;
+
+  debugger;
+
+  const valueAtPath = getValueAt(root, path);
 
   const addItems: () => MenuItem<MenuAction>[] = () => {
-    const isArray = valueAtPath.tag === 'jv-array';
-    const isObject = !strictMode && valueAtPath.tag === 'jv-object';
-    if (isArray || isObject) {
-      return [item({ tag: 'add', path, isArray })];
-    }
-    return [];
+    return valueAtPath
+      .map((v) => {
+        const isArray = v.tag === 'jv-array';
+        const isObject = !strictMode && v.tag === 'jv-object';
+        if (isArray || isObject) {
+          const menuAction: MenuAction = { tag: 'add', path, isArray };
+          return [item(menuAction)];
+        }
+        return [];
+      })
+      .withDefault([]);
   };
 
   const isRoot = path.isEmpty();
@@ -277,8 +285,16 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
   return menu(
     moveItems
       .concat(addItems())
-      .concat(createTypesMenu(path, valueAtPath, proposals, strictMode))
-      .concat(createProposeMenu(path, valueAtPath, proposals, strictMode))
+      .concat(
+        valueAtPath
+          .map((v) => createTypesMenu(path, v, proposals, strictMode))
+          .withDefault([]),
+      )
+      .concat(
+        valueAtPath
+          .map((v) => createProposeMenu(path, v, proposals, strictMode))
+          .withDefault([]),
+      )
       .concat(deleteItems),
   );
 }
