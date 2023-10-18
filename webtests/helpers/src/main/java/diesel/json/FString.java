@@ -26,13 +26,13 @@ public class FString extends FJsonValue {
     }
 
     public FString assertNoError() {
-        $$(".bx--form-requirement").count(0).eval();
+        $$(".djson--form-requirement").count(0).eval();
         findInput().where(not(attrEquals("data-invalid", "true"))).eval();
         return this;
     }
 
     public FString assertError(String expectedError) {
-        $$(".bx--form-requirement")
+        $$(".djson--form-requirement")
                 .where(textContains(expectedError))
                 .count(1)
                 .at(0)

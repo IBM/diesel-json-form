@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@types/carbon-components-react": "^7.25.2",
+    "@types/carbon-components": "^10.27.1",
     "@types/carbon__icons-react": "^10.23.0",
     "@types/jest": "^26.0.20",
     "@types/react": "^16.9.56",
