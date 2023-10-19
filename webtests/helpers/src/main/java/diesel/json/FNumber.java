@@ -20,13 +20,13 @@ public class FNumber extends FJsonValue {
     }
 
     public FNumber assertHasError() {
-        $$(".bx--form-requirement").count(0).eval();
+        $$(".djson--form-requirement").count(0).eval();
         findInput().where((attrEquals("data-invalid", "true"))).eval();
         return this;
     }
 
     public FNumber assertNoError() {
-        $$(".bx--form-requirement").count(0).eval();
+        $$(".djson--form-requirement").count(0).eval();
         findInput().where(not(attrEquals("data-invalid", "true"))).eval();
         return this;
     }

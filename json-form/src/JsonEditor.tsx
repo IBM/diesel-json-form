@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { settings } from 'carbon-components';
+settings.prefix = 'djson';
 import React from 'react';
 import {
   Cmd,

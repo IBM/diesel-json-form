@@ -18,12 +18,12 @@ public class FDate extends FJsonValue{
         return this;
     }
     public FDate assertNoError() {
-        $$(".bx--form-requirement").count(0).eval();
+        $$(".djson--form-requirement").count(0).eval();
         findInput().where(not(attrEquals("data-invalid", "true"))).eval();
         return this;
     }
     public FDate assertHasError(String expectedError){
-        $$(".bx--form-requirement")
+        $$(".djson--form-requirement")
                 .at(0)
                 .where(textEquals(expectedError)).eval();
         return this;
