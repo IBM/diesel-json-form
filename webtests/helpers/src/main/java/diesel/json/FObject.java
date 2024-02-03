@@ -129,11 +129,11 @@ public class FObject extends FJsonValue {
     }
     public FObject selectPropertyValue(String property, String value){
         Findr findSelect = findPropRow(property)
-                 .$$(".djson--list-box__menu-icon")
+                 .$$(".bx--list-box__menu-icon")
                  .expectOne();
 
         findSelect.click();
-        $$(".djson--list-box__menu-item__option")
+        $$(".bx--list-box__menu-item__option")
                 .where(Findrs.textEquals(value))
                 .expectOne()
                 .click();

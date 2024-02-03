@@ -694,11 +694,6 @@
     "@types/react" "*"
     flatpickr "4.6.1"
 
-"@types/carbon-components@^10.27.1":
-  version "10.27.3"
-  resolved "https://registry.yarnpkg.com/@types/carbon-components/-/carbon-components-10.27.3.tgz#2c092b36de6d46d808e468eb31e0f693a2c0ed60"
-  integrity sha512-C4oDSXYFyPZa5ZM2pxBHcjzOuI/OP3whuCt2WzabxssaZHymOHjcaP1lXERkIfswLoNrAeSKfKad0wIeQbzNUA==
-
 "@types/carbon__icons-react@^10.23.0":
   version "10.31.1"
   resolved "https://registry.npmjs.org/@types/carbon__icons-react/-/carbon__icons-react-10.31.1.tgz"
