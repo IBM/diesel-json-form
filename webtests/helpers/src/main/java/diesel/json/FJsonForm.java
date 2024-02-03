@@ -56,7 +56,7 @@ public class FJsonForm extends AbstractPageObject {
     }
 
     public FMenu clickRootMenu() {
-        $$(".doc-root button.djson--tooltip__trigger")
+        $$(".doc-root button.bx--tooltip__trigger")
             .expectOne()
             .click();
         return new FMenu(fRoot);
