@@ -347,17 +347,17 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@diesel-parser/json-schema-facade-js@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-js/-/json-schema-facade-js-0.10.0.tgz#abb9dad12cd5acf5c9568dbcfd1198bb87ac87dd"
-  integrity sha512-JHeReNofGvSbmV99ZLDUsFqkqeLebG3luvQRC9J77QbwlXyhIAK28aoftUbMLDB+PwyryPzHb6B5aiJltE/7ng==
+"@diesel-parser/json-schema-facade-js@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-js/-/json-schema-facade-js-0.11.0.tgz#fb084372082c1ab30103a127450558aafbc32cd7"
+  integrity sha512-jVC38VEEWSyKmFMy8BJNYvCXrrm2c7a95FQ9PqCn4GiA1Z21/OOvDi58e8BxADVGBW9+kh13oa0cYu9jxzijAA==
 
-"@diesel-parser/json-schema-facade-ts@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-ts/-/json-schema-facade-ts-0.10.0.tgz#bc7541f5a9fd1b2d0315c8186a2371e5e85b8326"
-  integrity sha512-58csorPvkmkQM0Eo7W0XlXUm+5uk/dCPDsm64GQ+OoiRB+6V6Nh18rScOwV+jbnSrrMuNgrUiPTUsIItKcLA+g==
+"@diesel-parser/json-schema-facade-ts@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@diesel-parser/json-schema-facade-ts/-/json-schema-facade-ts-0.11.0.tgz#6feba37c8aaa0e7d6044b59e6d34730a21a6a874"
+  integrity sha512-z9kaX7AC+l+J430kuHLlOeIlj1EjWrPsmjl2D2FkLptO7izPnJTqr8zkhY9ito+JdOlT3979TvsAOW+QC33M1g==
   dependencies:
-    "@diesel-parser/json-schema-facade-js" "^0.10.0"
+    "@diesel-parser/json-schema-facade-js" "^0.11.0"
 
 "@diesel-parser/monaco@~0.1.0":
   version "0.1.0"
@@ -368,10 +368,10 @@
     monaco-languageclient "4.0.2"
     vscode-json-languageservice "5.1.3"
 
-"@diesel-parser/ts-facade@~0.17.0":
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/@diesel-parser/ts-facade/-/ts-facade-0.17.0.tgz#445edb09144c36c3d1f31211bc4e3807a253c3b3"
-  integrity sha512-zw+Zn1y+shYNPm+f6waxZCyAtYdbTsq4KRkcsmyEkZ7c/Me8y7Ycgmtn6KlLxeWauX03u9qM2R/Uky7ZZzR/Yg==
+"@diesel-parser/ts-facade@~0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@diesel-parser/ts-facade/-/ts-facade-0.18.0.tgz#da9d9104faa8bae0a4173e939cdc1bc811b092e9"
+  integrity sha512-pAZ6yBSj6363eqVqIR78l7cQKElBth3sYbXW6r3KqVnBDlwQlR9j6tillr+ax/Te6oU3sFwDkXP23tnQQWvR8Q==
 
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
