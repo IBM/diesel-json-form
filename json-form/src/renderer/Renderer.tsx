@@ -504,6 +504,12 @@ function ViewStringWithCombo(p: ViewStringWithComboProps): React.ReactElement {
           value: item.selectedItem ?? '',
         });
       }}
+      onInputChange={(text) => {
+        dispatchUpdateProperty(p, {
+          tag: 'jv-string',
+          value: text ?? '',
+        });
+      }}
     />
   );
 }
