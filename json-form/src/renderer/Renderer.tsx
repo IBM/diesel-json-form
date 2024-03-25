@@ -113,6 +113,7 @@ export function ViewJsonValue(
               value={value}
               dispatch={p.dispatch}
               rendererFactory={rendererFactory}
+              language={p.language}
             />
           ),
         });
@@ -573,6 +574,7 @@ interface MyDatePickerProps {
   readonly isInvalid: boolean;
   readonly invalidText: string;
   readonly t: TFunction;
+  readonly language: string;
 }
 
 function MyDatePicker(props: MyDatePickerProps) {
@@ -587,6 +589,8 @@ function MyDatePicker(props: MyDatePickerProps) {
         props.onChange(str);
       }}
       value={props.value}
+      /* @ts-ignore */
+      locale={props.language}
     >
       <DatePickerInput
         id={'input-' + fmtPath}
@@ -636,6 +640,7 @@ function ViewStringWithFormats(
               isInvalid={isInvalid(p)}
               invalidText={errorsToInvalidText(p)}
               t={p.model.t}
+              language={p.language}
             />
           );
         }
@@ -659,6 +664,7 @@ function ViewStringWithFormats(
                   isInvalid={invalid}
                   invalidText={errorsToInvalidText(p)}
                   t={p.model.t}
+                  language={p.language}
                 />
               </div>
               <div className={'date-time-picker__time'}>
