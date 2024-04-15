@@ -326,8 +326,5 @@ export const samples = [
   ["RendererObject", Example_Renderer4],
 ];
 
-export const initialSchema = {
-  type: "array",
-  items: { type: "string", renderer: "MyStringRenderer" },
-};
-export const initialValue = ["a", "b"];
+export const initialSchema = {};
+export const initialValue = {};
