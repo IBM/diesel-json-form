@@ -36,17 +36,23 @@ export const MyStringRenderer: Renderer<Model, Msg> = {
   reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value, model, schema } = args;
     const strValue = value.tag === "jv-string" ? value.value : "NOT A STRING";
-    const m: Model = model.withDefaultSupply(() => ({
-      value: strValue,
-      isMouseOver: false,
-      myConfigProp: MyConfigPropDecoder.decodeValue(schema).toMaybe(),
-    }));
+    const m: Model = model
+      .map((x) => ({
+        ...x,
+        value: strValue,
+      }))
+      .withDefaultSupply(() => ({
+        value: strValue,
+        isMouseOver: false,
+        myConfigProp: MyConfigPropDecoder.decodeValue(schema).toMaybe(),
+      }));
     return noCmd(m);
   },
   view: function (args: RendererViewArgs<Model, Msg>): React.ReactElement {
-    const { dispatch, model } = args;
+    const { dispatch, model, path } = args;
     return (
       <div
+        key={path.format() + model.value}
         className={"my-string"}
         onMouseEnter={() => dispatch({ tag: "mouse-enter" })}
         onMouseLeave={() => dispatch({ tag: "mouse-leave" })}
