@@ -34,7 +34,7 @@ export type MenuAction =
   | { tag: 'move-up'; path: JsPath }
   | { tag: 'move-down'; path: JsPath }
   | { tag: 'propose'; path: JsPath }
-  | { tag: 'proposal'; path: JsPath; value: JsonValue }
+  | { tag: 'proposal'; path: JsPath; value: JsonValue; index: number }
   | { tag: 'types' }
   | { tag: 'change-type'; path: JsPath; value: JsonValue }
   | { tag: 'add'; path: JsPath; isArray: boolean };
@@ -163,11 +163,12 @@ export function createProposeMenu(
   }
 
   const proposeMenu: Menu<MenuAction> = menu(
-    proposals.map((value) =>
+    proposals.map((value, index) =>
       item({
         tag: 'proposal',
         path,
         value,
+        index,
       }),
     ),
   );

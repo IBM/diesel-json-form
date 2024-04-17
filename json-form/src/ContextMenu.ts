@@ -46,7 +46,12 @@ export function executeContextMenuAction(
       return actionUpdateValue(model, action.path, action.value);
     }
     case 'proposal': {
-      return actionApplyProposal(model, action.path, action.value);
+      return actionApplyProposal(
+        model,
+        action.path,
+        action.value,
+        action.index,
+      );
     }
     case 'add': {
       if (action.isArray) {

@@ -26,6 +26,7 @@ import {
   jvArray,
   JvArray,
   jvNull,
+  JvObject,
   jvObject,
   mapValueAt,
   mergeProperties,
@@ -33,6 +34,7 @@ import {
   moveElement,
   moveProperty,
   setValueAt,
+  valueFromAny,
   valueToAny,
 } from './JsonValue';
 import * as TPM from 'tea-pop-menu';
@@ -55,16 +57,32 @@ export function actionApplyProposal(
   model: Model,
   path: JsPath,
   proposal: JsonValue,
+  proposalIndex: number,
 ): [Model, Cmd<Msg>] {
   switch (proposal.tag) {
     case 'jv-object': {
       const newProposal = getValueAt(model.root.b, path)
         .map((valueAtPath) => {
           if (valueAtPath.tag === 'jv-object') {
-            //const newValue = setValueAt(model.root.b, path, proposal);
+            const augmentedProposal = model.validationResult
+              .andThen((vr) => {
+                // TODO deep propose only for proposalIndex
+                const all = JsFacade.propose(vr, path.format(), 5);
+                return maybeOf(all[proposalIndex]);
+              })
+              .andThen((proposalAny) => {
+                return valueFromAny(proposalAny).match(
+                  (jsonValue) => just(jsonValue),
+                  () => nothing,
+                );
+              })
+              .andThen((v) =>
+                v.tag === 'jv-object' ? just(v as JvObject) : nothing,
+              )
+              .withDefault(proposal);
 
             // do not overwrite existing props
-            return mergeProperties(proposal, valueAtPath);
+            return mergeProperties(augmentedProposal, valueAtPath);
           }
           return proposal;
         })
