@@ -63,7 +63,10 @@ export function actionApplyProposal(
     case 'jv-object': {
       const newProposal = getValueAt(model.root.b, path)
         .map((valueAtPath) => {
-          if (valueAtPath.tag === 'jv-object') {
+          if (
+            valueAtPath.tag === 'jv-object' ||
+            valueAtPath.tag === 'jv-null'
+          ) {
             const augmentedProposal = model.validationResult
               .andThen((vr) => {
                 // TODO deep propose only for proposalIndex
@@ -81,8 +84,12 @@ export function actionApplyProposal(
               )
               .withDefault(proposal);
 
-            // do not overwrite existing props
-            return mergeProperties(augmentedProposal, valueAtPath);
+            if (valueAtPath.tag === 'jv-object') {
+              // do not overwrite existing props
+              return mergeProperties(augmentedProposal, valueAtPath);
+            } else {
+              return augmentedProposal;
+            }
           }
           return proposal;
         })
