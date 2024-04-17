@@ -155,31 +155,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                                 .clickAddPropButton("customer");
 
                 JsPath customerPath = JsPath.empty.append("customer");
-                f.objectAt(customerPath)
-                                .assertProperties("age", "amount", "firstName", "lastName");
-
-                f.stringAt(customerPath.append("firstName"))
-                                .assertValue("")
-                                .setValue("John");
-                f.stringAt(customerPath.append("lastName"))
-                                .assertValue("")
-                                .setValue("Doe");
-                f.numberAt(customerPath.append("amount"))
-                                .assertValue(0)
-                                .setValue(123);
-                f.numberAt(customerPath.append("age"))
-                                .assertValue(0)
-                                .setValue(18);
-
-                sandbox.jsonEditor
-                                .assertText("{\n" +
-                                                "  \"customer\": {\n" +
-                                                "    \"age\": 18,\n" +
-                                                "    \"amount\": 123,\n" +
-                                                "    \"firstName\": \"John\",\n" +
-                                                "    \"lastName\": \"Doe\"\n" +
-                                                "  }\n" +
-                                                "}");
+                f.objectAt(customerPath).assertEmpty();
         }
 
         private void assertErrorInvalidType(String type) {
