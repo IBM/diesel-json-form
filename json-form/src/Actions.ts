@@ -19,6 +19,7 @@ import { Cmd, just, maybeOf, noCmd, nothing, Task, Tuple } from 'tea-cup-core';
 import { getProposals, Model } from './Model';
 import { JsPath } from './JsPath';
 import {
+  clearPropertiesIfObject,
   deleteValueAt,
   getValueAt,
   JsonValue,
@@ -60,6 +61,8 @@ export function actionApplyProposal(
       const newProposal = getValueAt(model.root.b, path)
         .map((valueAtPath) => {
           if (valueAtPath.tag === 'jv-object') {
+            //const newValue = setValueAt(model.root.b, path, proposal);
+
             // do not overwrite existing props
             return mergeProperties(proposal, valueAtPath);
           }
@@ -161,8 +164,9 @@ export function actionAddProperty(
           );
 
         const propertyProposals = newValidationResult
-          .map((vr) => getProposals(vr, path.append(propertyName)))
-          .withDefault([]);
+          .map((vr) => getProposals(vr, path.append(propertyName), -1))
+          .withDefault([])
+          .map(clearPropertiesIfObject);
 
         const newObject2 = jvObject([
           ...owner.properties,
@@ -201,8 +205,9 @@ export function actionAddElementToArray(
             JsFacade.validate(schemaAny, valueToAny(tmpRoot)),
           );
 
+        debugger;
         const proposals = newValidationResult
-          .map((vr) => getProposals(vr, path.append(newElemIndex)))
+          .map((vr) => getProposals(vr, path.append(newElemIndex), -1))
           .withDefault([]);
 
         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
@@ -259,7 +264,7 @@ export function actionTriggerClicked(
             root: model.root.b,
             path,
             proposals: model.validationResult
-              .map((vr) => getProposals(vr, path))
+              .map((vr) => getProposals(vr, path, -1))
               .withDefault([]),
             valueAtPath,
             strictMode: model.strictMode,

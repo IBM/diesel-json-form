@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { Maybe, nothing } from 'tea-cup-core';
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
 import { JsPath } from './JsPath';
 import {
@@ -34,7 +33,7 @@ export type MenuAction =
   | { tag: 'move' }
   | { tag: 'move-up'; path: JsPath }
   | { tag: 'move-down'; path: JsPath }
-  | { tag: 'propose'; path: JsPath; value: Maybe<JsonValue> }
+  | { tag: 'propose'; path: JsPath }
   | { tag: 'proposal'; path: JsPath; value: JsonValue }
   | { tag: 'types' }
   | { tag: 'change-type'; path: JsPath; value: JsonValue }
@@ -155,7 +154,6 @@ export function createTypesMenu(
 
 export function createProposeMenu(
   path: JsPath,
-  valueAtPath: JsonValue,
   proposals: ReadonlyArray<JsonValue>,
   strictMode: boolean,
 ): ReadonlyArray<MenuItem<MenuAction>> {
@@ -173,7 +171,7 @@ export function createProposeMenu(
       }),
     ),
   );
-  return [item({ tag: 'propose', path, value: nothing }, proposeMenu)];
+  return [item({ tag: 'propose', path }, proposeMenu)];
 }
 
 export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
@@ -225,7 +223,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
     moveItems
       .concat(addItems())
       .concat(createTypesMenu(path, valueAtPath, proposals, strictMode))
-      .concat(createProposeMenu(path, valueAtPath, proposals, strictMode))
+      .concat(createProposeMenu(path, proposals, strictMode))
       .concat(deleteItems),
   );
 }

@@ -166,6 +166,7 @@ function doComputeStringsMetadata(
         const proposals: ReadonlyArray<string> = getProposals(
           validationResult,
           path,
+          -1,
         )
           .flatMap((proposal) => {
             if (proposal.tag === 'jv-string') {
@@ -205,6 +206,7 @@ function doComputePropsToAdd(
         const propNameProposals: string[] = getProposals(
           validationResult,
           path,
+          -1,
         ).flatMap((proposal) => {
           if (proposal.tag === 'jv-object') {
             return proposal.properties.map((p) => p.name);
@@ -304,8 +306,9 @@ export function updateAddingPropertyName(
 export function getProposals(
   validationResult: JsValidationResult,
   path: JsPath,
+  depth: number,
 ): ReadonlyArray<JsonValue> {
-  const proposals = JsFacade.propose(validationResult, path.format(), 5);
+  const proposals = JsFacade.propose(validationResult, path.format(), depth);
   return proposals.flatMap((proposalAny) => {
     return valueFromAny(proposalAny).match(
       (jsonValue) => [jsonValue],

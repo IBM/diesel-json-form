@@ -441,3 +441,10 @@ export function indexOfPathInParent(root: JsonValue, path: JsPath): number {
     )
     .withDefault(-1);
 }
+
+export function clearPropertiesIfObject(v: JsonValue): JsonValue {
+  if (v.tag === 'jv-object') {
+    return jvObject();
+  }
+  return v;
+}

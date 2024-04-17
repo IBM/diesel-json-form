@@ -26,6 +26,7 @@ import {
   actionMoveValue,
   actionUpdateValue,
 } from './Actions';
+import { clearPropertiesIfObject } from './JsonValue';
 
 export function executeContextMenuAction(
   model: Model,
@@ -46,11 +47,6 @@ export function executeContextMenuAction(
     }
     case 'proposal': {
       return actionApplyProposal(model, action.path, action.value);
-    }
-    case 'propose': {
-      return action.value
-        .map((value) => actionApplyProposal(model, action.path, value))
-        .withDefaultSupply(() => noCmd(model));
     }
     case 'add': {
       if (action.isArray) {
