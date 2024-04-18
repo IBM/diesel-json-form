@@ -19,12 +19,14 @@ import { Cmd, just, maybeOf, noCmd, nothing, Task, Tuple } from 'tea-cup-core';
 import { getProposals, Model } from './Model';
 import { JsPath } from './JsPath';
 import {
+  clearPropertiesIfObject,
   deleteValueAt,
   getValueAt,
   JsonValue,
   jvArray,
   JvArray,
   jvNull,
+  JvObject,
   jvObject,
   mapValueAt,
   mergeProperties,
@@ -32,6 +34,7 @@ import {
   moveElement,
   moveProperty,
   setValueAt,
+  valueFromAny,
   valueToAny,
 } from './JsonValue';
 import * as TPM from 'tea-pop-menu';
@@ -54,16 +57,35 @@ export function actionApplyProposal(
   model: Model,
   path: JsPath,
   proposal: JsonValue,
+  proposalIndex: number,
 ): [Model, Cmd<Msg>] {
   switch (proposal.tag) {
     case 'jv-object': {
       const newProposal = getValueAt(model.root.b, path)
         .map((valueAtPath) => {
+          const augmentedProposal = model.validationResult
+            .andThen((vr) => {
+              // TODO deep propose only for proposalIndex
+              const all = JsFacade.propose(vr, path.format(), 5);
+              return maybeOf(all[proposalIndex]);
+            })
+            .andThen((proposalAny) => {
+              return valueFromAny(proposalAny).match(
+                (jsonValue) => just(jsonValue),
+                () => nothing,
+              );
+            })
+            .andThen((v) =>
+              v.tag === 'jv-object' ? just(v as JvObject) : nothing,
+            )
+            .withDefault(proposal);
+
           if (valueAtPath.tag === 'jv-object') {
             // do not overwrite existing props
-            return mergeProperties(proposal, valueAtPath);
+            return mergeProperties(augmentedProposal, valueAtPath);
+          } else {
+            return augmentedProposal;
           }
-          return proposal;
         })
         .withDefault(proposal);
 
@@ -161,8 +183,9 @@ export function actionAddProperty(
           );
 
         const propertyProposals = newValidationResult
-          .map((vr) => getProposals(vr, path.append(propertyName)))
-          .withDefault([]);
+          .map((vr) => getProposals(vr, path.append(propertyName), -1))
+          .withDefault([])
+          .map(clearPropertiesIfObject);
 
         const newObject2 = jvObject([
           ...owner.properties,
@@ -201,8 +224,9 @@ export function actionAddElementToArray(
             JsFacade.validate(schemaAny, valueToAny(tmpRoot)),
           );
 
+        debugger;
         const proposals = newValidationResult
-          .map((vr) => getProposals(vr, path.append(newElemIndex)))
+          .map((vr) => getProposals(vr, path.append(newElemIndex), -1))
           .withDefault([]);
 
         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
@@ -259,7 +283,7 @@ export function actionTriggerClicked(
             root: model.root.b,
             path,
             proposals: model.validationResult
-              .map((vr) => getProposals(vr, path))
+              .map((vr) => getProposals(vr, path, -1))
               .withDefault([]),
             valueAtPath,
             strictMode: model.strictMode,
