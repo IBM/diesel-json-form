@@ -63,35 +63,29 @@ export function actionApplyProposal(
     case 'jv-object': {
       const newProposal = getValueAt(model.root.b, path)
         .map((valueAtPath) => {
-          if (
-            valueAtPath.tag === 'jv-object' ||
-            valueAtPath.tag === 'jv-null'
-          ) {
-            const augmentedProposal = model.validationResult
-              .andThen((vr) => {
-                // TODO deep propose only for proposalIndex
-                const all = JsFacade.propose(vr, path.format(), 5);
-                return maybeOf(all[proposalIndex]);
-              })
-              .andThen((proposalAny) => {
-                return valueFromAny(proposalAny).match(
-                  (jsonValue) => just(jsonValue),
-                  () => nothing,
-                );
-              })
-              .andThen((v) =>
-                v.tag === 'jv-object' ? just(v as JvObject) : nothing,
-              )
-              .withDefault(proposal);
+          const augmentedProposal = model.validationResult
+            .andThen((vr) => {
+              // TODO deep propose only for proposalIndex
+              const all = JsFacade.propose(vr, path.format(), 5);
+              return maybeOf(all[proposalIndex]);
+            })
+            .andThen((proposalAny) => {
+              return valueFromAny(proposalAny).match(
+                (jsonValue) => just(jsonValue),
+                () => nothing,
+              );
+            })
+            .andThen((v) =>
+              v.tag === 'jv-object' ? just(v as JvObject) : nothing,
+            )
+            .withDefault(proposal);
 
-            if (valueAtPath.tag === 'jv-object') {
-              // do not overwrite existing props
-              return mergeProperties(augmentedProposal, valueAtPath);
-            } else {
-              return augmentedProposal;
-            }
+          if (valueAtPath.tag === 'jv-object') {
+            // do not overwrite existing props
+            return mergeProperties(augmentedProposal, valueAtPath);
+          } else {
+            return augmentedProposal;
           }
-          return proposal;
         })
         .withDefault(proposal);
 
