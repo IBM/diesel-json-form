@@ -156,6 +156,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
           value={model.root.b}
           dispatch={dispatch}
           rendererFactory={props.rendererFactory}
+          language={props.model.lang}
         />
       </div>
       {model.menuModel
