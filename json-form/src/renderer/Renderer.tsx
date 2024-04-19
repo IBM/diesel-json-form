@@ -418,7 +418,10 @@ function ViewNumber(p: ViewValueProps<JvNumber>): React.ReactElement {
       invalidText={errorsToInvalidText(p)}
       invalid={isInvalid(p)}
       onChange={(evt) => {
-        const newValue = parseFloat(evt.target.value);
+        let newValue = parseFloat(evt.target.value);
+        if (isNaN(newValue)) {
+          newValue = 0;
+        }
         dispatchUpdateProperty(p, { tag: 'jv-number', value: newValue });
       }}
     />
