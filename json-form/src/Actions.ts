@@ -232,7 +232,7 @@ export function actionAddElementToArray(
         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
         const newArray: JvArray = {
           ...array,
-          elems: [...array.elems, proposal],
+          elems: [...array.elems, clearPropertiesIfObject(proposal)],
         };
         const newRoot = setValueAt(model.root.b, path, newArray);
         return setRoot(model, newRoot);
