@@ -27,6 +27,19 @@ const Sample_EnumArray = `{
   }
 }`;
 
+const Sample_ObjectArray = `{
+  "type": [
+    "array", "null"
+  ],
+  "items": {
+    "type": [ "object", "null" ],
+    "properties": {
+      "foo": { "type": "number" },
+      "bar": { "type": "boolean" }
+    }
+  }
+}`;
+
 const Sample_BeanContainingOtherBean = `{
   "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "http://schema.BeanWithBean",
@@ -310,6 +323,7 @@ export const samples = [
   ["Long", Sample_Long],
   ["String", Sample_String],
   ["EnumArray", Sample_EnumArray],
+  ["ObjectArray", Sample_ObjectArray],
   ["BeanContainingOtherBean", Sample_BeanContainingOtherBean],
   ["Inheritance", Sample_Inheritance],
   ["Polymorphism", Example_Polymorphism],
