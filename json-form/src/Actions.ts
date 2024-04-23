@@ -224,7 +224,6 @@ export function actionAddElementToArray(
             JsFacade.validate(schemaAny, valueToAny(tmpRoot)),
           );
 
-        debugger;
         const proposals = newValidationResult
           .map((vr) => getProposals(vr, path.append(newElemIndex), -1))
           .withDefault([]);
