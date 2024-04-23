@@ -1,7 +1,7 @@
 {
-  "documentRoot": "Dokumentstammverzeichnis",
-  "propertyAlreadyExists": "Eigenschaft ist bereits vorhanden",
-  "propertyNamePlaceholder": "geben Sie den Eigenschaftsnamen ein...",
+  "documentRoot": "Dokumentstamm",
+  "propertyAlreadyExists": "Eigenschaft bereits vorhanden",
+  "propertyNamePlaceholder": "Typeigenschaftsname ...",
   "propertyNameLabel": "Eigenschaftsname in {{path}}",
   "emptyObject": "Leeres Objekt",
   "emptyArray": "Leeres Array",
@@ -13,14 +13,14 @@
   "dateValueLabel": "Datum von {{path}}",
   "timeValueLabel": "Zeit von {{path}}",
   "contextMenu": {
-    "move": "Umlagerung",
+    "move": "Verschieben",
     "moveUp": "Nach oben",
     "moveDown": "Nach unten",
-    "propose": "Vorschlagen",
+    "propose": "vorschlagen",
     "delete": "Löschen",
     "changeType": "Typ ändern",
     "addElement": "Element hinzufügen",
-    "addProperty": "Eigenschaft hinzufügen..."
+    "addProperty": "Eigenschaft hinzufügen ..."
   },
   "icon.openMenu": "Menü öffnen",
   "icon.expand": "Einblenden",

@@ -1,0 +1,28 @@
+{
+  "documentRoot": "문서 루트",
+  "propertyAlreadyExists": "특성이 이미 있음",
+  "propertyNamePlaceholder": "특성 이름 입력 ...",
+  "propertyNameLabel": "{{path}} 의 특성 이름",
+  "emptyObject": "빈 오브젝트",
+  "emptyArray": "빈 배열",
+  "stringValuePlaceholder": "텍스트 문자열 입력",
+  "stringValueLabel": "{{path}} 의 텍스트 문자열",
+  "stringValueComboLabel": "{{path}} 의 텍스트 문자열 선택",
+  "numberValueLabel": "{{path}} 의 수",
+  "booleanValueLabel": "{{path}} 의 부울 확인",
+  "dateValueLabel": "{{path}} 의 날짜",
+  "timeValueLabel": "{{path}} 의 시간",
+  "contextMenu": {
+    "move": "이동",
+    "moveUp": "올림",
+    "moveDown": "아래로",
+    "propose": "제안",
+    "delete": "삭제",
+    "changeType": "유형 변경",
+    "addElement": "ADD ELEMENT",
+    "addProperty": "특성 추가 ..."
+  },
+  "icon.openMenu": "메뉴 열기",
+  "icon.expand": "펼치기",
+  "icon.collapse": "접기"
+}

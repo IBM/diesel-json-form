@@ -1,0 +1,28 @@
+{
+  "documentRoot": "Dokumentrot",
+  "propertyAlreadyExists": "Egenskapen finns redan",
+  "propertyNamePlaceholder": "tygenskapsnamn ...",
+  "propertyNameLabel": "egenskapsnamn i {{path}}",
+  "emptyObject": "Tomt objekt",
+  "emptyArray": "Tom matris",
+  "stringValuePlaceholder": "Ange en textsträng",
+  "stringValueLabel": "textsträng för {{path}}",
+  "stringValueComboLabel": "välj textsträngen för {{path}}",
+  "numberValueLabel": "numret på {{path}}",
+  "booleanValueLabel": "Kontrollera Boolean av {{path}}",
+  "dateValueLabel": "Datum för {{path}}",
+  "timeValueLabel": "tid för {{path}}",
+  "contextMenu": {
+    "move": "Flytta",
+    "moveUp": "Uppåt",
+    "moveDown": "Nedåt",
+    "propose": "Föreslå",
+    "delete": "Ta bort",
+    "changeType": "Ändringstyp",
+    "addElement": "Lägg till element",
+    "addProperty": "Lägg till egenskap ..."
+  },
+  "icon.openMenu": "Öppna meny",
+  "icon.expand": "Expandera",
+  "icon.collapse": "Komprimera"
+}

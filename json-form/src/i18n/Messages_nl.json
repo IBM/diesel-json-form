@@ -1,0 +1,28 @@
+{
+  "documentRoot": "Hoofddirectory document",
+  "propertyAlreadyExists": "Eigenschap bestaat al",
+  "propertyNamePlaceholder": "eigenschap type ...",
+  "propertyNameLabel": "eigenschap in {{path}}",
+  "emptyObject": "Leeg object",
+  "emptyArray": "Lege array",
+  "stringValuePlaceholder": "Voer een tekenreeks in",
+  "stringValueLabel": "tekstreeks van {{path}}",
+  "stringValueComboLabel": "Tekstreeks selecteren van {{path}}",
+  "numberValueLabel": "nummer van {{path}}",
+  "booleanValueLabel": "Boolean van {{path}}",
+  "dateValueLabel": "datum van {{path}}",
+  "timeValueLabel": "tijd van {{path}}",
+  "contextMenu": {
+    "move": "Verplaatsen",
+    "moveUp": "Omhoog",
+    "moveDown": "Omlaag",
+    "propose": "Voorstellen",
+    "delete": "Wissen",
+    "changeType": "Type wijziging",
+    "addElement": "Element toevoegen",
+    "addProperty": "Eigenschap toevoegen ..."
+  },
+  "icon.openMenu": "Menu openen",
+  "icon.expand": "Uitvouwen",
+  "icon.collapse": "Samenvouwen"
+}
