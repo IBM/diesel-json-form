@@ -1,15 +1,11 @@
 package diesel.json;
 
+import static com.pojosontheweb.selenium.Findrs.textEquals;
+
+import org.openqa.selenium.By;
+
 import com.pojosontheweb.selenium.Findr;
 import com.pojosontheweb.selenium.Findrs;
-import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
-
-import java.util.function.Function;
-
-import static com.pojosontheweb.selenium.Findrs.textEquals;
 
 public class FArray extends FJsonValue {
 
@@ -22,8 +18,7 @@ public class FArray extends FJsonValue {
 
     private Findr.ListFindr findElems() {
         return getFindr().elemList(
-            By.xpath("./div[contains(@class,'array-elem')]")
-        );
+                By.xpath("./div[contains(@class,'array-elem')]"));
     }
 
     public FString getStringCell(int index) {
@@ -32,7 +27,6 @@ public class FArray extends FJsonValue {
         return new FString(path.append(index), cell);
 
     }
-
 
     public FArray assertLength(int expectedLength) {
         findElems().count(expectedLength).eval();
@@ -56,6 +50,5 @@ public class FArray extends FJsonValue {
                 .eval();
         return this;
     }
-
 
 }

@@ -38,15 +38,13 @@ public class FObject extends FJsonValue {
     private Findr.ListFindr findPropButtons() {
         return getFindr()
                 .elemList(
-                        By.xpath("./div/div[contains(@class,'add-prop-row')]/button")
-                );
+                        By.xpath("./div/div[contains(@class,'add-prop-row')]/button"));
     }
 
     public FObject assertAddPropButtons(String prop, String... rest) {
         List<String> props = Stream.concat(
                 Stream.of(prop),
-                Stream.of(rest)
-        ).collect(Collectors.toList());
+                Stream.of(rest)).collect(Collectors.toList());
 
         findPropButtons()
                 .eval(elems -> {
@@ -65,24 +63,22 @@ public class FObject extends FJsonValue {
     public FObject assertProperties(String... props) {
         List<String> expected = Stream.of(props).collect(Collectors.toList());
         getFindr()
-            .elemList(
-                By.xpath(
-                    "./div[contains(@class,'object-prop')]/div[contains(@class,'prop-name-row')]/div[contains(@class,'prop-name')]"
-                )
-            )
-            .eval(elems -> {
-                List<String> actual = elems.stream().map(WebElement::getText).collect(Collectors.toList());
-                return actual.equals(expected);
-            });
+                .elemList(
+                        By.xpath(
+                                "./div[contains(@class,'object-prop')]/div[contains(@class,'prop-name-row')]/div[contains(@class,'prop-name')]"))
+                .eval(elems -> {
+                    List<String> actual = elems.stream().map(WebElement::getText).collect(Collectors.toList());
+                    return actual.equals(expected);
+                });
         return this;
     }
-    public FObject assertEmptyProperties(String... props){
+
+    public FObject assertEmptyProperties(String... props) {
         List<String> expected = Stream.of(props).collect(Collectors.toList());
         getFindr()
                 .elemList(
                         By.xpath(
-                                "./div/div[contains(@class,'add-prop-row')]/button")
-                )
+                                "./div/div[contains(@class,'add-prop-row')]/button"))
                 .eval(elems -> {
                     List<String> actual = elems.stream().map(WebElement::getText).collect(Collectors.toList());
                     return actual.equals(expected);
@@ -95,8 +91,7 @@ public class FObject extends FJsonValue {
                 .where(e -> {
                     WebElement propNameElem = e.findElement(
                             By.xpath(
-                                    "./div[contains(@class,'prop-name-row')]/div[contains(@class,'prop-name')]")
-                    );
+                                    "./div[contains(@class,'prop-name-row')]/div[contains(@class,'prop-name')]"));
                     if (propNameElem == null) {
                         return false;
                     }
@@ -127,10 +122,11 @@ public class FObject extends FJsonValue {
                 .eval();
         return this;
     }
-    public FObject selectPropertyValue(String property, String value){
+
+    public FObject selectPropertyValue(String property, String value) {
         Findr findSelect = findPropRow(property)
-                 .$$(".bx--list-box__menu-icon")
-                 .expectOne();
+                .$$(".bx--list-box__menu-icon")
+                .expectOne();
 
         findSelect.click();
         $$(".bx--list-box__menu-item__option")

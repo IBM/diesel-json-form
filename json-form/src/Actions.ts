@@ -224,7 +224,6 @@ export function actionAddElementToArray(
             JsFacade.validate(schemaAny, valueToAny(tmpRoot)),
           );
 
-        debugger;
         const proposals = newValidationResult
           .map((vr) => getProposals(vr, path.append(newElemIndex), -1))
           .withDefault([]);
@@ -232,7 +231,7 @@ export function actionAddElementToArray(
         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
         const newArray: JvArray = {
           ...array,
-          elems: [...array.elems, proposal],
+          elems: [...array.elems, clearPropertiesIfObject(proposal)],
         };
         const newRoot = setValueAt(model.root.b, path, newArray);
         return setRoot(model, newRoot);
