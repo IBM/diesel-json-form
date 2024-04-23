@@ -1,15 +1,15 @@
 {
   "documentRoot": "文書ルート",
-  "propertyAlreadyExists": "プロパティーは既に存在しています",
-  "propertyNamePlaceholder": "タイプ・プロパティー名...",
-  "propertyNameLabel": "{{path}} でのプロパティー名",
+  "propertyAlreadyExists": "プロパティーは既に存在します",
+  "propertyNamePlaceholder": "プロパティー名の入力 ...",
+  "propertyNameLabel": "{{path}} のプロパティー名",
   "emptyObject": "空のオブジェクト",
   "emptyArray": "空の配列",
   "stringValuePlaceholder": "テキスト・ストリングを入力してください",
   "stringValueLabel": "{{path}} のテキスト・ストリング",
-  "stringValueComboLabel": "{{path}} のテキスト・ストリングの選択",
+  "stringValueComboLabel": "{{path}} のテキスト・ストリングを選択します",
   "numberValueLabel": "{{path}} の数",
-  "booleanValueLabel": "{{path}} のブール値の検証",
+  "booleanValueLabel": "{{path}} のブール値を確認してください",
   "dateValueLabel": "{{path}} の日付",
   "timeValueLabel": "{{path}} の時刻",
   "contextMenu": {
@@ -18,9 +18,9 @@
     "moveDown": "下へ",
     "propose": "提案",
     "delete": "削除",
-    "changeType": "タイプの変更",
-    "addElement": "エレメントを追加します",
-    "addProperty": "プロパティーの追加..."
+    "changeType": "変更タイプ",
+    "addElement": "エレメントの追加",
+    "addProperty": "プロパティーの追加 ..."
   },
   "icon.openMenu": "メニューを開く",
   "icon.expand": "展開",

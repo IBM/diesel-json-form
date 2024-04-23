@@ -1,7 +1,7 @@
 {
-  "documentRoot": "Racine de document",
-  "propertyAlreadyExists": "Cette propriété existe déjà",
-  "propertyNamePlaceholder": "nom de la propriété de type...",
+  "documentRoot": "Racine du document",
+  "propertyAlreadyExists": "La propriété existe déjà",
+  "propertyNamePlaceholder": "entrez le nom de la propriété ...",
   "propertyNameLabel": "nom de propriété dans {{path}}",
   "emptyObject": "Objet vide",
   "emptyArray": "Tableau vide",
@@ -14,15 +14,15 @@
   "timeValueLabel": "heure de {{path}}",
   "contextMenu": {
     "move": "Déplacer",
-    "moveUp": "Opérationnelle",
-    "moveDown": "En panne",
+    "moveUp": "Haut",
+    "moveDown": "Bas",
     "propose": "Proposer",
     "delete": "Supprimer",
-    "changeType": "Changer de type",
+    "changeType": "Changer le type",
     "addElement": "Ajouter un élément",
-    "addProperty": "Ajouter une propriété..."
+    "addProperty": "Ajouter une propriété ..."
   },
-  "icon.openMenu": "Ouvrir le menu",
+  "icon.openMenu": "Fermer le menu",
   "icon.expand": "Développer",
-  "icon.collapse": "Condenser"
+  "icon.collapse": "Réduire"
 }

@@ -1,0 +1,28 @@
+{
+  "documentRoot": "Element główny dokumentu",
+  "propertyAlreadyExists": "Właściwość już istnieje",
+  "propertyNamePlaceholder": "Nazwa właściwości typu ...",
+  "propertyNameLabel": "nazwa właściwości w {{path}}",
+  "emptyObject": "Pusty obiekt",
+  "emptyArray": "Pusta tablica",
+  "stringValuePlaceholder": "Wprowadź łańcuch tekstowy",
+  "stringValueLabel": "łańcuch tekstowy {{path}}",
+  "stringValueComboLabel": "wybierz łańcuch tekstowy {{path}}",
+  "numberValueLabel": "liczba {{path}}",
+  "booleanValueLabel": "sprawdź wartość boolowską {{path}}",
+  "dateValueLabel": "data {{path}}",
+  "timeValueLabel": "czas {{path}}",
+  "contextMenu": {
+    "move": "Przenieś",
+    "moveUp": "W górę",
+    "moveDown": "W dół",
+    "propose": "Proponuj",
+    "delete": "Usuń",
+    "changeType": "Typ zmiany",
+    "addElement": "Dodaj element",
+    "addProperty": "Dodaj właściwość ..."
+  },
+  "icon.openMenu": "Otwórz menu",
+  "icon.expand": "Rozwiń",
+  "icon.collapse": "Zwiń"
+}

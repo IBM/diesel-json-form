@@ -1,7 +1,7 @@
 {
   "documentRoot": "文档根",
   "propertyAlreadyExists": "属性已存在",
-  "propertyNamePlaceholder": "输入属性名称...",
+  "propertyNamePlaceholder": "类型属性名 ...",
   "propertyNameLabel": "{{path}} 中的属性名称",
   "emptyObject": "空对象",
   "emptyArray": "空数组",
@@ -20,7 +20,7 @@
     "delete": "删除",
     "changeType": "更改类型",
     "addElement": "添加元素",
-    "addProperty": "添加属性..."
+    "addProperty": "添加属性 ..."
   },
   "icon.openMenu": "打开菜单",
   "icon.expand": "展开",

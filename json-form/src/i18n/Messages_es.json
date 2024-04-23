@@ -1,7 +1,7 @@
 {
   "documentRoot": "Raíz de documento",
   "propertyAlreadyExists": "La propiedad ya existe",
-  "propertyNamePlaceholder": "nombre de propiedad de tipo...",
+  "propertyNamePlaceholder": "escriba el nombre de la propiedad ...",
   "propertyNameLabel": "nombre de propiedad en {{path}}",
   "emptyObject": "Objeto vacío",
   "emptyArray": "Matriz vacía",
@@ -16,11 +16,11 @@
     "move": "Mover",
     "moveUp": "Arriba",
     "moveDown": "Abajo",
-    "propose": "Proponer",
+    "propose": "Proponga",
     "delete": "Suprimir",
     "changeType": "Cambiar tipo",
     "addElement": "Añadir elemento",
-    "addProperty": "Añadir propiedad..."
+    "addProperty": "Añadir propiedad ..."
   },
   "icon.openMenu": "Abrir menú",
   "icon.expand": "Expandir",
