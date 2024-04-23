@@ -158,6 +158,31 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 f.objectAt(customerPath).assertEmpty();
         }
 
+        @Test
+        public void addArrayElement() {
+                FJsonForm f = sandbox.jsonForm;
+
+                sandbox.selectSample(ObjectArray);
+                sandbox.jsonEditor.focus().clearText();
+                sandbox.jsonEditor.assertText("");
+
+                f
+                                .clickRootMenu()
+                                .clickPropose("array");
+                f
+                                .arrayAt(JsPath.empty)
+                                .assertLength(0);
+                f
+                                .clickRootMenu()
+                                .clickAddElement();
+                f
+                                .arrayAt(JsPath.empty)
+                                .assertLength(1);
+                f
+                                .objectAt(JsPath.empty.append(0))
+                                .assertEmpty();
+        }
+
         private void assertErrorInvalidType(String type) {
                 sandbox.schemaEditor
                                 .focus()
