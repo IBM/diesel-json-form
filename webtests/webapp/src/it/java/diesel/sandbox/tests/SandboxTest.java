@@ -110,6 +110,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         private final String BeanContainingOtherBean = "BeanContainingOtherBean";
         private final String EnumArray = "EnumArray";
+        private final String ObjectArray = "ObjectArray";
 
         @Test
         public void customerAge() {
