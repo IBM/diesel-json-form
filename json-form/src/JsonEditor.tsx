@@ -25,11 +25,12 @@ import {
   nothing,
   Port,
   Sub,
+  Task,
   Tuple,
   updatePiped,
 } from 'tea-cup-core';
-import { DevTools, Program } from 'react-tea-cup';
-import { contextMenuMsg, Msg, setJsonStr, setStrictModeMsg } from './Msg';
+import { Program } from 'react-tea-cup';
+import { contextMenuMsg, Msg, noOp, setJsonStr, setStrictModeMsg } from './Msg';
 import {
   computeAll,
   CustomRendererModel,
@@ -199,6 +200,21 @@ function withOutValueChanged(
   ];
 }
 
+function selectTextCmd(path: JsPath): Cmd<Msg> {
+  const selectTask: Task<Error, string> = Task.fromLambda(() => {
+    const inputId = `input-${path.format('_')}`;
+    const input = document.getElementById(inputId);
+    if (!input) {
+      throw new Error(`input not found for path ${path.format()}`);
+    }
+    if (input instanceof HTMLInputElement) {
+      input.select();
+    }
+    return 'ok';
+  });
+  return Task.attempt(selectTask, () => noOp);
+}
+
 export function update(
   msg: Msg,
   model: Model,
@@ -207,11 +223,18 @@ export function update(
   switch (msg.tag) {
     case 'delete-property':
       return withOutValueChanged(model, actionDeleteValue(model, msg.path));
-    case 'update-property':
-      return withOutValueChanged(
+    case 'update-property': {
+      const mac = updatePiped(
         model,
-        actionUpdateValue(model, msg.path, msg.value),
+        (model) => actionUpdateValue(model, msg.path, msg.value),
+        (model) => {
+          const cmd: Cmd<Msg> =
+            msg.selectText === true ? selectTextCmd(msg.path) : Cmd.none();
+          return [model, cmd];
+        },
       );
+      return withOutValueChanged(model, mac);
+    }
     case 'add-property-clicked':
       return noOut(actionAddPropertyClicked(model, msg.path));
     case 'new-property-name-changed':
@@ -437,7 +460,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
         return [maco[0], maco[1]];
       }}
       subscriptions={subscriptions}
-      devTools={DevTools.init<Model, Msg>(window)}
+      // devTools={DevTools.init<Model, Msg>(window)}
     />
   );
 }
