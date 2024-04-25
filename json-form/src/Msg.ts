@@ -99,6 +99,7 @@ export interface DeleteProperty extends HasPath {
 export interface UpdateProperty extends HasPath {
   tag: 'update-property';
   value: JsonValue;
+  selectText?: boolean;
 }
 
 export interface AddPropertyClicked extends HasPath {

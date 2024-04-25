@@ -397,11 +397,13 @@ function ViewArray(p: ViewValueProps<JvArray>): React.ReactElement {
 function dispatchUpdateProperty(
   p: ViewValueProps<JsonValue>,
   newValue: JsonValue,
+  selectText?: boolean,
 ) {
   p.dispatch({
     tag: 'update-property',
     path: p.path,
     value: newValue,
+    selectText,
   });
 }
 
@@ -419,10 +421,16 @@ function ViewNumber(p: ViewValueProps<JvNumber>): React.ReactElement {
       invalid={isInvalid(p)}
       onChange={(evt) => {
         let newValue = parseFloat(evt.target.value);
+        let selectText = false;
         if (isNaN(newValue)) {
           newValue = 0;
+          selectText = true;
         }
-        dispatchUpdateProperty(p, { tag: 'jv-number', value: newValue });
+        dispatchUpdateProperty(
+          p,
+          { tag: 'jv-number', value: newValue },
+          selectText,
+        );
       }}
     />
   );
