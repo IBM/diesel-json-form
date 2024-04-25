@@ -17,7 +17,7 @@
     "@carbon/icons": "^10.28.0",
     "@carbon/icons-react": "~10.22.0",
     "@carbon/themes": "~10.21.0",
-    "@diesel-parser/json-form": "^3.3.2",
+    "@diesel-parser/json-form": "^3.3.3",
     "@diesel-parser/monaco": "~0.1.0",
     "carbon-components": "~10.25.0",
     "carbon-components-react": "~7.25.0",
