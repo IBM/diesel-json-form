@@ -37,6 +37,7 @@ export type Msg =
   | MenuTriggerClicked
   | { tag: 'set-json-str'; schema: Maybe<JsonValue>; json: JsonValue }
   | { tag: 'set-strict-mode'; strictMode: boolean }
+  | { tag: 'set-debounce-ms'; debounceMs: number }
   | ToggleExpandCollapse
   | AddPropertyButtonClicked
   | RecomputeMetadata
@@ -64,6 +65,13 @@ export function setStrictModeMsg(strictMode: boolean): Msg {
   return {
     tag: 'set-strict-mode',
     strictMode,
+  };
+}
+
+export function setDebounceMsMsg(debounceMs: number): Msg {
+  return {
+    tag: 'set-debounce-ms',
+    debounceMs,
   };
 }
 

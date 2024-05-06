@@ -366,7 +366,10 @@ export function actionUpdateValue(
 const debouncer = new Debouncer<Msg>();
 
 export function setRoot(model: Model, root: JsonValue): [Model, Cmd<Msg>] {
-  const cmd = debouncer.debounce({ tag: 'recompute-metadata' }, 500);
+  const cmd = debouncer.debounce(
+    { tag: 'recompute-metadata' },
+    model.debounceMs,
+  );
   const newModel: Model = {
     ...model,
     root: new Tuple(valueToAny(root), root),

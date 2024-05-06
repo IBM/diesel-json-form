@@ -100,6 +100,20 @@ strictModeCb.addEventListener("change", () => {
   JsonForm.setStrictModePort.send(strictModeCb.checked);
 });
 
+const debounceMs = document.getElementById("debounceMs") as HTMLInputElement;
+
+function getDebounceMs(): number {
+  let newDebounce = parseInt(debounceMs.value);
+  if (isNaN(newDebounce) || newDebounce < 0) {
+    newDebounce = 0;
+  }
+  return newDebounce;
+}
+
+debounceMs.addEventListener("change", (e) => {
+  JsonForm.setDebounceMsPort.send(getDebounceMs());
+});
+
 switch (valueRes.tag) {
   case "Err": {
     const errNode = document.createElement("div");
@@ -108,12 +122,17 @@ switch (valueRes.tag) {
     break;
   }
   case "Ok": {
-    initJsonForm(schema, valueRes.value, strictMode);
+    initJsonForm(schema, valueRes.value, strictMode, getDebounceMs());
     break;
   }
 }
 
-function initJsonForm(schema: any, value: any, strictMode: boolean) {
+function initJsonForm(
+  schema: any,
+  value: any,
+  strictMode: boolean,
+  debounceMs: number
+) {
   ReactDOM.render(
     JsonForm.JsonEditor({
       schema,
@@ -128,6 +147,7 @@ function initJsonForm(schema: any, value: any, strictMode: boolean) {
       },
       strictMode,
       rendererFactory: MyRendererFactory,
+      debounceMs,
     }),
     jsonForm
   );

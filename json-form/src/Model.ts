@@ -42,6 +42,7 @@ export interface Model {
   readonly lang: string;
   readonly strictMode: boolean;
   readonly customRenderers: ReadonlyMap<string, Maybe<CustomRendererModel>>;
+  readonly debounceMs: number;
 }
 
 export interface CustomRendererModel {
@@ -249,6 +250,7 @@ export function initialModel(
   schema: Maybe<JsonValue>,
   root: JsonValue,
   strictMode: boolean,
+  debounceMs: number,
 ): Model {
   const t = initMyI18n(lang);
   const model: Model = {
@@ -266,6 +268,7 @@ export function initialModel(
     formats: new Map(),
     strictMode,
     customRenderers: new Map(),
+    debounceMs: Math.max(0, debounceMs),
   };
 
   return computeAll(doValidate(model));
