@@ -30,7 +30,14 @@ import {
   updatePiped,
 } from 'tea-cup-core';
 import { Program } from 'react-tea-cup';
-import { contextMenuMsg, Msg, noOp, setJsonStr, setStrictModeMsg } from './Msg';
+import {
+  contextMenuMsg,
+  Msg,
+  noOp,
+  setDebounceMsMsg,
+  setJsonStr,
+  setStrictModeMsg,
+} from './Msg';
 import {
   computeAll,
   CustomRendererModel,
@@ -66,9 +73,16 @@ export function init(
   initialValue: JsonValue,
   strictMode: boolean,
   rendererFactory: RendererFactory,
+  debounceMs: number,
 ): [Model, Cmd<Msg>] {
   JsFacade.setLang(language);
-  const model = initialModel(language, schema, initialValue, strictMode);
+  const model = initialModel(
+    language,
+    schema,
+    initialValue,
+    strictMode,
+    debounceMs,
+  );
   return reInitRenderers(model, rendererFactory);
 }
 
@@ -316,6 +330,7 @@ export function update(
           msg.json,
           model.strictMode,
           rendererFactory,
+          model.debounceMs,
         ),
       );
     }
@@ -332,6 +347,8 @@ export function update(
       return noOut(noCmd(model));
     case 'set-strict-mode':
       return noOut(noCmd(setStrictMode(model, msg.strictMode)));
+    case 'set-debounce-ms':
+      return noOut(noCmd({ ...model, debounceMs: msg.debounceMs }));
     case 'recompute-metadata': {
       const newModel = computeAll(doValidate(model));
       return withOutValueChanged(
@@ -409,6 +426,8 @@ export const sendJsonPort = new Port<[Maybe<JsonValue>, JsonValue]>();
 
 export const setStrictModePort = new Port<boolean>();
 
+export const setDebounceMsPort = new Port<number>();
+
 export function subscriptions(model: Model): Sub<Msg> {
   // the menu's subs
   const subMenu = model.menuModel
@@ -417,7 +436,13 @@ export function subscriptions(model: Model): Sub<Msg> {
   // the ports subs
   const portSub = sendJsonPort.subscribe(setJsonStr);
   const setStrictModePortSub = setStrictModePort.subscribe(setStrictModeMsg);
-  return Sub.batch([subMenu, portSub, setStrictModePortSub]);
+  const setDebouceMsPortSub = setDebounceMsPort.subscribe(setDebounceMsMsg);
+  return Sub.batch([
+    subMenu,
+    portSub,
+    setStrictModePortSub,
+    setDebouceMsPortSub,
+  ]);
 }
 
 export interface JsonEditorProps {
@@ -427,6 +452,7 @@ export interface JsonEditorProps {
   readonly strictMode: boolean;
   readonly onChange?: (value: JsonValue) => void;
   readonly rendererFactory: RendererFactory;
+  readonly debounceMs?: number;
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
@@ -439,6 +465,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           props.value,
           props.strictMode,
           props.rendererFactory,
+          props.debounceMs || 500,
         )
       }
       view={(dispatch, model) => (
