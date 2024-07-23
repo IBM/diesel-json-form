@@ -9,6 +9,7 @@ import {
 import { Cmd, just, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
 import { JsValidationError } from "@diesel-parser/json-schema-facade-ts";
+import { JsonEditorRenderOptions } from "@diesel-parser/json-form/dist/JsonEditorRenderOptions";
 
 export type Msg =
   | { tag: "mouse-enter"; index: number }
@@ -33,7 +34,7 @@ export const RatingRenderer: Renderer<Model, Msg> = {
     };
     return noCmd(newModel);
   },
-  view: function (args: RendererViewArgs<Model, Msg>): React.ReactElement {
+  view: function (args: RendererViewArgs<Model, Msg, JsonEditorRenderOptions>): React.ReactElement {
     const { model, dispatch } = args;
     const box = (index: number) => {
       const checked = index <= model.value;

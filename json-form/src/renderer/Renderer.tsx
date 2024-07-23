@@ -50,6 +50,7 @@ import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--verti
 import Add16 from '@carbon/icons-react/lib/add/16';
 import { TFunction } from 'i18next';
 import { ViewValueProps } from './ViewValueProps';
+import { JsonEditorRenderOptions } from '../JsonEditorRenderOptions';
 
 export interface RendererInitArgs<Model> {
   readonly path: JsPath;
@@ -59,16 +60,17 @@ export interface RendererInitArgs<Model> {
   readonly schema: any;
 }
 
-export interface RendererViewArgs<Model, Msg> {
+export interface RendererViewArgs<Model, Msg, JsonEditorRenderOptions> {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
   readonly path: JsPath;
   readonly formView: (path: JsPath, value: JsonValue) => React.ReactElement;
+  readonly renderOptions?: JsonEditorRenderOptions;
 }
 
 export interface Renderer<Model, Msg> {
   reinit(args: RendererInitArgs<Model>): [Model, Cmd<Msg>];
-  view(args: RendererViewArgs<Model, Msg>): React.ReactElement;
+  view(args: RendererViewArgs<Model, Msg, JsonEditorRenderOptions>): React.ReactElement;
   update(msg: Msg, model: Model): [Model, Cmd<Msg>, Maybe<JsonValue>];
 }
 
@@ -88,7 +90,7 @@ export class RendererFactory {
 export function ViewJsonValue(
   p: ViewValueProps<JsonValue>,
 ): React.ReactElement {
-  const { value, rendererFactory } = p;
+  const { value, rendererFactory, renderOptions } = p;
 
   const path = p.path.format();
   if (rendererFactory) {
@@ -116,6 +118,7 @@ export function ViewJsonValue(
               language={p.language}
             />
           ),
+          renderOptions: renderOptions
         });
       }
     }
@@ -145,7 +148,7 @@ export function ViewJsonValue(
 }
 
 function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
-  const { model, value, dispatch, path } = p;
+  const { model, value, dispatch, path, renderOptions } = p;
   const { properties } = value;
   const { t } = model;
 
@@ -251,6 +254,7 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
                   path={propertyPath}
                   disabled={isAddingProp}
                   t={t}
+                  renderOptions={renderOptions}
                 />
               </div>
             </div>
@@ -258,7 +262,7 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
               <></>
             ) : (
               <div className="prop-value">
-                <ViewJsonValue {...p} path={propertyPath} value={prop.value} />
+                <ViewJsonValue {...p} path={propertyPath} value={prop.value} renderOptions={renderOptions}/>
               </div>
             )}
           </div>
@@ -343,7 +347,7 @@ function ExpandCollapseButton(props: ExpandCollapseButtonProps) {
 }
 
 function ViewArray(p: ViewValueProps<JvArray>): React.ReactElement {
-  const { dispatch, path, value, model } = p;
+  const { dispatch, path, value, model, renderOptions } = p;
   const { t } = model;
   const isAdding = p.model.adding.isJust();
   return (
@@ -374,6 +378,7 @@ function ViewArray(p: ViewValueProps<JvArray>): React.ReactElement {
                         path={elemPath}
                         disabled={isAdding}
                         t={t}
+                        renderOptions={renderOptions}
                       />
                     </div>
                   </div>
@@ -381,7 +386,7 @@ function ViewArray(p: ViewValueProps<JvArray>): React.ReactElement {
                     <></>
                   ) : (
                     <div className={'elem-value'}>
-                      <ViewJsonValue {...p} path={elemPath} value={elemValue} />
+                      <ViewJsonValue {...p} path={elemPath} value={elemValue} renderOptions={renderOptions}/>
                     </div>
                   )}
                 </div>
@@ -808,10 +813,11 @@ export interface MenuTriggerProps {
   readonly path: JsPath;
   readonly disabled: boolean;
   readonly t: TFunction;
+  readonly renderOptions?: JsonEditorRenderOptions 
 }
 
 export function MenuTrigger(props: MenuTriggerProps) {
-  const { disabled, path, dispatch, t } = props;
+  const { disabled, path, dispatch, t, renderOptions } = props;
   return (
     <Button
       iconDescription={t('icon.openMenu')}
@@ -819,9 +825,10 @@ export function MenuTrigger(props: MenuTriggerProps) {
       size={'sm'}
       kind={'ghost'}
       renderIcon={OverflowMenuVertical16}
-      tooltipPosition={'left'}
+      tooltipPosition={renderOptions?.menuTooltipPosition ?? 'left'}
       hasIconOnly={true}
       onClick={onMenuTriggerClick(dispatch, path)}
+      style={{overflow: renderOptions?.hideMenuTooltip ? 'hidden' : undefined}}
     />
   );
 }

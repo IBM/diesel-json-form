@@ -4,6 +4,7 @@ import { JsPath } from '../JsPath';
 import { Dispatcher } from 'tea-cup-core';
 import { Msg } from '../Msg';
 import { RendererFactory } from './Renderer';
+import { JsonEditorRenderOptions } from '../JsonEditorRenderOptions';
 
 export interface ViewValueProps<T extends JsonValue> {
   readonly model: Model;
@@ -12,4 +13,5 @@ export interface ViewValueProps<T extends JsonValue> {
   readonly rendererFactory: RendererFactory;
   readonly dispatch: Dispatcher<Msg>;
   readonly language: string;
+  readonly renderOptions?: JsonEditorRenderOptions
 }

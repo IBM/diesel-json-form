@@ -8,6 +8,7 @@ import {
 } from "@diesel-parser/json-form";
 import { Cmd, Maybe, noCmd, nothing } from "tea-cup-core";
 import * as React from "react";
+import { JsonEditorRenderOptions } from "@diesel-parser/json-form/dist/JsonEditorRenderOptions";
 
 export type Msg = string;
 
@@ -29,7 +30,7 @@ export const MyObjectRenderer: Renderer<Model, Msg> = {
     }
     return noCmd(newModel);
   },
-  view: function (args: RendererViewArgs<Model, Msg>): React.ReactElement {
+  view: function (args: RendererViewArgs<Model, Msg, JsonEditorRenderOptions>): React.ReactElement {
     const { model, formView, path } = args;
     if (model.value.properties.length === 0) {
       return <p>Empty object</p>;

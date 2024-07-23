@@ -66,6 +66,7 @@ import { executeContextMenuAction } from './ContextMenu';
 import { OutMsg, outValueChanged } from './OutMsg';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { RendererFactory } from './renderer/Renderer';
+import { JsonEditorRenderOptions } from './JsonEditorRenderOptions';
 
 export function init(
   language: string,
@@ -148,10 +149,11 @@ export interface ViewJsonEditorProps {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
+  readonly renderOptions: JsonEditorRenderOptions;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
-  const { model, dispatch } = props;
+  const { model, dispatch, renderOptions } = props;
   return (
     <div className="diesel-json-editor">
       <div className="diesel-json-editor-scrollpane">
@@ -163,6 +165,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
             path={JsPath.empty}
             disabled={model.adding.isJust()}
             t={model.t}
+            renderOptions={renderOptions}
           />
         </div>
         <ViewJsonValue
@@ -172,6 +175,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
           dispatch={dispatch}
           rendererFactory={props.rendererFactory}
           language={props.model.lang}
+          renderOptions={renderOptions}
         />
       </div>
       {model.menuModel
@@ -453,6 +457,7 @@ export interface JsonEditorProps {
   readonly onChange?: (value: JsonValue) => void;
   readonly rendererFactory: RendererFactory;
   readonly debounceMs?: number;
+  readonly renderOptions: JsonEditorRenderOptions
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
@@ -473,6 +478,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           dispatch={dispatch}
           model={model}
           rendererFactory={props.rendererFactory}
+          renderOptions={props.renderOptions}
         />
       )}
       update={(msg, model) => {

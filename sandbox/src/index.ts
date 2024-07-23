@@ -148,6 +148,10 @@ function initJsonForm(
       strictMode,
       rendererFactory: MyRendererFactory,
       debounceMs,
+      renderOptions: {
+        menuTooltipPosition: "bottom",
+        hideMenuTooltip: false
+      }
     }),
     jsonForm
   );
