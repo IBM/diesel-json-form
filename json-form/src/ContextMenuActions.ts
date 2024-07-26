@@ -27,6 +27,7 @@ import {
   jvObject,
   jvString,
 } from './JsonValue';
+import { JsonEditorMenuOptionFilter, JsonEditorMenuOptions } from './JsonEditorRenderOptions';
 
 export type MenuAction =
   | { tag: 'delete'; path: JsPath }
@@ -72,6 +73,7 @@ export interface MenuPropertyProps {
   readonly valueAtPath: JsonValue;
   readonly proposals: ReadonlyArray<JsonValue>;
   readonly strictMode: boolean;
+  readonly menuFilter?: JsonEditorMenuOptionFilter
 }
 
 export function createTypesMenu(
@@ -176,7 +178,7 @@ export function createProposeMenu(
 }
 
 export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
-  const { path, proposals, valueAtPath, root, strictMode } = props;
+  const { path, proposals, valueAtPath, root, strictMode, menuFilter } = props;
 
   const addItems: () => MenuItem<MenuAction>[] = () => {
     const isArray = valueAtPath.tag === 'jv-array';
@@ -204,7 +206,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
     })
     .withDefault(0);
 
-  const hasMoveMenu = !isRoot && nbItems > 1;
+  const hasMoveMenu = !isRoot && nbItems > 1 && !((menuFilter?.menuFilters && JsonEditorMenuOptions.MOVE) === JsonEditorMenuOptions.MOVE);
 
   const moveMenu: () => Menu<MenuAction> = () => {
     const index = indexOfPathInParent(root, path);
@@ -218,13 +220,16 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
 
   const moveItems = hasMoveMenu ? [item(maMove(), moveMenu())] : [];
 
-  const deleteItems = isRoot ? [] : [item(maDelete(path))];
+  const deleteItems = isRoot && ((menuFilter?.menuFilters && JsonEditorMenuOptions.DELETE) === JsonEditorMenuOptions.DELETE) ? [] : [item(maDelete(path))];
+
+  const changeTypes = ((menuFilter?.menuFilters && JsonEditorMenuOptions.CHANGE_TYPE) === JsonEditorMenuOptions.CHANGE_TYPE) ? [] : createTypesMenu(path, valueAtPath, proposals, strictMode);
+  const proposeItems = ((menuFilter?.menuFilters && JsonEditorMenuOptions.PROPOSE) === JsonEditorMenuOptions.PROPOSE) ? [] : createProposeMenu(path, proposals, strictMode);
 
   return menu(
     moveItems
       .concat(addItems())
-      .concat(createTypesMenu(path, valueAtPath, proposals, strictMode))
-      .concat(createProposeMenu(path, proposals, strictMode))
+      .concat(changeTypes)
+      .concat(proposeItems)
       .concat(deleteItems),
   );
 }

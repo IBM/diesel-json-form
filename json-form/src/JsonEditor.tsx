@@ -66,7 +66,7 @@ import { executeContextMenuAction } from './ContextMenu';
 import { OutMsg, outValueChanged } from './OutMsg';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { RendererFactory } from './renderer/Renderer';
-import { JsonEditorRenderOptions } from './JsonEditorRenderOptions';
+import { JsonEditorMenuOptionFilter, JsonEditorRenderOptions } from './JsonEditorRenderOptions';
 
 export function init(
   language: string,
@@ -237,6 +237,7 @@ export function update(
   msg: Msg,
   model: Model,
   rendererFactory: RendererFactory,
+  menuFilter?: JsonEditorMenuOptionFilter
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
     case 'delete-property':
@@ -279,7 +280,7 @@ export function update(
       );
     }
     case 'menu-trigger-clicked': {
-      return noOut(actionTriggerClicked(model, msg.path, msg.refBox));
+      return noOut(actionTriggerClicked(model, msg.path, msg.refBox, menuFilter));
     }
     case 'menu-msg': {
       return withOutValueChanged(
@@ -458,6 +459,7 @@ export interface JsonEditorProps {
   readonly rendererFactory: RendererFactory;
   readonly debounceMs?: number;
   readonly renderOptions: JsonEditorRenderOptions
+  readonly menuFilter: JsonEditorMenuOptionFilter
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
@@ -482,7 +484,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
         />
       )}
       update={(msg, model) => {
-        const maco = update(msg, model, props.rendererFactory);
+        const maco = update(msg, model, props.rendererFactory, props.menuFilter);
         maco[2].forEach((outMsg) => {
           switch (outMsg.tag) {
             case 'value-changed': {

@@ -19,6 +19,7 @@ import "@diesel-parser/json-form/dist/JsonEditor.css";
 import ReactDOM from "react-dom";
 import * as JsonForm from "@diesel-parser/json-form";
 import { RendererFactory } from "@diesel-parser/json-form";
+import { JsonEditorMenuOptions } from "@diesel-parser/json-form/dist/JsonEditorRenderOptions";
 
 import { editor1, editor2 } from "./text-editor";
 import { MyStringRenderer } from "./MyStringRenderer";
@@ -151,6 +152,9 @@ function initJsonForm(
       renderOptions: {
         menuTooltipPosition: "bottom",
         hideMenuTooltip: false
+      },
+      menuFilter: {
+        menuFilters: JsonEditorMenuOptions.PROPOSE | JsonEditorMenuOptions.CHANGE_TYPE
       }
     }),
     jsonForm
