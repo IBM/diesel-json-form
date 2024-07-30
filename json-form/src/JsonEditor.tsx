@@ -149,7 +149,7 @@ export interface ViewJsonEditorProps {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
-  readonly renderOptions: JsonEditorRenderOptions;
+  readonly renderOptions?: JsonEditorRenderOptions;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
@@ -157,7 +157,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
   return (
     <div className="diesel-json-editor">
       <div className="diesel-json-editor-scrollpane">
-        <div className={'doc-root'}>
+        {!renderOptions?.hideDocRoot && <div className={'doc-root'}>
           <em>{model.t('documentRoot')}</em>
           <ArrayCounter value={model.root.b} />
           <MenuTrigger
@@ -167,7 +167,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
             t={model.t}
             renderOptions={renderOptions}
           />
-        </div>
+        </div>}
         <ViewJsonValue
           model={model}
           path={JsPath.empty}

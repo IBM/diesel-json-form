@@ -238,14 +238,14 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
         return (
           <div className={propNameClass.join(' ')} key={prop.name + propIndex}>
             <div className={'prop-name-row'}>
-              <div className="prop-expand">
+              {!renderOptions?.hideCollapsiblePanel && <div className="prop-expand">
                 <ExpandCollapseButton
                   collapsed={isCollapsed}
                   dispatch={dispatch}
                   path={propertyPath}
                   t={t}
                 />
-              </div>
+              </div>}
               <div className={'prop-name'}>{prop.name}</div>
               <ArrayCounter value={prop.value} />
               <div className={'prop-menu'}>
@@ -363,14 +363,14 @@ function ViewArray(p: ViewValueProps<JvArray>): React.ReactElement {
               return (
                 <div className={'array-elem'} key={`value-${elemIndex}`}>
                   <div className={'array-elem-head'}>
-                    <div className="prop-expand">
+                    {!renderOptions?.hideCollapsiblePanel && <div className="prop-expand">
                       <ExpandCollapseButton
                         collapsed={isCollapsed}
                         dispatch={dispatch}
                         path={elemPath}
                         t={t}
                       />
-                    </div>
+                    </div>}
                     <div className={'elem-name'}>#{elemIndex}</div>
                     <div className={'prop-menu'}>
                       <MenuTrigger

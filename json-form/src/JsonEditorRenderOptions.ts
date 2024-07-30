@@ -3,6 +3,8 @@ import { Direction } from "carbon-components-react/typings/shared";
 export interface JsonEditorRenderOptions {
   readonly menuTooltipPosition?: Direction | undefined;
   readonly hideMenuTooltip?: boolean | undefined;
+  readonly hideDocRoot?: boolean | undefined;
+  readonly hideCollapsiblePanel?: boolean | undefined;
 }
 
 export enum JsonEditorMenuOptions {

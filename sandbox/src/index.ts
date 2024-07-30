@@ -150,8 +150,9 @@ function initJsonForm(
       rendererFactory: MyRendererFactory,
       debounceMs,
       renderOptions: {
-        menuTooltipPosition: "bottom",
-        hideMenuTooltip: false
+        hideMenuTooltip: true,
+        hideDocRoot: true,
+        hideCollapsiblePanel: true
       },
       menuFilter: {
         menuFilters: JsonEditorMenuOptions.PROPOSE | JsonEditorMenuOptions.CHANGE_TYPE
