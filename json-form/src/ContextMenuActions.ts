@@ -183,7 +183,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
   const addItems: () => MenuItem<MenuAction>[] = () => {
     const isArray = valueAtPath.tag === 'jv-array';
     const isObject = !strictMode && valueAtPath.tag === 'jv-object';
-    if (isArray || isObject) {
+    if ((isArray || isObject) && !((menuFilter?.menuFilters && JsonEditorMenuOptions.ADD) === JsonEditorMenuOptions.ADD)) {
       return [item({ tag: 'add', path, isArray })];
     }
     return [];
