@@ -6,7 +6,7 @@ orbs:
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: cimg/node:16.20
+    - image: cimg/node:16.20-browsers
 
 jobs:
   build:
