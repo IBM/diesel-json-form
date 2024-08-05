@@ -25,17 +25,14 @@
     "@types/jest": "^26.0.20",
     "@types/react": "^16.9.56",
     "@types/react-dom": "^16.9.8",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.4",
     "jest": "24.9.0",
     "node-sass": "^7.0.1",
     "node-sass-package-importer": "^5.3.2",
     "npm-scripts-watcher": "^1.0.2",
-    "prettier": "2.0.5",
     "ts-jest": "24.0.2"
   },
   "scripts": {
-    "build": "yarn clean && yarn build:ts && yarn test && yarn build:scss",
+    "build": "yarn clean && yarn lint && yarn build:ts && yarn test && yarn build:scss",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "build:scss": "node-sass --importer ../node_modules/node-sass-package-importer/dist/cli.js src/JsonEditor.scss dist/JsonEditor.css",

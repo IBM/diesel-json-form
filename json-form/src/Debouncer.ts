@@ -34,7 +34,10 @@ class DebounceCmd<M> extends Cmd<M> {
 
   private canceled = false;
 
-  constructor(private readonly msg: M, private readonly delay: number) {
+  constructor(
+    private readonly msg: M,
+    private readonly delay: number,
+  ) {
     super();
   }
 

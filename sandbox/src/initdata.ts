@@ -1,4 +1,4 @@
-import big_sample from "./big_sample.json";
+import big_sample from './big_sample.json';
 
 const Sample_Long = `{
   "type": [
@@ -259,16 +259,16 @@ const Example_Renderer3 = JSON.stringify(
   {
     properties: {
       name: {
-        type: "string",
+        type: 'string',
       },
       rating: {
-        type: "number",
-        renderer: "RatingRenderer",
+        type: 'number',
+        renderer: 'RatingRenderer',
       },
     },
   },
   null,
-  "  "
+  '  ',
 );
 
 const Example_Renderer4 = `
@@ -287,29 +287,29 @@ const Example_Renderer4 = `
 
 const Example_Date = JSON.stringify(
   {
-    type: "string",
-    format: "date",
+    type: 'string',
+    format: 'date',
   },
   null,
-  "  "
+  '  ',
 );
 
 const Example_Time = JSON.stringify(
   {
-    type: "string",
-    format: "time",
+    type: 'string',
+    format: 'time',
   },
   null,
-  "  "
+  '  ',
 );
 
 const Example_DateTime = JSON.stringify(
   {
-    type: "string",
-    format: "date-time",
+    type: 'string',
+    format: 'date-time',
   },
   null,
-  "  "
+  '  ',
 );
 
 const Example_DateTimeWithExample = `{
@@ -319,25 +319,25 @@ const Example_DateTimeWithExample = `{
 }`;
 
 export const samples = [
-  ["All", "{}"],
-  ["Long", Sample_Long],
-  ["String", Sample_String],
-  ["EnumArray", Sample_EnumArray],
-  ["ObjectArray", Sample_ObjectArray],
-  ["BeanContainingOtherBean", Sample_BeanContainingOtherBean],
-  ["Inheritance", Sample_Inheritance],
-  ["Polymorphism", Example_Polymorphism],
-  ["Cycle", Example_Cycle],
-  ["Unwrapping", Example_Unwrapping],
-  ["Date", Example_Date],
-  ["Time", Example_Time],
-  ["DateTime", Example_DateTime],
-  ["DateTimeExample", Example_DateTimeWithExample],
-  ["BigSample", JSON.stringify(big_sample, null, "  ")],
-  ["Renderer1", Example_Renderer1],
-  ["Renderer2", Example_Renderer2],
-  ["RendererRating", Example_Renderer3],
-  ["RendererObject", Example_Renderer4],
+  ['All', '{}'],
+  ['Long', Sample_Long],
+  ['String', Sample_String],
+  ['EnumArray', Sample_EnumArray],
+  ['ObjectArray', Sample_ObjectArray],
+  ['BeanContainingOtherBean', Sample_BeanContainingOtherBean],
+  ['Inheritance', Sample_Inheritance],
+  ['Polymorphism', Example_Polymorphism],
+  ['Cycle', Example_Cycle],
+  ['Unwrapping', Example_Unwrapping],
+  ['Date', Example_Date],
+  ['Time', Example_Time],
+  ['DateTime', Example_DateTime],
+  ['DateTimeExample', Example_DateTimeWithExample],
+  ['BigSample', JSON.stringify(big_sample, null, '  ')],
+  ['Renderer1', Example_Renderer1],
+  ['Renderer2', Example_Renderer2],
+  ['RendererRating', Example_Renderer3],
+  ['RendererObject', Example_Renderer4],
 ];
 
 export const initialSchema = {};

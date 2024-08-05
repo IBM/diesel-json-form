@@ -14,23 +14,7 @@
  * limitations under the License.
  */
 
-import * as React from 'react';
-import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-core';
-import { Msg } from '../Msg';
-import {
-  JsonValue,
-  JvArray,
-  JvBoolean,
-  JvNull,
-  JvNumber,
-  JvObject,
-  jvString,
-  JvString,
-} from '../JsonValue';
-import { CustomRendererModel, Model as FormModel, Model } from '../Model';
-import { JsPath } from '../JsPath';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
-import { box, Dim, pos } from 'tea-pop-core';
 import {
   Button,
   Checkbox,
@@ -43,11 +27,27 @@ import {
   TimePicker,
   TimePickerSelect,
 } from 'carbon-components-react';
+import * as React from 'react';
+import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-core';
+import { box, Dim, pos } from 'tea-pop-core';
+import {
+  JsonValue,
+  JvArray,
+  JvBoolean,
+  JvNull,
+  JvNumber,
+  JvObject,
+  jvString,
+  JvString,
+} from '../JsonValue';
+import { JsPath } from '../JsPath';
+import { CustomRendererModel, Model as FormModel } from '../Model';
+import { Msg } from '../Msg';
 
+import Add16 from '@carbon/icons-react/lib/add/16';
 import ChevronDown16 from '@carbon/icons-react/lib/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/lib/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--vertical/16';
-import Add16 from '@carbon/icons-react/lib/add/16';
 import { TFunction } from 'i18next';
 import { ViewValueProps } from './ViewValueProps';
 
@@ -567,9 +567,9 @@ function MyTimePicker(props: MyTimePickerProps) {
           }}
           value={new MyTime(value).offset}
         >
-          {[<SelectItem text={''} value={''} />].concat(
-            allOffsets.map((offset) => (
-              <SelectItem value={offset} text={offset} />
+          {[<SelectItem text={''} value={''} key={'item'} />].concat(
+            allOffsets.map((offset, i) => (
+              <SelectItem value={offset} text={offset} key={'item-' + i} />
             )),
           )}
         </TimePickerSelect>
@@ -762,20 +762,19 @@ function ViewNull(p: ViewValueProps<JvNull>): React.ReactElement {
   );
 }
 
-export const onMenuTriggerClick = (
-  dispatch: Dispatcher<Msg>,
-  propertyPath: JsPath,
-) => (e: React.MouseEvent<HTMLElement>) => {
-  const btnBox = e.target as HTMLElement;
-  if (btnBox) {
-    const rb = box(pos(e.clientX, e.clientY), Dim.zero);
-    dispatch({
-      tag: 'menu-trigger-clicked',
-      path: propertyPath,
-      refBox: rb, //box(rb.p.add(pos(rb.d.w / 2, rb.d.h / 2)), Dim.zero),
-    });
-  }
-};
+export const onMenuTriggerClick =
+  (dispatch: Dispatcher<Msg>, propertyPath: JsPath) =>
+  (e: React.MouseEvent<HTMLElement>) => {
+    const btnBox = e.target as HTMLElement;
+    if (btnBox) {
+      const rb = box(pos(e.clientX, e.clientY), Dim.zero);
+      dispatch({
+        tag: 'menu-trigger-clicked',
+        path: propertyPath,
+        refBox: rb, //box(rb.p.add(pos(rb.d.w / 2, rb.d.h / 2)), Dim.zero),
+      });
+    }
+  };
 
 export interface ViewErrorsProps {
   errors: ReadonlyArray<JsValidationError>;
