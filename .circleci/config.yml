@@ -6,7 +6,7 @@ orbs:
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: cimg/node:16.20-browsers
+    - image: cimg/node:16.20
 
 jobs:
   build:
@@ -22,7 +22,7 @@ jobs:
   webtests:
     <<: *defaults
     docker:
-      - image: cimg/openjdk:17.0
+      - image: cimg/openjdk:17.0-browsers
     environment:
       DISPLAY: :99
       
