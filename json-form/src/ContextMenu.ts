@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-import { MenuAction } from './ContextMenuActions';
-import { Msg } from './Msg';
-import { Model } from './Model';
 import { Cmd, noCmd } from 'tea-cup-core';
 import {
   actionAddElementToArray,
@@ -26,7 +23,9 @@ import {
   actionMoveValue,
   actionUpdateValue,
 } from './Actions';
-import { clearPropertiesIfObject } from './JsonValue';
+import { MenuAction } from './ContextMenuActions';
+import { Model } from './Model';
+import { Msg } from './Msg';
 
 export function executeContextMenuAction(
   model: Model,
