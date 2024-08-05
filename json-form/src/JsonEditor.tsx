@@ -458,8 +458,8 @@ export interface JsonEditorProps {
   readonly onChange?: (value: JsonValue) => void;
   readonly rendererFactory: RendererFactory;
   readonly debounceMs?: number;
-  readonly renderOptions: JsonEditorRenderOptions
-  readonly menuFilter: JsonEditorMenuOptionFilter
+  readonly renderOptions?: JsonEditorRenderOptions
+  readonly menuFilter?: JsonEditorMenuOptionFilter
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
