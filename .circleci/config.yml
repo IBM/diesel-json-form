@@ -22,7 +22,7 @@ jobs:
   webtests:
     <<: *defaults
     docker:
-      - image: circleci/openjdk:8-jdk-browsers
+      - image: cimg/openjdk:17.0.11-noders
     environment:
       DISPLAY: :99
       
@@ -70,7 +70,6 @@ jobs:
       - run: ./deploy.sh
 
 workflows:
-  version: 2
   build-deploy:
     jobs:
       - build:
