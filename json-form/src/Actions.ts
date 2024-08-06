@@ -261,7 +261,7 @@ export function actionTriggerClicked(
   model: Model,
   path: JsPath,
   refBox: Box,
-  menuFilter?: MenuOptionFilter
+  menuFilter?: MenuOptionFilter,
 ): [Model, Cmd<Msg>] {
   return getValueAt(model.root.b, path)
     .map((valueAtPath) => {
@@ -288,7 +288,7 @@ export function actionTriggerClicked(
               .withDefault([]),
             valueAtPath,
             strictMode: model.strictMode,
-            menuFilter
+            menuFilter,
           }),
           refBox,
         ),

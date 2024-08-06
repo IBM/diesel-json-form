@@ -118,7 +118,7 @@ export function ViewJsonValue(
               language={p.language}
             />
           ),
-          renderOptions: renderOptions
+          renderOptions: renderOptions,
         });
       }
     }
@@ -238,14 +238,16 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
         return (
           <div className={propNameClass.join(' ')} key={prop.name + propIndex}>
             <div className={'prop-name-row'}>
-              {!renderOptions?.hideCollapsiblePanel && <div className="prop-expand">
-                <ExpandCollapseButton
-                  collapsed={isCollapsed}
-                  dispatch={dispatch}
-                  path={propertyPath}
-                  t={t}
-                />
-              </div>}
+              {!renderOptions?.hideCollapsiblePanel && (
+                <div className="prop-expand">
+                  <ExpandCollapseButton
+                    collapsed={isCollapsed}
+                    dispatch={dispatch}
+                    path={propertyPath}
+                    t={t}
+                  />
+                </div>
+              )}
               <div className={'prop-name'}>{prop.name}</div>
               <ArrayCounter value={prop.value} />
               <div className={'prop-menu'}>
@@ -262,7 +264,12 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
               <></>
             ) : (
               <div className="prop-value">
-                <ViewJsonValue {...p} path={propertyPath} value={prop.value} renderOptions={renderOptions}/>
+                <ViewJsonValue
+                  {...p}
+                  path={propertyPath}
+                  value={prop.value}
+                  renderOptions={renderOptions}
+                />
               </div>
             )}
           </div>
@@ -363,14 +370,16 @@ function ViewArray(p: ViewValueProps<JvArray>): React.ReactElement {
               return (
                 <div className={'array-elem'} key={`value-${elemIndex}`}>
                   <div className={'array-elem-head'}>
-                    {!renderOptions?.hideCollapsiblePanel && <div className="prop-expand">
-                      <ExpandCollapseButton
-                        collapsed={isCollapsed}
-                        dispatch={dispatch}
-                        path={elemPath}
-                        t={t}
-                      />
-                    </div>}
+                    {!renderOptions?.hideCollapsiblePanel && (
+                      <div className="prop-expand">
+                        <ExpandCollapseButton
+                          collapsed={isCollapsed}
+                          dispatch={dispatch}
+                          path={elemPath}
+                          t={t}
+                        />
+                      </div>
+                    )}
                     <div className={'elem-name'}>#{elemIndex}</div>
                     <div className={'prop-menu'}>
                       <MenuTrigger
@@ -386,7 +395,12 @@ function ViewArray(p: ViewValueProps<JvArray>): React.ReactElement {
                     <></>
                   ) : (
                     <div className={'elem-value'}>
-                      <ViewJsonValue {...p} path={elemPath} value={elemValue} renderOptions={renderOptions}/>
+                      <ViewJsonValue
+                        {...p}
+                        path={elemPath}
+                        value={elemValue}
+                        renderOptions={renderOptions}
+                      />
                     </div>
                   )}
                 </div>
@@ -812,7 +826,7 @@ export interface MenuTriggerProps {
   readonly path: JsPath;
   readonly disabled: boolean;
   readonly t: TFunction;
-  readonly renderOptions?: RenderOptions 
+  readonly renderOptions?: RenderOptions;
 }
 
 export function MenuTrigger(props: MenuTriggerProps) {
@@ -827,7 +841,9 @@ export function MenuTrigger(props: MenuTriggerProps) {
       tooltipPosition={'left'}
       hasIconOnly={true}
       onClick={onMenuTriggerClick(dispatch, path)}
-      style={{overflow: renderOptions?.hideMenuTooltip ? 'hidden' : undefined}}
+      style={{
+        overflow: renderOptions?.hideMenuTooltip ? 'hidden' : undefined,
+      }}
     />
   );
 }

@@ -10,8 +10,8 @@ export enum MenuOptions {
   PROPOSE = 1 << 2,
   CHANGE_TYPE = 1 << 3,
   ADD = 1 << 4,
-} 
+}
 
 export interface MenuOptionFilter {
-  readonly menuFilters?: MenuOptions
+  readonly menuFilters?: MenuOptions;
 }
