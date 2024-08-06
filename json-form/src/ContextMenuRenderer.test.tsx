@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { createTypesMenu, MenuAction } from './ContextMenuActions';
+import {
+  createMenu,
+  createTypesMenu,
+  MenuAction,
+  MenuPropertyProps,
+} from './ContextMenuActions';
+import { JsonEditorMenuOptionFilter } from './JsonEditorRenderOptions';
 import {
   JsonValue,
   jvArray,
@@ -25,7 +31,7 @@ import {
   jvString,
 } from './JsonValue';
 import { JsPath } from './JsPath';
-import { item, menu, MenuItem } from 'tea-pop-menu';
+import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
 
 describe('Change type menu', () => {
   test('[SM: ON, P: 1, V: valid] ' + 'no types menu', () => {
@@ -97,6 +103,93 @@ describe('Change type menu', () => {
   );
 });
 
+describe('menu render options', () => {
+  describe('default options', () => {
+    const menuFilter: JsonEditorMenuOptionFilter = {};
+
+    test('null value', () => {
+      const props: MenuPropertyProps = {
+        root: jvNull,
+        path: JsPath.empty,
+        valueAtPath: jvNull,
+        proposals: [],
+        strictMode: false,
+        menuFilter,
+      };
+      const actual = createMenu(props);
+      expect(menuActionTags(actual)).toEqual(['types', 'delete']);
+    });
+
+    test('empty object value', () => {
+      const props: MenuPropertyProps = {
+        root: jvObject(),
+        path: JsPath.empty,
+        valueAtPath: jvObject(),
+        proposals: [],
+        strictMode: false,
+        menuFilter,
+      };
+      const actual = createMenu(props);
+      expect(menuActionTags(actual)).toEqual(['add', 'types', 'delete']);
+    });
+
+    test('empty array value', () => {
+      const props: MenuPropertyProps = {
+        root: jvArray(),
+        path: JsPath.empty,
+        valueAtPath: jvArray(),
+        proposals: [],
+        strictMode: false,
+        menuFilter,
+      };
+      const actual = createMenu(props);
+      expect(menuActionTags(actual)).toEqual(['add', 'types', 'delete']);
+    });
+
+    test('value with proposals', () => {
+      const props: MenuPropertyProps = {
+        root: jvArray(),
+        path: JsPath.empty,
+        valueAtPath: jvNull,
+        proposals: [jvNull],
+        strictMode: false,
+        menuFilter,
+      };
+      const actual = createMenu(props);
+      expect(menuActionTags(actual)).toEqual(['types', 'propose', 'delete']);
+    });
+
+    test('non empty object value with move', () => {
+      const props: MenuPropertyProps = {
+        root: jvObject([
+          { name: 'foo', value: jvNull },
+          { name: 'bar', value: jvNull },
+        ]),
+        path: JsPath.empty.append('bar'),
+        valueAtPath: jvNull,
+        proposals: [],
+        strictMode: false,
+        menuFilter,
+      };
+      const actual = createMenu(props);
+      expect(menuActionTags(actual)).toEqual(['move', 'types', 'delete']);
+    });
+
+    test('non empty array value with move', () => {
+      const props: MenuPropertyProps = {
+        root: jvArray([jvNull, jvNull]),
+        path: JsPath.empty.append(1),
+        valueAtPath: jvNull,
+        proposals: [],
+        strictMode: false,
+        menuFilter,
+      };
+      const actual = createMenu(props);
+      expect(menuActionTags(actual)).toEqual(['move', 'types', 'delete']);
+    });
+  });
+});
+
 /*-----------*/
 /*  Helpers  */
 /*-----------*/
@@ -127,4 +220,15 @@ function buildExpectedTypesMenu(
       ),
     ),
   ];
+}
+
+function menuActionTags(menu: Menu<MenuAction>): ReadonlyArray<string> {
+  return menu.elems.flatMap((e) => {
+    switch (e.tag) {
+      case 'item':
+        return [e.userData.tag];
+      default:
+        return [];
+    }
+  });
 }
