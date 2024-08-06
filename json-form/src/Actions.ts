@@ -42,7 +42,7 @@ import { createMenu, MenuAction } from './ContextMenuActions';
 import { Box } from 'tea-pop-core';
 import { Debouncer } from './Debouncer';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import { JsonEditorMenuOptionFilter } from './JsonEditorRenderOptions';
+import { MenuOptionFilter } from './RenderOptions';
 
 export function actionDeleteValue(
   model: Model,
@@ -261,7 +261,7 @@ export function actionTriggerClicked(
   model: Model,
   path: JsPath,
   refBox: Box,
-  menuFilter?: JsonEditorMenuOptionFilter
+  menuFilter?: MenuOptionFilter
 ): [Model, Cmd<Msg>] {
   return getValueAt(model.root.b, path)
     .map((valueAtPath) => {

@@ -64,14 +64,13 @@ import {
   setStrictModeMsg,
 } from './Msg';
 import { OutMsg, outValueChanged } from './OutMsg';
-import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import { JsonEditorMenuOptionFilter, JsonEditorRenderOptions } from './JsonEditorRenderOptions';
 import {
   ArrayCounter,
   MenuTrigger,
   RendererFactory,
   ViewJsonValue,
 } from './renderer/Renderer';
+import { MenuOptionFilter, RenderOptions } from './RenderOptions';
 
 export function init(
   language: string,
@@ -154,7 +153,7 @@ export interface ViewJsonEditorProps {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
-  readonly renderOptions?: JsonEditorRenderOptions;
+  readonly renderOptions?: RenderOptions;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
@@ -242,7 +241,7 @@ export function update(
   msg: Msg,
   model: Model,
   rendererFactory: RendererFactory,
-  menuFilter?: JsonEditorMenuOptionFilter
+  menuFilter?: MenuOptionFilter
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
     case 'delete-property':
@@ -463,8 +462,8 @@ export interface JsonEditorProps {
   readonly onChange?: (value: JsonValue) => void;
   readonly rendererFactory: RendererFactory;
   readonly debounceMs?: number;
-  readonly renderOptions?: JsonEditorRenderOptions
-  readonly menuFilter?: JsonEditorMenuOptionFilter
+  readonly renderOptions?: RenderOptions
+  readonly menuFilter?: MenuOptionFilter
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
