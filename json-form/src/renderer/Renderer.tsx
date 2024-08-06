@@ -50,7 +50,7 @@ import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--verti
 import Add16 from '@carbon/icons-react/lib/add/16';
 import { TFunction } from 'i18next';
 import { ViewValueProps } from './ViewValueProps';
-import { JsonEditorRenderOptions } from '../JsonEditorRenderOptions';
+import { RenderOptions } from '../RenderOptions';
 
 export interface RendererInitArgs<Model> {
   readonly path: JsPath;
@@ -60,17 +60,17 @@ export interface RendererInitArgs<Model> {
   readonly schema: any;
 }
 
-export interface RendererViewArgs<Model, Msg, JsonEditorRenderOptions> {
+export interface RendererViewArgs<Model, Msg> {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
   readonly path: JsPath;
   readonly formView: (path: JsPath, value: JsonValue) => React.ReactElement;
-  readonly renderOptions?: JsonEditorRenderOptions;
+  readonly renderOptions?: RenderOptions;
 }
 
 export interface Renderer<Model, Msg> {
   reinit(args: RendererInitArgs<Model>): [Model, Cmd<Msg>];
-  view(args: RendererViewArgs<Model, Msg, JsonEditorRenderOptions>): React.ReactElement;
+  view(args: RendererViewArgs<Model, Msg>): React.ReactElement;
   update(msg: Msg, model: Model): [Model, Cmd<Msg>, Maybe<JsonValue>];
 }
 
@@ -813,7 +813,7 @@ export interface MenuTriggerProps {
   readonly path: JsPath;
   readonly disabled: boolean;
   readonly t: TFunction;
-  readonly renderOptions?: JsonEditorRenderOptions 
+  readonly renderOptions?: RenderOptions 
 }
 
 export function MenuTrigger(props: MenuTriggerProps) {
@@ -825,7 +825,7 @@ export function MenuTrigger(props: MenuTriggerProps) {
       size={'sm'}
       kind={'ghost'}
       renderIcon={OverflowMenuVertical16}
-      tooltipPosition={renderOptions?.menuTooltipPosition ?? 'left'}
+      tooltipPosition={'left'}
       hasIconOnly={true}
       onClick={onMenuTriggerClick(dispatch, path)}
       style={{overflow: renderOptions?.hideMenuTooltip ? 'hidden' : undefined}}

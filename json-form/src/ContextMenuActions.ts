@@ -27,7 +27,7 @@ import {
   jvObject,
   jvString,
 } from './JsonValue';
-import { JsonEditorMenuOptionFilter, JsonEditorMenuOptions } from './JsonEditorRenderOptions';
+import { MenuOptionFilter, MenuOptions } from './RenderOptions';
 
 export type MenuAction =
   | { tag: 'delete'; path: JsPath }
@@ -73,7 +73,7 @@ export interface MenuPropertyProps {
   readonly valueAtPath: JsonValue;
   readonly proposals: ReadonlyArray<JsonValue>;
   readonly strictMode: boolean;
-  readonly menuFilter?: JsonEditorMenuOptionFilter
+  readonly menuFilter?: MenuOptionFilter
 }
 
 export function createTypesMenu(
@@ -183,7 +183,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
   const addItems: () => MenuItem<MenuAction>[] = () => {
     const isArray = valueAtPath.tag === 'jv-array';
     const isObject = !strictMode && valueAtPath.tag === 'jv-object';
-    if ((isArray || isObject) && !((menuFilter?.menuFilters && JsonEditorMenuOptions.ADD) === JsonEditorMenuOptions.ADD)) {
+    if ((isArray || isObject) && !((menuFilter?.menuFilters && MenuOptions.ADD) === MenuOptions.ADD)) {
       return [item({ tag: 'add', path, isArray })];
     }
     return [];
@@ -206,7 +206,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
     })
     .withDefault(0);
 
-  const hasMoveMenu = !isRoot && nbItems > 1 && !((menuFilter?.menuFilters && JsonEditorMenuOptions.MOVE) === JsonEditorMenuOptions.MOVE);
+  const hasMoveMenu = !isRoot && nbItems > 1 && !((menuFilter?.menuFilters && MenuOptions.MOVE) === MenuOptions.MOVE);
 
   const moveMenu: () => Menu<MenuAction> = () => {
     const index = indexOfPathInParent(root, path);
@@ -220,10 +220,10 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
 
   const moveItems = hasMoveMenu ? [item(maMove(), moveMenu())] : [];
 
-  const deleteItems = isRoot && ((menuFilter?.menuFilters && JsonEditorMenuOptions.DELETE) === JsonEditorMenuOptions.DELETE) ? [] : [item(maDelete(path))];
+  const deleteItems = isRoot && ((menuFilter?.menuFilters && MenuOptions.DELETE) === MenuOptions.DELETE) ? [] : [item(maDelete(path))];
 
-  const changeTypes = ((menuFilter?.menuFilters && JsonEditorMenuOptions.CHANGE_TYPE) === JsonEditorMenuOptions.CHANGE_TYPE) ? [] : createTypesMenu(path, valueAtPath, proposals, strictMode);
-  const proposeItems = ((menuFilter?.menuFilters && JsonEditorMenuOptions.PROPOSE) === JsonEditorMenuOptions.PROPOSE) ? [] : createProposeMenu(path, proposals, strictMode);
+  const changeTypes = ((menuFilter?.menuFilters && MenuOptions.CHANGE_TYPE) === MenuOptions.CHANGE_TYPE) ? [] : createTypesMenu(path, valueAtPath, proposals, strictMode);
+  const proposeItems = ((menuFilter?.menuFilters && MenuOptions.PROPOSE) === MenuOptions.PROPOSE) ? [] : createProposeMenu(path, proposals, strictMode);
 
   return menu(
     moveItems

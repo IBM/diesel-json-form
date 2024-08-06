@@ -15,7 +15,6 @@ import {
   nothing,
 } from "tea-cup-core";
 import * as React from "react";
-import { JsonEditorRenderOptions } from "@diesel-parser/json-form/dist/JsonEditorRenderOptions";
 
 export type Msg =
   | { tag: "mouse-enter" }
@@ -49,7 +48,7 @@ export const MyStringRenderer: Renderer<Model, Msg> = {
       }));
     return noCmd(m);
   },
-  view: function (args: RendererViewArgs<Model, Msg, JsonEditorRenderOptions>): React.ReactElement {
+  view: function (args: RendererViewArgs<Model, Msg>): React.ReactElement {
     const { dispatch, model, path } = args;
     return (
       <div
