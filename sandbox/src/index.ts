@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-import "./style.css";
-import "@diesel-parser/json-form/dist/JsonEditor.css";
-import ReactDOM from "react-dom";
-import * as JsonForm from "@diesel-parser/json-form";
-import { RendererFactory } from "@diesel-parser/json-form";
+import './style.css';
+import '@diesel-parser/json-form/dist/JsonEditor.css';
+import ReactDOM from 'react-dom';
+import * as JsonForm from '@diesel-parser/json-form';
+import { RendererFactory } from '@diesel-parser/json-form';
 
-import { editor1, editor2 } from "./text-editor";
-import { MyStringRenderer } from "./MyStringRenderer";
-import { RatingRenderer } from "./RatingRenderer";
-import { MyObjectRenderer } from "./MyObjectRenderer";
-import { initialSchema, initialValue, samples } from "./initdata";
+import { editor1, editor2 } from './text-editor';
+import { MyStringRenderer } from './MyStringRenderer';
+import { RatingRenderer } from './RatingRenderer';
+import { MyObjectRenderer } from './MyObjectRenderer';
+import { initialSchema, initialValue, samples } from './initdata';
 
 const MyRendererFactory = new RendererFactory();
-MyRendererFactory.addRenderer("MyStringRenderer", MyStringRenderer);
-MyRendererFactory.addRenderer("RatingRenderer", RatingRenderer);
-MyRendererFactory.addRenderer("MyObjectRenderer", MyObjectRenderer);
+MyRendererFactory.addRenderer('MyStringRenderer', MyStringRenderer);
+MyRendererFactory.addRenderer('RatingRenderer', RatingRenderer);
+MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
 
-editor1.getModel()?.onDidChangeContent((e) => {
+editor1.getModel()?.onDidChangeContent(() => {
   sendJsonStr();
 });
 
@@ -48,35 +48,35 @@ function getValue() {
 function sendJsonStr() {
   const schema = getSchema();
   const value = getValue();
-  console.log("send JSON str", schema, value);
+  console.log('send JSON str', schema, value);
   JsonForm.sendJsonPort.send([schema, value]);
 }
 
 const syncPanesCb: HTMLInputElement = document.getElementById(
-  "syncPanes"
+  'syncPanes',
 ) as HTMLInputElement;
 
-editor2.getModel()?.onDidChangeContent((e) => {
-  console.log("ed2 change");
+editor2.getModel()?.onDidChangeContent(() => {
+  console.log('ed2 change');
   if (syncPanesCb.checked) {
     sendJsonStr();
   }
 });
 
 const sampleSchemaSelect = document.getElementById(
-  "sampleSchemaSelect"
+  'sampleSchemaSelect',
 ) as HTMLSelectElement;
 
 samples
   .map((s) => {
-    const e = document.createElement("option");
+    const e = document.createElement('option');
     e.value = s[1];
     e.innerHTML = s[0];
     return e;
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-sampleSchemaSelect.addEventListener("change", () => {
+sampleSchemaSelect.addEventListener('change', () => {
   editor1.setValue(sampleSchemaSelect.value);
   sendJsonStr();
 });
@@ -84,23 +84,23 @@ sampleSchemaSelect.addEventListener("change", () => {
 const schema = JsonForm.valueFromAny(initialSchema).toMaybe();
 const valueRes = JsonForm.valueFromAny(initialValue);
 
-const jsonForm = document.getElementById("json-form");
+const jsonForm = document.getElementById('json-form');
 if (!jsonForm) {
-  throw new Error("json-form elem not found");
+  throw new Error('json-form elem not found');
 }
 
 const strictMode = false;
 const strictModeCb: HTMLInputElement = document.getElementById(
-  "strictMode"
+  'strictMode',
 ) as HTMLInputElement;
 strictModeCb.checked = strictMode;
-strictModeCb.addEventListener("change", () => {
+strictModeCb.addEventListener('change', () => {
   // ReactDOM.unmountComponentAtNode(jsonForm);
   // initJsonForm(getSchema(), getValue(), strictModeCb.checked)
   JsonForm.setStrictModePort.send(strictModeCb.checked);
 });
 
-const debounceMs = document.getElementById("debounceMs") as HTMLInputElement;
+const debounceMs = document.getElementById('debounceMs') as HTMLInputElement;
 
 function getDebounceMs(): number {
   let newDebounce = parseInt(debounceMs.value);
@@ -110,18 +110,18 @@ function getDebounceMs(): number {
   return newDebounce;
 }
 
-debounceMs.addEventListener("change", (e) => {
+debounceMs.addEventListener('change', () => {
   JsonForm.setDebounceMsPort.send(getDebounceMs());
 });
 
 switch (valueRes.tag) {
-  case "Err": {
-    const errNode = document.createElement("div");
+  case 'Err': {
+    const errNode = document.createElement('div');
     errNode.appendChild(document.createTextNode(valueRes.err));
     jsonForm.appendChild(errNode);
     break;
   }
-  case "Ok": {
+  case 'Ok': {
     initJsonForm(schema, valueRes.value, strictMode, getDebounceMs());
     break;
   }
@@ -131,7 +131,7 @@ function initJsonForm(
   schema: any,
   value: any,
   strictMode: boolean,
-  debounceMs: number
+  debounceMs: number,
 ) {
   ReactDOM.render(
     JsonForm.JsonEditor({
@@ -139,16 +139,16 @@ function initJsonForm(
       value,
       language: navigator.language,
       onChange: (value: JsonForm.JsonValue) => {
-        console.log("value changed");
+        console.log('value changed');
         if (syncPanesCb.checked) {
           const va = JsonForm.valueToAny(value);
-          editor2.setValue(JSON.stringify(va, null, "  "));
+          editor2.setValue(JSON.stringify(va, null, '  '));
         }
       },
       strictMode,
       rendererFactory: MyRendererFactory,
       debounceMs,
     }),
-    jsonForm
+    jsonForm,
   );
 }

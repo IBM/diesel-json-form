@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import React from 'react';
+import { Program } from 'react-tea-cup';
 import {
   Cmd,
   Dispatcher,
@@ -29,26 +31,7 @@ import {
   Tuple,
   updatePiped,
 } from 'tea-cup-core';
-import { Program } from 'react-tea-cup';
-import {
-  contextMenuMsg,
-  Msg,
-  noOp,
-  setDebounceMsMsg,
-  setJsonStr,
-  setStrictModeMsg,
-} from './Msg';
-import {
-  computeAll,
-  CustomRendererModel,
-  doValidate,
-  initialModel,
-  Model,
-  updateAddingPropertyName,
-} from './Model';
-import { getValueAt, JsonValue, valueToAny } from './JsonValue';
-import { ArrayCounter, MenuTrigger, ViewJsonValue } from './renderer/Renderer';
-import { JsPath } from './JsPath';
+import * as TPM from 'tea-pop-menu';
 import {
   actionAddElementToArray,
   actionAddProperty,
@@ -59,14 +42,36 @@ import {
   actionTriggerClicked,
   actionUpdateValue,
 } from './Actions';
-import * as TPM from 'tea-pop-menu';
+import { executeContextMenuAction } from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { executeContextMenuAction } from './ContextMenu';
+import { getValueAt, JsonValue, valueToAny } from './JsonValue';
+import { JsPath } from './JsPath';
+import {
+  computeAll,
+  CustomRendererModel,
+  doValidate,
+  initialModel,
+  Model,
+  updateAddingPropertyName,
+} from './Model';
+import {
+  contextMenuMsg,
+  Msg,
+  noOp,
+  setDebounceMsMsg,
+  setJsonStr,
+  setStrictModeMsg,
+} from './Msg';
 import { OutMsg, outValueChanged } from './OutMsg';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import { RendererFactory } from './renderer/Renderer';
 import { JsonEditorMenuOptionFilter, JsonEditorRenderOptions } from './JsonEditorRenderOptions';
+import {
+  ArrayCounter,
+  MenuTrigger,
+  RendererFactory,
+  ViewJsonValue,
+} from './renderer/Renderer';
 
 export function init(
   language: string,
@@ -180,7 +185,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
       </div>
       {model.menuModel
         .map((menuModel) => (
-          <div className={'diesel-json-editor-menu'}>
+          <div className={'diesel-json-editor-menu'} key={'editor-menu'}>
             <TPM.ViewMenu
               model={menuModel}
               dispatch={map(dispatch, contextMenuMsg)}

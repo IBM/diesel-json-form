@@ -14,61 +14,61 @@
  * limitations under the License.
  */
 
-import "monaco-editor/esm/vs/editor/editor.all.js";
+import 'monaco-editor/esm/vs/editor/editor.all.js';
 
 // // support all editor features
-import "monaco-editor/esm/vs/editor/standalone/browser/accessibilityHelp/accessibilityHelp.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/inspectTokens/inspectTokens.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/iPadShowKeyboard/iPadShowKeyboard.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneHelpQuickAccess.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneGotoLineQuickAccess.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneGotoSymbolQuickAccess.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneCommandsQuickAccess.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/quickInput/standaloneQuickInputService.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/referenceSearch/standaloneReferenceSearch.js";
-import "monaco-editor/esm/vs/editor/standalone/browser/toggleHighContrast/toggleHighContrast.js";
+import 'monaco-editor/esm/vs/editor/standalone/browser/accessibilityHelp/accessibilityHelp.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/inspectTokens/inspectTokens.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/iPadShowKeyboard/iPadShowKeyboard.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneHelpQuickAccess.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneGotoLineQuickAccess.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneGotoSymbolQuickAccess.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneCommandsQuickAccess.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickInput/standaloneQuickInputService.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/referenceSearch/standaloneReferenceSearch.js';
+import 'monaco-editor/esm/vs/editor/standalone/browser/toggleHighContrast/toggleHighContrast.js';
 
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
-import * as vscode from "vscode";
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
+import * as vscode from 'vscode';
 
-import * as JsonFacade from "@diesel-parser/json-schema-facade-ts";
-import { DieselMonaco } from "@diesel-parser/monaco";
-import { buildWorkerDefinition } from "monaco-editor-workers";
-import { DieselParserFacade } from "@diesel-parser/ts-facade";
-import { initialSchema, initialValue } from "./initdata";
+import * as JsonFacade from '@diesel-parser/json-schema-facade-ts';
+import { DieselMonaco } from '@diesel-parser/monaco';
+import { buildWorkerDefinition } from 'monaco-editor-workers';
+import { DieselParserFacade } from '@diesel-parser/ts-facade';
+import { initialSchema, initialValue } from './initdata';
 
-buildWorkerDefinition(".", new URL("", window.location.href).href, false);
+buildWorkerDefinition('.', new URL('', window.location.href).href, false);
 
-const LANGUAGE_ID1 = "json1";
-const LANGUAGE_ID2 = "json2";
-const MODEL_URI1 = "inmemory://editor1.json1";
+const LANGUAGE_ID1 = 'json1';
+const LANGUAGE_ID2 = 'json2';
+const MODEL_URI1 = 'inmemory://editor1.json1';
 const MONACO_URI1 = monaco.Uri.parse(MODEL_URI1);
-const MODEL_URI2 = "inmemory://editor2.json2";
+const MODEL_URI2 = 'inmemory://editor2.json2';
 const MONACO_URI2 = monaco.Uri.parse(MODEL_URI2);
 
 monaco.languages.register({
   id: LANGUAGE_ID1,
-  extensions: [".json1"],
-  aliases: ["JSON1", "json1"],
-  mimetypes: ["application/json"],
+  extensions: ['.json1'],
+  aliases: ['JSON1', 'json1'],
+  mimetypes: ['application/json'],
 });
 
 monaco.languages.register({
   id: LANGUAGE_ID2,
-  extensions: [".json2"],
-  aliases: ["JSON2", "json2"],
-  mimetypes: ["application/json"],
+  extensions: ['.json2'],
+  aliases: ['JSON2', 'json2'],
+  mimetypes: ['application/json'],
 });
 
 const model1 = monaco.editor.createModel(
-  JSON.stringify(initialSchema, undefined, "  "),
+  JSON.stringify(initialSchema, undefined, '  '),
   LANGUAGE_ID1,
-  MONACO_URI1
+  MONACO_URI1,
 );
 const model2 = monaco.editor.createModel(
-  JSON.stringify(initialValue, undefined, "  "),
+  JSON.stringify(initialValue, undefined, '  '),
   LANGUAGE_ID2,
-  MONACO_URI2
+  MONACO_URI2,
 );
 
 const options = {
@@ -77,32 +77,32 @@ const options = {
     enabled: true,
   },
   automaticLayout: false,
-  "semanticHighlighting.enabled": true,
+  'semanticHighlighting.enabled': true,
   minimap: {
     enabled: false,
   },
 };
 
 export const editor1 = monaco.editor.create(
-  document.getElementById("editor1")!,
+  document.getElementById('editor1')!,
   {
     ...options,
     model: model1,
-  }
+  },
 );
 
 export const editor2 = monaco.editor.create(
-  document.getElementById("editor2")!,
+  document.getElementById('editor2')!,
   {
     ...options,
     model: model2,
-  }
+  },
 );
 
 // @ts-ignore
-window["editor1"] = editor1;
+window['editor1'] = editor1;
 // @ts-ignore
-window["editor2"] = editor2;
+window['editor2'] = editor2;
 
 const docs = vscode.workspace.textDocuments;
 const vscodeDocument1 = docs[0];
@@ -113,7 +113,7 @@ const INITIAL_VALUE = {};
 const parser1: DieselParserFacade = JsonFacade.getJsonParser(INITIAL_VALUE);
 let parser2: DieselParserFacade = JsonFacade.getJsonParser(INITIAL_VALUE);
 
-model1.onDidChangeContent((e) => {
+model1.onDidChangeContent(() => {
   try {
     const newSchema = JSON.parse(model1.getValue());
     parser2 = JsonFacade.getJsonParser(newSchema);
@@ -124,17 +124,17 @@ model1.onDidChangeContent((e) => {
 
 function getTokenType(styleName: string): string | undefined {
   switch (styleName) {
-    case "number":
-    case "string":
-    case "keyword":
+    case 'number':
+    case 'string':
+    case 'keyword':
       return styleName;
-    case "attr":
-      return "property";
+    case 'attr':
+      return 'property';
   }
   return undefined;
 }
 
-const TOKEN_TYPES = ["number", "string", "keyword", "property"];
+const TOKEN_TYPES = ['number', 'string', 'keyword', 'property'];
 
 const dieselMonaco1 = new DieselMonaco(
   MODEL_URI1,
@@ -144,7 +144,7 @@ const dieselMonaco1 = new DieselMonaco(
   undefined,
   TOKEN_TYPES,
   getTokenType,
-  vscodeDocument1
+  vscodeDocument1,
 );
 
 const dieselMonaco2 = new DieselMonaco(
@@ -155,19 +155,19 @@ const dieselMonaco2 = new DieselMonaco(
   undefined,
   TOKEN_TYPES,
   getTokenType,
-  vscodeDocument2
+  vscodeDocument2,
 );
 
 dieselMonaco1.registerCompletion();
 dieselMonaco1.registerSemanticHighlight();
-model1.onDidChangeContent((_event) => {
+model1.onDidChangeContent(() => {
   dieselMonaco1.validateDocument();
 });
 dieselMonaco1.validateDocument();
 
 dieselMonaco2.registerCompletion();
 dieselMonaco2.registerSemanticHighlight();
-model2.onDidChangeContent((_event) => {
+model2.onDidChangeContent(() => {
   dieselMonaco2.validateDocument();
 });
 dieselMonaco2.validateDocument();
