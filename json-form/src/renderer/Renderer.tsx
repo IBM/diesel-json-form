@@ -65,7 +65,6 @@ export interface RendererViewArgs<Model, Msg> {
   readonly model: Model;
   readonly path: JsPath;
   readonly formView: (path: JsPath, value: JsonValue) => React.ReactElement;
-  readonly renderOptions?: RenderOptions;
 }
 
 export interface Renderer<Model, Msg> {
