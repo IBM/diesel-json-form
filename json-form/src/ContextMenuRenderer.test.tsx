@@ -20,7 +20,6 @@ import {
   MenuAction,
   MenuPropertyProps,
 } from './ContextMenuActions';
-import { JsonEditorMenuOptionFilter } from './JsonEditorRenderOptions';
 import {
   JsonValue,
   jvArray,
@@ -32,6 +31,7 @@ import {
 } from './JsonValue';
 import { JsPath } from './JsPath';
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
+import { MenuOptionFilter } from './RenderOptions';
 
 describe('Change type menu', () => {
   test('[SM: ON, P: 1, V: valid] ' + 'no types menu', () => {
@@ -105,7 +105,7 @@ describe('Change type menu', () => {
 
 describe('menu render options', () => {
   describe('default options', () => {
-    const menuFilter: JsonEditorMenuOptionFilter = {};
+    const menuFilter: MenuOptionFilter = {};
 
     test('null value', () => {
       const props: MenuPropertyProps = {
