@@ -89,7 +89,7 @@ export class RendererFactory {
 export function ViewJsonValue(
   p: ViewValueProps<JsonValue>,
 ): React.ReactElement {
-  const { value, rendererFactory, renderOptions } = p;
+  const { value, rendererFactory } = p;
 
   const path = p.path.format();
   if (rendererFactory) {
@@ -117,7 +117,6 @@ export function ViewJsonValue(
               language={p.language}
             />
           ),
-          renderOptions: renderOptions,
         });
       }
     }
