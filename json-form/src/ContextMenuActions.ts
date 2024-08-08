@@ -185,7 +185,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
     const isObject = !strictMode && valueAtPath.tag === 'jv-object';
     if (
       (isArray || isObject) &&
-      !((menuFilter?.menuFilters && MenuOptions.ADD) === MenuOptions.ADD)
+      !(menuFilter?.menuFilters && menuFilter?.menuFilters & MenuOptions.ADD)
     ) {
       return [item({ tag: 'add', path, isArray })];
     }
@@ -212,7 +212,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
   const hasMoveMenu =
     !isRoot &&
     nbItems > 1 &&
-    !((menuFilter?.menuFilters && MenuOptions.MOVE) === MenuOptions.MOVE);
+    !(menuFilter?.menuFilters && menuFilter?.menuFilters & MenuOptions.MOVE);
 
   const moveMenu: () => Menu<MenuAction> = () => {
     const index = indexOfPathInParent(root, path);
@@ -228,17 +228,17 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
 
   const deleteItems =
     isRoot &&
-    (menuFilter?.menuFilters && MenuOptions.DELETE) === MenuOptions.DELETE
+    menuFilter?.menuFilters &&
+    menuFilter?.menuFilters & MenuOptions.DELETE
       ? []
       : [item(maDelete(path))];
 
   const changeTypes =
-    (menuFilter?.menuFilters && MenuOptions.CHANGE_TYPE) ===
-    MenuOptions.CHANGE_TYPE
+    menuFilter?.menuFilters && menuFilter?.menuFilters & MenuOptions.CHANGE_TYPE
       ? []
       : createTypesMenu(path, valueAtPath, proposals, strictMode);
   const proposeItems =
-    (menuFilter?.menuFilters && MenuOptions.PROPOSE) === MenuOptions.PROPOSE
+    menuFilter?.menuFilters && menuFilter?.menuFilters & MenuOptions.PROPOSE
       ? []
       : createProposeMenu(path, proposals, strictMode);
 
