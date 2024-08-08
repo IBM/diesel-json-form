@@ -31,7 +31,7 @@ import {
 } from './JsonValue';
 import { JsPath } from './JsPath';
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
-import { MenuOptionFilter } from './RenderOptions';
+import { MenuOptions } from './RenderOptions';
 
 describe('Change type menu', () => {
   test('[SM: ON, P: 1, V: valid] ' + 'no types menu', () => {
@@ -105,8 +105,6 @@ describe('Change type menu', () => {
 
 describe('menu render options', () => {
   describe('default options', () => {
-    const menuFilter: MenuOptionFilter = {};
-
     test('null value', () => {
       const props: MenuPropertyProps = {
         root: jvNull,
@@ -114,7 +112,7 @@ describe('menu render options', () => {
         valueAtPath: jvNull,
         proposals: [],
         strictMode: false,
-        menuFilter,
+        menuFilter: {},
       };
       const actual = createMenu(props);
       expect(menuActionTags(actual)).toEqual(['types', 'delete']);
@@ -127,7 +125,7 @@ describe('menu render options', () => {
         valueAtPath: jvObject(),
         proposals: [],
         strictMode: false,
-        menuFilter,
+        menuFilter: {},
       };
       const actual = createMenu(props);
       expect(menuActionTags(actual)).toEqual(['add', 'types', 'delete']);
@@ -140,7 +138,7 @@ describe('menu render options', () => {
         valueAtPath: jvArray(),
         proposals: [],
         strictMode: false,
-        menuFilter,
+        menuFilter: {},
       };
       const actual = createMenu(props);
       expect(menuActionTags(actual)).toEqual(['add', 'types', 'delete']);
@@ -153,7 +151,7 @@ describe('menu render options', () => {
         valueAtPath: jvNull,
         proposals: [jvNull],
         strictMode: false,
-        menuFilter,
+        menuFilter: {},
       };
       const actual = createMenu(props);
       expect(menuActionTags(actual)).toEqual(['types', 'propose', 'delete']);
@@ -169,7 +167,7 @@ describe('menu render options', () => {
         valueAtPath: jvNull,
         proposals: [],
         strictMode: false,
-        menuFilter,
+        menuFilter: {},
       };
       const actual = createMenu(props);
       expect(menuActionTags(actual)).toEqual(['move', 'types', 'delete']);
@@ -182,10 +180,134 @@ describe('menu render options', () => {
         valueAtPath: jvNull,
         proposals: [],
         strictMode: false,
-        menuFilter,
+        menuFilter: {},
       };
       const actual = createMenu(props);
       expect(menuActionTags(actual)).toEqual(['move', 'types', 'delete']);
+    });
+
+    test('null value no delete', () => {
+      const props: MenuPropertyProps = {
+        root: jvNull,
+        path: JsPath.empty,
+        valueAtPath: jvNull,
+        proposals: [],
+        strictMode: false,
+        menuFilter: {
+          menuFilters: MenuOptions.DELETE,
+        },
+      };
+      const actual = createMenu(props);
+      expect(getSelectedFilter(props, MenuOptions.ADD)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.CHANGE_TYPE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.DELETE)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.MOVE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.PROPOSE)).toEqual(false);
+      expect(menuActionTags(actual)).toEqual(['types']);
+    });
+
+    test('empty object value no add or change type', () => {
+      const props: MenuPropertyProps = {
+        root: jvObject(),
+        path: JsPath.empty,
+        valueAtPath: jvObject(),
+        proposals: [],
+        strictMode: false,
+        menuFilter: {
+          menuFilters: MenuOptions.ADD,
+        },
+      };
+      const actual = createMenu(props);
+      expect(getSelectedFilter(props, MenuOptions.ADD)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.CHANGE_TYPE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.DELETE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.MOVE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.PROPOSE)).toEqual(false);
+      expect(menuActionTags(actual)).toEqual(['types', 'delete']);
+    });
+
+    test('empty array value no delete or change type', () => {
+      const props: MenuPropertyProps = {
+        root: jvArray(),
+        path: JsPath.empty,
+        valueAtPath: jvArray(),
+        proposals: [],
+        strictMode: false,
+        menuFilter: {
+          menuFilters: MenuOptions.DELETE | MenuOptions.CHANGE_TYPE,
+        },
+      };
+      const actual = createMenu(props);
+      expect(getSelectedFilter(props, MenuOptions.ADD)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.CHANGE_TYPE)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.DELETE)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.MOVE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.PROPOSE)).toEqual(false);
+      expect(menuActionTags(actual)).toEqual(['add']);
+    });
+
+    test('value with proposals no propose or change type or add', () => {
+      const props: MenuPropertyProps = {
+        root: jvArray(),
+        path: JsPath.empty,
+        valueAtPath: jvNull,
+        proposals: [jvNull],
+        strictMode: false,
+        menuFilter: {
+          menuFilters:
+            MenuOptions.CHANGE_TYPE | MenuOptions.PROPOSE | MenuOptions.ADD,
+        },
+      };
+      const actual = createMenu(props);
+      expect(getSelectedFilter(props, MenuOptions.ADD)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.CHANGE_TYPE)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.DELETE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.MOVE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.PROPOSE)).toEqual(true);
+      expect(menuActionTags(actual)).toEqual(['delete']);
+    });
+
+    test('non empty object value with move no change type', () => {
+      const props: MenuPropertyProps = {
+        root: jvObject([
+          { name: 'foo', value: jvNull },
+          { name: 'bar', value: jvNull },
+        ]),
+        path: JsPath.empty.append('bar'),
+        valueAtPath: jvNull,
+        proposals: [],
+        strictMode: false,
+        menuFilter: {
+          menuFilters: MenuOptions.CHANGE_TYPE,
+        },
+      };
+      const actual = createMenu(props);
+      expect(getSelectedFilter(props, MenuOptions.ADD)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.CHANGE_TYPE)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.DELETE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.MOVE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.PROPOSE)).toEqual(false);
+      expect(menuActionTags(actual)).toEqual(['move', 'delete']);
+    });
+
+    test('non empty array value with move no change type or move', () => {
+      const props: MenuPropertyProps = {
+        root: jvArray([jvNull, jvNull]),
+        path: JsPath.empty.append(1),
+        valueAtPath: jvNull,
+        proposals: [],
+        strictMode: false,
+        menuFilter: {
+          menuFilters: MenuOptions.MOVE | MenuOptions.CHANGE_TYPE,
+        },
+      };
+      const actual = createMenu(props);
+      expect(getSelectedFilter(props, MenuOptions.ADD)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.CHANGE_TYPE)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.DELETE)).toEqual(false);
+      expect(getSelectedFilter(props, MenuOptions.MOVE)).toEqual(true);
+      expect(getSelectedFilter(props, MenuOptions.PROPOSE)).toEqual(false);
+      expect(menuActionTags(actual)).toEqual(['delete']);
     });
   });
 });
@@ -231,4 +353,14 @@ function menuActionTags(menu: Menu<MenuAction>): ReadonlyArray<string> {
         return [];
     }
   });
+}
+
+function getSelectedFilter(
+  menuPropertyProps: MenuPropertyProps,
+  filter: MenuOptions,
+) {
+  return (
+    menuPropertyProps?.menuFilter?.menuFilters &&
+    (menuPropertyProps?.menuFilter?.menuFilters & filter) === filter
+  );
 }
