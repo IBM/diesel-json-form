@@ -15,3 +15,10 @@ export enum MenuOptions {
 export interface MenuOptionFilter {
   readonly menuFilters?: MenuOptions;
 }
+
+export function isMenuOptionHidden(
+  option: number,
+  filter: MenuOptionFilter | undefined,
+): boolean {
+  return ((filter?.menuFilters ?? 0) & option) > 0;
+}

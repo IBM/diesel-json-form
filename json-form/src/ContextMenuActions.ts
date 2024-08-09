@@ -27,7 +27,11 @@ import {
   jvObject,
   jvString,
 } from './JsonValue';
-import { MenuOptionFilter, MenuOptions } from './RenderOptions';
+import {
+  isMenuOptionHidden,
+  MenuOptionFilter,
+  MenuOptions,
+} from './RenderOptions';
 
 export type MenuAction =
   | { tag: 'delete'; path: JsPath }
@@ -185,7 +189,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
     const isObject = !strictMode && valueAtPath.tag === 'jv-object';
     if (
       (isArray || isObject) &&
-      !(menuFilter?.menuFilters && menuFilter?.menuFilters & MenuOptions.ADD)
+      !isMenuOptionHidden(MenuOptions.ADD, menuFilter)
     ) {
       return [item({ tag: 'add', path, isArray })];
     }
@@ -210,9 +214,7 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
     .withDefault(0);
 
   const hasMoveMenu =
-    !isRoot &&
-    nbItems > 1 &&
-    !(menuFilter?.menuFilters && menuFilter?.menuFilters & MenuOptions.MOVE);
+    !isRoot && nbItems > 1 && !isMenuOptionHidden(MenuOptions.MOVE, menuFilter);
 
   const moveMenu: () => Menu<MenuAction> = () => {
     const index = indexOfPathInParent(root, path);
@@ -229,18 +231,16 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
   const deleteItems =
     isRoot &&
     menuFilter?.menuFilters &&
-    menuFilter?.menuFilters & MenuOptions.DELETE
+    isMenuOptionHidden(MenuOptions.DELETE, menuFilter)
       ? []
       : [item(maDelete(path))];
 
-  const changeTypes =
-    menuFilter?.menuFilters && menuFilter?.menuFilters & MenuOptions.CHANGE_TYPE
-      ? []
-      : createTypesMenu(path, valueAtPath, proposals, strictMode);
-  const proposeItems =
-    menuFilter?.menuFilters && menuFilter?.menuFilters & MenuOptions.PROPOSE
-      ? []
-      : createProposeMenu(path, proposals, strictMode);
+  const changeTypes = isMenuOptionHidden(MenuOptions.CHANGE_TYPE, menuFilter)
+    ? []
+    : createTypesMenu(path, valueAtPath, proposals, strictMode);
+  const proposeItems = isMenuOptionHidden(MenuOptions.PROPOSE, menuFilter)
+    ? []
+    : createProposeMenu(path, proposals, strictMode);
 
   return menu(
     moveItems
