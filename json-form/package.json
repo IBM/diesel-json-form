@@ -20,6 +20,9 @@
     "tea-cup-core": "^2.2.3"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/react": "12",
     "@types/carbon-components-react": "^7.25.2",
     "@types/carbon__icons-react": "^10.23.0",
     "@types/jest": "^26.0.20",
