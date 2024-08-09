@@ -185,7 +185,8 @@ describe('menu render options', () => {
       const actual = createMenu(props);
       expect(menuActionTags(actual)).toEqual(['move', 'types', 'delete']);
     });
-
+  });
+  describe('menu filtering options', () => {
     test('null value no delete', () => {
       const props: MenuPropertyProps = {
         root: jvNull,
