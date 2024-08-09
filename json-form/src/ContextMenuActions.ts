@@ -27,6 +27,11 @@ import {
   jvObject,
   jvString,
 } from './JsonValue';
+import {
+  isMenuOptionHidden,
+  MenuOptionFilter,
+  MenuOptions,
+} from './RenderOptions';
 
 export type MenuAction =
   | { tag: 'delete'; path: JsPath }
@@ -72,6 +77,7 @@ export interface MenuPropertyProps {
   readonly valueAtPath: JsonValue;
   readonly proposals: ReadonlyArray<JsonValue>;
   readonly strictMode: boolean;
+  readonly menuFilter?: MenuOptionFilter;
 }
 
 export function createTypesMenu(
@@ -176,12 +182,15 @@ export function createProposeMenu(
 }
 
 export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
-  const { path, proposals, valueAtPath, root, strictMode } = props;
+  const { path, proposals, valueAtPath, root, strictMode, menuFilter } = props;
 
   const addItems: () => MenuItem<MenuAction>[] = () => {
     const isArray = valueAtPath.tag === 'jv-array';
     const isObject = !strictMode && valueAtPath.tag === 'jv-object';
-    if (isArray || isObject) {
+    if (
+      (isArray || isObject) &&
+      !isMenuOptionHidden(MenuOptions.ADD, menuFilter)
+    ) {
       return [item({ tag: 'add', path, isArray })];
     }
     return [];
@@ -204,7 +213,8 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
     })
     .withDefault(0);
 
-  const hasMoveMenu = !isRoot && nbItems > 1;
+  const hasMoveMenu =
+    !isRoot && nbItems > 1 && !isMenuOptionHidden(MenuOptions.MOVE, menuFilter);
 
   const moveMenu: () => Menu<MenuAction> = () => {
     const index = indexOfPathInParent(root, path);
@@ -218,13 +228,25 @@ export function createMenu(props: MenuPropertyProps): Menu<MenuAction> {
 
   const moveItems = hasMoveMenu ? [item(maMove(), moveMenu())] : [];
 
-  const deleteItems = isRoot ? [] : [item(maDelete(path))];
+  const deleteItems =
+    isRoot &&
+    menuFilter?.menuFilters &&
+    isMenuOptionHidden(MenuOptions.DELETE, menuFilter)
+      ? []
+      : [item(maDelete(path))];
+
+  const changeTypes = isMenuOptionHidden(MenuOptions.CHANGE_TYPE, menuFilter)
+    ? []
+    : createTypesMenu(path, valueAtPath, proposals, strictMode);
+  const proposeItems = isMenuOptionHidden(MenuOptions.PROPOSE, menuFilter)
+    ? []
+    : createProposeMenu(path, proposals, strictMode);
 
   return menu(
     moveItems
       .concat(addItems())
-      .concat(createTypesMenu(path, valueAtPath, proposals, strictMode))
-      .concat(createProposeMenu(path, proposals, strictMode))
+      .concat(changeTypes)
+      .concat(proposeItems)
       .concat(deleteItems),
   );
 }

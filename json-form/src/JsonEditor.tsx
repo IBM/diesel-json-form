@@ -70,6 +70,7 @@ import {
   RendererFactory,
   ViewJsonValue,
 } from './renderer/Renderer';
+import { MenuOptionFilter, RenderOptions } from './RenderOptions';
 
 export function init(
   language: string,
@@ -152,23 +153,27 @@ export interface ViewJsonEditorProps {
   readonly dispatch: Dispatcher<Msg>;
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
+  readonly renderOptions?: RenderOptions;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
-  const { model, dispatch } = props;
+  const { model, dispatch, renderOptions } = props;
   return (
     <div className="diesel-json-editor">
       <div className="diesel-json-editor-scrollpane">
-        <div className={'doc-root'}>
-          <em>{model.t('documentRoot')}</em>
-          <ArrayCounter value={model.root.b} />
-          <MenuTrigger
-            dispatch={dispatch}
-            path={JsPath.empty}
-            disabled={model.adding.isJust()}
-            t={model.t}
-          />
-        </div>
+        {!renderOptions?.hideDocRoot && (
+          <div className={'doc-root'}>
+            <em>{model.t('documentRoot')}</em>
+            <ArrayCounter value={model.root.b} />
+            <MenuTrigger
+              dispatch={dispatch}
+              path={JsPath.empty}
+              disabled={model.adding.isJust()}
+              t={model.t}
+              renderOptions={renderOptions}
+            />
+          </div>
+        )}
         <ViewJsonValue
           model={model}
           path={JsPath.empty}
@@ -176,6 +181,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
           dispatch={dispatch}
           rendererFactory={props.rendererFactory}
           language={props.model.lang}
+          renderOptions={renderOptions}
         />
       </div>
       {model.menuModel
@@ -237,6 +243,7 @@ export function update(
   msg: Msg,
   model: Model,
   rendererFactory: RendererFactory,
+  menuFilter?: MenuOptionFilter,
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
     case 'delete-property':
@@ -279,7 +286,9 @@ export function update(
       );
     }
     case 'menu-trigger-clicked': {
-      return noOut(actionTriggerClicked(model, msg.path, msg.refBox));
+      return noOut(
+        actionTriggerClicked(model, msg.path, msg.refBox, menuFilter),
+      );
     }
     case 'menu-msg': {
       return withOutValueChanged(
@@ -457,6 +466,8 @@ export interface JsonEditorProps {
   readonly onChange?: (value: JsonValue) => void;
   readonly rendererFactory: RendererFactory;
   readonly debounceMs?: number;
+  readonly renderOptions?: RenderOptions;
+  readonly menuFilter?: MenuOptionFilter;
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
@@ -477,10 +488,16 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           dispatch={dispatch}
           model={model}
           rendererFactory={props.rendererFactory}
+          renderOptions={props.renderOptions}
         />
       )}
       update={(msg, model) => {
-        const maco = update(msg, model, props.rendererFactory);
+        const maco = update(
+          msg,
+          model,
+          props.rendererFactory,
+          props.menuFilter,
+        );
         maco[2].forEach((outMsg) => {
           switch (outMsg.tag) {
             case 'value-changed': {
