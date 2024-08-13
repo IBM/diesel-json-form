@@ -57,7 +57,9 @@ jobs:
       - run: git config user.name "vankeisb-ci"
       - run:
           name: Deploy docs to gh-pages branch
-          command: GITHUB_TOKEN=${GH_PAGES_TOKEN} yarn --cwd sandbox gh-pages
+          command: |
+            export GITHUB_TOKEN=${GH_PAGES_TOKEN} 
+            yarn --cwd sandbox gh-pages
 
   deploy:
     <<: *defaults
