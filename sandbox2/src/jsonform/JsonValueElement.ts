@@ -1,5 +1,5 @@
 import { RendererArgs } from './RendererArgs';
-import { JsonNode, removeChildren, toJsonNode } from './util';
+import { removeChildren, toJsonNode } from './util';
 
 export class JsonValueElement extends HTMLElement {
   static TAG_NAME = 'json-value';
@@ -30,7 +30,7 @@ export class JsonValueElement extends HTMLElement {
         break;
       }
       case 'array': {
-        this.appendChild(renderArray(value.value));
+        this.appendChild(renderArray(args, value.value));
         break;
       }
       case 'null': {
@@ -83,8 +83,25 @@ function renderObject(args: RendererArgs, obj: any): HTMLElement {
   return wrapperElem;
 }
 
-function renderArray(value: ReadonlyArray<any>): HTMLElement {
-  throw 'renderArray';
+function renderArray(
+  args: RendererArgs,
+  value: ReadonlyArray<any>,
+): HTMLElement {
+  const { path } = args;
+  const wrapperElem = document.createElement('div');
+  wrapperElem.style.display = 'flex';
+  wrapperElem.style.flexDirection = 'column';
+  value.forEach((item, itemIndex) => {
+    const valueElem = document.createElement(
+      JsonValueElement.TAG_NAME,
+    ) as JsonValueElement;
+    valueElem.render({
+      path: path.append(itemIndex),
+      value: toJsonNode(item),
+    });
+    wrapperElem.appendChild(valueElem);
+  });
+  return wrapperElem;
 }
 
 function renderNull(): HTMLElement {

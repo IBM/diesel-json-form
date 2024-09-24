@@ -47,4 +47,8 @@ sampleSchemaSelect.addEventListener('change', () => {
   jsonForm.schema = JSON.parse(taSchema.value);
 });
 
-jsonForm.value = toJsonNode({ foo: 123, bar: 'yalla', baz: { skunk: true } });
+jsonForm.value = toJsonNode({
+  foo: 123,
+  bar: 'yalla',
+  baz: { skunk: true, myList: [1, 2, 'yess'] },
+});
