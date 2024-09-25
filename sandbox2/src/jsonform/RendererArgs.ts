@@ -1,9 +1,9 @@
-import { JsValidationResult } from '@diesel-parser/json-schema-facade-ts';
-import { JsPath } from '@diesel-parser/json-form';
-import { JsonNode } from './util';
+import { JsonValue, JsPath } from '@diesel-parser/json-form';
+import { SchemaInfos } from './SchemaInfos';
 
 export interface RendererArgs {
-  readonly value: JsonNode;
+  readonly value: JsonValue;
   readonly path: JsPath;
-  readonly validationResult?: JsValidationResult;
+  readonly valueChanged: (path: JsPath) => void;
+  readonly schemaInfos?: SchemaInfos;
 }

@@ -18,7 +18,7 @@ import './style.css';
 import { samples } from './initdata';
 import { JsonFormElement } from './jsonform/JsonFormElement';
 import { JsonValueElement } from './jsonform/JsonValueElement';
-import { toJsonNode } from './jsonform/util';
+import { valueFromAny } from '@diesel-parser/json-form';
 
 customElements.define(JsonFormElement.TAG_NAME, JsonFormElement);
 customElements.define(JsonValueElement.TAG_NAME, JsonValueElement);
@@ -47,8 +47,15 @@ sampleSchemaSelect.addEventListener('change', () => {
   jsonForm.schema = JSON.parse(taSchema.value);
 });
 
-jsonForm.value = toJsonNode({
+valueFromAny({
   foo: 123,
   bar: 'yalla',
   baz: { skunk: true, myList: [1, 2, 'yess'] },
-});
+}).match(
+  (v) => jsonForm.render(v),
+  (err) => {
+    throw err;
+  },
+);
+
+// jsonForm.value = toJsonNode('turbo');

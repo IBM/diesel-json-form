@@ -1,5 +1,12 @@
+import {
+  JvArray,
+  JvBoolean,
+  JvNumber,
+  JvObject,
+  JvString,
+} from '@diesel-parser/json-form';
 import { RendererArgs } from './RendererArgs';
-import { removeChildren, toJsonNode } from './util';
+import { removeChildren } from './util';
 
 export class JsonValueElement extends HTMLElement {
   static TAG_NAME = 'json-value';
@@ -13,27 +20,27 @@ export class JsonValueElement extends HTMLElement {
     const { value, path } = args;
     this.setAttribute('jf-path', path.format());
     switch (value.tag) {
-      case 'string': {
-        this.appendChild(renderString(value.value));
+      case 'jv-string': {
+        this.appendChild(renderString(args, value));
         break;
       }
-      case 'number': {
-        this.appendChild(renderNumber(value.value));
+      case 'jv-number': {
+        this.appendChild(renderNumber(args, value));
         break;
       }
-      case 'boolean': {
-        this.appendChild(renderBoolean(value.value));
+      case 'jv-boolean': {
+        this.appendChild(renderBoolean(args, value));
         break;
       }
-      case 'object': {
-        this.appendChild(renderObject(args, value.value));
+      case 'jv-object': {
+        this.appendChild(renderObject(args, value));
         break;
       }
-      case 'array': {
-        this.appendChild(renderArray(args, value.value));
+      case 'jv-array': {
+        this.appendChild(renderArray(args, value));
         break;
       }
-      case 'null': {
+      case 'jv-null': {
         this.appendChild(renderNull());
         break;
       }
@@ -41,63 +48,64 @@ export class JsonValueElement extends HTMLElement {
   }
 }
 
-function renderString(value: string): HTMLElement {
+function renderString(args: RendererArgs, value: JvString): HTMLElement {
   const input = document.createElement('input') as HTMLInputElement;
-  input.value = value;
+  input.value = value.value;
+  const { path, valueChanged } = args;
+  input.addEventListener('input', () => {
+    valueChanged(path);
+  });
   return input;
 }
 
-function renderNumber(value: number): HTMLElement {
+function renderNumber(args: RendererArgs, value: JvNumber): HTMLElement {
   const input = document.createElement('input') as HTMLInputElement;
-  input.value = value.toLocaleString();
+  input.value = value.value.toLocaleString();
   return input;
 }
 
-function renderBoolean(value: boolean): HTMLElement {
+function renderBoolean(args: RendererArgs, value: JvBoolean): HTMLElement {
   const input = document.createElement('input') as HTMLInputElement;
   input.type = 'checkbox';
-  input.checked = value;
+  input.checked = value.value;
   return input;
 }
 
-function renderObject(args: RendererArgs, obj: any): HTMLElement {
-  const { path } = args;
+function renderObject(args: RendererArgs, obj: JvObject): HTMLElement {
+  const { path, valueChanged } = args;
   const wrapperElem = document.createElement('div');
   wrapperElem.style.display = 'grid';
   wrapperElem.style.gridTemplateColumns = '1fr 1fr';
-  Object.keys(obj).forEach((key) => {
+  obj.properties.forEach((property) => {
     const labelElem = document.createElement('div');
-    labelElem.textContent = key;
+    labelElem.textContent = property.name;
     wrapperElem.appendChild(labelElem);
-
-    const propValue = obj[key];
     const valueElem = document.createElement(
       JsonValueElement.TAG_NAME,
     ) as JsonValueElement;
     valueElem.render({
-      path: path.append(key),
-      value: toJsonNode(propValue),
+      path: path.append(property.name),
+      value: property.value,
+      valueChanged,
     });
     wrapperElem.appendChild(valueElem);
   });
   return wrapperElem;
 }
 
-function renderArray(
-  args: RendererArgs,
-  value: ReadonlyArray<any>,
-): HTMLElement {
-  const { path } = args;
+function renderArray(args: RendererArgs, value: JvArray): HTMLElement {
+  const { path, valueChanged } = args;
   const wrapperElem = document.createElement('div');
   wrapperElem.style.display = 'flex';
   wrapperElem.style.flexDirection = 'column';
-  value.forEach((item, itemIndex) => {
+  value.elems.forEach((item, itemIndex) => {
     const valueElem = document.createElement(
       JsonValueElement.TAG_NAME,
     ) as JsonValueElement;
     valueElem.render({
       path: path.append(itemIndex),
-      value: toJsonNode(item),
+      value: item,
+      valueChanged,
     });
     wrapperElem.appendChild(valueElem);
   });

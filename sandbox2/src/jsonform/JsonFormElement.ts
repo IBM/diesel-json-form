@@ -1,51 +1,49 @@
-import { JsonNode, removeChildren } from './util';
-import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import { JsPath } from '@diesel-parser/json-form';
+import { removeChildren } from './util';
+import { JsonValue, JsPath } from '@diesel-parser/json-form';
 import { JsonValueElement } from './JsonValueElement';
 
 export class JsonFormElement extends HTMLElement {
   static TAG_NAME = 'json-form';
 
-  private _value: JsonNode | undefined;
-  private _schema: any = undefined;
+  private _jsonValueElement: JsonValueElement;
+
+  private static initValueElem(): JsonValueElement {
+    return document.createElement(
+      JsonValueElement.TAG_NAME,
+    ) as JsonValueElement;
+  }
 
   constructor() {
     super();
+    this._jsonValueElement = JsonFormElement.initValueElem();
   }
 
-  set value(value: JsonNode) {
-    this._value = value;
-    this.render();
-  }
+  set schema(schema: any) {}
 
-  set schema(schema: any) {
-    this._schema = schema;
-  }
-
-  private render() {
+  render(value: JsonValue) {
     removeChildren(this);
-    if (this._value === undefined) {
-      const noValue = document.createElement('div');
-      noValue.textContent = 'Form is empty';
-      this.appendChild(noValue);
-    } else {
-      const jsonValue = document.createElement(
-        JsonValueElement.TAG_NAME,
-      ) as JsonValueElement;
-      const validationResult =
-        this._schema !== undefined
-          ? JsFacade.validate(this._schema, this._value)
-          : undefined;
-      jsonValue.render({
-        path: JsPath.empty,
-        value: this._value,
-        validationResult,
-      });
-      this.appendChild(jsonValue);
-      // const renderer = this._rendererFactory.getRenderer(this._value);
-      // if (renderer) {
+    this._jsonValueElement = JsonFormElement.initValueElem();
+    // if (this._value === undefined) {
+    //   const noValue = document.createElement('div');
+    //   noValue.textContent = 'Form is empty';
+    //   this.appendChild(noValue);
+    // } else {
+    // const validationResult =
+    //   this._schema !== undefined
+    //     ? JsFacade.validate(this._schema, this._value)
+    //     : undefined;
+    // if (validationResult) {
+    //   this._schemaInfos = new SchemaInfos(validationResult);
+    // }
+    this._jsonValueElement.render({
+      path: JsPath.empty,
+      value,
+      valueChanged: this.onValueChanged,
+    });
+    this.appendChild(this._jsonValueElement);
+  }
 
-      // }
-    }
+  private onValueChanged(path: JsPath) {
+    console.log('path', path);
   }
 }
