@@ -13,10 +13,13 @@ export class JsonFormElement extends HTMLElement {
     super();
   }
 
-  set schema(schema: any) {}
+  set schema(schema: any) {
+    this._schemaInfos.schema = schema;
+  }
 
   render(value: JsonValue) {
     removeChildren(this);
+    this._schemaInfos.value = value;
     this._jsonValueElement = renderValue({
       path: JsPath.empty,
       value,
@@ -27,7 +30,9 @@ export class JsonFormElement extends HTMLElement {
   }
 
   private onValueChanged(path: JsPath) {
-    console.log('form ionValueChanged', path, this.getValue());
+    const value = this.getValue();
+    console.log('form ionValueChanged', path, value);
+    this._schemaInfos.value = value;
   }
 
   getValue(): JsonValue {

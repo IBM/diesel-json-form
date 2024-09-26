@@ -24,6 +24,7 @@ import { JsonObjectElement } from './jsonform/elements/JsonObjectElement';
 import { JsonBooleanElement } from './jsonform/elements/JsonBooleanElement';
 import { JsonNumberElement } from './jsonform/elements/JsonNumberElement';
 import { JsonStringElement } from './jsonform/elements/JsonStringElement';
+import { JsonErrorList } from './jsonform/elements/JsonErrorList';
 
 customElements.define(JsonFormElement.TAG_NAME, JsonFormElement);
 customElements.define(JsonStringElement.TAG_NAME, JsonStringElement);
@@ -32,6 +33,7 @@ customElements.define(JsonBooleanElement.TAG_NAME, JsonBooleanElement);
 customElements.define(JsonArrayElement.TAG_NAME, JsonArrayElement);
 customElements.define(JsonObjectElement.TAG_NAME, JsonObjectElement);
 customElements.define(JsonNullElement.TAG_NAME, JsonNullElement);
+customElements.define(JsonErrorList.TAG_NAME, JsonErrorList);
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
@@ -42,6 +44,7 @@ samples
     const e = document.createElement('option');
     e.value = s[1];
     e.innerHTML = s[0];
+    // e.selected = e.value.indexOf('BeanContaining') !== -1;
     return e;
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
@@ -57,11 +60,19 @@ sampleSchemaSelect.addEventListener('change', () => {
   jsonForm.schema = JSON.parse(taSchema.value);
 });
 
-valueFromAny({
-  foo: 123,
-  bar: 'yalla',
-  baz: { skunk: true, myList: [1, 2, 'yess'] },
-}).match(
+// sampleSchemaSelect.value = 'BeanContainingOtherBean';
+
+// const value = 'yalla';
+
+const value = {
+  customer: {
+    age: 'not a string',
+  },
+};
+
+jsonForm.schema = {};
+
+valueFromAny(value).match(
   (v) => jsonForm.render(v),
   (err) => {
     throw err;

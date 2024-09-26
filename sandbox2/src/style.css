@@ -125,3 +125,11 @@ footer.sandbox .gas-station {
 #editor1, #editor2 {
   height: 100%;
 }
+
+json-string.json-error input {
+  border-color: red;
+}
+
+json-error-list {
+  color: red;
+}
