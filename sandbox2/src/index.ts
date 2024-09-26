@@ -16,16 +16,14 @@
 
 import './style.css';
 import { samples } from './initdata';
-import { JsonFormElement } from './jsonform/JsonFormElement';
+import { JsonFormElement } from './jsonform/elements/JsonFormElement';
 import { valueFromAny } from '@diesel-parser/json-form';
-import {
-  JsonArrayElement,
-  JsonBooleanElement,
-  JsonNullElement,
-  JsonNumberElement,
-  JsonObjectElement,
-  JsonStringElement,
-} from './jsonform/JsonValueElement';
+import { JsonNullElement } from './jsonform/elements/JsonNullElement';
+import { JsonArrayElement } from './jsonform/elements/JsonArrayElement';
+import { JsonObjectElement } from './jsonform/elements/JsonObjectElement';
+import { JsonBooleanElement } from './jsonform/elements/JsonBooleanElement';
+import { JsonNumberElement } from './jsonform/elements/JsonNumberElement';
+import { JsonStringElement } from './jsonform/elements/JsonStringElement';
 
 customElements.define(JsonFormElement.TAG_NAME, JsonFormElement);
 customElements.define(JsonStringElement.TAG_NAME, JsonStringElement);

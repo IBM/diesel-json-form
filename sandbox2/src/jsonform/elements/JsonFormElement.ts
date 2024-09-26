@@ -1,6 +1,6 @@
-import { removeChildren } from './util';
+import { removeChildren } from '../util';
 import { JsonValue, JsPath } from '@diesel-parser/json-form';
-import { JsonValueElement, renderValue } from './JsonValueElement';
+import { JsonValueElement, renderValue } from '../JsonValueElement';
 
 export class JsonFormElement extends HTMLElement {
   static TAG_NAME = 'json-form';
