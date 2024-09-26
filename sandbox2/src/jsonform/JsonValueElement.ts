@@ -54,4 +54,12 @@ export abstract class JsonValueElementBase<T extends JsonValue>
       this._schemaInfos.removeListener(this);
     }
   }
+
+  get schemaInfos(): SchemaInfos | undefined {
+    return this._schemaInfos;
+  }
+
+  get path(): JsPath | undefined {
+    return this._path;
+  }
 }

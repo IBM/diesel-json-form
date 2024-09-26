@@ -1,5 +1,8 @@
 import { JsonValue, JsPath, valueToAny } from '@diesel-parser/json-form';
-import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
+import {
+  JsValidationError,
+  JsValidationResult,
+} from '@diesel-parser/json-schema-facade-ts';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
 export class SchemaInfos {
@@ -12,6 +15,7 @@ export class SchemaInfos {
 
   private _schema: any;
   private _value?: JsonValue;
+  private _validationResult?: JsValidationResult;
 
   addListener(l: SchemaInfosListener): void {
     this._listeners.push(l);
@@ -40,11 +44,11 @@ export class SchemaInfos {
     this._value = value;
     const errsMap = new Map<string, Array<JsValidationError>>();
     if (this._schema !== undefined && this._schema !== null) {
-      const validationResult = JsFacade.validate(
+      this._validationResult = JsFacade.validate(
         this._schema,
         valueToAny(value),
       );
-      JsFacade.getErrors(validationResult).forEach((err) => {
+      JsFacade.getErrors(this._validationResult).forEach((err) => {
         let errsForPath = errsMap.get(err.path);
         if (!errsForPath) {
           errsForPath = [];
@@ -56,6 +60,10 @@ export class SchemaInfos {
     this._errorsMap = errsMap;
     console.log('errs', errsMap);
     this._listeners.forEach((l) => l.onSchemaInfoChanged(this));
+  }
+
+  get validationResult(): JsValidationResult | undefined {
+    return this._validationResult;
   }
 }
 
