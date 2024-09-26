@@ -17,11 +17,23 @@
 import './style.css';
 import { samples } from './initdata';
 import { JsonFormElement } from './jsonform/JsonFormElement';
-import { JsonValueElement } from './jsonform/JsonValueElement';
 import { valueFromAny } from '@diesel-parser/json-form';
+import {
+  JsonArrayElement,
+  JsonBooleanElement,
+  JsonNullElement,
+  JsonNumberElement,
+  JsonObjectElement,
+  JsonStringElement,
+} from './jsonform/JsonValueElement';
 
 customElements.define(JsonFormElement.TAG_NAME, JsonFormElement);
-customElements.define(JsonValueElement.TAG_NAME, JsonValueElement);
+customElements.define(JsonStringElement.TAG_NAME, JsonStringElement);
+customElements.define(JsonNumberElement.TAG_NAME, JsonNumberElement);
+customElements.define(JsonBooleanElement.TAG_NAME, JsonBooleanElement);
+customElements.define(JsonArrayElement.TAG_NAME, JsonArrayElement);
+customElements.define(JsonObjectElement.TAG_NAME, JsonObjectElement);
+customElements.define(JsonNullElement.TAG_NAME, JsonNullElement);
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
