@@ -24,15 +24,15 @@ export class JsonArrayElement
   }
 
   private render(args: RendererArgs, value: JvArray) {
-    const { path, valueChanged } = args;
+    const { path } = args;
     const wrapperElem = document.createElement('div');
     wrapperElem.style.display = 'flex';
     wrapperElem.style.flexDirection = 'column';
     value.elems.forEach((item, itemIndex) => {
       const valueElem = renderValue({
+        ...args,
         path: path.append(itemIndex),
         value: item,
-        valueChanged,
       });
       this._elems.push(valueElem);
       wrapperElem.appendChild(valueElem);

@@ -25,7 +25,7 @@ export class JsonObjectElement
   }
 
   private render(args: RendererArgs, value: JvObject) {
-    const { path, valueChanged } = args;
+    const { path } = args;
     const wrapperElem = document.createElement('div');
     wrapperElem.style.display = 'grid';
     wrapperElem.style.gridTemplateColumns = '1fr 1fr';
@@ -34,9 +34,9 @@ export class JsonObjectElement
       labelElem.textContent = property.name;
       wrapperElem.appendChild(labelElem);
       const valueElem = renderValue({
+        ...args,
         path: path.append(property.name),
         value: property.value,
-        valueChanged,
       });
       this._elems.push(Tuple.t2(property.name, valueElem));
       wrapperElem.appendChild(valueElem);

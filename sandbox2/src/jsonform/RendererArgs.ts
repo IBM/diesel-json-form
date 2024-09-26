@@ -5,5 +5,5 @@ export interface RendererArgs {
   readonly value: JsonValue;
   readonly path: JsPath;
   readonly valueChanged: (path: JsPath) => void;
-  readonly schemaInfos?: SchemaInfos;
+  readonly schemaInfos: SchemaInfos;
 }
