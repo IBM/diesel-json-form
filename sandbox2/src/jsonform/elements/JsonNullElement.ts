@@ -1,19 +1,14 @@
 import { JvNull, jvNull } from '@diesel-parser/json-form';
-import { JsonValueElement } from '../JsonValueElement';
+import { JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 
-export class JsonNullElement
-  extends HTMLElement
-  implements JsonValueElement<JvNull>
-{
+export class JsonNullElement extends JsonValueElementBase<JvNull> {
   static TAG_NAME = 'json-null';
 
-  static newInstance(args: RendererArgs): JsonNullElement {
+  static newInstance(): JsonNullElement {
     const e = document.createElement(
       JsonNullElement.TAG_NAME,
     ) as JsonNullElement;
-    e.setAttribute('jf-path', args.path.format());
-    e.render();
     return e;
   }
 
@@ -21,7 +16,8 @@ export class JsonNullElement
     super();
   }
 
-  private render() {
+  protected doRender(args: RendererArgs) {
+    this.setAttribute('jf-path', args.path.format());
     this.textContent = 'null';
   }
 

@@ -65,9 +65,10 @@ sampleSchemaSelect.addEventListener('change', () => {
 // const value = 'yalla';
 
 const value = {
-  customer: {
-    age: 'not a string',
-  },
+  customer: 123,
+  // customer: {
+  //   age: 'not a string',
+  // },
 };
 
 jsonForm.schema = {};

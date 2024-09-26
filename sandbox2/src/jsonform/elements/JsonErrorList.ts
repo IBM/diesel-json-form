@@ -13,10 +13,6 @@ export class JsonErrorList extends HTMLElement {
     super();
   }
 
-  connectedCallback() {
-    this.style.display = 'none';
-  }
-
   set errors(errors: readonly JsValidationError[]) {
     removeChildren(this);
     if (errors.length === 0) {

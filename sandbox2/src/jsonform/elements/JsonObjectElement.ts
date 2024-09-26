@@ -1,20 +1,16 @@
 import { JvObject, JsonValue, jvObject } from '@diesel-parser/json-form';
 import { Tuple } from 'tea-cup-core';
-import { JsonValueElement, renderValue } from '../JsonValueElement';
+import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
+import { renderValue } from '../RenderValue';
 
-export class JsonObjectElement
-  extends HTMLElement
-  implements JsonValueElement<JvObject>
-{
+export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   static TAG_NAME = 'json-object';
 
-  static newInstance(args: RendererArgs, value: JvObject): JsonObjectElement {
+  static newInstance(): JsonObjectElement {
     const e = document.createElement(
       JsonObjectElement.TAG_NAME,
     ) as JsonObjectElement;
-    e.setAttribute('jf-path', args.path.format());
-    e.render(args, value);
     return e;
   }
 
@@ -24,7 +20,8 @@ export class JsonObjectElement
     super();
   }
 
-  private render(args: RendererArgs, value: JvObject) {
+  protected doRender(args: RendererArgs, value: JvObject) {
+    this.setAttribute('jf-path', args.path.format());
     const { path } = args;
     const wrapperElem = document.createElement('div');
     wrapperElem.style.display = 'grid';

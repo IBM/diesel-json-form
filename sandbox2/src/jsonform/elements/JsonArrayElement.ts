@@ -1,19 +1,15 @@
 import { JvArray, JsonValue, jvArray } from '@diesel-parser/json-form';
-import { JsonValueElement, renderValue } from '../JsonValueElement';
+import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
+import { renderValue } from '../RenderValue';
 
-export class JsonArrayElement
-  extends HTMLElement
-  implements JsonValueElement<JvArray>
-{
+export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   static TAG_NAME = 'json-array';
 
-  static newInstance(args: RendererArgs, value: JvArray): JsonArrayElement {
+  static newInstance(): JsonArrayElement {
     const e = document.createElement(
       JsonArrayElement.TAG_NAME,
     ) as JsonArrayElement;
-    e.setAttribute('jf-path', args.path.format());
-    e.render(args, value);
     return e;
   }
 
@@ -23,7 +19,8 @@ export class JsonArrayElement
     super();
   }
 
-  private render(args: RendererArgs, value: JvArray) {
+  protected doRender(args: RendererArgs, value: JvArray) {
+    this.setAttribute('jf-path', args.path.format());
     const { path } = args;
     const wrapperElem = document.createElement('div');
     wrapperElem.style.display = 'flex';
