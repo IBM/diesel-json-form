@@ -1,6 +1,7 @@
 import { JvNumber, jvNumber } from '@diesel-parser/json-form';
 import { JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
+import { input } from '../HtmlBuilder';
 
 export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
   static TAG_NAME = 'json-number';
@@ -16,12 +17,13 @@ export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
 
   constructor() {
     super();
-    this._input = document.createElement('input') as HTMLInputElement;
+    this._input = input({
+      type: 'number',
+    }) as HTMLInputElement;
   }
 
   protected doRender(args: RendererArgs, value: JvNumber) {
-    this._input.type = 'number';
-    this._input.value = value.value.toLocaleString();
+    this._input.valueAsNumber = value.value;
     const { path, valueChanged } = args;
     this._input.addEventListener('input', () => {
       valueChanged(path);

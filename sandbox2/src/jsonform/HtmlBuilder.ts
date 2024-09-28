@@ -32,6 +32,7 @@ export const input = node('input');
 export const label = node('label');
 export const ul = node('ul');
 export const li = node('li');
+export const button = node('button');
 
 export function text(s: string): Text {
   return document.createTextNode(s);

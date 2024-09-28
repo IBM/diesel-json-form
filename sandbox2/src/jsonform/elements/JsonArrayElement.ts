@@ -2,6 +2,7 @@ import { JvArray, JsonValue, jvArray } from '@diesel-parser/json-form';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { renderValue } from '../RenderValue';
+import { div } from '../HtmlBuilder';
 
 export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   static TAG_NAME = 'json-array';
@@ -21,9 +22,12 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
 
   protected doRender(args: RendererArgs, value: JvArray) {
     const { path } = args;
-    const wrapperElem = document.createElement('div');
-    wrapperElem.style.display = 'flex';
-    wrapperElem.style.flexDirection = 'column';
+    const wrapperElem = div({
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+      },
+    });
     value.elems.forEach((item, itemIndex) => {
       const valueElem = renderValue({
         ...args,

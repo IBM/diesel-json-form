@@ -12,7 +12,7 @@ import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { renderValue } from '../RenderValue';
 import { SchemaInfos } from '../SchemaInfos';
-import { empty } from '../HtmlBuilder';
+import { button, div, empty, text } from '../HtmlBuilder';
 
 interface ObjectProp {
   readonly propertyName: string;
@@ -36,8 +36,8 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
 
   constructor() {
     super();
-    this._propsToAddWrapper = document.createElement('div');
-    this._wrapperElem = document.createElement('div');
+    this._propsToAddWrapper = div({});
+    this._wrapperElem = div({});
   }
 
   protected doRender(args: RendererArgs, value: JvObject) {
@@ -58,8 +58,7 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     path: JsPath,
     propertyIndex: number,
   ): ObjectProp {
-    const labelElem = document.createElement('div');
-    labelElem.textContent = property.name;
+    const labelElem = div({}, text(property.name));
     this._wrapperElem.appendChild(labelElem);
     const valueElem = renderValue({
       ...args,
@@ -67,12 +66,15 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
       value: property.value,
     });
     this._wrapperElem.appendChild(valueElem);
-    const buttonDelete = document.createElement('button');
-    buttonDelete.textContent = 'delete';
+    const buttonDelete = button(
+      {
+        onclick: () => {
+          this.removeProperty(propertyIndex);
+        },
+      },
+      text('delete'),
+    );
     this._wrapperElem.appendChild(buttonDelete);
-    buttonDelete.addEventListener('click', () => {
-      this.removeProperty(propertyIndex);
-    });
     return {
       propertyName: property.name,
       propertyValueElem: valueElem,
@@ -153,12 +155,15 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     propsToAdd
       .filter((propertyName) => !existingProps.has(propertyName))
       .forEach((propertyName) => {
-        const propButton = document.createElement('button');
-        propButton.textContent = '+ ' + propertyName;
+        const propButton = button(
+          {
+            onclick: () => {
+              this.addProperty(propertyName);
+            },
+          },
+          text('+ ' + propertyName),
+        );
         this._propsToAddWrapper.appendChild(propButton);
-        propButton.addEventListener('click', () => {
-          this.addProperty(propertyName);
-        });
       });
   }
 

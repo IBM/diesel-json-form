@@ -2,6 +2,7 @@ import { JvString, jvString } from '@diesel-parser/json-form';
 import { JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { SchemaInfosListener } from '../SchemaInfos';
+import { input } from '../HtmlBuilder';
 
 export class JsonStringElement
   extends JsonValueElementBase<JvString>
@@ -20,7 +21,7 @@ export class JsonStringElement
 
   constructor() {
     super();
-    this._input = document.createElement('input') as HTMLInputElement;
+    this._input = input({}) as HTMLInputElement;
   }
 
   protected doRender(args: RendererArgs, value: JvString) {
