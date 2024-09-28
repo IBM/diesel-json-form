@@ -1,4 +1,9 @@
-import { JsonValue, JsPath, valueToAny } from '@diesel-parser/json-form';
+import {
+  JsonValue,
+  JsPath,
+  jvObject,
+  valueToAny,
+} from '@diesel-parser/json-form';
 import {
   JsValidationError,
   JsValidationResult,
@@ -14,7 +19,7 @@ export class SchemaInfos {
   >();
 
   private _schema: any;
-  private _value?: JsonValue;
+  private _value: JsonValue = jvObject();
   private _validationResult?: JsValidationResult;
 
   addListener(l: SchemaInfosListener): void {
@@ -32,22 +37,17 @@ export class SchemaInfos {
     return this._errorsMap.get(path.format()) ?? [];
   }
 
-  set schema(schema: any) {
+  setSchema(schema: any) {
     this._schema = schema;
-    if (this._value) {
-      this.value = this._value;
-    }
+    this.setRootValue(this._value);
   }
 
-  set value(value: JsonValue) {
+  setRootValue(value: JsonValue) {
     console.log('validate', value, this._schema);
     this._value = value;
     const errsMap = new Map<string, Array<JsValidationError>>();
     if (this._schema !== undefined && this._schema !== null) {
-      this._validationResult = JsFacade.validate(
-        this._schema,
-        valueToAny(value),
-      );
+      this._validationResult = this.validate(value);
       JsFacade.getErrors(this._validationResult).forEach((err) => {
         let errsForPath = errsMap.get(err.path);
         if (!errsForPath) {
@@ -64,6 +64,15 @@ export class SchemaInfos {
 
   get validationResult(): JsValidationResult | undefined {
     return this._validationResult;
+  }
+
+  getRootValue(): JsonValue {
+    return this._value;
+  }
+
+  validate(value: JsonValue): JsValidationResult {
+    const schema = this._schema === undefined ? {} : this._schema;
+    return JsFacade.validate(schema, valueToAny(value));
   }
 }
 

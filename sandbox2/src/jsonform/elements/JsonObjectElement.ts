@@ -3,6 +3,10 @@ import {
   JsonValue,
   jvObject,
   getProposals,
+  setValueAt,
+  jvNull,
+  JsonProperty,
+  JsPath,
 } from '@diesel-parser/json-form';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
@@ -42,29 +46,39 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     this._wrapperElem.style.display = 'grid';
     this._wrapperElem.style.gridTemplateColumns = '1fr 1fr 1fr';
     value.properties.forEach((property, propertyIndex) => {
-      const labelElem = document.createElement('div');
-      labelElem.textContent = property.name;
-      this._wrapperElem.appendChild(labelElem);
-      const valueElem = renderValue({
-        ...args,
-        path: path.append(property.name),
-        value: property.value,
-      });
-      this._wrapperElem.appendChild(valueElem);
-      const buttonDelete = document.createElement('button');
-      buttonDelete.textContent = 'delete';
-      this._wrapperElem.appendChild(buttonDelete);
-      buttonDelete.addEventListener('click', () => {
-        this.removeProperty(propertyIndex);
-      });
-      this._elems.push({
-        propertyName: property.name,
-        propertyElements: [labelElem, valueElem, buttonDelete],
-        propertyValueElem: valueElem,
-      });
+      const op = this.renderProperty(property, args, path, propertyIndex);
+      this._elems.push(op);
     });
     this.appendChild(this._wrapperElem);
     this.appendChild(this._propsToAddWrapper);
+  }
+
+  private renderProperty(
+    property: JsonProperty,
+    args: RendererArgs,
+    path: JsPath,
+    propertyIndex: number,
+  ): ObjectProp {
+    const labelElem = document.createElement('div');
+    labelElem.textContent = property.name;
+    this._wrapperElem.appendChild(labelElem);
+    const valueElem = renderValue({
+      ...args,
+      path: path.append(property.name),
+      value: property.value,
+    });
+    this._wrapperElem.appendChild(valueElem);
+    const buttonDelete = document.createElement('button');
+    buttonDelete.textContent = 'delete';
+    this._wrapperElem.appendChild(buttonDelete);
+    buttonDelete.addEventListener('click', () => {
+      this.removeProperty(propertyIndex);
+    });
+    return {
+      propertyName: property.name,
+      propertyValueElem: valueElem,
+      propertyElements: [labelElem, valueElem, buttonDelete],
+    };
   }
 
   private removeProperty(index: number): void {
@@ -75,6 +89,44 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
         this._wrapperElem.removeChild(pElem),
       );
       this.fireValueChanged();
+    }
+  }
+
+  private addProperty(name: string): void {
+    if (this.schemaInfos && this.path && this.args) {
+      const newPath = this.path.append(name);
+      const propOwner = this.getValue();
+      const newPropOwner: JvObject = {
+        ...propOwner,
+        properties: [
+          ...propOwner.properties,
+          {
+            name,
+            value: jvNull,
+          },
+        ],
+      };
+      const newRoot = setValueAt(
+        this.schemaInfos.getRootValue(),
+        this.path,
+        newPropOwner,
+      );
+      const validationResult = this.schemaInfos.validate(newRoot);
+      const proposals = getProposals(validationResult, newPath, -1);
+      if (proposals.length > 0) {
+        const propValue = proposals[0];
+        const newProp = this.renderProperty(
+          {
+            name,
+            value: propValue,
+          },
+          this.args,
+          newPath,
+          this._elems.length,
+        );
+        this._elems.push(newProp);
+        this.fireValueChanged();
+      }
     }
   }
 
@@ -104,6 +156,9 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
         const propButton = document.createElement('button');
         propButton.textContent = '+ ' + propertyName;
         this._propsToAddWrapper.appendChild(propButton);
+        propButton.addEventListener('click', () => {
+          this.addProperty(propertyName);
+        });
       });
   }
 

@@ -15,12 +15,12 @@ export class JsonFormElement extends HTMLElement {
   }
 
   set schema(schema: any) {
-    this._schemaInfos.schema = schema;
+    this._schemaInfos.setSchema(schema);
   }
 
   render(value: JsonValue) {
     removeChildren(this);
-    this._schemaInfos.value = value;
+    this._schemaInfos.setRootValue(value);
     this._jsonValueElement = renderValue({
       path: JsPath.empty,
       value,
@@ -33,7 +33,7 @@ export class JsonFormElement extends HTMLElement {
   private onValueChanged(path: JsPath) {
     const value = this.getValue();
     console.log('form ionValueChanged', path, value);
-    this._schemaInfos.value = value;
+    this._schemaInfos.setRootValue(value);
   }
 
   getValue(): JsonValue {

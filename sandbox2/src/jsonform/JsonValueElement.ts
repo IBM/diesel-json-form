@@ -68,4 +68,8 @@ export abstract class JsonValueElementBase<T extends JsonValue>
       this._args.valueChanged(this._args.path);
     }
   }
+
+  get args(): RendererArgs | undefined {
+    return this._args;
+  }
 }
