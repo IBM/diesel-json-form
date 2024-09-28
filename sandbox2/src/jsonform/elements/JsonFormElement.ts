@@ -8,18 +8,21 @@ export class JsonFormElement extends HTMLElement {
   static TAG_NAME = 'json-form';
 
   private _jsonValueElement?: JsonValueElement<JsonValue> & HTMLElement;
-  private _schemaInfos: SchemaInfos = new SchemaInfos();
+  private _schemaInfos?: SchemaInfos;
+  private _schema: any;
 
   constructor() {
     super();
   }
 
   set schema(schema: any) {
-    this._schemaInfos.setSchema(schema);
+    this._schema = schema;
+    this._schemaInfos?.setSchema(schema);
   }
 
   render(value: JsonValue) {
     removeChildren(this);
+    this._schemaInfos = new SchemaInfos(value, this._schema);
     this._schemaInfos.setRootValue(value);
     this._jsonValueElement = renderValue({
       path: JsPath.empty,
@@ -30,10 +33,11 @@ export class JsonFormElement extends HTMLElement {
     this.appendChild(this._jsonValueElement);
   }
 
-  private onValueChanged(path: JsPath) {
-    const value = this.getValue();
-    console.log('form ionValueChanged', path, value);
-    this._schemaInfos.setRootValue(value);
+  private onValueChanged() {
+    if (this._schemaInfos) {
+      const value = this.getValue();
+      this._schemaInfos.setRootValue(value);
+    }
   }
 
   getValue(): JsonValue {

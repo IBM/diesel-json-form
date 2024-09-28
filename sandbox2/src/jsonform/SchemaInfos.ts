@@ -1,9 +1,4 @@
-import {
-  JsonValue,
-  JsPath,
-  jvObject,
-  valueToAny,
-} from '@diesel-parser/json-form';
+import { JsonValue, JsPath, valueToAny } from '@diesel-parser/json-form';
 import {
   JsValidationError,
   JsValidationResult,
@@ -19,8 +14,14 @@ export class SchemaInfos {
   >();
 
   private _schema: any;
-  private _value: JsonValue = jvObject();
-  private _validationResult?: JsValidationResult;
+  private _value: JsonValue;
+  private _validationResult: JsValidationResult;
+
+  constructor(value: JsonValue, schema: any) {
+    this._value = value;
+    this._schema = schema === undefined || schema === null ? {} : schema;
+    this._validationResult = this.validate(value);
+  }
 
   addListener(l: SchemaInfosListener): void {
     this._listeners.push(l);
@@ -62,7 +63,7 @@ export class SchemaInfos {
     this._listeners.forEach((l) => l.onSchemaInfoChanged(this));
   }
 
-  get validationResult(): JsValidationResult | undefined {
+  get validationResult(): JsValidationResult {
     return this._validationResult;
   }
 

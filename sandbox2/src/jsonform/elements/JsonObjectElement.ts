@@ -93,6 +93,11 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   }
 
   private addProperty(name: string): void {
+    console.log(
+      'object addProperty ' + name + ' at path ' + this.path?.format() ??
+        'NO PATH',
+    );
+
     if (this.schemaInfos && this.path && this.args) {
       const newPath = this.path.append(name);
       const propOwner = this.getValue();
@@ -114,14 +119,15 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
       const validationResult = this.schemaInfos.validate(newRoot);
       const proposals = getProposals(validationResult, newPath, -1);
       if (proposals.length > 0) {
-        const propValue = proposals[0];
+        const propValue =
+          proposals[0].tag === 'jv-object' ? jvObject() : proposals[0];
         const newProp = this.renderProperty(
           {
             name,
             value: propValue,
           },
           this.args,
-          newPath,
+          this.path,
           this._elems.length,
         );
         this._elems.push(newProp);
@@ -146,9 +152,19 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   }
 
   onSchemaInfoChanged(schemaInfos: SchemaInfos): void {
+    console.log(
+      'object onSchemaInfoChanged at path ' + this.path?.format() ?? 'NO PATH',
+    );
+
     super.onSchemaInfoChanged(schemaInfos);
     removeChildren(this._propsToAddWrapper);
     const propsToAdd = this.computePropertiesToAdd();
+    console.log(
+      'object onSchemaInfoChanged at path ' + this.path?.format() ??
+        'NO PATH' + ', propsToAdd ',
+      propsToAdd,
+    );
+
     const existingProps = new Set(this._elems.map((e) => e.propertyName));
     propsToAdd
       .filter((propertyName) => !existingProps.has(propertyName))
