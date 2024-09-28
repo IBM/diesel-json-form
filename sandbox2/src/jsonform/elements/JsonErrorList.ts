@@ -1,5 +1,5 @@
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
-import { removeChildren } from '../util';
+import * as H from '../HtmlBuilder';
 
 export class JsonErrorList extends HTMLElement {
   static TAG_NAME = 'json-error-list';
@@ -9,19 +9,24 @@ export class JsonErrorList extends HTMLElement {
     return e;
   }
 
+  private _ulElem: HTMLElement = H.ul({});
+
   constructor() {
     super();
   }
 
+  connectedCallback() {
+    this.appendChild(this._ulElem);
+  }
+
   set errors(errors: readonly JsValidationError[]) {
-    removeChildren(this);
+    H.empty(this._ulElem);
     if (errors.length === 0) {
       this.style.display = 'none';
     } else {
       errors.forEach((error) => {
-        const li = document.createElement('li');
-        li.textContent = error.message;
-        this.appendChild(li);
+        const liElem = H.li({}, H.text(error.message));
+        this._ulElem.appendChild(liElem);
       });
       this.style.display = 'block';
     }

@@ -12,7 +12,7 @@ import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { renderValue } from '../RenderValue';
 import { SchemaInfos } from '../SchemaInfos';
-import { removeChildren } from '../util';
+import { empty } from '../HtmlBuilder';
 
 interface ObjectProp {
   readonly propertyName: string;
@@ -41,7 +41,6 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   }
 
   protected doRender(args: RendererArgs, value: JvObject) {
-    this.setAttribute('jf-path', args.path.format());
     const { path } = args;
     this._wrapperElem.style.display = 'grid';
     this._wrapperElem.style.gridTemplateColumns = '1fr 1fr 1fr';
@@ -93,11 +92,6 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   }
 
   private addProperty(name: string): void {
-    console.log(
-      'object addProperty ' + name + ' at path ' + this.path?.format() ??
-        'NO PATH',
-    );
-
     if (this.schemaInfos && this.path && this.args) {
       const newPath = this.path.append(name);
       const propOwner = this.getValue();
@@ -152,19 +146,9 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   }
 
   onSchemaInfoChanged(schemaInfos: SchemaInfos): void {
-    console.log(
-      'object onSchemaInfoChanged at path ' + this.path?.format() ?? 'NO PATH',
-    );
-
     super.onSchemaInfoChanged(schemaInfos);
-    removeChildren(this._propsToAddWrapper);
+    empty(this._propsToAddWrapper);
     const propsToAdd = this.computePropertiesToAdd();
-    console.log(
-      'object onSchemaInfoChanged at path ' + this.path?.format() ??
-        'NO PATH' + ', propsToAdd ',
-      propsToAdd,
-    );
-
     const existingProps = new Set(this._elems.map((e) => e.propertyName));
     propsToAdd
       .filter((propertyName) => !existingProps.has(propertyName))

@@ -1,7 +1,6 @@
 import { JvNumber, jvNumber } from '@diesel-parser/json-form';
 import { JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
-import { removeChildren } from '../util';
 
 export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
   static TAG_NAME = 'json-number';
@@ -21,8 +20,6 @@ export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
   }
 
   protected doRender(args: RendererArgs, value: JvNumber) {
-    this.setAttribute('jf-path', args.path.format());
-    removeChildren(this);
     this._input.type = 'number';
     this._input.value = value.value.toLocaleString();
     const { path, valueChanged } = args;

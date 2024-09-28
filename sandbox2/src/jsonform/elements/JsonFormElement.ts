@@ -1,4 +1,3 @@
-import { removeChildren } from '../util';
 import { JsonValue, JsPath } from '@diesel-parser/json-form';
 import { JsonValueElement } from '../JsonValueElement';
 import { SchemaInfos } from '../SchemaInfos';
@@ -21,7 +20,6 @@ export class JsonFormElement extends HTMLElement {
   }
 
   render(value: JsonValue) {
-    removeChildren(this);
     this._schemaInfos = new SchemaInfos(value, this._schema);
     this._schemaInfos.setRootValue(value);
     this._jsonValueElement = renderValue({

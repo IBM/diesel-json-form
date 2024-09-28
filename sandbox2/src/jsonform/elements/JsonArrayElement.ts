@@ -20,7 +20,6 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   }
 
   protected doRender(args: RendererArgs, value: JvArray) {
-    this.setAttribute('jf-path', args.path.format());
     const { path } = args;
     const wrapperElem = document.createElement('div');
     wrapperElem.style.display = 'flex';

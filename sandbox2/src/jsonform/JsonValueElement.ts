@@ -2,6 +2,7 @@ import { JsonValue, JsPath } from '@diesel-parser/json-form';
 import { RendererArgs } from './RendererArgs';
 import { SchemaInfos, SchemaInfosListener } from './SchemaInfos';
 import { JsonErrorList } from './elements/JsonErrorList';
+import { empty } from './HtmlBuilder';
 
 export interface JsonValueElement<T extends JsonValue> {
   getValue(): T;
@@ -42,6 +43,7 @@ export abstract class JsonValueElementBase<T extends JsonValue>
   }
 
   render(args: RendererArgs, value: T): void {
+    empty(this);
     this._args = args;
     this.setAttribute('jf-path', args.path.format());
     args.schemaInfos.addListener(this);

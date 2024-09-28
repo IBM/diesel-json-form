@@ -1,7 +1,6 @@
 import { JvString, jvString } from '@diesel-parser/json-form';
 import { JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
-import { removeChildren } from '../util';
 import { SchemaInfosListener } from '../SchemaInfos';
 
 export class JsonStringElement
@@ -25,7 +24,6 @@ export class JsonStringElement
   }
 
   protected doRender(args: RendererArgs, value: JvString) {
-    removeChildren(this);
     this._input.value = value.value;
     const { path, valueChanged } = args;
     this._input.addEventListener('input', () => {

@@ -1,6 +1,5 @@
 import { JvNull, jvNull } from '@diesel-parser/json-form';
 import { JsonValueElementBase } from '../JsonValueElement';
-import { RendererArgs } from '../RendererArgs';
 
 export class JsonNullElement extends JsonValueElementBase<JvNull> {
   static TAG_NAME = 'json-null';
@@ -16,8 +15,7 @@ export class JsonNullElement extends JsonValueElementBase<JvNull> {
     super();
   }
 
-  protected doRender(args: RendererArgs) {
-    this.setAttribute('jf-path', args.path.format());
+  protected doRender() {
     this.textContent = 'null';
   }
 
