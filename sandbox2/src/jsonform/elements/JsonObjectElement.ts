@@ -4,12 +4,17 @@ import {
   jvObject,
   getProposals,
 } from '@diesel-parser/json-form';
-import { Tuple } from 'tea-cup-core';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { renderValue } from '../RenderValue';
 import { SchemaInfos } from '../SchemaInfos';
 import { removeChildren } from '../util';
+
+interface ObjectProp {
+  readonly propertyName: string;
+  readonly propertyElements: HTMLElement[];
+  readonly propertyValueElem: JsonValueElement<JsonValue>;
+}
 
 export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   static TAG_NAME = 'json-object';
@@ -21,37 +26,56 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     return e;
   }
 
-  private _elems: Tuple<string, JsonValueElement<JsonValue>>[] = [];
+  private _elems: ObjectProp[] = [];
   private _propsToAddWrapper: HTMLElement;
+  private _wrapperElem: HTMLElement;
 
   constructor() {
     super();
     this._propsToAddWrapper = document.createElement('div');
+    this._wrapperElem = document.createElement('div');
   }
 
   protected doRender(args: RendererArgs, value: JvObject) {
     this.setAttribute('jf-path', args.path.format());
     const { path } = args;
-    const wrapperElem = document.createElement('div');
-    wrapperElem.style.display = 'grid';
-    wrapperElem.style.gridTemplateColumns = '1fr 1fr 1fr';
-    value.properties.forEach((property) => {
+    this._wrapperElem.style.display = 'grid';
+    this._wrapperElem.style.gridTemplateColumns = '1fr 1fr 1fr';
+    value.properties.forEach((property, propertyIndex) => {
       const labelElem = document.createElement('div');
       labelElem.textContent = property.name;
-      wrapperElem.appendChild(labelElem);
+      this._wrapperElem.appendChild(labelElem);
       const valueElem = renderValue({
         ...args,
         path: path.append(property.name),
         value: property.value,
       });
-      this._elems.push(Tuple.t2(property.name, valueElem));
-      wrapperElem.appendChild(valueElem);
+      this._wrapperElem.appendChild(valueElem);
       const buttonDelete = document.createElement('button');
       buttonDelete.textContent = 'delete';
-      wrapperElem.appendChild(buttonDelete);
+      this._wrapperElem.appendChild(buttonDelete);
+      buttonDelete.addEventListener('click', () => {
+        this.removeProperty(propertyIndex);
+      });
+      this._elems.push({
+        propertyName: property.name,
+        propertyElements: [labelElem, valueElem, buttonDelete],
+        propertyValueElem: valueElem,
+      });
     });
-    this.appendChild(wrapperElem);
+    this.appendChild(this._wrapperElem);
     this.appendChild(this._propsToAddWrapper);
+  }
+
+  private removeProperty(index: number): void {
+    const objectProp = this._elems[index];
+    if (objectProp) {
+      this._elems.splice(index, 1);
+      objectProp.propertyElements.forEach((pElem) =>
+        this._wrapperElem.removeChild(pElem),
+      );
+      this.fireValueChanged();
+    }
   }
 
   private computePropertiesToAdd(): string[] {
@@ -73,7 +97,7 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     super.onSchemaInfoChanged(schemaInfos);
     removeChildren(this._propsToAddWrapper);
     const propsToAdd = this.computePropertiesToAdd();
-    const existingProps = new Set(this._elems.map((e) => e.a));
+    const existingProps = new Set(this._elems.map((e) => e.propertyName));
     propsToAdd
       .filter((propertyName) => !existingProps.has(propertyName))
       .forEach((propertyName) => {
@@ -85,8 +109,8 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
 
   getValue(): JvObject {
     return jvObject(
-      this._elems.map((elem) => {
-        return { name: elem.a, value: elem.b.getValue() };
+      this._elems.map((x) => {
+        return { name: x.propertyName, value: x.propertyValueElem.getValue() };
       }),
     );
   }

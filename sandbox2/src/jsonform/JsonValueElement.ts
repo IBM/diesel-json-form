@@ -18,14 +18,14 @@ export abstract class JsonValueElementBase<T extends JsonValue>
 
   private _schemaInfos?: SchemaInfos;
   private _errorNode?: JsonErrorList;
-  private _path?: JsPath;
+  private _args?: RendererArgs;
 
   abstract getValue(): T;
   protected abstract doRender(args: RendererArgs, value: T): void;
 
   onSchemaInfoChanged(schemaInfos: SchemaInfos) {
-    if (this._path) {
-      const errors = schemaInfos.getErrors(this._path);
+    if (this._args) {
+      const errors = schemaInfos.getErrors(this._args.path);
       if (this._errorNode) {
         this.removeChild(this._errorNode);
         delete this._errorNode;
@@ -42,10 +42,10 @@ export abstract class JsonValueElementBase<T extends JsonValue>
   }
 
   render(args: RendererArgs, value: T): void {
+    this._args = args;
     this.setAttribute('jf-path', args.path.format());
     args.schemaInfos.addListener(this);
     this._schemaInfos = args.schemaInfos;
-    this._path = args.path;
     this.doRender(args, value);
   }
 
@@ -60,6 +60,12 @@ export abstract class JsonValueElementBase<T extends JsonValue>
   }
 
   get path(): JsPath | undefined {
-    return this._path;
+    return this._args?.path;
+  }
+
+  protected fireValueChanged() {
+    if (this._args) {
+      this._args.valueChanged(this._args.path);
+    }
   }
 }
