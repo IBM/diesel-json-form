@@ -20,6 +20,7 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   }
 
   private _elems: ItemRow[] = [];
+  private _wrapperElem: HTMLElement = div({});
 
   constructor() {
     super();
@@ -30,7 +31,6 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     const wrapperElem = div({});
     wrapperElem.style.display = 'grid';
     wrapperElem.style.gridTemplateColumns = '1fr 1fr';
-
     value.elems.forEach((item, itemIndex) => {
       const valueElem = renderValue({
         ...args,
@@ -40,12 +40,27 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
       wrapperElem.appendChild(valueElem);
       const deleteButton = button({}, text('delete'));
       wrapperElem.appendChild(deleteButton);
-      this._elems.push({
+      const itemRow = {
         valueElem,
         deleteButton,
+      };
+      this._elems.push(itemRow);
+      deleteButton.addEventListener('click', () => {
+        this.deleteItem(itemRow);
       });
     });
     this.appendChild(wrapperElem);
+    this._wrapperElem = wrapperElem;
+  }
+
+  private deleteItem(itemRow: ItemRow) {
+    const i = this._elems.indexOf(itemRow);
+    if (i !== -1) {
+      this._elems.splice(i, 1);
+      this._wrapperElem.removeChild(itemRow.valueElem);
+      this._wrapperElem.removeChild(itemRow.deleteButton);
+      this.fireValueChanged();
+    }
   }
 
   getValue(): JvArray {
