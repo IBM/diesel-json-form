@@ -64,13 +64,14 @@ sampleSchemaSelect.addEventListener('change', () => {
 
 // const value = 'yalla';
 
-const value = {
-  //  customer: 123,
-  customer: {
-    age: 'not a string',
-    firstName: 'Remi',
-  },
-};
+const value = [1, 2, 'foo', true, { foo: 'bar' }];
+
+// const value = {
+//   customer: {
+//     age: 'not a string',
+//     firstName: 'Remi',
+//   },
+// };
 
 jsonForm.schema = {};
 
