@@ -1,4 +1,11 @@
-import { JvArray, JsonValue, jvArray } from '@diesel-parser/json-form';
+import {
+  JvArray,
+  JsonValue,
+  jvArray,
+  jvNull,
+  setValueAt,
+  getProposals,
+} from '@diesel-parser/json-form';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { renderValue } from '../RenderValue';
@@ -21,36 +28,76 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
 
   private _elems: ItemRow[] = [];
   private _wrapperElem: HTMLElement = div({});
+  private _addButtonElem: HTMLElement = div({ className: 'add-elem' });
 
   constructor() {
     super();
   }
 
   protected doRender(args: RendererArgs, value: JvArray) {
-    const { path } = args;
     const wrapperElem = div({});
     wrapperElem.style.display = 'grid';
     wrapperElem.style.gridTemplateColumns = '1fr 1fr';
     value.elems.forEach((item, itemIndex) => {
-      const valueElem = renderValue({
-        ...args,
-        path: path.append(itemIndex),
-        value: item,
-      });
-      wrapperElem.appendChild(valueElem);
-      const deleteButton = button({}, text('delete'));
-      wrapperElem.appendChild(deleteButton);
-      const itemRow = {
-        valueElem,
-        deleteButton,
-      };
+      const itemRow = this.createItemRow(args, item, itemIndex);
       this._elems.push(itemRow);
-      deleteButton.addEventListener('click', () => {
+      wrapperElem.appendChild(itemRow.valueElem);
+      wrapperElem.appendChild(itemRow.deleteButton);
+      itemRow.deleteButton.addEventListener('click', () => {
         this.deleteItem(itemRow);
       });
     });
-    this.appendChild(wrapperElem);
+    this._addButtonElem.style.gridColumn = 'span 2';
+    const addButton = button(
+      {
+        onclick: () => {
+          this.addElem();
+        },
+      },
+      text('add elem'),
+    );
+    this._addButtonElem.appendChild(addButton);
+    wrapperElem.appendChild(this._addButtonElem);
+
     this._wrapperElem = wrapperElem;
+    this.appendChild(wrapperElem);
+  }
+
+  private createItemRow(
+    args: RendererArgs,
+    item: JsonValue,
+    itemIndex: number,
+  ): ItemRow {
+    const deleteButton = button({}, text('delete'));
+    const valueElem = renderValue({
+      ...args,
+      path: args.path.append(itemIndex),
+      value: item,
+    });
+    return {
+      valueElem,
+      deleteButton,
+    };
+  }
+
+  private addElem() {
+    if (this.schemaInfos && this.path) {
+      const thisValue = this.getValue();
+      const newValue = jvArray([...thisValue.elems, jvNull]);
+      const root = this.schemaInfos.getRootValue();
+      const newRoot = setValueAt(root, this.path, newValue);
+      const validationResult = this.schemaInfos.validate(newRoot);
+      const proposals = getProposals(
+        validationResult,
+        this.path.append(newValue.elems.length - 1),
+        -1,
+      );
+      if (proposals.length > 0) {
+        const proposal = proposals[0];
+      }
+      debugger;
+      console.log(proposals);
+    }
   }
 
   private deleteItem(itemRow: ItemRow) {
