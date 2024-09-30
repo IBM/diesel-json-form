@@ -15,7 +15,7 @@
     "carbon-components": "^10.25.0",
     "carbon-components-react": "^7.25.0",
     "carbon-icons": "^7.0.0",
-    "react": "^16.14.0",
+    "react": "^16.14.0 || ^17.0.2",
     "react-tea-cup": "^2.2.3",
     "tea-cup-core": "^2.2.3"
   },
