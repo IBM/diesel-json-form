@@ -21,6 +21,7 @@ import {
   ComboBox,
   DatePicker,
   DatePickerInput,
+  DatePickerProps,
   SelectItem,
   Tag,
   TextInput,
@@ -605,6 +606,12 @@ interface MyDatePickerProps {
   readonly language: string;
 }
 
+function languageToPickerLocale(x: string): DatePickerProps['locale'] {
+  const parts = x.split('-');
+  // @ts-ignore
+  return parts[0];
+}
+
 function MyDatePicker(props: MyDatePickerProps) {
   const fmtPath = props.path.format('_');
   const { t } = props;
@@ -617,8 +624,7 @@ function MyDatePicker(props: MyDatePickerProps) {
         props.onChange(str);
       }}
       value={props.value}
-      /* @ts-ignore */
-      locale={props.language}
+      locale={languageToPickerLocale(props.language)}
     >
       <DatePickerInput
         id={'input-' + fmtPath}
