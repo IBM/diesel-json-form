@@ -64,7 +64,7 @@ sampleSchemaSelect.addEventListener('change', () => {
 
 // const value = 'yalla';
 
-const value = [1, 2, 'foo', true, { foo: 'bar' }];
+// const value = [1, 2, 'foo', true, { foo: 'bar' }];
 
 // const value = {
 //   customer: {
@@ -72,6 +72,8 @@ const value = [1, 2, 'foo', true, { foo: 'bar' }];
 //     firstName: 'Remi',
 //   },
 // };
+
+const value = {};
 
 jsonForm.schema = {};
 

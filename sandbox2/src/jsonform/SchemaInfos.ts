@@ -2,6 +2,7 @@ import { JsonValue, JsPath, valueToAny } from '@diesel-parser/json-form';
 import {
   JsValidationError,
   JsValidationResult,
+  JsRenderer,
 } from '@diesel-parser/json-schema-facade-ts';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
@@ -12,6 +13,7 @@ export class SchemaInfos {
     string,
     ReadonlyArray<JsValidationError>
   >();
+  private _renderers: ReadonlyMap<string, JsRenderer | undefined> = new Map();
 
   private _schema: any;
   private _value: JsonValue;
@@ -57,6 +59,7 @@ export class SchemaInfos {
         }
         errsForPath.push(err);
       });
+      this._renderers = JsFacade.getRenderers(this._validationResult);
     }
     this._errorsMap = errsMap;
     console.log('errs', errsMap);
@@ -74,6 +77,10 @@ export class SchemaInfos {
   validate(value: JsonValue): JsValidationResult {
     const schema = this._schema === undefined ? {} : this._schema;
     return JsFacade.validate(schema, valueToAny(value));
+  }
+
+  getRenderer(path: JsPath): JsRenderer | undefined {
+    return this._renderers.get(path.format());
   }
 }
 

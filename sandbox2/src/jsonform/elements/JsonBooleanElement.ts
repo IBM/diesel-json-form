@@ -20,9 +20,9 @@ export class JsonBooleanElement extends JsonValueElementBase<JvBoolean> {
     this._input = input({ type: 'checkbox' }) as HTMLInputElement;
   }
 
-  protected doRender(args: RendererArgs, value: JvBoolean) {
+  protected doRender(args: RendererArgs<JvBoolean>) {
+    const { value, path, valueChanged } = args;
     this._input.checked = value.value;
-    const { path, valueChanged } = args;
     this._input.addEventListener('input', () => {
       valueChanged(path);
     });

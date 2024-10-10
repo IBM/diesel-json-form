@@ -24,9 +24,9 @@ export class JsonStringElement
     this._input = input({}) as HTMLInputElement;
   }
 
-  protected doRender(args: RendererArgs, value: JvString) {
+  protected doRender(args: RendererArgs<JvString>) {
+    const { path, valueChanged, value } = args;
     this._input.value = value.value;
-    const { path, valueChanged } = args;
     this._input.addEventListener('input', () => {
       valueChanged(path);
     });

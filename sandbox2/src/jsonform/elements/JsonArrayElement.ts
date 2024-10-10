@@ -8,7 +8,6 @@ import {
 } from '@diesel-parser/json-form';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
-import { renderValue } from '../RenderValue';
 import { button, div, text } from '../HtmlBuilder';
 
 interface ItemRow {
@@ -34,10 +33,11 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     super();
   }
 
-  protected doRender(args: RendererArgs, value: JvArray) {
+  protected doRender(args: RendererArgs<JvArray>) {
     const wrapperElem = div({});
     wrapperElem.style.display = 'grid';
     wrapperElem.style.gridTemplateColumns = '1fr 1fr';
+    const { value } = args;
     value.elems.forEach((item, itemIndex) => {
       const itemRow = this.createItemRow(args, item, itemIndex);
       this._elems.push(itemRow);
@@ -64,12 +64,13 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   }
 
   private createItemRow(
-    args: RendererArgs,
+    args: RendererArgs<JvArray>,
     item: JsonValue,
     itemIndex: number,
   ): ItemRow {
     const deleteButton = button({}, text('delete'));
-    const valueElem = renderValue({
+    const { renderer } = args;
+    const valueElem = renderer.render({
       ...args,
       path: args.path.append(itemIndex),
       value: item,
@@ -94,8 +95,8 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
       );
       if (proposals.length > 0) {
         const proposal = proposals[0];
+        console.log('proposal', proposal);
       }
-      debugger;
       console.log(proposals);
     }
   }

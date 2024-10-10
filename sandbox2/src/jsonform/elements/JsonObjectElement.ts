@@ -10,7 +10,6 @@ import {
 } from '@diesel-parser/json-form';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
-import { renderValue } from '../RenderValue';
 import { SchemaInfos } from '../SchemaInfos';
 import { button, div, empty, text } from '../HtmlBuilder';
 
@@ -40,8 +39,8 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     this._wrapperElem = div({});
   }
 
-  protected doRender(args: RendererArgs, value: JvObject) {
-    const { path } = args;
+  protected doRender(args: RendererArgs<JvObject>) {
+    const { path, value } = args;
     this._wrapperElem.style.display = 'grid';
     this._wrapperElem.style.gridTemplateColumns = '1fr 1fr 1fr';
     value.properties.forEach((property, propertyIndex) => {
@@ -54,13 +53,14 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
 
   private renderProperty(
     property: JsonProperty,
-    args: RendererArgs,
+    args: RendererArgs<JvObject>,
     path: JsPath,
     propertyIndex: number,
   ): ObjectProp {
     const labelElem = div({}, text(property.name));
     this._wrapperElem.appendChild(labelElem);
-    const valueElem = renderValue({
+    const { renderer } = args;
+    const valueElem = renderer.render({
       ...args,
       path: path.append(property.name),
       value: property.value,

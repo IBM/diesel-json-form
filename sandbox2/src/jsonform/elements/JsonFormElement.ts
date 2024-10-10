@@ -1,7 +1,7 @@
 import { JsonValue, JsPath } from '@diesel-parser/json-form';
 import { JsonValueElement } from '../JsonValueElement';
 import { SchemaInfos } from '../SchemaInfos';
-import { renderValue } from '../RenderValue';
+import { Renderer } from '../Renderer';
 
 export class JsonFormElement extends HTMLElement {
   static TAG_NAME = 'json-form';
@@ -9,6 +9,7 @@ export class JsonFormElement extends HTMLElement {
   private _jsonValueElement?: JsonValueElement<JsonValue> & HTMLElement;
   private _schemaInfos?: SchemaInfos;
   private _schema: any;
+  private _renderer: Renderer = new Renderer();
 
   constructor() {
     super();
@@ -22,11 +23,12 @@ export class JsonFormElement extends HTMLElement {
   render(value: JsonValue) {
     this._schemaInfos = new SchemaInfos(value, this._schema);
     this._schemaInfos.setRootValue(value);
-    this._jsonValueElement = renderValue({
+    this._jsonValueElement = this._renderer.render({
       path: JsPath.empty,
       value,
       valueChanged: this.onValueChanged.bind(this),
       schemaInfos: this._schemaInfos,
+      renderer: this._renderer,
     });
     this.appendChild(this._jsonValueElement);
   }

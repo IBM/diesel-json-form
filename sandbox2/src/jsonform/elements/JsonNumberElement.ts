@@ -22,9 +22,9 @@ export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
     }) as HTMLInputElement;
   }
 
-  protected doRender(args: RendererArgs, value: JvNumber) {
+  protected doRender(args: RendererArgs<JvNumber>) {
+    const { value, path, valueChanged } = args;
     this._input.valueAsNumber = value.value;
-    const { path, valueChanged } = args;
     this._input.addEventListener('input', () => {
       valueChanged(path);
     });

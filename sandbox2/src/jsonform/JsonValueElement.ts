@@ -6,7 +6,7 @@ import { empty } from './HtmlBuilder';
 
 export interface JsonValueElement<T extends JsonValue> {
   getValue(): T;
-  render(args: RendererArgs, value: T): void;
+  render(args: RendererArgs<T>): void;
 }
 
 export abstract class JsonValueElementBase<T extends JsonValue>
@@ -19,13 +19,19 @@ export abstract class JsonValueElementBase<T extends JsonValue>
 
   private _schemaInfos?: SchemaInfos;
   private _errorNode?: JsonErrorList;
-  private _args?: RendererArgs;
+  private _args?: RendererArgs<T>;
+  private _rendererKey?: string;
 
   abstract getValue(): T;
-  protected abstract doRender(args: RendererArgs, value: T): void;
+  protected abstract doRender(args: RendererArgs<T>): void;
 
   onSchemaInfoChanged(schemaInfos: SchemaInfos) {
     if (this._args) {
+      // const rendererKey = schemaInfos.getRenderer(this._args?.path);
+      // if (this._rendererKey !== rendererKey) {
+      //   this._rendererKey = rendererKey?.key;
+      //   debugger;
+      // }
       const errors = schemaInfos.getErrors(this._args.path);
       if (this._errorNode) {
         this.removeChild(this._errorNode);
@@ -42,13 +48,13 @@ export abstract class JsonValueElementBase<T extends JsonValue>
     }
   }
 
-  render(args: RendererArgs, value: T): void {
+  render(args: RendererArgs<T>): void {
     empty(this);
     this._args = args;
     this.setAttribute('jf-path', args.path.format());
     args.schemaInfos.addListener(this);
     this._schemaInfos = args.schemaInfos;
-    this.doRender(args, value);
+    this.doRender(args);
   }
 
   disconnectedCallback() {
@@ -71,7 +77,7 @@ export abstract class JsonValueElementBase<T extends JsonValue>
     }
   }
 
-  get args(): RendererArgs | undefined {
+  get args(): RendererArgs<T> | undefined {
     return this._args;
   }
 }
