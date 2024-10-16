@@ -5,15 +5,15 @@ import {
   RendererInitArgs,
   RendererViewArgs,
   ViewErrors,
-} from "@diesel-parser/json-form";
-import { Cmd, just, Maybe, noCmd, nothing } from "tea-cup-core";
-import * as React from "react";
-import { JsValidationError } from "@diesel-parser/json-schema-facade-ts";
+} from '@diesel-parser/json-form';
+import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
+import * as React from 'react';
+import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 
 export type Msg =
-  | { tag: "mouse-enter"; index: number }
-  | { tag: "mouse-leave" }
-  | { tag: "rating-clicked"; index: number };
+  | { tag: 'mouse-enter'; index: number }
+  | { tag: 'mouse-leave' }
+  | { tag: 'rating-clicked'; index: number };
 
 export interface Model {
   readonly errors: ReadonlyArray<JsValidationError>;
@@ -24,7 +24,7 @@ export interface Model {
 export const RatingRenderer: Renderer<Model, Msg> = {
   reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value, formModel, path } = args;
-    const v = value.tag === "jv-number" ? value.value : -1;
+    const v = value.tag === 'jv-number' ? parseInt(value.value) : -1;
     const errors = formModel.errors.get(path.format()) ?? [];
     const newModel: Model = {
       errors,
@@ -40,18 +40,18 @@ export const RatingRenderer: Renderer<Model, Msg> = {
       return (
         <div
           key={index}
-          className={"rating-item"}
-          onMouseEnter={() => dispatch({ tag: "mouse-enter", index })}
-          onMouseLeave={() => dispatch({ tag: "mouse-leave" })}
-          onClick={() => dispatch({ tag: "rating-clicked", index })}
+          className={'rating-item'}
+          onMouseEnter={() => dispatch({ tag: 'mouse-enter', index })}
+          onMouseLeave={() => dispatch({ tag: 'mouse-leave' })}
+          onClick={() => dispatch({ tag: 'rating-clicked', index })}
           style={{
-            backgroundColor: checked ? "green" : "lightgray",
+            backgroundColor: checked ? 'green' : 'lightgray',
             height: 50,
             width: 50,
             marginRight: 4,
             cursor: model.mouseOver.map((i) => i === index).withDefault(false)
-              ? "pointer"
-              : "default",
+              ? 'pointer'
+              : 'default',
           }}
         ></div>
       );
@@ -60,10 +60,10 @@ export const RatingRenderer: Renderer<Model, Msg> = {
     return (
       <>
         <div
-          className={"rating"}
+          className={'rating'}
           style={{
-            display: "flex",
-            flexDirection: "row",
+            display: 'flex',
+            flexDirection: 'row',
           }}
         >
           {box(1)}
@@ -78,27 +78,27 @@ export const RatingRenderer: Renderer<Model, Msg> = {
   },
   update: function (
     msg: Msg,
-    model: Model
+    model: Model,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
     switch (msg.tag) {
-      case "mouse-enter": {
+      case 'mouse-enter': {
         return noOutNoCmd({
           ...model,
           mouseOver: just(msg.index),
         });
       }
-      case "mouse-leave": {
+      case 'mouse-leave': {
         return noOutNoCmd({
           ...model,
           mouseOver: nothing,
         });
       }
-      case "rating-clicked": {
+      case 'rating-clicked': {
         const newModel: Model = {
           ...model,
           value: msg.index,
         };
-        return [newModel, Cmd.none(), just(jvNumber(msg.index))];
+        return [newModel, Cmd.none(), just(jvNumber(msg.index.toString()))];
       }
     }
     return noOutNoCmd(model);

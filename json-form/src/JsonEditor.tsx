@@ -27,7 +27,6 @@ import {
   nothing,
   Port,
   Sub,
-  Task,
   Tuple,
   updatePiped,
 } from 'tea-cup-core';
@@ -58,7 +57,6 @@ import {
 import {
   contextMenuMsg,
   Msg,
-  noOp,
   setDebounceMsMsg,
   setJsonStr,
   setStrictModeMsg,
@@ -224,21 +222,6 @@ function withOutValueChanged(
   ];
 }
 
-function selectTextCmd(path: JsPath): Cmd<Msg> {
-  const selectTask: Task<Error, string> = Task.fromLambda(() => {
-    const inputId = `input-${path.format('_')}`;
-    const input = document.getElementById(inputId);
-    if (!input) {
-      throw new Error(`input not found for path ${path.format()}`);
-    }
-    if (input instanceof HTMLInputElement) {
-      input.select();
-    }
-    return 'ok';
-  });
-  return Task.attempt(selectTask, () => noOp);
-}
-
 export function update(
   msg: Msg,
   model: Model,
@@ -249,15 +232,7 @@ export function update(
     case 'delete-property':
       return withOutValueChanged(model, actionDeleteValue(model, msg.path));
     case 'update-property': {
-      const mac = updatePiped(
-        model,
-        (model) => actionUpdateValue(model, msg.path, msg.value),
-        (model) => {
-          const cmd: Cmd<Msg> =
-            msg.selectText === true ? selectTextCmd(msg.path) : Cmd.none();
-          return [model, cmd];
-        },
-      );
+      const mac = actionUpdateValue(model, msg.path, msg.value);
       return withOutValueChanged(model, mac);
     }
     case 'add-property-clicked':

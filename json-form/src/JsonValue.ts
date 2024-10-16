@@ -41,7 +41,7 @@ export interface JvBoolean {
 
 export interface JvNumber {
   readonly tag: 'jv-number';
-  readonly value: number;
+  readonly value: string;
 }
 
 export interface JvArray {
@@ -63,7 +63,7 @@ export function jvString(value: string): JvString {
   };
 }
 
-export function jvNumber(value: number): JvNumber {
+export function jvNumber(value: string): JvNumber {
   return {
     tag: 'jv-number',
     value,
@@ -180,7 +180,7 @@ export function valueFromAny(value: any): Result<string, JsonValue> {
     case 'boolean':
       return ok({ tag: 'jv-boolean', value });
     case 'number':
-      return ok({ tag: 'jv-number', value });
+      return ok({ tag: 'jv-number', value: value.toString() });
     default:
       return err(valueType);
   }
@@ -202,7 +202,8 @@ export function valueToAny(value: JsonValue): any {
     case 'jv-null':
       return null;
     case 'jv-number':
-      return value.value;
+      const parsed = parseFloat(value.value);
+      return isNaN(parsed) ? value.value : parsed;
     case 'jv-string': {
       return value.value;
     }
