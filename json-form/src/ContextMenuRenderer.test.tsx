@@ -36,16 +36,16 @@ import { MenuOptions } from './RenderOptions';
 describe('Change type menu', () => {
   test('[SM: ON, P: 1, V: valid] ' + 'no types menu', () => {
     const typesMenu = buildTypesMenuStrictMode(
-      [jvNumber(123), jvNumber(456)],
-      jvNumber(456),
+      [jvNumber('123'), jvNumber('456')],
+      jvNumber('456'),
     );
     expect(typesMenu).toStrictEqual([]);
   });
 
   test('[SM: ON, P: 2 same type, V: valid] ' + 'no types menu', () => {
     const typesMenu = buildTypesMenuStrictMode(
-      [jvNumber(123), jvNumber(456)],
-      jvNumber(456),
+      [jvNumber('123'), jvNumber('456')],
+      jvNumber('456'),
     );
     expect(typesMenu).toStrictEqual([]);
   });
@@ -55,10 +55,10 @@ describe('Change type menu', () => {
       'menu type exists and subMenu should contains 2 entries corresponding to the 2 proposals',
     () => {
       const typesMenu = buildTypesMenuStrictMode(
-        [jvNumber(123), jvNull],
+        [jvNumber('123'), jvNull],
         jvString('Foo'),
       );
-      const expectedTypesMenu = buildExpectedTypesMenu([jvNumber(0), jvNull]);
+      const expectedTypesMenu = buildExpectedTypesMenu([jvNumber('0'), jvNull]);
       expect(typesMenu).toStrictEqual(expectedTypesMenu);
     },
   );
@@ -68,8 +68,8 @@ describe('Change type menu', () => {
       'menu type exists and subMenu should contains 1 entry corresponding to the proposal that does not match the value',
     () => {
       const typesMenu = buildTypesMenuStrictMode(
-        [jvNumber(123), jvNull],
-        jvNumber(456),
+        [jvNumber('123'), jvNull],
+        jvNumber('456'),
       );
       const expectedTypesMenu = buildExpectedTypesMenu([jvNull]);
       expect(typesMenu).toStrictEqual(expectedTypesMenu);
@@ -80,8 +80,8 @@ describe('Change type menu', () => {
     '[SM: ON, P: 1, V: wrong type]' +
       'menu type exists and subMenu should contains 1 entry corresponding to the proposal',
     () => {
-      const typesMenu = buildTypesMenuStrictMode([jvNumber(123)], jvNull);
-      const expectedTypesMenu = buildExpectedTypesMenu([jvNumber(0)]);
+      const typesMenu = buildTypesMenuStrictMode([jvNumber('123')], jvNull);
+      const expectedTypesMenu = buildExpectedTypesMenu([jvNumber('0')]);
       expect(typesMenu).toStrictEqual(expectedTypesMenu);
     },
   );
@@ -93,7 +93,7 @@ describe('Change type menu', () => {
       const typesMenu = buildTypesMenu(jvNull);
       const expectedTypesMenu = buildExpectedTypesMenu([
         jvString(''),
-        jvNumber(0),
+        jvNumber('0'),
         jvBool(true),
         jvObject(),
         jvArray(),

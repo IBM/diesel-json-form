@@ -40,21 +40,21 @@ import { JsPath } from './JsPath';
 describe('JsonValue', () => {
   test('should parse from str', () => {
     expect(parseJsonValue('null')).toEqual(ok(jvNull));
-    expect(parseJsonValue('123')).toEqual(ok(jvNumber(123)));
+    expect(parseJsonValue('123')).toEqual(ok(jvNumber('123')));
     expect(parseJsonValue('true')).toEqual(ok(jvBool(true)));
     expect(parseJsonValue('"yalla"')).toEqual(ok(jvString('yalla')));
     expect(parseJsonValue(JSON.stringify({ foo: 'bar' }))).toEqual(
       ok(jvObject([{ name: 'foo', value: jvString('bar') }])),
     );
     expect(parseJsonValue(JSON.stringify([1, 2, 3]))).toEqual(
-      ok(jvArray([jvNumber(1), jvNumber(2), jvNumber(3)])),
+      ok(jvArray([jvNumber('1'), jvNumber('2'), jvNumber('3')])),
     );
   });
 
   describe('should convert', () => {
     test('from any', () => {
       expect(valueFromAny(null)).toEqual(ok(jvNull));
-      expect(valueFromAny(123)).toEqual(ok(jvNumber(123)));
+      expect(valueFromAny(123)).toEqual(ok(jvNumber('123')));
       expect(valueFromAny(true)).toEqual(ok(jvBool(true)));
       expect(valueFromAny('yalla')).toEqual(ok(jvString('yalla')));
       expect(valueFromAny({ foo: 'bar' })).toEqual(
@@ -63,25 +63,44 @@ describe('JsonValue', () => {
       expect(valueFromAny([1, { foo: 'bar' }, [2, 3]])).toEqual(
         ok(
           jvArray([
-            jvNumber(1),
+            jvNumber('1'),
             jvObject([
               {
                 name: 'foo',
                 value: jvString('bar'),
               },
             ]),
-            jvArray([jvNumber(2), jvNumber(3)]),
+            jvArray([jvNumber('2'), jvNumber('3')]),
           ]),
         ),
       );
     });
 
+    test('invalid number converts to string', () => {
+      expect(valueToAny(jvNumber('yalla'))).toEqual('yalla');
+    });
+
+    test('number roundtrip', () => {
+      valueFromAny(123).match(
+        (v) => {
+          expect(v).toEqual(jvNumber('123'));
+          const a = valueToAny(v);
+          expect(a).toEqual(123);
+        },
+        (err) => {
+          fail(err);
+        },
+      );
+    });
+
     test('to any', () => {
       expect(valueToAny(jvNull)).toEqual(null);
-      expect(valueToAny(jvNumber(123))).toEqual(123);
+      expect(valueToAny(jvNumber('123'))).toEqual(123);
       expect(valueToAny(jvString('yalla'))).toEqual('yalla');
       expect(valueToAny(jvBool(true))).toEqual(true);
-      expect(valueToAny(jvArray([jvNumber(1), jvNumber(2)]))).toEqual([1, 2]);
+      expect(valueToAny(jvArray([jvNumber('1'), jvNumber('2')]))).toEqual([
+        1, 2,
+      ]);
       expect(
         valueToAny(
           jvObject([
@@ -91,7 +110,7 @@ describe('JsonValue', () => {
               value: jvObject([
                 {
                   name: 'baz',
-                  value: jvArray([jvBool(true), jvNumber(999)]),
+                  value: jvArray([jvBool(true), jvNumber('999')]),
                 },
               ]),
             },
@@ -184,8 +203,8 @@ describe('JsonValue', () => {
 
   describe('can be updated', () => {
     test('at root', () => {
-      expect(setValueAt(jvNull, JsPath.empty, jvNumber(123))).toEqual(
-        jvNumber(123),
+      expect(setValueAt(jvNull, JsPath.empty, jvNumber('123'))).toEqual(
+        jvNumber('123'),
       );
     });
 
@@ -193,8 +212,8 @@ describe('JsonValue', () => {
       expect(
         setValueAt(
           jvObject([
-            { name: 'foo', value: jvNumber(12) },
-            { name: 'bar', value: jvNumber(13) },
+            { name: 'foo', value: jvNumber('12') },
+            { name: 'bar', value: jvNumber('13') },
           ]),
           JsPath.empty.append('foo'),
           jvBool(true),
@@ -202,7 +221,7 @@ describe('JsonValue', () => {
       ).toEqual(
         jvObject([
           { name: 'foo', value: jvBool(true) },
-          { name: 'bar', value: jvNumber(13) },
+          { name: 'bar', value: jvNumber('13') },
         ]),
       );
     });
@@ -210,11 +229,11 @@ describe('JsonValue', () => {
     test('1st level array', () => {
       expect(
         setValueAt(
-          jvArray([jvNumber(12), jvNumber(13), jvNumber(14)]),
+          jvArray([jvNumber('12'), jvNumber('13'), jvNumber('14')]),
           JsPath.empty.append(1),
           jvString('yalla'),
         ),
-      ).toEqual(jvArray([jvNumber(12), jvString('yalla'), jvNumber(14)]));
+      ).toEqual(jvArray([jvNumber('12'), jvString('yalla'), jvNumber('14')]));
     });
 
     test('deeply nested', () => {
@@ -255,7 +274,7 @@ describe('JsonValue', () => {
       });
 
       expect(
-        setValueAt(myObj, JsPath.parse('a/b/c/d/1/foo'), jvNumber(999)),
+        setValueAt(myObj, JsPath.parse('a/b/c/d/1/foo'), jvNumber('999')),
       ).toEqual(expected);
     });
   });
@@ -263,8 +282,8 @@ describe('JsonValue', () => {
   describe('can be mapped', () => {
     test('root', () => {
       expect(
-        mapValueAt(jvNull, JsPath.empty, () => just(jvNumber(123))),
-      ).toEqual(just(jvNumber(123)));
+        mapValueAt(jvNull, JsPath.empty, () => just(jvNumber('123'))),
+      ).toEqual(just(jvNumber('123')));
     });
 
     test('root delete', () => {
@@ -278,11 +297,11 @@ describe('JsonValue', () => {
 
     test('1st level prop', () => {
       expect(
-        mapValueAt(root1, JsPath.parse('foo'), () => just(jvNumber(123))),
+        mapValueAt(root1, JsPath.parse('foo'), () => just(jvNumber('123'))),
       ).toEqual(
         just(
           jvObject([
-            { name: 'foo', value: jvNumber(123) },
+            { name: 'foo', value: jvNumber('123') },
             { name: 'blah', value: jvString('yalla') },
           ]),
         ),
@@ -295,17 +314,17 @@ describe('JsonValue', () => {
       );
     });
 
-    const root2 = jvArray([jvNumber(123), jvString('foo'), jvNull]);
+    const root2 = jvArray([jvNumber('123'), jvString('foo'), jvNull]);
 
     test('1st level array', () => {
       expect(
         mapValueAt(root2, JsPath.parse('1'), () => just(jvBool(true))),
-      ).toEqual(just(jvArray([jvNumber(123), jvBool(true), jvNull])));
+      ).toEqual(just(jvArray([jvNumber('123'), jvBool(true), jvNull])));
     });
 
     test('1st level array delete', () => {
       expect(deleteValueAt(root2, JsPath.parse('1'))).toEqual(
-        just(jvArray([jvNumber(123), jvNull])),
+        just(jvArray([jvNumber('123'), jvNull])),
       );
     });
 
