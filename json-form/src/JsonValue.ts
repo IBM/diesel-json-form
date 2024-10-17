@@ -449,3 +449,28 @@ export function clearPropertiesIfObject(v: JsonValue): JsonValue {
   }
   return v;
 }
+
+export function stringify(value: JsonValue): string {
+  switch (value.tag) {
+    case 'jv-null':
+      return 'null';
+    case 'jv-string':
+      return `"${escapeDoubleQuotes(value.value)}"`;
+    case 'jv-boolean':
+      return value.value ? 'true' : 'false';
+    case 'jv-number':
+      return value.value;
+    case 'jv-array':
+      return `[${value.elems.map(stringify).join(',')}]`;
+    case 'jv-object':
+      return `{${value.properties.map(stringifyProp).join(',')}}`;
+  }
+}
+
+function stringifyProp(p: JsonProperty): string {
+  return `"${escapeDoubleQuotes(p.name)}":${stringify(p.value)}`;
+}
+
+function escapeDoubleQuotes(s: string): string {
+  return s.replace(/\\([\s\S])|(")/g, '\\$1$2');
+}

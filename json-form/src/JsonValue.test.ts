@@ -31,11 +31,24 @@ import {
   moveProperty,
   parseJsonValue,
   setValueAt,
+  stringify,
   valueFromAny,
   valueToAny,
 } from './JsonValue';
 import { just, nothing, ok } from 'tea-cup-core';
 import { JsPath } from './JsPath';
+
+function valueFromAnyThrow(value: any): JsonValue {
+  const v = valueFromAny(value);
+  switch (v.tag) {
+    case 'Err': {
+      throw new Error(v.err);
+    }
+    case 'Ok': {
+      return v.value;
+    }
+  }
+}
 
 describe('JsonValue', () => {
   test('should parse from str', () => {
@@ -124,18 +137,6 @@ describe('JsonValue', () => {
       });
     });
   });
-
-  function valueFromAnyThrow(value: any): JsonValue {
-    const v = valueFromAny(value);
-    switch (v.tag) {
-      case 'Err': {
-        throw new Error(v.err);
-      }
-      case 'Ok': {
-        return v.value;
-      }
-    }
-  }
 
   describe('can be queried', () => {
     test('at root', () => {
@@ -478,5 +479,44 @@ describe('JsonValue', () => {
         b: 2,
       }),
     );
+  });
+});
+
+describe('stringify', () => {
+  test('string', () => {
+    expect(stringify(jvString('yalla'))).toEqual('"yalla"');
+  });
+  test('string escaped', () => {
+    expect(stringify(jvString('ya"lla'))).toEqual('"ya\\"lla"');
+    expect(stringify(jvString('ya\\"lla'))).toEqual('"ya\\"lla"');
+  });
+  test('number', () => {
+    expect(stringify(jvNumber('123'))).toEqual('123');
+  });
+  test('null', () => {
+    expect(stringify(jvNull)).toEqual('null');
+  });
+  test('boolean', () => {
+    expect(stringify(jvBool(true))).toEqual('true');
+  });
+  test('object', () => {
+    expect(stringify(jvObject([{ name: 'foo', value: jvNull }]))).toEqual(
+      '{"foo":null}',
+    );
+  });
+  test('array', () => {
+    expect(stringify(jvArray([jvBool(false), jvNumber('123')]))).toEqual(
+      '[false,123]',
+    );
+  });
+  test('complex', () => {
+    const raw = {
+      foo: 1,
+      bar: 'yalla',
+      baz: [1, true],
+    };
+    const o1 = valueFromAnyThrow(raw);
+    const s1 = stringify(o1);
+    expect(s1).toEqual(JSON.stringify(raw));
   });
 });
