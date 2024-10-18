@@ -85,7 +85,15 @@ export class Lexer {
   constructor(
     private readonly json: string,
     private index: number = 0,
-  ) {}
+  ) {
+    this.eatWhitespaces();
+  }
+
+  private eatWhitespaces() {
+    while (/\s/.test(this.json.charAt(this.index))) {
+      this.index++;
+    }
+  }
 
   static getTokens(str: string): Token[] {
     const l = new Lexer(str);
@@ -97,21 +105,23 @@ export class Lexer {
   }
 
   hasNext(): boolean {
+    this.eatWhitespaces();
     return this.index < this.json.length;
   }
 
   next(): Token {
+    this.eatWhitespaces();
     if (this.hasNext()) {
       const sub = this.json.substring(this.index);
-      console.log('next', sub, this.index);
+      //console.log('next', sub, this.index);
       const matches: Token[] = [];
       for (const rule of RULES) {
         const t = rule.test(sub, this.index);
         if (t) {
-          console.log('>>', this.index, 'matched', rule, t);
+          //console.log('>>', this.index, 'matched', rule, t);
           matches.push(t);
         } else {
-          console.log('>>', this.index, 'not matched', rule);
+          //console.log('>>', this.index, 'not matched', rule);
         }
       }
       if (matches.length === 0) {
@@ -120,7 +130,7 @@ export class Lexer {
       matches.sort((t1, t2) => t2.length - t1.length); // descending sort
       const t = matches[0];
       this.index += t.length;
-      console.log('new index', this.index);
+      //console.log('new index', this.index);
       return t;
     } else {
       throw new Error('reached eos, no more tokens');

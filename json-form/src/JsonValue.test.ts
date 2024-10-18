@@ -29,7 +29,6 @@ import {
   mergeProperties,
   moveElement,
   moveProperty,
-  parseJsonValue,
   setValueAt,
   stringify,
   valueFromAny,
@@ -37,6 +36,7 @@ import {
 } from './JsonValue';
 import { just, nothing, ok } from 'tea-cup-core';
 import { JsPath } from './JsPath';
+import { parseJsonValue } from './parser/JsonValueParser';
 
 function valueFromAnyThrow(value: any): JsonValue {
   const v = valueFromAny(value);

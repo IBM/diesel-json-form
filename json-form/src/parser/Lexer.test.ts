@@ -55,4 +55,20 @@ describe('Lexer', () => {
       new Token('numeric', '4', 5),
     ]);
   });
+  test('whitespaces 1', () => {
+    assertTokens(' 1', [new Token('numeric', '1', 1)]);
+  });
+  test('whitespaces 2', () => {
+    assertTokens(' 1 2 , ', [
+      new Token('numeric', '1', 1),
+      new Token('numeric', '2', 3),
+      new Token('comma', ',', 5),
+    ]);
+  });
+  test('whitespaces 3', () => {
+    assertTokens('\t1\n2', [
+      new Token('numeric', '1', 1),
+      new Token('numeric', '2', 3),
+    ]);
+  });
 });
