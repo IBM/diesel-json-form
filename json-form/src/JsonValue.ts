@@ -227,17 +227,17 @@ function isObjLiteral(_obj: any) {
       })();
 }
 
-export function parseJsonValue(json: string): Result<string, JsonValue> {
-  try {
-    const x = JSON.parse(json);
-    return valueFromAny(x);
-  } catch (e) {
-    if (e instanceof Error) {
-      return err(e.message);
-    }
-    return err('unhandled error ' + e);
-  }
-}
+// export function parseJsonValue(json: string): Result<string, JsonValue> {
+//   try {
+//     const x = JSON.parse(json);
+//     return valueFromAny(x);
+//   } catch (e) {
+//     if (e instanceof Error) {
+//       return err(e.message);
+//     }
+//     return err('unhandled error ' + e);
+//   }
+// }
 
 export function setValueAt(
   root: JsonValue,

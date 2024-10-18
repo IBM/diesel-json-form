@@ -6,9 +6,9 @@ import {
   jvObject,
   jvArray,
   jvNull,
-  parseJsonValue,
   JsonValue,
 } from '../JsonValue';
+import { parseJsonValue } from './JsonValueParser';
 
 function expectOk(json: string, expected: JsonValue) {
   expect(parseJsonValue(json)).toEqual(ok(expected));
@@ -40,6 +40,9 @@ describe('JsonValueParser', () => {
     expectOk('[]', jvArray([]));
   });
   test('array2', () => {
+    expectOk('[1]', jvArray([jvNumber('1')]));
+  });
+  test('array3', () => {
     expectOk('[1,null,true]', jvArray([jvNumber('1'), jvNull, jvBool(true)]));
   });
 });

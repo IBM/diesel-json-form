@@ -102,7 +102,6 @@ export class Lexer {
 
   next(): Token {
     if (this.hasNext()) {
-      debugger;
       const sub = this.json.substring(this.index);
       console.log('next', sub, this.index);
       const matches: Token[] = [];
@@ -122,7 +121,6 @@ export class Lexer {
       const t = matches[0];
       this.index += t.length;
       console.log('new index', this.index);
-      debugger;
       return t;
     } else {
       throw new Error('reached eos, no more tokens');
