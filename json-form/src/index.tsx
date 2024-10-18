@@ -21,3 +21,4 @@ export * from './JsonEditor';
 export * from './OutMsg';
 export * from './Msg';
 export * from './renderer/Renderer';
+export * from './parser/JsonValueParser';
