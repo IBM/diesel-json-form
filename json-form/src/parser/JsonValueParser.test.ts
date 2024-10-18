@@ -7,6 +7,7 @@ import {
   jvArray,
   jvNull,
   JsonValue,
+  stringify,
 } from '../JsonValue';
 import { parseJsonValue } from './JsonValueParser';
 
@@ -35,6 +36,33 @@ describe('JsonValueParser', () => {
   });
   test('object2', () => {
     expectOk('{"foo":1}', jvObject([{ name: 'foo', value: jvNumber('1') }]));
+  });
+  test('object3', () => {
+    expectOk(
+      '{"a":{}}',
+      jvObject([
+        {
+          name: 'a',
+          value: jvObject([]),
+        },
+      ]),
+    );
+  });
+  test('object4', () => {
+    expectOk(
+      '{"a":{"b":1}}',
+      jvObject([
+        {
+          name: 'a',
+          value: jvObject([
+            {
+              name: 'b',
+              value: jvNumber('1'),
+            },
+          ]),
+        },
+      ]),
+    );
   });
   test('array', () => {
     expectOk('[]', jvArray([]));

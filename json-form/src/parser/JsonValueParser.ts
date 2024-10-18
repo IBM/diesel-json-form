@@ -13,6 +13,11 @@ import {
 import { Lexer, Token } from './Lexer';
 
 export function parseJsonValue(str: string): Result<string, JsonValue> {
+  // try {
+  //   return valueFromAny(JSON.parse(str));
+  // } catch (e) {
+  //   return err('unable to parse json');
+  // }
   const l = new Lexer(str);
   return parseValue(l.next(), l);
 }
@@ -69,6 +74,7 @@ function parseProps(lexer: Lexer): Result<string, JsonProperty[]> {
       const comma = lexer.next();
       switch (comma.type) {
         case 'object-close': {
+          t = lexer.next();
           break;
         }
         case 'comma': {
