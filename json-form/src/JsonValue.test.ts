@@ -36,7 +36,7 @@ import {
 } from './JsonValue';
 import { just, nothing, ok } from 'tea-cup-core';
 import { JsPath } from './JsPath';
-import { parseJsonValue } from './parser/JsonValueParser';
+import { parseJsonValue } from './parser/JsonParser';
 
 function valueFromAnyThrow(value: any): JsonValue {
   const v = valueFromAny(value);
