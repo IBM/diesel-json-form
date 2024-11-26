@@ -13,15 +13,10 @@
     "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
   },
   "dependencies": {
-    "@carbon/icon-helpers": "^10.28.0",
-    "@carbon/icons": "^10.28.0",
-    "@carbon/icons-react": "~10.22.0",
-    "@carbon/themes": "~10.21.0",
+    "@carbon/react": "^1.71.0",
+    "@carbon/icons-react": "^11.53.0",
     "@diesel-parser/json-form": "^3.6.0",
     "@diesel-parser/monaco": "~0.1.0",
-    "carbon-components": "~10.25.0",
-    "carbon-components-react": "~7.25.0",
-    "carbon-icons": "~7.0.0",
     "monaco-editor-workers": "0.34.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -31,6 +26,8 @@
     "tea-pop-menu": "^5.0.0"
   },
   "devDependencies": {
+    "@types/react": "^17.0.83",
+    "@types/react-dom": "^17.0.25",
     "@diesel-parser/ts-facade": "~0.18.0",
     "@types/vscode": "~1.69.1",
     "copy-webpack-plugin": "^11.0.0",

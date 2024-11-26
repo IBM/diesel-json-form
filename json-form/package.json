@@ -10,12 +10,10 @@
     "tea-pop-menu": "^5.0.0"
   },
   "peerDependencies": {
-    "@carbon/icons-react": "^10.22.0",
-    "@carbon/themes": "^10.21.0",
-    "carbon-components": "^10.25.0",
-    "carbon-components-react": "^7.25.0",
-    "carbon-icons": "^7.0.0",
-    "react": "^16.14.0 || ^17.0.2",
+    "@carbon/react": "^1.71.0",
+    "@carbon/icons-react": "^11.53.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-tea-cup": "^2.2.3",
     "tea-cup-core": "^2.2.3"
   },
@@ -23,14 +21,10 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/react": "12",
-    "@types/carbon-components-react": "^7.25.2",
-    "@types/carbon__icons-react": "^10.23.0",
     "@types/jest": "^26.0.20",
-    "@types/react": "^16.9.56",
-    "@types/react-dom": "^16.9.8",
+    "@types/react": "^17.0.83",
+    "@types/react-dom": "^17.0.25",
     "jest": "24.9.0",
-    "node-sass": "^7.0.1",
-    "node-sass-package-importer": "^5.3.2",
     "npm-scripts-watcher": "^1.0.2",
     "ts-jest": "24.0.2"
   },
