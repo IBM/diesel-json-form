@@ -34,7 +34,7 @@
 }
 
 #sandbox .banner div {
-   margin: 0px 1rem  0px 1rem;
+  margin: 0px 1rem 0px 1rem;
 }
 
 .sub {
@@ -110,7 +110,7 @@ footer.sandbox .powered-by {
 }
 
 footer.sandbox .spacer {
-  flex-grow: 1
+  flex-grow: 1;
 }
 
 footer.sandbox .gas-station {
@@ -122,6 +122,7 @@ footer.sandbox .gas-station {
   flex-grow: 1;
 }
 
-#editor1, #editor2 {
+#editor1,
+#editor2 {
   height: 100%;
 }

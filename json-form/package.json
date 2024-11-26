@@ -25,14 +25,16 @@
     "@types/react": "^17.0.83",
     "@types/react-dom": "^17.0.25",
     "jest": "24.9.0",
+    "sass": "^1.81.0",
     "npm-scripts-watcher": "^1.0.2",
     "ts-jest": "24.0.2"
   },
   "scripts": {
-    "build": "yarn clean && yarn lint && yarn build:ts && yarn test && yarn build:scss",
+    "build": "yarn clean && yarn lint && yarn build:ts && yarn test && yarn build:sass",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
-    "build:scss": "node-sass --importer ../node_modules/node-sass-package-importer/dist/cli.js src/JsonEditor.scss dist/JsonEditor.css",
+    "build:sass-dev": "sass --source-map --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
+    "build:sass": "sass --style=compressed --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
     "clean": "rimraf dist",
     "test": "jest",
     "test:watch": "jest --watch",

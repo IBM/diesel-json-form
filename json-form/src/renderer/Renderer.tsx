@@ -27,7 +27,13 @@ import {
   TextInput,
   TimePicker,
   TimePickerSelect,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import {
+  Add,
+  ChevronDown,
+  ChevronUp,
+  OverflowMenuVertical,
+} from '@carbon/icons-react';
 import * as React from 'react';
 import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-core';
 import { box, Dim, pos } from 'tea-pop-core';
@@ -44,11 +50,6 @@ import {
 import { JsPath } from '../JsPath';
 import { CustomRendererModel, Model as FormModel } from '../Model';
 import { Msg } from '../Msg';
-
-import Add16 from '@carbon/icons-react/lib/add/16';
-import ChevronDown16 from '@carbon/icons-react/lib/chevron--down/16';
-import ChevronUp16 from '@carbon/icons-react/lib/chevron--up/16';
-import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--vertical/16';
 import { TFunction } from 'i18next';
 import { ViewValueProps } from './ViewValueProps';
 import { RenderOptions } from '../RenderOptions';
@@ -286,7 +287,7 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
                 .map((propName) => (
                   <div className="add-prop-row" key={propName}>
                     <Button
-                      renderIcon={Add16}
+                      renderIcon={Add}
                       kind={'ghost'}
                       onClick={() =>
                         dispatch({
@@ -334,7 +335,7 @@ function ExpandCollapseButton(props: ExpandCollapseButtonProps) {
   return (
     <Button
       kind={'ghost'}
-      renderIcon={props.collapsed ? ChevronUp16 : ChevronDown16}
+      renderIcon={props.collapsed ? ChevronUp : ChevronDown}
       iconDescription={props.t(
         props.collapsed ? 'icon.expand' : 'icon.collapse',
       )}
@@ -508,13 +509,13 @@ function ViewStringWithCombo(p: ViewStringWithComboProps): React.ReactElement {
   return (
     <ComboBox
       id={'input-' + p.path.format('_')}
-      ariaLabel={t('stringValueComboLabel', {
+      aria-label={t('stringValueComboLabel', {
         path: p.path.format('.'),
       }).toString()}
       disabled={p.model.adding.isJust()}
       invalidText={errorsToInvalidText(p)}
       invalid={isInvalid(p)}
-      items={p.proposals}
+      items={[...p.proposals]}
       value={p.value.value}
       selectedItem={p.value.value}
       placeholder={''}
@@ -567,7 +568,6 @@ function MyTimePicker(props: MyTimePickerProps) {
           aria-label={t('timeValueLabel', {
             path: props.path.format('.'),
           }).toString()}
-          labelText={''}
           onChange={(event) => {
             const offset = event.target.value;
             const t = new MyTime(value);
@@ -607,6 +607,7 @@ function MyDatePicker(props: MyDatePickerProps) {
   const { t } = props;
   return (
     <DatePicker
+      // @ts-ignore
       id={'date-picker-' + fmtPath}
       datePickerType="single"
       dateFormat={'Y-m-d'}
@@ -623,8 +624,6 @@ function MyDatePicker(props: MyDatePickerProps) {
         }).toString()}
         labelText={''}
         hideLabel={true}
-        autoComplete={'off'}
-        value={props.value}
         onChange={(e) => {
           props.onChange(e.target.value);
         }}
@@ -831,7 +830,7 @@ export function MenuTrigger(props: MenuTriggerProps) {
       disabled={disabled}
       size={'sm'}
       kind={'ghost'}
-      renderIcon={OverflowMenuVertical16}
+      renderIcon={OverflowMenuVertical}
       tooltipPosition={'left'}
       hasIconOnly={true}
       onClick={onMenuTriggerClick(dispatch, path)}
