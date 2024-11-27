@@ -4,7 +4,8 @@
   "private": true,
   "description": "",
   "scripts": {
-    "start": "yarn copy:monacoworkers && webpack serve",
+    "start": "yarn copy:monacoworkers && yarn build:sass && webpack serve",
+    "build:sass": "sass --style=compressed --load-path=../node_modules/ src/style.scss src/style.css",
     "prettify": "prettier --write .",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "eslint '**/*.{js,ts}' --fix",
@@ -13,8 +14,8 @@
     "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
   },
   "dependencies": {
-    "@carbon/react": "^1.71.0",
     "@carbon/icons-react": "^11.53.0",
+    "@carbon/react": "^1.71.0",
     "@diesel-parser/json-form": "^3.6.0",
     "@diesel-parser/monaco": "~0.1.0",
     "monaco-editor-workers": "0.34.2",
@@ -26,15 +27,16 @@
     "tea-pop-menu": "^5.0.0"
   },
   "devDependencies": {
+    "@diesel-parser/ts-facade": "~0.18.0",
     "@types/react": "^17.0.83",
     "@types/react-dom": "^17.0.25",
-    "@diesel-parser/ts-facade": "~0.18.0",
     "@types/vscode": "~1.69.1",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^5.2.6",
     "file-loader": "^6.2.0",
     "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
+    "sass": "^1.81.0",
     "shx": "~0.3.4",
     "style-loader": "^2.0.0",
     "ts-loader": "^9.2.2",
