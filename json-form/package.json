@@ -10,8 +10,8 @@
     "tea-pop-menu": "^5.0.0"
   },
   "peerDependencies": {
-    "@carbon/react": "^1.71.0",
     "@carbon/icons-react": "^11.53.0",
+    "@carbon/react": "^1.71.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-tea-cup": "^2.2.3",
@@ -25,12 +25,13 @@
     "@types/react": "^17.0.83",
     "@types/react-dom": "^17.0.25",
     "jest": "24.9.0",
-    "sass": "^1.81.0",
     "npm-scripts-watcher": "^1.0.2",
+    "rimraf": "^6.0.1",
+    "sass": "^1.81.0",
     "ts-jest": "24.0.2"
   },
   "scripts": {
-    "build": "yarn clean && yarn lint && yarn build:ts && yarn test && yarn build:sass",
+    "build": "npm run clean && npm run lint && npm run build:ts && npm run test && npm run build:sass",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "build:sass-dev": "sass --source-map --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
