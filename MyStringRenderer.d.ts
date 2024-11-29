@@ -1,11 +1,11 @@
-import { Renderer } from "@diesel-parser/json-form";
-import { Maybe } from "tea-cup-core";
+import { Renderer } from '@diesel-parser/json-form';
+import { Maybe } from 'tea-cup-core';
 export declare type Msg = {
-    tag: "mouse-enter";
+    tag: 'mouse-enter';
 } | {
-    tag: "mouse-leave";
+    tag: 'mouse-leave';
 } | {
-    tag: "button-clicked";
+    tag: 'button-clicked';
 };
 export interface Model {
     readonly value: string;
