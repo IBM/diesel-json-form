@@ -1,4 +1,4 @@
-import { Lexer } from './Lexer';
+import { Lexer, Token } from './Lexer';
 
 export type Event =
   | 'end-array'
@@ -12,13 +12,44 @@ export type Event =
   | 'value-number'
   | 'value-string';
 
+abstract class State {
+  constructor(readonly lexer: Lexer) {}
+
+  abstract next(): State | undefined;
+}
+
+class InitialState extends State {
+  private done: boolean = false;
+
+  constructor(lexer: Lexer) {
+    super(lexer);
+  }
+
+  next(): State | undefined {
+    if (this.done) {
+      throw 'unexpected token at ' + t.index;
+    }
+    const t = this.lexer.next();
+    switch (t.type) {
+      case 'string': {
+        if (!this.done) {
+          return;
+        }
+      }
+      case 'object-open':
+      default:
+        throw 'unexpected token at ' + t.index;
+    }
+  }
+}
+
 export class JsonParser {
   private lexer: Lexer;
-  private states: Event[] = [];
-  private done: boolean = false;
+  private states: State[];
 
   constructor(json: string) {
     this.lexer = new Lexer(json);
+    this.states = [new InitialState(this.lexer)];
   }
 
   getString(): string | undefined {
@@ -29,25 +60,19 @@ export class JsonParser {
     return this.lexer.hasNext();
   }
 
-  private lastState(): Event | undefined {
-    if (this.states.length === 0) {
-      return undefined;
-    }
+  private lastState(): State {
     return this.states[this.states.length - 1];
   }
 
   next(): Event {
-    if (this.done) {
-      throw 'done already';
-    }
     const t = this.lexer.next();
     switch (t.type) {
       case 'string': {
         const lastState = this.lastState();
-        if (!lastState) {
-          this.done = true;
-          return 'value-string';
-        } else if (lastState === 'start-object') {
+        if (lastState.tag === 'start-object') {
+          if (lastState.elementDone) {
+          }
+
           this.states.push('key-name');
           return 'key-name';
         } else if (lastState === 'key-name') {
@@ -95,8 +120,12 @@ export class JsonParser {
         }
       }
       case 'comma': {
+        if (this.commaProcessed) {
+          throw 'found unexpected comma at ' + t.index;
+        }
         const lastState = this.lastState();
         if (lastState === 'start-object') {
+          this.commaProcessed = true;
           return this.next();
         } else {
           throw 'found unexpected comma at ' + t.index;

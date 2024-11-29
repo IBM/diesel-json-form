@@ -14,21 +14,24 @@ function expectEvents(json: string, expected: Event[]) {
   expect(actual).toEqual(expected);
 }
 
+function expectError(json: string, reason: string) {
+  const p = new JsonParser(json);
+  try {
+    while (p.hasNext()) {
+      p.next();
+    }
+    fail('should have thrown');
+  } catch (err) {
+    expect(err).toBe(reason);
+  }
+}
+
 describe('JsonParser', () => {
   test('string', () => {
     expectEvents('"yalla"', ['value-string']);
   });
   test('two strings fail', () => {
-    const p = new JsonParser('"foo""bar"');
-    expect(p.hasNext()).toBe(true);
-    expect(p.next()).toEqual('value-string');
-    expect(p.hasNext()).toBe(true);
-    try {
-      p.next();
-      fail('should have thrown');
-    } catch (e) {
-      expect(e).toEqual('done already');
-    }
+    expectError('"foo""bar"', 'done already');
   });
   test('object empty', () => {
     expectEvents('{}', ['start-object', 'end-object']);
@@ -60,6 +63,51 @@ describe('JsonParser', () => {
       'key-name',
       'value-string',
       'end-object',
+    ]);
+  });
+  test('unexpected comma 1', () => {
+    expectError('{,}', 'found unexpected comma at 1');
+  });
+  test('unexpected comma 2', () => {
+    expectError('{"x","y"}', 'found unexpected comma at 4');
+  });
+  test('unexpected comma 3', () => {
+    expectError('{,"x":"y"}', 'found unexpected comma at 8');
+  });
+  test('unexpected comma 4', () => {
+    expectError('{"x",:"y"}', 'found unexpected comma at 4');
+  });
+  test('unexpected comma 5', () => {
+    expectError('{"x":,"y"}', 'found unexpected comma at 5');
+  });
+  test('unexpected comma 6', () => {
+    expectError('{"x":"y",}', 'found unexpected comma at 8');
+  });
+  test('array empty', () => {
+    expectEvents('[]', ['start-array', 'end-array']);
+  });
+  test('array single elem', () => {
+    expectEvents('["x"]', ['start-array', 'value-string', 'end-array']);
+  });
+  test('array two elems', () => {
+    expectEvents('["x","y"]', [
+      'start-array',
+      'value-string',
+      'value-string',
+      'end-array',
+    ]);
+  });
+  test('array nested', () => {
+    expectEvents('[["a"], ["b","c"]]', [
+      'start-array',
+      'start-array',
+      'value-string',
+      'end-array',
+      'start-array',
+      'value-string',
+      'value-string',
+      'end-array',
+      'end-array',
     ]);
   });
 
