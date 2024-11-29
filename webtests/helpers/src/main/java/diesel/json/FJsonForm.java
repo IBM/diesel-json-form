@@ -2,10 +2,8 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
-import org.openqa.selenium.By;
 
 import static com.pojosontheweb.selenium.Findrs.attrEquals;
-import static com.pojosontheweb.selenium.Findrs.textEquals;
 
 public class FJsonForm extends AbstractPageObject {
 
@@ -56,7 +54,7 @@ public class FJsonForm extends AbstractPageObject {
     }
 
     public FMenu clickRootMenu() {
-        $$(".doc-root button.bx--tooltip__trigger")
+        $$(".doc-root .cds--tooltip-trigger__wrapper button")
             .expectOne()
             .click();
         return new FMenu(fRoot);
