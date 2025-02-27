@@ -25,7 +25,7 @@ jobs:
       - image: cimg/openjdk:17.0-browsers
     environment:
       DISPLAY: :99
-      
+
     steps:
       - run: sudo Xvfb :99 -screen 0 1920x1200x24 > /dev/null 2>&1 &
       - attach_workspace:
@@ -98,4 +98,3 @@ workflows:
               only: /v\d+\.\d+\.\d+/
             branches:
               ignore: /.*/
-

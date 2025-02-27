@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-yarn install && \
-yarn --cwd json-form build && \
-yarn --cwd sandbox build
+npm install && \
+(cd json-form && npm run build) && \
+(cd sandbox && npm run build)

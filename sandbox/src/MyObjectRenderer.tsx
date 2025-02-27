@@ -5,9 +5,9 @@ import {
   JvObject,
   RendererInitArgs,
   RendererViewArgs,
-} from "@diesel-parser/json-form";
-import { Cmd, Maybe, noCmd, nothing } from "tea-cup-core";
-import * as React from "react";
+} from '@diesel-parser/json-form';
+import { Cmd, Maybe, noCmd, nothing } from 'tea-cup-core';
+import * as React from 'react';
 
 export type Msg = string;
 
@@ -21,7 +21,7 @@ export const MyObjectRenderer: Renderer<Model, Msg> = {
     let newModel = {
       value: jvObject(),
     };
-    if (value.tag === "jv-object") {
+    if (value.tag === 'jv-object') {
       newModel = {
         ...newModel,
         value,
@@ -49,7 +49,7 @@ export const MyObjectRenderer: Renderer<Model, Msg> = {
   },
   update: function (
     msg: Msg,
-    model: Model
+    model: Model,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
     return noOutNoCmd(model);
   },
