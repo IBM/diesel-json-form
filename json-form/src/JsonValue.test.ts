@@ -29,25 +29,17 @@ import {
   mergeProperties,
   moveElement,
   moveProperty,
+  parseJsonValue,
   setValueAt,
   stringify,
-  valueFromAny,
-  valueToAny,
 } from './JsonValue';
 import { just, nothing, ok } from 'tea-cup-core';
 import { JsPath } from './JsPath';
-import { parseJsonValue } from './parser/JsonParser';
+import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
-function valueFromAnyThrow(value: any): JsonValue {
-  const v = valueFromAny(value);
-  switch (v.tag) {
-    case 'Err': {
-      throw new Error(v.err);
-    }
-    case 'Ok': {
-      return v.value;
-    }
-  }
+function valueFromAny(value: any): JsonValue {
+  const s = JSON.stringify(value);
+  return JsFacade.toJsonValue(JsFacade.parseValue(s));
 }
 
 describe('JsonValue', () => {
@@ -64,78 +56,14 @@ describe('JsonValue', () => {
     );
   });
 
-  describe('should convert', () => {
-    test('from any', () => {
-      expect(valueFromAny(null)).toEqual(ok(jvNull));
-      expect(valueFromAny(123)).toEqual(ok(jvNumber('123')));
-      expect(valueFromAny(true)).toEqual(ok(jvBool(true)));
-      expect(valueFromAny('yalla')).toEqual(ok(jvString('yalla')));
-      expect(valueFromAny({ foo: 'bar' })).toEqual(
-        ok(jvObject([{ name: 'foo', value: jvString('bar') }])),
-      );
-      expect(valueFromAny([1, { foo: 'bar' }, [2, 3]])).toEqual(
-        ok(
-          jvArray([
-            jvNumber('1'),
-            jvObject([
-              {
-                name: 'foo',
-                value: jvString('bar'),
-              },
-            ]),
-            jvArray([jvNumber('2'), jvNumber('3')]),
-          ]),
-        ),
-      );
-    });
+  test('JSON.parse rounds large numbers', () => {
+    expect(JSON.parse('9999999999999999')).toEqual(10000000000000000);
+  });
 
-    test('invalid number converts to string', () => {
-      expect(valueToAny(jvNumber('yalla'))).toEqual('yalla');
-    });
-
-    test('number roundtrip', () => {
-      valueFromAny(123).match(
-        (v) => {
-          expect(v).toEqual(jvNumber('123'));
-          const a = valueToAny(v);
-          expect(a).toEqual(123);
-        },
-        (err) => {
-          fail(err);
-        },
-      );
-    });
-
-    test('to any', () => {
-      expect(valueToAny(jvNull)).toEqual(null);
-      expect(valueToAny(jvNumber('123'))).toEqual(123);
-      expect(valueToAny(jvString('yalla'))).toEqual('yalla');
-      expect(valueToAny(jvBool(true))).toEqual(true);
-      expect(valueToAny(jvArray([jvNumber('1'), jvNumber('2')]))).toEqual([
-        1, 2,
-      ]);
-      expect(
-        valueToAny(
-          jvObject([
-            { name: 'foo', value: jvString('bar') },
-            {
-              name: 'blah',
-              value: jvObject([
-                {
-                  name: 'baz',
-                  value: jvArray([jvBool(true), jvNumber('999')]),
-                },
-              ]),
-            },
-          ]),
-        ),
-      ).toEqual({
-        foo: 'bar',
-        blah: {
-          baz: [true, 999],
-        },
-      });
-    });
+  test('should parse large numbers', () => {
+    expect(parseJsonValue('9999999999999999')).toEqual(
+      ok(jvNumber('9999999999999999')),
+    );
   });
 
   describe('can be queried', () => {
@@ -146,7 +74,7 @@ describe('JsonValue', () => {
     test('1st level prop', () => {
       expect(
         getValueAt(
-          valueFromAnyThrow({
+          valueFromAny({
             foo: 'bar',
             blah: 1,
             zzz: true,
@@ -158,12 +86,12 @@ describe('JsonValue', () => {
 
     test('1st level array', () => {
       expect(
-        getValueAt(valueFromAnyThrow([1, true, 'yalla']), JsPath.parse('2')),
+        getValueAt(valueFromAny([1, true, 'yalla']), JsPath.parse('2')),
       ).toEqual(just(jvString('yalla')));
     });
 
     test('deeply nested', () => {
-      const myObj = valueFromAnyThrow({
+      const myObj = valueFromAny({
         a: {
           b: {
             c: {
@@ -184,7 +112,7 @@ describe('JsonValue', () => {
 
       expect(getValueAt(myObj, JsPath.parse('a/b/c'))).toEqual(
         just(
-          valueFromAnyThrow({
+          valueFromAny({
             d: [
               1,
               {
@@ -238,7 +166,7 @@ describe('JsonValue', () => {
     });
 
     test('deeply nested', () => {
-      const myObj = valueFromAnyThrow({
+      const myObj = valueFromAny({
         a: {
           b: {
             c: {
@@ -256,7 +184,7 @@ describe('JsonValue', () => {
         a2: 'yalla',
       });
 
-      const expected = valueFromAnyThrow({
+      const expected = valueFromAny({
         a: {
           b: {
             c: {
@@ -329,7 +257,7 @@ describe('JsonValue', () => {
       );
     });
 
-    const root3 = valueFromAnyThrow({
+    const root3 = valueFromAny({
       a: {
         b: {
           c: {
@@ -353,7 +281,7 @@ describe('JsonValue', () => {
       );
       expect(mapped).toEqual(
         just(
-          valueFromAnyThrow({
+          valueFromAny({
             a: {
               b: {
                 c: {
@@ -377,7 +305,7 @@ describe('JsonValue', () => {
     test('deeply nested delete', () => {
       expect(deleteValueAt(root3, JsPath.parse('a/b/c/d/1/foo'))).toEqual(
         just(
-          valueFromAnyThrow({
+          valueFromAny({
             a: {
               b: {
                 c: {
@@ -395,41 +323,41 @@ describe('JsonValue', () => {
 
   describe('should move', () => {
     test('props', () => {
-      const v = valueFromAnyThrow({
+      const v = valueFromAny({
         a: 1,
         b: 2,
         c: 3,
       });
       expect(moveProperty(v, JsPath.empty, 'b', 'up')).toEqual(
-        valueFromAnyThrow({
+        valueFromAny({
           b: 2,
           a: 1,
           c: 3,
         }),
       );
       expect(moveProperty(v, JsPath.empty, 'b', 'down')).toEqual(
-        valueFromAnyThrow({
+        valueFromAny({
           a: 1,
           c: 3,
           b: 2,
         }),
       );
       expect(moveProperty(v, JsPath.empty, 'a', 'up')).toEqual(
-        valueFromAnyThrow({
+        valueFromAny({
           a: 1,
           b: 2,
           c: 3,
         }),
       );
       expect(moveProperty(v, JsPath.empty, 'c', 'down')).toEqual(
-        valueFromAnyThrow({
+        valueFromAny({
           a: 1,
           b: 2,
           c: 3,
         }),
       );
       expect(moveProperty(v, JsPath.empty, 'c', 'up')).toEqual(
-        valueFromAnyThrow({
+        valueFromAny({
           a: 1,
           c: 3,
           b: 2,
@@ -439,84 +367,131 @@ describe('JsonValue', () => {
     });
 
     test('arrays', () => {
-      const v = valueFromAnyThrow([1, 2, 3]);
+      const v = valueFromAny([1, 2, 3]);
       expect(moveElement(v, JsPath.empty, 1, 'up')).toEqual(
-        valueFromAnyThrow([2, 1, 3]),
+        valueFromAny([2, 1, 3]),
       );
       expect(moveElement(v, JsPath.empty, 1, 'down')).toEqual(
-        valueFromAnyThrow([1, 3, 2]),
+        valueFromAny([1, 3, 2]),
       );
       expect(moveElement(v, JsPath.empty, 0, 'up')).toEqual(
-        valueFromAnyThrow([1, 2, 3]),
+        valueFromAny([1, 2, 3]),
       );
       expect(moveElement(v, JsPath.empty, 2, 'down')).toEqual(
-        valueFromAnyThrow([1, 2, 3]),
+        valueFromAny([1, 2, 3]),
       );
       expect(moveElement(v, JsPath.empty, 999, 'up')).toEqual(v);
     });
   });
 
   test('objects can be merged', () => {
-    const o1 = valueFromAnyThrow({
+    const o1 = valueFromAny({
       a: 1,
       c: 3,
     }) as JvObject;
-    const o2 = valueFromAnyThrow({
+    const o2 = valueFromAny({
       a: 2,
       b: 2,
     }) as JvObject;
     expect(mergeProperties(o1, o2)).toEqual(
-      valueFromAnyThrow({
+      valueFromAny({
         a: 2,
         b: 2,
         c: 3,
       }),
     );
     expect(mergeProperties(o2, o1)).toEqual(
-      valueFromAnyThrow({
+      valueFromAny({
         a: 1,
         c: 3,
         b: 2,
       }),
     );
   });
-});
 
-describe('stringify', () => {
-  test('string', () => {
-    expect(stringify(jvString('yalla'))).toEqual('"yalla"');
-  });
-  test('string escaped', () => {
-    expect(stringify(jvString('ya"lla'))).toEqual('"ya\\"lla"');
-    expect(stringify(jvString('ya\\"lla'))).toEqual('"ya\\"lla"');
-  });
-  test('number', () => {
-    expect(stringify(jvNumber('123'))).toEqual('123');
-  });
-  test('null', () => {
-    expect(stringify(jvNull)).toEqual('null');
-  });
-  test('boolean', () => {
-    expect(stringify(jvBool(true))).toEqual('true');
-  });
-  test('object', () => {
-    expect(stringify(jvObject([{ name: 'foo', value: jvNull }]))).toEqual(
-      '{"foo":null}',
-    );
-  });
-  test('array', () => {
-    expect(stringify(jvArray([jvBool(false), jvNumber('123')]))).toEqual(
-      '[false,123]',
-    );
-  });
-  test('complex', () => {
+  describe('stringify', () => {
+    test('string', () => {
+      expect(stringify(jvString('yalla'))).toEqual('"yalla"');
+    });
+    test('string escaped', () => {
+      expect(stringify(jvString('ya"lla'))).toEqual('"ya\\"lla"');
+      expect(stringify(jvString('ya\\"lla'))).toEqual('"ya\\"lla"');
+    });
+    test('number', () => {
+      expect(stringify(jvNumber('123'))).toEqual('123');
+      expect(stringify(jvNumber('9999999999999999'))).toEqual(
+        '9999999999999999',
+      );
+    });
+    test('null', () => {
+      expect(stringify(jvNull)).toEqual('null');
+    });
+    test('boolean', () => {
+      expect(stringify(jvBool(true))).toEqual('true');
+    });
+    test('object', () => {
+      expect(stringify(jvObject([{ name: 'foo', value: jvNull }]))).toEqual(
+        '{"foo":null}',
+      );
+    });
+    test('array', () => {
+      expect(stringify(jvArray([jvBool(false), jvNumber('123')]))).toEqual(
+        '[false,123]',
+      );
+    });
+
     const raw = {
       foo: 1,
       bar: 'yalla',
       baz: [1, true],
     };
-    const o1 = valueFromAnyThrow(raw);
-    const s1 = stringify(o1);
-    expect(s1).toEqual(JSON.stringify(raw));
+    const o = valueFromAny(raw);
+
+    test('complex', () => {
+      expect(stringify(o)).toEqual(JSON.stringify(raw));
+    });
+
+    describe('with indent', () => {
+      function roundtrip(o: any) {
+        const expected = JSON.stringify(o, undefined, '  ');
+        expect(stringify(valueFromAny(o), '  ')).toEqual(expected);
+      }
+
+      test('object simple', () => {
+        roundtrip({
+          foo: 1,
+          bar: 'baz',
+        });
+      });
+      test('object nested', () => {
+        roundtrip({
+          foo: {
+            bar: 'baz',
+          },
+        });
+      });
+      test('object nested 2', () => {
+        roundtrip({
+          foo: {
+            bar: 'baz',
+            blah: {
+              yalla: 'yolo',
+            },
+          },
+        });
+      });
+      test('array simple', () => {
+        roundtrip([1, 2, 3]);
+      });
+      test('array nested', () => {
+        roundtrip([
+          [1, 2],
+          [3, 4],
+        ]);
+      });
+      test('array nested 2', () => {
+        roundtrip([1, [2, [3, 4]]]);
+      });
+    });
   });
 });

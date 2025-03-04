@@ -15,11 +15,16 @@
  */
 
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
+import { jvObject, jvString, stringify } from './JsonValue';
 
 describe('JsFacade', () => {
   test('should return schema validation markers when parsing', () => {
     const parseRequest = { text: 'true' };
-    const parser = JsFacade.getJsonParser({ type: 'string' });
+    const parser = JsFacade.getJsonParser(
+      JsFacade.parseValue(
+        stringify(jvObject([{ name: 'type', value: jvString('string') }])),
+      ),
+    );
     const res = parser.parse(parseRequest);
     expect(res.success).toBe(true);
     expect(res.error).toBeUndefined;
@@ -33,14 +38,17 @@ describe('JsFacade', () => {
   });
   test('should predict based on schema', () => {
     const predictRequest = { text: '{}', offset: 1 };
-    const parser = JsFacade.getJsonParser({
-      type: 'object',
-      properties: {
-        foo: {
-          type: 'string',
+    const schema = JsFacade.parseValue(
+      JSON.stringify({
+        type: 'object',
+        properties: {
+          foo: {
+            type: 'string',
+          },
         },
-      },
-    });
+      }),
+    );
+    const parser = JsFacade.getJsonParser(schema);
     const res = parser.predict(predictRequest);
     expect(res.success).toBe(true);
     expect(res.error).toBeUndefined;

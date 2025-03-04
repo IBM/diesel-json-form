@@ -44,7 +44,7 @@ import {
 import { executeContextMenuAction } from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { getValueAt, JsonValue, valueToAny } from './JsonValue';
+import { getValueAt, JsonValue, stringify } from './JsonValue';
 import { JsPath } from './JsPath';
 import {
   computeAll,
@@ -110,7 +110,7 @@ function reInitRenderers(
             const m: Maybe<CustomRendererModel> =
               existingModel === undefined ? nothing : existingModel;
             const jValue: Maybe<JsonValue> = getValueAt(
-              model.root.b,
+              model.root,
               JsPath.parse(path),
             );
             if (jValue.type === 'Just') {
@@ -162,7 +162,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
         {!renderOptions?.hideDocRoot && (
           <div className={'doc-root'}>
             <em>{model.t('documentRoot')}</em>
-            <ArrayCounter value={model.root.b} />
+            <ArrayCounter value={model.root} />
             <MenuTrigger
               dispatch={dispatch}
               path={JsPath.empty}
@@ -175,7 +175,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
         <ViewJsonValue
           model={model}
           path={JsPath.empty}
-          value={model.root.b}
+          value={model.root}
           dispatch={dispatch}
           rendererFactory={props.rendererFactory}
           language={props.model.lang}
@@ -213,12 +213,12 @@ function withOutValueChanged(
   prevModel: Model,
   mac: [Model, Cmd<Msg>],
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
-  const prev = JSON.stringify(valueToAny(prevModel.root.b));
-  const cur = JSON.stringify(valueToAny(mac[0].root.b));
+  const prev = stringify(prevModel.root);
+  const cur = stringify(mac[0].root);
   return [
     mac[0],
     mac[1],
-    cur === prev ? nothing : just(outValueChanged(mac[0].root.b)),
+    cur === prev ? nothing : just(outValueChanged(mac[0].root)),
   ];
 }
 

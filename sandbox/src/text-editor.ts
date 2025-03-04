@@ -108,17 +108,22 @@ const docs = vscode.workspace.textDocuments;
 const vscodeDocument1 = docs[0];
 const vscodeDocument2 = docs[1];
 
-const INITIAL_VALUE = {};
+const INITIAL_VALUE = '{}';
 
-const parser1: DieselParserFacade = JsonFacade.getJsonParser(INITIAL_VALUE);
-let parser2: DieselParserFacade = JsonFacade.getJsonParser(INITIAL_VALUE);
+const parser1: DieselParserFacade = JsonFacade.getJsonParser(
+  JsonFacade.parseValue(INITIAL_VALUE),
+);
+let parser2: DieselParserFacade = JsonFacade.getJsonParser(
+  JsonFacade.parseValue(INITIAL_VALUE),
+);
 
 model1.onDidChangeContent(() => {
   try {
-    const newSchema = JSON.parse(model1.getValue());
-    parser2 = JsonFacade.getJsonParser(newSchema);
+    parser2 = JsonFacade.getJsonParser(
+      JsonFacade.parseValue(model1.getValue()),
+    );
   } catch (e) {
-    parser2 = JsonFacade.getJsonParser(INITIAL_VALUE);
+    parser2 = JsonFacade.getJsonParser(JsonFacade.parseValue(INITIAL_VALUE));
   }
 });
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { just, Maybe, nothing, Tuple } from 'tea-cup-core';
-import { getValueAt, JsonValue, valueFromAny, valueToAny } from './JsonValue';
+import { just, Maybe, nothing } from 'tea-cup-core';
+import { getValueAt, JsonValue, jsonValueToFacadeValue } from './JsonValue';
 import { JsPath } from './JsPath';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
@@ -28,8 +28,8 @@ import { TFunction } from 'i18next';
 import { initMyI18n } from './i18n/MyI18n';
 
 export interface Model {
-  readonly schema: Maybe<Tuple<any, JsonValue>>;
-  readonly root: Tuple<any, JsonValue>;
+  readonly schema: Maybe<JsonValue>;
+  readonly root: JsonValue;
   readonly validationResult: Maybe<JsValidationResult>;
   readonly errors: ReadonlyMap<string, ReadonlyArray<JsValidationError>>;
   readonly adding: Maybe<AddingState>;
@@ -58,8 +58,10 @@ export interface AddingState {
 
 export function doValidate(model: Model): Model {
   return model.schema
-    .map((t) => {
-      const validationResult = just(JsFacade.validate(t.a, model.root.a));
+    .map((s) => {
+      const schema = jsonValueToFacadeValue(s);
+      const value = jsonValueToFacadeValue(model.root);
+      const validationResult = just(JsFacade.validate(schema, value));
       return {
         ...model,
         validationResult,
@@ -138,7 +140,7 @@ function doComputeStringsMetadata(
   metadata: StringsMetadata,
   path: JsPath = JsPath.empty,
 ): void {
-  getValueAt(model.root.b, path).forEach((value) => {
+  getValueAt(model.root, path).forEach((value) => {
     switch (value.tag) {
       case 'jv-object': {
         value.properties.forEach((prop) =>
@@ -200,7 +202,7 @@ function doComputePropsToAdd(
   props: Map<string, ReadonlyArray<string>>,
   path: JsPath = JsPath.empty,
 ): void {
-  getValueAt(model.root.b, path).forEach((value) => {
+  getValueAt(model.root, path).forEach((value) => {
     switch (value.tag) {
       case 'jv-object': {
         // compute props for this object and recurse
@@ -241,10 +243,6 @@ function doComputePropsToAdd(
   });
 }
 
-function toValueTuple(v: JsonValue): Tuple<any, JsonValue> {
-  return new Tuple(valueToAny(v), v);
-}
-
 export function initialModel(
   lang: string,
   schema: Maybe<JsonValue>,
@@ -256,8 +254,8 @@ export function initialModel(
   const model: Model = {
     lang,
     t,
-    schema: schema.map(toValueTuple),
-    root: toValueTuple(root),
+    schema,
+    root,
     validationResult: nothing,
     errors: new Map(),
     adding: nothing,
@@ -288,7 +286,7 @@ export function updateAddingPropertyName(
       const res: AddingState = {
         ...addingState,
         addingPropName: propName,
-        isDuplicate: getValueAt(model.root.b, addingState.ownerPath)
+        isDuplicate: getValueAt(model.root, addingState.ownerPath)
           .map((ownerValue) => {
             if (ownerValue.tag === 'jv-object') {
               return (
@@ -312,12 +310,7 @@ export function getProposals(
   depth: number,
 ): ReadonlyArray<JsonValue> {
   const proposals = JsFacade.propose(validationResult, path.format(), depth);
-  return proposals.flatMap((proposalAny) => {
-    return valueFromAny(proposalAny).match(
-      (jsonValue) => [jsonValue],
-      () => [], // TODO error ignored not so good ?
-    );
-  });
+  return proposals.map(JsFacade.toJsonValue);
 }
 
 export function getFormats(

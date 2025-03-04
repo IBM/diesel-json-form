@@ -23,6 +23,7 @@ import {
   deleteValueAt,
   getValueAt,
   JsonValue,
+  jsonValueToFacadeValue,
   jvArray,
   JvArray,
   jvNull,
@@ -34,8 +35,6 @@ import {
   moveElement,
   moveProperty,
   setValueAt,
-  valueFromAny,
-  valueToAny,
 } from './JsonValue';
 import * as TPM from 'tea-pop-menu';
 import { createMenu, MenuAction } from './ContextMenuActions';
@@ -50,7 +49,7 @@ export function actionDeleteValue(
 ): [Model, Cmd<Msg>] {
   return setRoot(
     model,
-    deleteValueAt(model.root.b, path).withDefault(model.root.b),
+    deleteValueAt(model.root, path).withDefault(model.root),
   );
 }
 
@@ -62,7 +61,7 @@ export function actionApplyProposal(
 ): [Model, Cmd<Msg>] {
   switch (proposal.tag) {
     case 'jv-object': {
-      const newProposal = getValueAt(model.root.b, path)
+      const newProposal = getValueAt(model.root, path)
         .map((valueAtPath) => {
           const augmentedProposal = model.validationResult
             .andThen((vr) => {
@@ -70,12 +69,7 @@ export function actionApplyProposal(
               const all = JsFacade.propose(vr, path.format(), 5);
               return maybeOf(all[proposalIndex]);
             })
-            .andThen((proposalAny) => {
-              return valueFromAny(proposalAny).match(
-                (jsonValue) => just(jsonValue),
-                () => nothing,
-              );
-            })
+            .map(JsFacade.toJsonValue)
             .andThen((v) =>
               v.tag === 'jv-object' ? just(v as JvObject) : nothing,
             )
@@ -106,7 +100,7 @@ function doUpdateValue(
   if (path.isEmpty()) {
     return setRoot(model, value);
   }
-  return setRoot(model, setValueAt(model.root.b, path, value));
+  return setRoot(model, setValueAt(model.root, path, value));
 }
 
 export function actionAddPropertyClicked(
@@ -147,7 +141,7 @@ export function actionConfirmAddProperty(
   return model.adding
     .filter((addingState) => addingState.addingPropName !== '')
     .andThen((addingState) => {
-      return mapValueAt(model.root.b, addingState.ownerPath, (owningValue) => {
+      return mapValueAt(model.root, addingState.ownerPath, (owningValue) => {
         if (owningValue.tag === 'jv-object') {
           return just(
             jvObject([
@@ -167,7 +161,7 @@ export function actionAddProperty(
   path: JsPath,
   propertyName: string,
 ): [Model, Cmd<Msg>] {
-  return getValueAt(model.root.b, path)
+  return getValueAt(model.root, path)
     .map<[Model, Cmd<Msg>]>((owner) => {
       if (owner.tag === 'jv-object') {
         // create the new object with a null value
@@ -176,12 +170,13 @@ export function actionAddProperty(
           ...owner.properties,
           { name: propertyName, value: jvNull },
         ]);
-        const newRoot = setValueAt(model.root.b, path, newObject);
-        const newValidationResult = model.schema
-          .map((s) => s.a)
-          .map((schemaAny) =>
-            JsFacade.validate(schemaAny, valueToAny(newRoot)),
-          );
+        const newRoot = setValueAt(model.root, path, newObject);
+        const newValidationResult = model.schema.map((schemaAny) =>
+          JsFacade.validate(
+            jsonValueToFacadeValue(schemaAny),
+            jsonValueToFacadeValue(newRoot),
+          ),
+        );
 
         const propertyProposals = newValidationResult
           .map((vr) => getProposals(vr, path.append(propertyName), -1))
@@ -196,7 +191,7 @@ export function actionAddProperty(
               propertyProposals.length === 0 ? jvNull : propertyProposals[0],
           },
         ]);
-        return setRoot(model, setValueAt(model.root.b, path, newObject2));
+        return setRoot(model, setValueAt(model.root, path, newObject2));
       }
       return noCmd(model);
     })
@@ -207,7 +202,7 @@ export function actionAddElementToArray(
   model: Model,
   path: JsPath,
 ): [Model, Cmd<Msg>] {
-  return getValueAt(model.root.b, path)
+  return getValueAt(model.root, path)
     .map<[Model, Cmd<Msg>]>((array) => {
       if (array.tag === 'jv-array') {
         const newElemIndex = array.elems.length;
@@ -217,13 +212,14 @@ export function actionAddElementToArray(
         // otherwise the proposals would be empty because
         // no path matches the requested index
         const tmpArray = jvArray([...array.elems, jvNull]);
-        const tmpRoot = setValueAt(model.root.b, path, tmpArray);
+        const tmpRoot = setValueAt(model.root, path, tmpArray);
 
-        const newValidationResult = model.schema
-          .map((s) => s.a)
-          .map((schemaAny) =>
-            JsFacade.validate(schemaAny, valueToAny(tmpRoot)),
-          );
+        const newValidationResult = model.schema.map((schemaAny) =>
+          JsFacade.validate(
+            jsonValueToFacadeValue(schemaAny),
+            jsonValueToFacadeValue(tmpRoot),
+          ),
+        );
 
         const proposals = newValidationResult
           .map((vr) => getProposals(vr, path.append(newElemIndex), -1))
@@ -234,7 +230,7 @@ export function actionAddElementToArray(
           ...array,
           elems: [...array.elems, clearPropertiesIfObject(proposal)],
         };
-        const newRoot = setValueAt(model.root.b, path, newArray);
+        const newRoot = setValueAt(model.root, path, newArray);
         return setRoot(model, newRoot);
       }
       return noCmd(model);
@@ -263,7 +259,7 @@ export function actionTriggerClicked(
   refBox: Box,
   menuFilter?: MenuOptionFilter,
 ): [Model, Cmd<Msg>] {
-  return getValueAt(model.root.b, path)
+  return getValueAt(model.root, path)
     .map((valueAtPath) => {
       const focusMenuCmd: Cmd<Msg> = Task.attempt(
         Task.fromLambda(() => {
@@ -281,7 +277,7 @@ export function actionTriggerClicked(
         model,
         TPM.open(
           createMenu({
-            root: model.root.b,
+            root: model.root,
             path,
             proposals: model.validationResult
               .map((vr) => getProposals(vr, path, -1))
@@ -323,12 +319,12 @@ export function actionMoveValue(
   return path
     .parent()
     .andThen<[Model, Cmd<Msg>]>((parentPath) =>
-      getValueAt(model.root.b, parentPath).andThen((parentValue) =>
+      getValueAt(model.root, parentPath).andThen((parentValue) =>
         path.lastElem().map((lastPathElem) => {
           switch (parentValue.tag) {
             case 'jv-object': {
               const newRoot = moveProperty(
-                model.root.b,
+                model.root,
                 parentPath,
                 lastPathElem,
                 direction,
@@ -341,7 +337,7 @@ export function actionMoveValue(
                 return noCmd(model);
               }
               const newRoot = moveElement(
-                model.root.b,
+                model.root,
                 parentPath,
                 index,
                 direction,
@@ -375,7 +371,7 @@ export function setRoot(model: Model, root: JsonValue): [Model, Cmd<Msg>] {
   );
   const newModel: Model = {
     ...model,
-    root: new Tuple(valueToAny(root), root),
+    root,
     adding: nothing,
   };
   return [newModel, cmd];

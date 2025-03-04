@@ -81,8 +81,8 @@ sampleSchemaSelect.addEventListener('change', () => {
   sendJsonStr();
 });
 
-const schema = JsonForm.valueFromAny(initialSchema).toMaybe();
-const valueRes = JsonForm.valueFromAny(initialValue);
+const schema = JsonForm.parseJsonValue(JSON.stringify(initialSchema)).toMaybe();
+const valueRes = JsonForm.parseJsonValue(JSON.stringify(initialValue));
 
 const jsonForm = document.getElementById('json-form');
 if (!jsonForm) {
@@ -141,8 +141,7 @@ function initJsonForm(
       onChange: (value: JsonForm.JsonValue) => {
         console.log('value changed');
         if (syncPanesCb.checked) {
-          const va = JsonForm.valueToAny(value);
-          editor2.setValue(JSON.stringify(va, null, '  '));
+          editor2.setValue(JsonForm.stringify(value, '  '));
         }
       },
       strictMode,
