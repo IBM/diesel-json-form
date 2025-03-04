@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@diesel-parser/json-schema-facade-ts": "^0.11.0",
+    "@diesel-parser/json-schema-facade-ts": "^0.12.0",
     "i18next": "^20.6.1",
     "tea-pop-core": "^5.0.0",
     "tea-pop-menu": "^5.0.0"
