@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { err, just, Maybe, nothing, ok, Result } from 'tea-cup-core';
+import { just, Maybe, nothing, ok, Result } from 'tea-cup-core';
 import { JsPath } from './JsPath';
+import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
 export type JsonValue =
   | JvNull
@@ -119,123 +120,6 @@ export function valueType(value: JsonValue): JsonValueType {
       return 'boolean';
     case 'jv-array':
       return 'array';
-  }
-}
-
-export function valueFromAny(value: any): Result<string, JsonValue> {
-  if (value === undefined) {
-    return err('undefined');
-  }
-  if (value === null) {
-    return ok(jvNull);
-  }
-  if (Array.isArray(value)) {
-    const a = value as any[];
-    const elems = [];
-    for (let i = 0; i < a.length; i++) {
-      const elemValue = valueFromAny(a[i]);
-      switch (elemValue.tag) {
-        case 'Ok': {
-          elems.push(elemValue.value);
-          break;
-        }
-        case 'Err': {
-          return elemValue;
-        }
-      }
-    }
-    return ok({
-      tag: 'jv-array',
-      elems,
-    });
-  }
-  const valueType = typeof value;
-  switch (valueType) {
-    case 'object':
-      if (!isObjLiteral(value)) {
-        return err('not an object literal');
-      }
-      const keys = Object.keys(value);
-      const properties: Array<JsonProperty> = [];
-      for (let i = 0; i < keys.length; i++) {
-        const propName = keys[i];
-        const propValue = valueFromAny(value[propName]);
-        switch (propValue.tag) {
-          case 'Ok': {
-            properties.push({
-              name: propName,
-              value: propValue.value,
-            });
-            break;
-          }
-          case 'Err': {
-            return propValue;
-          }
-        }
-      }
-
-      return ok({ tag: 'jv-object', properties });
-    case 'string':
-      return ok({ tag: 'jv-string', value });
-    case 'boolean':
-      return ok({ tag: 'jv-boolean', value });
-    case 'number':
-      return ok({ tag: 'jv-number', value: value.toString() });
-    default:
-      return err(valueType);
-  }
-}
-
-export function valueToAny(value: JsonValue): any {
-  switch (value.tag) {
-    case 'jv-array':
-      return value.elems.map(valueToAny);
-    case 'jv-object': {
-      const res: any = {};
-      value.properties.forEach((p) => {
-        res[p.name] = valueToAny(p.value);
-      });
-      return res;
-    }
-    case 'jv-boolean':
-      return value.value;
-    case 'jv-null':
-      return null;
-    case 'jv-number':
-      const parsed = parseFloat(value.value);
-      return isNaN(parsed) ? value.value : parsed;
-    case 'jv-string': {
-      return value.value;
-    }
-  }
-}
-
-function isObjLiteral(_obj: any) {
-  let _test = _obj;
-  return typeof _obj !== 'object' || _obj === null
-    ? false
-    : (function () {
-        while (true) {
-          if (
-            Object.getPrototypeOf((_test = Object.getPrototypeOf(_test))) ===
-            null
-          ) {
-            break;
-          }
-        }
-        return Object.getPrototypeOf(_obj) === _test;
-      })();
-}
-
-export function parseJsonValue(json: string): Result<string, JsonValue> {
-  try {
-    const x = JSON.parse(json);
-    return valueFromAny(x);
-  } catch (e) {
-    if (e instanceof Error) {
-      return err(e.message);
-    }
-    return err('unhandled error ' + e);
   }
 }
 
@@ -448,4 +332,80 @@ export function clearPropertiesIfObject(v: JsonValue): JsonValue {
     return jvObject();
   }
   return v;
+}
+
+function mkSpaces(space: string, indentLevel: number): string {
+  let s = '';
+  for (let i = 0; i < indentLevel; i++) {
+    s += space;
+  }
+  return s;
+}
+
+export function stringify(value: JsonValue, space?: string): string {
+  return doStringify(value, space);
+}
+
+function doStringify(
+  value: JsonValue,
+  space?: string,
+  indentLevel: number = 1,
+): string {
+  switch (value.tag) {
+    case 'jv-null':
+      return 'null';
+    case 'jv-string':
+      return `"${escapeDoubleQuotes(value.value)}"`;
+    case 'jv-boolean':
+      return value.value ? 'true' : 'false';
+    case 'jv-number':
+      return value.value;
+    case 'jv-array': {
+      if (space) {
+        const indent = mkSpaces(space, indentLevel);
+        const elemLines = value.elems.map((elem) => {
+          const elemVal = doStringify(elem, space, indentLevel + 1);
+          return indent + elemVal;
+        });
+        let elems = elemLines.join(',\n');
+        if (elemLines.length > 0) {
+          elems += '\n';
+        }
+        return `[\n${elems}${mkSpaces(space, indentLevel - 1)}]`;
+      } else {
+        return `[${value.elems.map((e) => stringify(e, space)).join(',')}]`;
+      }
+    }
+
+    case 'jv-object': {
+      if (space) {
+        const indent = mkSpaces(space, indentLevel);
+        const propLines = value.properties.map((p) => {
+          const propVal = doStringify(p.value, space, indentLevel + 1);
+          return indent + '"' + escapeDoubleQuotes(p.name) + '": ' + propVal;
+        });
+        let props = propLines.join(',\n');
+        if (propLines.length > 0) {
+          props += '\n';
+        }
+        return `{\n${props}${mkSpaces(space, indentLevel - 1)}}`;
+      } else {
+        return `{${value.properties.map((p) => '"' + escapeDoubleQuotes(p.name) + '":' + stringify(p.value, space)).join(',')}}`;
+      }
+    }
+  }
+}
+
+function escapeDoubleQuotes(s: string): string {
+  return s.replace(/\\([\s\S])|(")/g, '\\$1$2');
+}
+
+export function jsonValueToFacadeValue(v: JsonValue): JsFacade.JsonValue {
+  const s = stringify(v);
+  return JsFacade.parseValue(s);
+}
+
+export function parseJsonValue(v: string): Result<string, JsonValue> {
+  const astNode = JsFacade.parseValue(v);
+  return ok(JsFacade.toJsonValue(astNode));
 }
