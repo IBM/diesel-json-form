@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { just, Maybe, nothing, ok, Result } from 'tea-cup-core';
+import { err, just, Maybe, nothing, ok, Result } from 'tea-cup-core';
 import { JsPath } from './JsPath';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
@@ -406,6 +406,15 @@ export function jsonValueToFacadeValue(v: JsonValue): JsFacade.JsonValue {
 }
 
 export function parseJsonValue(v: string): Result<string, JsonValue> {
-  const astNode = JsFacade.parseValue(v);
-  return ok(JsFacade.toJsonValue(astNode));
+  try {
+    const astNode = JsFacade.parseValue(v);
+    return ok(JsFacade.toJsonValue(astNode));
+  } catch (e) {
+    return err(getErrorMessage(e));
+  }
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  return String(error);
 }
