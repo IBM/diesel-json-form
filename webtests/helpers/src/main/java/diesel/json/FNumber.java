@@ -10,17 +10,17 @@ public class FNumber extends FJsonValue {
         super(path, findr);
     }
 
-    private Findr findInput() {
+    public Findr findInput() {
         return $("#input-" + this.path.format("_"));
     }
 
-    public FNumber assertValue(int expected) {
-        findInput().where(attrEquals("value", Integer.toString(expected))).eval();
+    public FNumber assertValue(String expected) {
+        findInput().where(attrEquals("value", expected)).eval();
         return this;
     }
 
-    public FNumber assertHasError() {
-        $$(".cds--form-requirement").count(0).eval();
+    public FNumber assertHasError(String expected) {
+        $$(".cds--form-requirement").where(textEquals(expected)).count(1).eval();
         findInput().where((attrEquals("data-invalid", "true"))).eval();
         return this;
     }
@@ -28,12 +28,13 @@ public class FNumber extends FJsonValue {
     public FNumber assertNoError() {
         $$(".cds--form-requirement").count(0).eval();
         findInput().where(not(attrEquals("data-invalid", "true"))).eval();
+
         return this;
     }
 
-    public FNumber setValue(int value) {
+    public FNumber setValue(String value) {
         findInput().clear();
-        findInput().sendKeys(Integer.toString(value));
+        findInput().sendKeys(value);
         return this;
     }
 }
