@@ -346,6 +346,10 @@ export function stringify(value: JsonValue, space?: string): string {
   return doStringify(value, space);
 }
 
+const numberRegex = new RegExp(
+  '^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$',
+);
+
 function doStringify(
   value: JsonValue,
   space?: string,
@@ -359,7 +363,11 @@ function doStringify(
     case 'jv-boolean':
       return value.value ? 'true' : 'false';
     case 'jv-number':
-      return value.value;
+      if (!numberRegex.test(value.value)) {
+        return `"${escapeDoubleQuotes(value.value)}"`;
+      } else {
+        return value.value;
+      }
     case 'jv-array': {
       if (space) {
         const indent = mkSpaces(space, indentLevel);
