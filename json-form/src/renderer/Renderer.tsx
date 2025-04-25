@@ -606,6 +606,8 @@ function MyDatePicker(props: MyDatePickerProps) {
   const fmtPath = props.path.format('_');
   const { t } = props;
   return (
+    // let it uncontrolled : do not provide value
+    // otherwise the picker crashes
     <DatePicker
       // @ts-ignore
       id={'date-picker-' + fmtPath}
@@ -614,8 +616,6 @@ function MyDatePicker(props: MyDatePickerProps) {
       onChange={(dates, str) => {
         props.onChange(str);
       }}
-      //   value={props.value}
-      value={''}
       locale={languageToPickerLocale(props.language)}
     >
       <DatePickerInput
