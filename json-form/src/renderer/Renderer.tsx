@@ -614,7 +614,8 @@ function MyDatePicker(props: MyDatePickerProps) {
       onChange={(dates, str) => {
         props.onChange(str);
       }}
-      value={props.value}
+      //   value={props.value}
+      value={''}
       locale={languageToPickerLocale(props.language)}
     >
       <DatePickerInput

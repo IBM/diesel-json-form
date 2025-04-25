@@ -691,6 +691,19 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     }
 
     @Test
+    public void typeDate() {
+        sandbox.selectSample("Date");
+        sandbox.jsonEditor.replaceText("\"\"");
+        FDate d = sandbox.jsonForm.dateAt(JsPath.empty);
+        d
+                .assertHasError("Invalid format: expected date")
+                .sendKeys("2020")
+                .assertHasError("Invalid format: expected date")
+                .sendKeys("-02-03")
+                .assertNoError();
+    }
+
+    @Test
     public void testNumberEmptyField() {
         sandbox.schemaEditor.replaceText("{\"type\":\"number\"}");
         sandbox.jsonEditor.replaceText("123");
@@ -707,7 +720,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         num.assertHasError("Invalid type: expected number");
 
         num.findInput().sendKeys("1");
-
         num.assertValue("1").assertNoError();
     }
 
