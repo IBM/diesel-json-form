@@ -343,6 +343,32 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     }
 
     @Test
+    public void typeDateInInputField() {
+        sandbox.selectSample("Date");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = simpleDateFormat.format(new Date());
+        sandbox.schemaEditor.assertText("{\n" +
+                "  \"type\": \"string\",\n" +
+                "  \"format\": \"date\"\n" +
+                "}");
+
+        sandbox.jsonEditor
+                .focus()
+                .clearText()
+                .typeText("\"\"");
+        sandbox.jsonForm
+                .dateAt(JsPath.empty)
+                .assertValue("")
+                .assertHasError("Invalid format: expected date");
+
+        sandbox.jsonForm
+                .dateAt(JsPath.empty)
+                .setValue("foo")
+                .assertHasError("Invalid format: expected date")
+                .assertValue("foo");
+    }
+
+    @Test
     public void ErrorsOnInvalidDateTime() {
         sandbox.selectSample("DateTime");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
