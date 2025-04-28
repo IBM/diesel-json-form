@@ -627,6 +627,7 @@ function MyDatePicker(props: MyDatePickerProps) {
         onChange={(e) => {
           props.onChange(e.target.value);
         }}
+        // @ts-ignore
         value={props.value} // need to set value twice
         invalidText={props.invalidText}
         invalid={props.isInvalid}
