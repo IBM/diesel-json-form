@@ -614,7 +614,7 @@ function MyDatePicker(props: MyDatePickerProps) {
       onChange={(dates, str) => {
         props.onChange(str);
       }}
-      value={props.value}
+      value={props.value} // need to set value twice
       locale={languageToPickerLocale(props.language)}
     >
       <DatePickerInput
@@ -627,6 +627,8 @@ function MyDatePicker(props: MyDatePickerProps) {
         onChange={(e) => {
           props.onChange(e.target.value);
         }}
+        // @ts-ignore
+        value={props.value} // need to set value twice
         invalidText={props.invalidText}
         invalid={props.isInvalid}
       />
