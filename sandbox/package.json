@@ -16,7 +16,7 @@
   "dependencies": {
     "@carbon/icons-react": "^11.53.0",
     "@carbon/react": "^1.71.0",
-    "@diesel-parser/json-form": "^5.2.1",
+    "@diesel-parser/json-form": "^5.2.2",
     "@diesel-parser/monaco": "~0.1.0",
     "monaco-editor-workers": "0.34.2",
     "react": "^17.0.2",
