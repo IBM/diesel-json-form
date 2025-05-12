@@ -611,8 +611,17 @@ function MyDatePicker(props: MyDatePickerProps) {
       id={'date-picker-' + fmtPath}
       datePickerType="single"
       dateFormat={'Y-m-d'}
-      onChange={(dates, str) => {
-        props.onChange(str);
+      onChange={(dates) => {
+        if (dates.length === 1) {
+          const d = dates[0];
+          const s =
+            d.getFullYear() +
+            '-' +
+            ('0' + (d.getMonth() + 1)).slice(-2) +
+            '-' +
+            ('0' + d.getDate()).slice(-2);
+          props.onChange(s);
+        }
       }}
       value={props.value} // need to set value twice
       locale={languageToPickerLocale(props.language)}
@@ -622,6 +631,7 @@ function MyDatePicker(props: MyDatePickerProps) {
         aria-label={t('dateValueLabel', {
           path: props.path.format('.'),
         }).toString()}
+        aria-autocomplete="none"
         labelText={''}
         hideLabel={true}
         onChange={(e) => {
