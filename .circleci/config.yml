@@ -22,7 +22,7 @@ jobs:
   webtests:
     <<: *defaults
     docker:
-      - image: cimg/openjdk:17.0-browsers
+      - image: cimg/openjdk:17.0.14-browsers
     environment:
       DISPLAY: :99
 
