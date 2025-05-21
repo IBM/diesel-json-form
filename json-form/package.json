@@ -28,7 +28,7 @@
     "npm-scripts-watcher": "^1.0.2",
     "rimraf": "^6.0.1",
     "sass": "^1.81.0",
-    "ts-jest": "24.0.2"
+    "ts-jest": "24.3.0"
   },
   "scripts": {
     "build": "npm run clean && npm run lint && npm run build:ts && npm run test && npm run build:sass",
