@@ -1,7 +1,7 @@
 import { Renderer } from '@diesel-parser/json-form';
 import { Maybe } from 'tea-cup-core';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
-export declare type Msg = {
+export type Msg = {
     tag: 'mouse-enter';
     index: number;
 } | {

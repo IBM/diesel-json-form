@@ -1,5 +1,5 @@
 import { Renderer, JvObject } from '@diesel-parser/json-form';
-export declare type Msg = string;
+export type Msg = string;
 export interface Model {
     readonly value: JvObject;
 }

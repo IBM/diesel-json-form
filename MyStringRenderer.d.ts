@@ -1,6 +1,6 @@
 import { Renderer } from '@diesel-parser/json-form';
 import { Maybe } from 'tea-cup-core';
-export declare type Msg = {
+export type Msg = {
     tag: 'mouse-enter';
 } | {
     tag: 'mouse-leave';
