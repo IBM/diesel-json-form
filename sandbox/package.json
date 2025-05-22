@@ -34,7 +34,7 @@
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^5.2.6",
     "file-loader": "^6.2.0",
-    "gh-pages": "^5.0.0",
+    "gh-pages": "^6.0.0",
     "html-webpack-plugin": "^5.3.1",
     "sass": "^1.81.0",
     "shx": "~0.4.0",
