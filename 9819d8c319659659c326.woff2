@@ -1,0 +1,1 @@
+export default __webpack_public_path__ + "fonts/IBMPlexSerif-Light-Latin2.woff2";
