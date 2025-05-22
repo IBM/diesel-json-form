@@ -32,7 +32,7 @@
     "@types/react-dom": "^17.0.25",
     "@types/vscode": "~1.100.0",
     "copy-webpack-plugin": "^13.0.0",
-    "css-loader": "^5.2.6",
+    "css-loader": "^7.0.0",
     "file-loader": "^6.2.0",
     "gh-pages": "^6.0.0",
     "html-webpack-plugin": "^5.3.1",
