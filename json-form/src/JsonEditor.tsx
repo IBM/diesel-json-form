@@ -41,7 +41,7 @@ import {
   actionTriggerClicked,
   actionUpdateValue,
 } from './Actions';
-import { executeContextMenuAction } from './ContextMenu';
+import executeContextMenuAction from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
 import { getValueAt, JsonValue, stringify } from './JsonValue';
@@ -69,6 +69,7 @@ import {
   ViewJsonValue,
 } from './renderer/Renderer';
 import { MenuOptionFilter, RenderOptions } from './RenderOptions';
+import { defaultSchemaService, SchemaService } from './SchemaService';
 
 export function init(
   language: string,
@@ -77,6 +78,7 @@ export function init(
   strictMode: boolean,
   rendererFactory: RendererFactory,
   debounceMs: number,
+  schemaService: SchemaService,
 ): [Model, Cmd<Msg>] {
   JsFacade.setLang(language);
   const model = initialModel(
@@ -85,17 +87,19 @@ export function init(
     initialValue,
     strictMode,
     debounceMs,
+    schemaService,
   );
-  return reInitRenderers(model, rendererFactory);
+  return reInitRenderers(model, rendererFactory, schemaService);
 }
 
 function reInitRenderers(
   model: Model,
   customRendererFactory: RendererFactory,
+  schemaService: SchemaService,
 ): [Model, Cmd<Msg>] {
   return model.validationResult
     .map((validationResult) => {
-      const renderers = JsFacade.getRenderers(validationResult);
+      const renderers = schemaService.getRenderers(validationResult);
       const newCustomRenderers: Map<
         string,
         Maybe<CustomRendererModel>
@@ -152,6 +156,7 @@ export interface ViewJsonEditorProps {
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
   readonly renderOptions?: RenderOptions;
+  readonly schemaService: SchemaService;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
@@ -226,6 +231,7 @@ export function update(
   msg: Msg,
   model: Model,
   rendererFactory: RendererFactory,
+  schemaService: SchemaService,
   menuFilter?: MenuOptionFilter,
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
@@ -262,7 +268,13 @@ export function update(
     }
     case 'menu-trigger-clicked': {
       return noOut(
-        actionTriggerClicked(model, msg.path, msg.refBox, menuFilter),
+        actionTriggerClicked(
+          schemaService,
+          model,
+          msg.path,
+          msg.refBox,
+          menuFilter,
+        ),
       );
     }
     case 'menu-msg': {
@@ -291,7 +303,8 @@ export function update(
                       updatePiped(
                         model,
                         (m) => closeMenu(m),
-                        (m) => executeContextMenuAction(m, out.data),
+                        (m) =>
+                          executeContextMenuAction(schemaService, m, out.data),
                       ),
                     )
                       .mapSecond((c) => Cmd.batch([cmd, c]))
@@ -308,7 +321,7 @@ export function update(
     case 'add-elem-clicked':
       return withOutValueChanged(
         model,
-        actionAddElementToArray(model, msg.path),
+        actionAddElementToArray(schemaService, model, msg.path),
       );
     case 'set-json-str': {
       return noOut(
@@ -319,6 +332,7 @@ export function update(
           model.strictMode,
           rendererFactory,
           model.debounceMs,
+          schemaService,
         ),
       );
     }
@@ -328,7 +342,7 @@ export function update(
     case 'add-property-btn-clicked': {
       return withOutValueChanged(
         model,
-        actionAddProperty(model, msg.path, msg.propertyName),
+        actionAddProperty(schemaService, model, msg.path, msg.propertyName),
       );
     }
     case 'no-op':
@@ -338,10 +352,13 @@ export function update(
     case 'set-debounce-ms':
       return noOut(noCmd({ ...model, debounceMs: msg.debounceMs }));
     case 'recompute-metadata': {
-      const newModel = computeAll(doValidate(model));
+      const newModel = computeAll(
+        schemaService,
+        doValidate(schemaService, model),
+      );
       return withOutValueChanged(
         model,
-        reInitRenderers(newModel, rendererFactory),
+        reInitRenderers(newModel, rendererFactory, schemaService),
       );
     }
     case 'renderer-child-msg': {
@@ -443,9 +460,12 @@ export interface JsonEditorProps {
   readonly debounceMs?: number;
   readonly renderOptions?: RenderOptions;
   readonly menuFilter?: MenuOptionFilter;
+  readonly schemaService?: SchemaService;
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
+  const schemaService: SchemaService =
+    props.schemaService ?? defaultSchemaService;
   return (
     <Program
       init={() =>
@@ -456,6 +476,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           props.strictMode,
           props.rendererFactory,
           props.debounceMs || 500,
+          schemaService,
         )
       }
       view={(dispatch, model) => (
@@ -464,6 +485,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           model={model}
           rendererFactory={props.rendererFactory}
           renderOptions={props.renderOptions}
+          schemaService={schemaService}
         />
       )}
       update={(msg, model) => {
@@ -471,6 +493,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           msg,
           model,
           props.rendererFactory,
+          schemaService,
           props.menuFilter,
         );
         maco[2].forEach((outMsg) => {

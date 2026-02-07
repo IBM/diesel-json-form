@@ -26,8 +26,10 @@ import {
 import { MenuAction } from './ContextMenuActions';
 import { Model } from './Model';
 import { Msg } from './Msg';
+import { SchemaService } from './SchemaService';
 
-export function executeContextMenuAction(
+export default function executeContextMenuAction(
+  service: SchemaService,
   model: Model,
   action: MenuAction,
 ): [Model, Cmd<Msg>] {
@@ -46,6 +48,7 @@ export function executeContextMenuAction(
     }
     case 'proposal': {
       return actionApplyProposal(
+        service,
         model,
         action.path,
         action.value,
@@ -54,7 +57,7 @@ export function executeContextMenuAction(
     }
     case 'add': {
       if (action.isArray) {
-        return actionAddElementToArray(model, action.path);
+        return actionAddElementToArray(service, model, action.path);
       } else {
         return actionAddPropertyClicked(model, action.path);
       }

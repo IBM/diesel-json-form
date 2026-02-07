@@ -42,6 +42,7 @@ import { Box } from 'tea-pop-core';
 import { Debouncer } from './Debouncer';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { MenuOptionFilter } from './RenderOptions';
+import { SchemaService } from './SchemaService';
 
 export function actionDeleteValue(
   model: Model,
@@ -54,6 +55,7 @@ export function actionDeleteValue(
 }
 
 export function actionApplyProposal(
+  service: SchemaService,
   model: Model,
   path: JsPath,
   proposal: JsonValue,
@@ -66,7 +68,7 @@ export function actionApplyProposal(
           const augmentedProposal = model.validationResult
             .andThen((vr) => {
               // TODO deep propose only for proposalIndex
-              const all = JsFacade.propose(vr, path.format(), 5);
+              const all = service.propose(vr, path.format(), 5);
               return maybeOf(all[proposalIndex]);
             })
             .map(JsFacade.toJsonValue)
@@ -157,6 +159,7 @@ export function actionConfirmAddProperty(
 }
 
 export function actionAddProperty(
+  service: SchemaService,
   model: Model,
   path: JsPath,
   propertyName: string,
@@ -172,14 +175,14 @@ export function actionAddProperty(
         ]);
         const newRoot = setValueAt(model.root, path, newObject);
         const newValidationResult = model.schema.map((schemaAny) =>
-          JsFacade.validate(
+          service.validate(
             jsonValueToFacadeValue(schemaAny),
             jsonValueToFacadeValue(newRoot),
           ),
         );
 
         const propertyProposals = newValidationResult
-          .map((vr) => getProposals(vr, path.append(propertyName), -1))
+          .map((vr) => getProposals(service, vr, path.append(propertyName), -1))
           .withDefault([])
           .map(clearPropertiesIfObject);
 
@@ -199,6 +202,7 @@ export function actionAddProperty(
 }
 
 export function actionAddElementToArray(
+  service: SchemaService,
   model: Model,
   path: JsPath,
 ): [Model, Cmd<Msg>] {
@@ -215,14 +219,14 @@ export function actionAddElementToArray(
         const tmpRoot = setValueAt(model.root, path, tmpArray);
 
         const newValidationResult = model.schema.map((schemaAny) =>
-          JsFacade.validate(
+          service.validate(
             jsonValueToFacadeValue(schemaAny),
             jsonValueToFacadeValue(tmpRoot),
           ),
         );
 
         const proposals = newValidationResult
-          .map((vr) => getProposals(vr, path.append(newElemIndex), -1))
+          .map((vr) => getProposals(service, vr, path.append(newElemIndex), -1))
           .withDefault([]);
 
         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
@@ -254,6 +258,7 @@ export function updateMenu(
 }
 
 export function actionTriggerClicked(
+  service: SchemaService,
   model: Model,
   path: JsPath,
   refBox: Box,
@@ -280,7 +285,7 @@ export function actionTriggerClicked(
             root: model.root,
             path,
             proposals: model.validationResult
-              .map((vr) => getProposals(vr, path, -1))
+              .map((vr) => getProposals(service, vr, path, -1))
               .withDefault([]),
             valueAtPath,
             strictMode: model.strictMode,

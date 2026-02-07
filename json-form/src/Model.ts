@@ -26,6 +26,7 @@ import {
 } from '@diesel-parser/json-schema-facade-ts';
 import { TFunction } from 'i18next';
 import { initMyI18n } from './i18n/MyI18n';
+import { SchemaService } from './SchemaService';
 
 export interface Model {
   readonly schema: Maybe<JsonValue>;
@@ -56,12 +57,12 @@ export interface AddingState {
   readonly isDuplicate: boolean;
 }
 
-export function doValidate(model: Model): Model {
+export function doValidate(service: SchemaService, model: Model): Model {
   return model.schema
     .map((s) => {
       const schema = jsonValueToFacadeValue(s);
       const value = jsonValueToFacadeValue(model.root);
-      const validationResult = just(JsFacade.validate(schema, value));
+      const validationResult = just(service.validate(schema, value));
       return {
         ...model,
         validationResult,
@@ -70,9 +71,9 @@ export function doValidate(model: Model): Model {
     .withDefault(model);
 }
 
-export function computeErrors(model: Model): Model {
+export function computeErrors(service: SchemaService, model: Model): Model {
   const errors = model.validationResult
-    .map(JsFacade.getErrors)
+    .map(service.getErrors)
     .map((jsErrors) => {
       const res = new Map();
       jsErrors.forEach((err) => {
@@ -95,11 +96,14 @@ export function computeErrors(model: Model): Model {
   };
 }
 
-export function computePropertiesToAdd(model: Model): Model {
+export function computePropertiesToAdd(
+  service: SchemaService,
+  model: Model,
+): Model {
   return model.validationResult
     .map((validationResult) => {
       const propertiesToAdd = new Map<string, ReadonlyArray<string>>();
-      doComputePropsToAdd(model, validationResult, propertiesToAdd);
+      doComputePropsToAdd(service, model, validationResult, propertiesToAdd);
       const newModel: Model = {
         ...model,
         propertiesToAdd,
@@ -114,7 +118,10 @@ interface StringsMetadata {
   readonly formats: Map<string, ReadonlyArray<string>>;
 }
 
-export function computeStringsMetadata(model: Model): Model {
+export function computeStringsMetadata(
+  service: SchemaService,
+  model: Model,
+): Model {
   return model.validationResult
     .map((validationResult) => {
       const comboBoxes = new Map<string, ReadonlyArray<string>>();
@@ -123,7 +130,7 @@ export function computeStringsMetadata(model: Model): Model {
         comboBoxes,
         formats,
       };
-      doComputeStringsMetadata(model, validationResult, metadata);
+      doComputeStringsMetadata(service, model, validationResult, metadata);
       const newModel: Model = {
         ...model,
         comboBoxes,
@@ -135,6 +142,7 @@ export function computeStringsMetadata(model: Model): Model {
 }
 
 function doComputeStringsMetadata(
+  service: SchemaService,
   model: Model,
   validationResult: JsValidationResult,
   metadata: StringsMetadata,
@@ -145,6 +153,7 @@ function doComputeStringsMetadata(
       case 'jv-object': {
         value.properties.forEach((prop) =>
           doComputeStringsMetadata(
+            service,
             model,
             validationResult,
             metadata,
@@ -157,6 +166,7 @@ function doComputeStringsMetadata(
         // recurse
         value.elems.forEach((elem, elemIndex) =>
           doComputeStringsMetadata(
+            service,
             model,
             validationResult,
             metadata,
@@ -167,6 +177,7 @@ function doComputeStringsMetadata(
       }
       case 'jv-string': {
         const proposals: ReadonlyArray<string> = getProposals(
+          service,
           validationResult,
           path,
           -1,
@@ -185,6 +196,7 @@ function doComputeStringsMetadata(
         }
 
         const formats: ReadonlyArray<string> = getFormats(
+          service,
           validationResult,
           path,
         );
@@ -197,6 +209,7 @@ function doComputeStringsMetadata(
 }
 
 function doComputePropsToAdd(
+  service: SchemaService,
   model: Model,
   validationResult: JsValidationResult,
   props: Map<string, ReadonlyArray<string>>,
@@ -207,6 +220,7 @@ function doComputePropsToAdd(
       case 'jv-object': {
         // compute props for this object and recurse
         const propNameProposals: string[] = getProposals(
+          service,
           validationResult,
           path,
           -1,
@@ -219,6 +233,7 @@ function doComputePropsToAdd(
         props.set(path.format(), propNameProposals);
         value.properties.forEach((prop) =>
           doComputePropsToAdd(
+            service,
             model,
             validationResult,
             props,
@@ -231,6 +246,7 @@ function doComputePropsToAdd(
         // recurse
         value.elems.forEach((elem, elemIndex) =>
           doComputePropsToAdd(
+            service,
             model,
             validationResult,
             props,
@@ -249,6 +265,7 @@ export function initialModel(
   root: JsonValue,
   strictMode: boolean,
   debounceMs: number,
+  schemaService: SchemaService,
 ): Model {
   const t = initMyI18n(lang);
   const model: Model = {
@@ -269,11 +286,14 @@ export function initialModel(
     debounceMs: Math.max(0, debounceMs),
   };
 
-  return computeAll(doValidate(model));
+  return computeAll(schemaService, doValidate(schemaService, model));
 }
 
-export function computeAll(model: Model): Model {
-  return computeStringsMetadata(computePropertiesToAdd(computeErrors(model)));
+export function computeAll(service: SchemaService, model: Model): Model {
+  return computeStringsMetadata(
+    service,
+    computePropertiesToAdd(service, computeErrors(service, model)),
+  );
 }
 
 export function updateAddingPropertyName(
@@ -305,17 +325,19 @@ export function updateAddingPropertyName(
 }
 
 export function getProposals(
+  service: SchemaService,
   validationResult: JsValidationResult,
   path: JsPath,
   depth: number,
 ): ReadonlyArray<JsonValue> {
-  const proposals = JsFacade.propose(validationResult, path.format(), depth);
+  const proposals = service.propose(validationResult, path.format(), depth);
   return proposals.map(JsFacade.toJsonValue);
 }
 
 export function getFormats(
+  service: SchemaService,
   validationResult: JsValidationResult,
   path: JsPath,
 ): ReadonlyArray<string> {
-  return JsFacade.getFormats(validationResult, path.format());
+  return service.getFormats(validationResult, path.format());
 }
