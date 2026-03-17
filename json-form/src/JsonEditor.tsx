@@ -89,17 +89,16 @@ export function init(
     debounceMs,
     schemaService,
   );
-  return reInitRenderers(model, rendererFactory, schemaService);
+  return reInitRenderers(model, rendererFactory);
 }
 
 function reInitRenderers(
   model: Model,
   customRendererFactory: RendererFactory,
-  schemaService: SchemaService,
 ): [Model, Cmd<Msg>] {
   return model.validationResult
     .map((validationResult) => {
-      const renderers = schemaService.getRenderers(validationResult);
+      const renderers = validationResult.getRenderers();
       const newCustomRenderers: Map<
         string,
         Maybe<CustomRendererModel>
@@ -268,13 +267,7 @@ export function update(
     }
     case 'menu-trigger-clicked': {
       return noOut(
-        actionTriggerClicked(
-          schemaService,
-          model,
-          msg.path,
-          msg.refBox,
-          menuFilter,
-        ),
+        actionTriggerClicked(model, msg.path, msg.refBox, menuFilter),
       );
     }
     case 'menu-msg': {
@@ -352,13 +345,10 @@ export function update(
     case 'set-debounce-ms':
       return noOut(noCmd({ ...model, debounceMs: msg.debounceMs }));
     case 'recompute-metadata': {
-      const newModel = computeAll(
-        schemaService,
-        doValidate(schemaService, model),
-      );
+      const newModel = computeAll(doValidate(schemaService, model));
       return withOutValueChanged(
         model,
-        reInitRenderers(newModel, rendererFactory, schemaService),
+        reInitRenderers(newModel, rendererFactory),
       );
     }
     case 'renderer-child-msg': {

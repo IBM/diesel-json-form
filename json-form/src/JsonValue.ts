@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { err, just, Maybe, nothing, ok, Result } from 'tea-cup-core';
 import { JsPath } from './JsPath';
-import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 
 export type JsonValue =
   | JvNull
@@ -408,11 +408,7 @@ function escapeDoubleQuotes(s: string): string {
   return s.replace(/\\([\s\S])|(")/g, '\\$1$2');
 }
 
-export function jsonValueToFacadeValue(v: JsonValue): JsFacade.JsonValue {
-  const s = stringify(v);
-  return JsFacade.parseValue(s);
-}
-
+// TODO remove call to facade
 export function parseJsonValue(v: string): Result<string, JsonValue> {
   try {
     const astNode = JsFacade.parseValue(v);

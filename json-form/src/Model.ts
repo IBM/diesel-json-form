@@ -15,24 +15,23 @@
  */
 
 import { just, Maybe, nothing } from 'tea-cup-core';
-import { getValueAt, JsonValue, jsonValueToFacadeValue } from './JsonValue';
+import { getValueAt, JsonValue } from './JsonValue';
 import { JsPath } from './JsPath';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
-import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import {
-  JsValidationError,
-  JsValidationResult,
-} from '@diesel-parser/json-schema-facade-ts';
 import { TFunction } from 'i18next';
 import { initMyI18n } from './i18n/MyI18n';
-import { SchemaService } from './SchemaService';
+import {
+  SchemaService,
+  ValidationError,
+  ValidationResult,
+} from './SchemaService';
 
 export interface Model {
   readonly schema: Maybe<JsonValue>;
   readonly root: JsonValue;
-  readonly validationResult: Maybe<JsValidationResult>;
-  readonly errors: ReadonlyMap<string, ReadonlyArray<JsValidationError>>;
+  readonly validationResult: Maybe<ValidationResult>;
+  readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;
   readonly adding: Maybe<AddingState>;
   readonly menuModel: Maybe<TPM.Model<MenuAction>>;
   readonly collapsedPaths: ReadonlySet<string>;
@@ -60,9 +59,7 @@ export interface AddingState {
 export function doValidate(service: SchemaService, model: Model): Model {
   return model.schema
     .map((s) => {
-      const schema = jsonValueToFacadeValue(s);
-      const value = jsonValueToFacadeValue(model.root);
-      const validationResult = just(service.validate(schema, value));
+      const validationResult = just(service.validate(s, model.root));
       return {
         ...model,
         validationResult,
@@ -71,9 +68,9 @@ export function doValidate(service: SchemaService, model: Model): Model {
     .withDefault(model);
 }
 
-export function computeErrors(service: SchemaService, model: Model): Model {
+export function computeErrors(model: Model): Model {
   const errors = model.validationResult
-    .map(service.getErrors)
+    .map((vr) => vr.getErrors())
     .map((jsErrors) => {
       const res = new Map();
       jsErrors.forEach((err) => {
@@ -86,9 +83,7 @@ export function computeErrors(service: SchemaService, model: Model): Model {
       });
       return res;
     })
-    .withDefaultSupply(
-      () => new Map<string, ReadonlyArray<JsValidationError>>(),
-    );
+    .withDefaultSupply(() => new Map<string, ReadonlyArray<ValidationError>>());
 
   return {
     ...model,
@@ -96,14 +91,11 @@ export function computeErrors(service: SchemaService, model: Model): Model {
   };
 }
 
-export function computePropertiesToAdd(
-  service: SchemaService,
-  model: Model,
-): Model {
+export function computePropertiesToAdd(model: Model): Model {
   return model.validationResult
     .map((validationResult) => {
       const propertiesToAdd = new Map<string, ReadonlyArray<string>>();
-      doComputePropsToAdd(service, model, validationResult, propertiesToAdd);
+      doComputePropsToAdd(model, validationResult, propertiesToAdd);
       const newModel: Model = {
         ...model,
         propertiesToAdd,
@@ -118,10 +110,7 @@ interface StringsMetadata {
   readonly formats: Map<string, ReadonlyArray<string>>;
 }
 
-export function computeStringsMetadata(
-  service: SchemaService,
-  model: Model,
-): Model {
+export function computeStringsMetadata(model: Model): Model {
   return model.validationResult
     .map((validationResult) => {
       const comboBoxes = new Map<string, ReadonlyArray<string>>();
@@ -130,7 +119,7 @@ export function computeStringsMetadata(
         comboBoxes,
         formats,
       };
-      doComputeStringsMetadata(service, model, validationResult, metadata);
+      doComputeStringsMetadata(model, validationResult, metadata);
       const newModel: Model = {
         ...model,
         comboBoxes,
@@ -142,9 +131,8 @@ export function computeStringsMetadata(
 }
 
 function doComputeStringsMetadata(
-  service: SchemaService,
   model: Model,
-  validationResult: JsValidationResult,
+  validationResult: ValidationResult,
   metadata: StringsMetadata,
   path: JsPath = JsPath.empty,
 ): void {
@@ -153,7 +141,6 @@ function doComputeStringsMetadata(
       case 'jv-object': {
         value.properties.forEach((prop) =>
           doComputeStringsMetadata(
-            service,
             model,
             validationResult,
             metadata,
@@ -166,7 +153,6 @@ function doComputeStringsMetadata(
         // recurse
         value.elems.forEach((elem, elemIndex) =>
           doComputeStringsMetadata(
-            service,
             model,
             validationResult,
             metadata,
@@ -176,12 +162,8 @@ function doComputeStringsMetadata(
         break;
       }
       case 'jv-string': {
-        const proposals: ReadonlyArray<string> = getProposals(
-          service,
-          validationResult,
-          path,
-          -1,
-        )
+        const proposals: ReadonlyArray<string> = validationResult
+          .propose(path, -1)
           .flatMap((proposal) => {
             if (proposal.tag === 'jv-string') {
               return [proposal.value];
@@ -195,11 +177,8 @@ function doComputeStringsMetadata(
           metadata.comboBoxes.set(path.format(), proposals);
         }
 
-        const formats: ReadonlyArray<string> = getFormats(
-          service,
-          validationResult,
-          path,
-        );
+        const formats: ReadonlyArray<string> =
+          validationResult.getFormats(path);
         if (formats.length > 0) {
           metadata.formats.set(path.format(), formats);
         }
@@ -209,9 +188,8 @@ function doComputeStringsMetadata(
 }
 
 function doComputePropsToAdd(
-  service: SchemaService,
   model: Model,
-  validationResult: JsValidationResult,
+  validationResult: ValidationResult,
   props: Map<string, ReadonlyArray<string>>,
   path: JsPath = JsPath.empty,
 ): void {
@@ -219,21 +197,17 @@ function doComputePropsToAdd(
     switch (value.tag) {
       case 'jv-object': {
         // compute props for this object and recurse
-        const propNameProposals: string[] = getProposals(
-          service,
-          validationResult,
-          path,
-          -1,
-        ).flatMap((proposal) => {
-          if (proposal.tag === 'jv-object') {
-            return proposal.properties.map((p) => p.name);
-          }
-          return [];
-        });
+        const propNameProposals: string[] = validationResult
+          .propose(path, -1)
+          .flatMap((proposal) => {
+            if (proposal.tag === 'jv-object') {
+              return proposal.properties.map((p) => p.name);
+            }
+            return [];
+          });
         props.set(path.format(), propNameProposals);
         value.properties.forEach((prop) =>
           doComputePropsToAdd(
-            service,
             model,
             validationResult,
             props,
@@ -246,7 +220,6 @@ function doComputePropsToAdd(
         // recurse
         value.elems.forEach((elem, elemIndex) =>
           doComputePropsToAdd(
-            service,
             model,
             validationResult,
             props,
@@ -265,7 +238,7 @@ export function initialModel(
   root: JsonValue,
   strictMode: boolean,
   debounceMs: number,
-  schemaService: SchemaService,
+  service: SchemaService,
 ): Model {
   const t = initMyI18n(lang);
   const model: Model = {
@@ -286,14 +259,11 @@ export function initialModel(
     debounceMs: Math.max(0, debounceMs),
   };
 
-  return computeAll(schemaService, doValidate(schemaService, model));
+  return computeAll(doValidate(service, model));
 }
 
-export function computeAll(service: SchemaService, model: Model): Model {
-  return computeStringsMetadata(
-    service,
-    computePropertiesToAdd(service, computeErrors(service, model)),
-  );
+export function computeAll(model: Model): Model {
+  return computeStringsMetadata(computePropertiesToAdd(computeErrors(model)));
 }
 
 export function updateAddingPropertyName(
@@ -322,22 +292,4 @@ export function updateAddingPropertyName(
       return res;
     }),
   };
-}
-
-export function getProposals(
-  service: SchemaService,
-  validationResult: JsValidationResult,
-  path: JsPath,
-  depth: number,
-): ReadonlyArray<JsonValue> {
-  const proposals = service.propose(validationResult, path.format(), depth);
-  return proposals.map(JsFacade.toJsonValue);
-}
-
-export function getFormats(
-  service: SchemaService,
-  validationResult: JsValidationResult,
-  path: JsPath,
-): ReadonlyArray<string> {
-  return service.getFormats(validationResult, path.format());
 }

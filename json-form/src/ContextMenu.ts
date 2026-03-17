@@ -48,7 +48,6 @@ export default function executeContextMenuAction(
     }
     case 'proposal': {
       return actionApplyProposal(
-        service,
         model,
         action.path,
         action.value,
