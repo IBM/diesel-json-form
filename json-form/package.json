@@ -49,7 +49,7 @@
       "build:ts"
     ],
     "src/**/*.scss": [
-      "build:scss"
+      "build:sass"
     ]
   }
 }
