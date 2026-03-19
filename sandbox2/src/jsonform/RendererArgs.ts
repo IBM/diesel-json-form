@@ -5,7 +5,7 @@ import { Renderer } from './Renderer';
 export interface RendererArgs<T extends JsonValue> {
   readonly value: T;
   readonly path: JsPath;
-  readonly valueChanged: (path: JsPath) => void;
+  readonly valueChanged: (path: JsPath, newValue: JsonValue) => void;
   readonly schemaInfos: SchemaInfos;
   readonly renderer: Renderer;
 }

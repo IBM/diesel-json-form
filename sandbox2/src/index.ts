@@ -17,7 +17,13 @@
 import './style.css';
 import { samples } from './initdata';
 import { JsonFormElement } from './jsonform/elements/JsonFormElement';
-import { valueFromAny } from '@diesel-parser/json-form';
+import {
+  defaultSchemaService,
+  JsonValue,
+  jvNumber,
+  jvString,
+  parseJsonValue,
+} from '@diesel-parser/json-form';
 import { JsonNullElement } from './jsonform/elements/JsonNullElement';
 import { JsonArrayElement } from './jsonform/elements/JsonArrayElement';
 import { JsonObjectElement } from './jsonform/elements/JsonObjectElement';
@@ -49,16 +55,37 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
+// const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
 
 const jsonForm = document.getElementById('my-form') as JsonFormElement;
 
-sampleSchemaSelect.addEventListener('change', () => {
-  taSchema.value = sampleSchemaSelect.value;
-  // editor1.setValue(sampleSchemaSelect.value);
-  // sendJsonStr();
-  jsonForm.schema = JSON.parse(taSchema.value);
-});
+function unsafeParseJsonValue(json: string): JsonValue {
+  return parseJsonValue(json).match(
+    (v) => v,
+    () => {
+      throw new Error('booom');
+    },
+  );
+}
+
+const schema = unsafeParseJsonValue(`
+    {
+        "type": "number"
+    }`);
+
+const value = jvNumber('yalla'); //jvNumber('1234');
+
+jsonForm.render(defaultSchemaService, schema, value);
+
+// sampleSchemaSelect.addEventListener('change', () => {
+//   taSchema.value = sampleSchemaSelect.value;
+//   // editor1.setValue(sampleSchemaSelect.value);
+//   // sendJsonStr();
+//   //   jsonForm.schema = JSON.parse(taSchema.value);
+
+//   //   jsonForm.schema = JSON.parse(taSchema.value);
+//   //   jsonForm.render(jvString('yalla'));
+// });
 
 // sampleSchemaSelect.value = 'BeanContainingOtherBean';
 
@@ -66,22 +93,15 @@ sampleSchemaSelect.addEventListener('change', () => {
 
 // const value = [1, 2, 'foo', true, { foo: 'bar' }];
 
-// const value = {
-//   customer: {
-//     age: 'not a string',
-//     firstName: 'Remi',
+// const value = {};
+
+// jsonForm.schema = {};
+
+// valueFromAny(value).match(
+//   (v) => jsonForm.render(v),
+//   (err) => {
+//     throw err;
 //   },
-// };
-
-const value = {};
-
-jsonForm.schema = {};
-
-valueFromAny(value).match(
-  (v) => jsonForm.render(v),
-  (err) => {
-    throw err;
-  },
-);
+// );
 
 // jsonForm.value = toJsonNode('turbo');

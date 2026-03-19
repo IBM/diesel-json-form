@@ -1,4 +1,4 @@
-import { JvBoolean, jvBool } from '@diesel-parser/json-form';
+import { JvBoolean, jvBool, jvNull } from '@diesel-parser/json-form';
 import { JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { input } from '../HtmlBuilder';
@@ -24,12 +24,16 @@ export class JsonBooleanElement extends JsonValueElementBase<JvBoolean> {
     const { value, path, valueChanged } = args;
     this._input.checked = value.value;
     this._input.addEventListener('input', () => {
-      valueChanged(path);
+      valueChanged(path, jvNull);
     });
     this.appendChild(this._input);
   }
 
   getValue(): JvBoolean {
     return jvBool(this._input.checked);
+  }
+
+  protected doReRender(): void {
+    throw '';
   }
 }

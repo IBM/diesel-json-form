@@ -1,11 +1,4 @@
-import {
-  JvArray,
-  JsonValue,
-  jvArray,
-  jvNull,
-  setValueAt,
-  getProposals,
-} from '@diesel-parser/json-form';
+import { JvArray, JsonValue, jvArray } from '@diesel-parser/json-form';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { button, div, text } from '../HtmlBuilder';
@@ -82,23 +75,23 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   }
 
   private addElem() {
-    if (this.schemaInfos && this.path) {
-      const thisValue = this.getValue();
-      const newValue = jvArray([...thisValue.elems, jvNull]);
-      const root = this.schemaInfos.getRootValue();
-      const newRoot = setValueAt(root, this.path, newValue);
-      const validationResult = this.schemaInfos.validate(newRoot);
-      const proposals = getProposals(
-        validationResult,
-        this.path.append(newValue.elems.length - 1),
-        -1,
-      );
-      if (proposals.length > 0) {
-        const proposal = proposals[0];
-        console.log('proposal', proposal);
-      }
-      console.log(proposals);
-    }
+    // if (this.schemaInfos && this.path) {
+    //   const thisValue = this.getValue();
+    //   const newValue = jvArray([...thisValue.elems, jvNull]);
+    //   const root = this.schemaInfos.getRootValue();
+    //   const newRoot = setValueAt(root, this.path, newValue);
+    //   const validationResult = this.schemaInfos.validate(newRoot);
+    //   const proposals = getProposals(
+    //     validationResult,
+    //     this.path.append(newValue.elems.length - 1),
+    //     -1,
+    //   );
+    //   if (proposals.length > 0) {
+    //     const proposal = proposals[0];
+    //     console.log('proposal', proposal);
+    //   }
+    //   console.log(proposals);
+    // }
   }
 
   private deleteItem(itemRow: ItemRow) {
@@ -107,11 +100,15 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
       this._elems.splice(i, 1);
       this._wrapperElem.removeChild(itemRow.valueElem);
       this._wrapperElem.removeChild(itemRow.deleteButton);
-      this.fireValueChanged();
+      this.fireValueChanged(jvArray([]));
     }
   }
 
   getValue(): JvArray {
     return jvArray(this._elems.map((e) => e.valueElem.getValue()));
+  }
+
+  protected doReRender(): void {
+    throw '';
   }
 }

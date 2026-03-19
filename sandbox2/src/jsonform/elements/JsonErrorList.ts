@@ -1,5 +1,5 @@
-import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 import * as H from '../HtmlBuilder';
+import { ValidationError } from '@diesel-parser/json-form';
 
 export class JsonErrorList extends HTMLElement {
   static TAG_NAME = 'json-error-list';
@@ -19,7 +19,7 @@ export class JsonErrorList extends HTMLElement {
     this.appendChild(this._ulElem);
   }
 
-  set errors(errors: readonly JsValidationError[]) {
+  set errors(errors: readonly ValidationError[]) {
     H.empty(this._ulElem);
     if (errors.length === 0) {
       this.style.display = 'none';

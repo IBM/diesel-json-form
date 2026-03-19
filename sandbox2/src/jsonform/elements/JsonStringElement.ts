@@ -1,13 +1,10 @@
 import { JvString, jvString } from '@diesel-parser/json-form';
 import { JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
-import { SchemaInfosListener } from '../SchemaInfos';
 import { input } from '../HtmlBuilder';
+import { SchemaInfos } from '../SchemaInfos';
 
-export class JsonStringElement
-  extends JsonValueElementBase<JvString>
-  implements SchemaInfosListener
-{
+export class JsonStringElement extends JsonValueElementBase<JvString> {
   static TAG_NAME = 'json-string';
 
   static newInstance(): JsonStringElement {
@@ -25,12 +22,16 @@ export class JsonStringElement
   }
 
   protected doRender(args: RendererArgs<JvString>) {
-    const { path, valueChanged, value } = args;
+    const { value } = args;
     this._input.value = value.value;
     this._input.addEventListener('input', () => {
-      valueChanged(path);
+      this.fireValueChanged(jvString(this._input.value));
     });
     this.appendChild(this._input);
+  }
+
+  protected doReRender(schemaInfos: SchemaInfos, value: JvString): void {
+    this._input.value = value.value;
   }
 
   getValue(): JvString {
