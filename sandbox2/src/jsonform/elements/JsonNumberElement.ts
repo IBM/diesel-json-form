@@ -1,4 +1,4 @@
-import { JvNumber, jvNumber } from '@diesel-parser/json-form';
+import { JsPath, JvNumber, jvNumber } from '@diesel-parser/json-form';
 import { JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { input } from '../HtmlBuilder';
@@ -33,7 +33,11 @@ export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
     this.appendChild(this._input);
   }
 
-  protected doReRender(schemaInfos: SchemaInfos, value: JvNumber): void {
+  protected doReRender(
+    schemaInfos: SchemaInfos,
+    path: JsPath,
+    value: JvNumber,
+  ): void {
     this._input.value = value.value;
   }
 

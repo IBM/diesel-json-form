@@ -1,9 +1,11 @@
-import { JvArray, JsonValue, jvArray } from '@diesel-parser/json-form';
+import { JvArray, JsonValue, jvArray, JsPath } from '@diesel-parser/json-form';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { button, div, text } from '../HtmlBuilder';
+import { SchemaInfos } from '../SchemaInfos';
 
 interface ItemRow {
+  readonly item: JsonValue;
   readonly valueElem: JsonValueElement<JsonValue> & HTMLElement;
   readonly deleteButton: HTMLElement;
 }
@@ -36,9 +38,9 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
       this._elems.push(itemRow);
       wrapperElem.appendChild(itemRow.valueElem);
       wrapperElem.appendChild(itemRow.deleteButton);
-      itemRow.deleteButton.addEventListener('click', () => {
-        this.deleteItem(itemRow);
-      });
+      //   itemRow.deleteButton.addEventListener('click', () => {
+      //     this.deleteItem(itemRow);
+      //   });
     });
     this._addButtonElem.style.gridColumn = 'span 2';
     const addButton = button(
@@ -51,7 +53,6 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     );
     this._addButtonElem.appendChild(addButton);
     wrapperElem.appendChild(this._addButtonElem);
-
     this._wrapperElem = wrapperElem;
     this.appendChild(wrapperElem);
   }
@@ -69,6 +70,7 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
       value: item,
     });
     return {
+      item,
       valueElem,
       deleteButton,
     };
@@ -94,21 +96,39 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     // }
   }
 
-  private deleteItem(itemRow: ItemRow) {
-    const i = this._elems.indexOf(itemRow);
-    if (i !== -1) {
-      this._elems.splice(i, 1);
-      this._wrapperElem.removeChild(itemRow.valueElem);
-      this._wrapperElem.removeChild(itemRow.deleteButton);
-      this.fireValueChanged(jvArray([]));
+  //   private deleteItem(itemRow: ItemRow) {
+  //     const i = this._elems.indexOf(itemRow);
+  //     if (i !== -1) {
+  //       this._elems.splice(i, 1);
+  //       this._wrapperElem.removeChild(itemRow.valueElem);
+  //       this._wrapperElem.removeChild(itemRow.deleteButton);
+  //       this.fireValueChanged(jvArray([]));
+  //     }
+  //   }
+
+  //   getValue(): JvArray {
+  //     return jvArray(this._elems.map((e) => e.valueElem.getValue()));
+  //   }
+
+  protected doReRender(
+    schemaInfos: SchemaInfos,
+    path: JsPath,
+    value: JvArray,
+  ): void {
+    const oldElems = this._elems.map((e) => e.item);
+    if (value.elems.length !== oldElems.length) {
+      throw new Error('not implemented');
     }
-  }
+    for (let i = 0; i < value.elems.length; i++) {
+      if (oldElems[i] === value.elems[i]) {
+      }
+    }
 
-  getValue(): JvArray {
-    return jvArray(this._elems.map((e) => e.valueElem.getValue()));
-  }
+    const newElems = new Set(value.elems);
+    for (const itemRow of this._elems) {
+    }
 
-  protected doReRender(): void {
-    throw '';
+    const oldValue = args.value;
+    // const oldItems = new Set(oldValue.elems);
   }
 }

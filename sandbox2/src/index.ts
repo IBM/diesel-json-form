@@ -20,6 +20,8 @@ import { JsonFormElement } from './jsonform/elements/JsonFormElement';
 import {
   defaultSchemaService,
   JsonValue,
+  jvArray,
+  jvBool,
   jvNumber,
   jvString,
   parseJsonValue,
@@ -70,10 +72,13 @@ function unsafeParseJsonValue(json: string): JsonValue {
 
 const schema = unsafeParseJsonValue(`
     {
-        "type": "number"
+        "type": "array",
+        "items": {
+            "type": "number"
+        }
     }`);
 
-const value = jvNumber('yalla'); //jvNumber('1234');
+const value = jvArray([jvNumber('123'), jvString('bar')]); //jvNumber('1234');
 
 jsonForm.render(defaultSchemaService, schema, value);
 

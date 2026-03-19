@@ -168,11 +168,11 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   //   });
   //   }
 
-  getValue(): JvObject {
-    return jvObject(
-      this._elems.map((x) => {
-        return { name: x.propertyName, value: x.propertyValueElem.getValue() };
-      }),
-    );
-  }
+  //   getValue(): JvObject {
+  //     return jvObject(
+  //       this._elems.map((x) => {
+  //         return { name: x.propertyName, value: x.propertyValueElem.getValue() };
+  //       }),
+  //     );
+  //   }
 }

@@ -64,16 +64,16 @@ export class JsonFormElement extends HTMLElement {
         this.removeChild(this._jsonValueElement);
         this.doRender(schemaInfos, newRoot);
       } else {
-        this._jsonValueElement.reRender(schemaInfos, newRoot);
+        this._jsonValueElement.reRender(schemaInfos, path, newRoot);
       }
     }
   }
 
-  getValue(): JsonValue {
-    if (this._jsonValueElement) {
-      return this._jsonValueElement.getValue();
-    } else {
-      throw new Error('no JsonValueElement found');
-    }
-  }
+  //   getValue(): JsonValue {
+  //     if (this._jsonValueElement) {
+  //       return this._jsonValueElement.getValue();
+  //     } else {
+  //       throw new Error('no JsonValueElement found');
+  //     }
+  //   }
 }

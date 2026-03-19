@@ -24,6 +24,6 @@ export class JsonNullElement extends JsonValueElementBase<JvNull> {
   }
 
   protected doReRender(): void {
-    throw '';
+    // noop
   }
 }
