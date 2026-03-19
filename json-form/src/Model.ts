@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-import { just, Maybe, nothing, Tuple } from 'tea-cup-core';
-import { getValueAt, JsonValue, valueFromAny, valueToAny } from './JsonValue';
+import { just, Maybe, nothing } from 'tea-cup-core';
+import { getValueAt, JsonValue } from './JsonValue';
 import { JsPath } from './JsPath';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
-import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import {
-  JsValidationError,
-  JsValidationResult,
-} from '@diesel-parser/json-schema-facade-ts';
 import { TFunction } from 'i18next';
 import { initMyI18n } from './i18n/MyI18n';
+import {
+  SchemaService,
+  ValidationError,
+  ValidationResult,
+} from './SchemaService';
 
 export interface Model {
-  readonly schema: Maybe<Tuple<any, JsonValue>>;
-  readonly root: Tuple<any, JsonValue>;
-  readonly validationResult: Maybe<JsValidationResult>;
-  readonly errors: ReadonlyMap<string, ReadonlyArray<JsValidationError>>;
+  readonly schema: Maybe<JsonValue>;
+  readonly root: JsonValue;
+  readonly validationResult: Maybe<ValidationResult>;
+  readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;
   readonly adding: Maybe<AddingState>;
   readonly menuModel: Maybe<TPM.Model<MenuAction>>;
   readonly collapsedPaths: ReadonlySet<string>;
@@ -56,10 +56,10 @@ export interface AddingState {
   readonly isDuplicate: boolean;
 }
 
-export function doValidate(model: Model): Model {
+export function doValidate(service: SchemaService, model: Model): Model {
   return model.schema
-    .map((t) => {
-      const validationResult = just(JsFacade.validate(t.a, model.root.a));
+    .map((s) => {
+      const validationResult = just(service.validate(s, model.root));
       return {
         ...model,
         validationResult,
@@ -70,7 +70,7 @@ export function doValidate(model: Model): Model {
 
 export function computeErrors(model: Model): Model {
   const errors = model.validationResult
-    .map(JsFacade.getErrors)
+    .map((vr) => vr.getErrors())
     .map((jsErrors) => {
       const res = new Map();
       jsErrors.forEach((err) => {
@@ -83,9 +83,7 @@ export function computeErrors(model: Model): Model {
       });
       return res;
     })
-    .withDefaultSupply(
-      () => new Map<string, ReadonlyArray<JsValidationError>>(),
-    );
+    .withDefaultSupply(() => new Map<string, ReadonlyArray<ValidationError>>());
 
   return {
     ...model,
@@ -134,11 +132,11 @@ export function computeStringsMetadata(model: Model): Model {
 
 function doComputeStringsMetadata(
   model: Model,
-  validationResult: JsValidationResult,
+  validationResult: ValidationResult,
   metadata: StringsMetadata,
   path: JsPath = JsPath.empty,
 ): void {
-  getValueAt(model.root.b, path).forEach((value) => {
+  getValueAt(model.root, path).forEach((value) => {
     switch (value.tag) {
       case 'jv-object': {
         value.properties.forEach((prop) =>
@@ -164,11 +162,8 @@ function doComputeStringsMetadata(
         break;
       }
       case 'jv-string': {
-        const proposals: ReadonlyArray<string> = getProposals(
-          validationResult,
-          path,
-          -1,
-        )
+        const proposals: ReadonlyArray<string> = validationResult
+          .propose(path, -1)
           .flatMap((proposal) => {
             if (proposal.tag === 'jv-string') {
               return [proposal.value];
@@ -182,10 +177,8 @@ function doComputeStringsMetadata(
           metadata.comboBoxes.set(path.format(), proposals);
         }
 
-        const formats: ReadonlyArray<string> = getFormats(
-          validationResult,
-          path,
-        );
+        const formats: ReadonlyArray<string> =
+          validationResult.getFormats(path);
         if (formats.length > 0) {
           metadata.formats.set(path.format(), formats);
         }
@@ -196,24 +189,22 @@ function doComputeStringsMetadata(
 
 function doComputePropsToAdd(
   model: Model,
-  validationResult: JsValidationResult,
+  validationResult: ValidationResult,
   props: Map<string, ReadonlyArray<string>>,
   path: JsPath = JsPath.empty,
 ): void {
-  getValueAt(model.root.b, path).forEach((value) => {
+  getValueAt(model.root, path).forEach((value) => {
     switch (value.tag) {
       case 'jv-object': {
         // compute props for this object and recurse
-        const propNameProposals: string[] = getProposals(
-          validationResult,
-          path,
-          -1,
-        ).flatMap((proposal) => {
-          if (proposal.tag === 'jv-object') {
-            return proposal.properties.map((p) => p.name);
-          }
-          return [];
-        });
+        const propNameProposals: string[] = validationResult
+          .propose(path, -1)
+          .flatMap((proposal) => {
+            if (proposal.tag === 'jv-object') {
+              return proposal.properties.map((p) => p.name);
+            }
+            return [];
+          });
         props.set(path.format(), propNameProposals);
         value.properties.forEach((prop) =>
           doComputePropsToAdd(
@@ -241,23 +232,20 @@ function doComputePropsToAdd(
   });
 }
 
-function toValueTuple(v: JsonValue): Tuple<any, JsonValue> {
-  return new Tuple(valueToAny(v), v);
-}
-
 export function initialModel(
   lang: string,
   schema: Maybe<JsonValue>,
   root: JsonValue,
   strictMode: boolean,
   debounceMs: number,
+  service: SchemaService,
 ): Model {
   const t = initMyI18n(lang);
   const model: Model = {
     lang,
     t,
-    schema: schema.map(toValueTuple),
-    root: toValueTuple(root),
+    schema,
+    root,
     validationResult: nothing,
     errors: new Map(),
     adding: nothing,
@@ -271,7 +259,7 @@ export function initialModel(
     debounceMs: Math.max(0, debounceMs),
   };
 
-  return computeAll(doValidate(model));
+  return computeAll(doValidate(service, model));
 }
 
 export function computeAll(model: Model): Model {
@@ -288,7 +276,7 @@ export function updateAddingPropertyName(
       const res: AddingState = {
         ...addingState,
         addingPropName: propName,
-        isDuplicate: getValueAt(model.root.b, addingState.ownerPath)
+        isDuplicate: getValueAt(model.root, addingState.ownerPath)
           .map((ownerValue) => {
             if (ownerValue.tag === 'jv-object') {
               return (
@@ -304,25 +292,4 @@ export function updateAddingPropertyName(
       return res;
     }),
   };
-}
-
-export function getProposals(
-  validationResult: JsValidationResult,
-  path: JsPath,
-  depth: number,
-): ReadonlyArray<JsonValue> {
-  const proposals = JsFacade.propose(validationResult, path.format(), depth);
-  return proposals.flatMap((proposalAny) => {
-    return valueFromAny(proposalAny).match(
-      (jsonValue) => [jsonValue],
-      () => [], // TODO error ignored not so good ?
-    );
-  });
-}
-
-export function getFormats(
-  validationResult: JsValidationResult,
-  path: JsPath,
-): ReadonlyArray<string> {
-  return JsFacade.getFormats(validationResult, path.format());
 }

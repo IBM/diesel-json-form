@@ -4,7 +4,7 @@ import {
   jvString,
   RendererInitArgs,
   RendererViewArgs,
-} from "@diesel-parser/json-form";
+} from '@diesel-parser/json-form';
 import {
   Cmd,
   Decode as D,
@@ -13,13 +13,13 @@ import {
   Maybe,
   noCmd,
   nothing,
-} from "tea-cup-core";
-import * as React from "react";
+} from 'tea-cup-core';
+import * as React from 'react';
 
 export type Msg =
-  | { tag: "mouse-enter" }
-  | { tag: "mouse-leave" }
-  | { tag: "button-clicked" };
+  | { tag: 'mouse-enter' }
+  | { tag: 'mouse-leave' }
+  | { tag: 'button-clicked' };
 
 export interface Model {
   readonly value: string;
@@ -28,14 +28,14 @@ export interface Model {
 }
 
 const MyConfigPropDecoder: Decoder<number> = D.at(
-  ["renderer", "myConfigProp"],
-  D.num
+  ['renderer', 'myConfigProp'],
+  D.num,
 );
 
 export const MyStringRenderer: Renderer<Model, Msg> = {
   reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
     const { value, model, schema } = args;
-    const strValue = value.tag === "jv-string" ? value.value : "NOT A STRING";
+    const strValue = value.tag === 'jv-string' ? value.value : 'NOT A STRING';
     const m: Model = model
       .map((x) => ({
         ...x,
@@ -53,39 +53,39 @@ export const MyStringRenderer: Renderer<Model, Msg> = {
     return (
       <div
         key={path.format() + model.value}
-        className={"my-string"}
-        onMouseEnter={() => dispatch({ tag: "mouse-enter" })}
-        onMouseLeave={() => dispatch({ tag: "mouse-leave" })}
+        className={'my-string'}
+        onMouseEnter={() => dispatch({ tag: 'mouse-enter' })}
+        onMouseLeave={() => dispatch({ tag: 'mouse-leave' })}
         style={{
-          backgroundColor: model.isMouseOver ? "red" : "green",
+          backgroundColor: model.isMouseOver ? 'red' : 'green',
         }}
       >
         {model.value}
-        <button onClick={() => dispatch({ tag: "button-clicked" })}>
+        <button onClick={() => dispatch({ tag: 'button-clicked' })}>
           Concat !
         </button>
         <p>
-          Config prop{" "}
+          Config prop{' '}
           {model.myConfigProp
-            .map((x) => "set to " + x)
-            .withDefault("is undefined")}
+            .map((x) => 'set to ' + x)
+            .withDefault('is undefined')}
         </p>
       </div>
     );
   },
   update: function (
     msg: Msg,
-    model: Model
+    model: Model,
   ): [Model, Cmd<Msg>, Maybe<JsonValue>] {
     switch (msg.tag) {
-      case "mouse-enter": {
+      case 'mouse-enter': {
         return noOutNoCmd({ ...model, isMouseOver: true });
       }
-      case "mouse-leave": {
+      case 'mouse-leave': {
         return noOutNoCmd({ ...model, isMouseOver: false });
       }
-      case "button-clicked": {
-        const value = model.value + "X";
+      case 'button-clicked': {
+        const value = model.value + 'X';
         return [{ ...model, value }, Cmd.none(), just(jvString(value))];
       }
     }

@@ -26,22 +26,22 @@ module.exports = [
   {
     settings: {
       react: {
-        version: "detect"
+        version: 'detect',
       },
     },
   },
   {
     plugins: {
-      "react-hooks": reactHooks,
+      'react-hooks': reactHooks,
     },
     languageOptions: {
       ecmaVersion: 2018,
       sourceType: 'module',
       parserOptions: {
         ecmaFeatures: {
-          jsx: true
-        }
-      }
+          jsx: true,
+        },
+      },
     },
     rules: {
       // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs

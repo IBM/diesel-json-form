@@ -107,7 +107,7 @@ export function createTypesMenu(
       : [
           jvNull,
           jvString(''),
-          jvNumber(0),
+          jvNumber('0'),
           jvBool(true),
           jvObject(),
           jvArray(),
@@ -134,7 +134,7 @@ export function createTypesMenu(
             case 'jv-null':
               return buildChangeTypeItem(jvNull);
             case 'jv-number':
-              return buildChangeTypeItem(jvNumber(0));
+              return buildChangeTypeItem(jvNumber('0'));
             case 'jv-object':
               return buildChangeTypeItem(jvObject());
             case 'jv-string':

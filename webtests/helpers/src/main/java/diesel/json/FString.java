@@ -2,11 +2,7 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.Findr;
 import diesel.json.util.Utility;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-
-import java.util.function.Function;
 
 import static com.pojosontheweb.selenium.Findrs.*;
 
@@ -26,13 +22,13 @@ public class FString extends FJsonValue {
     }
 
     public FString assertNoError() {
-        $$(".bx--form-requirement").count(0).eval();
+        $$(".cds--form-requirement").count(0).eval();
         findInput().where(not(attrEquals("data-invalid", "true"))).eval();
         return this;
     }
 
     public FString assertError(String expectedError) {
-        $$(".bx--form-requirement")
+        $$(".cds--form-requirement")
                 .where(textContains(expectedError))
                 .count(1)
                 .at(0)

@@ -25,6 +25,7 @@ import { ViewJsonEditor } from './JsonEditor';
 import { initialModel } from './Model';
 import { nothing } from 'tea-cup-core';
 import { jvArray, jvNull, jvObject } from './JsonValue';
+import { defaultSchemaService } from './SchemaService';
 
 describe('Render options', () => {
   describe('defaults', () => {
@@ -43,10 +44,18 @@ describe('Render options', () => {
     test('menu document root', () => {
       const { container } = render(
         ViewJsonEditor({
-          model: initialModel('en', nothing, jvNull, false, 0),
+          model: initialModel(
+            'en',
+            nothing,
+            jvNull,
+            false,
+            0,
+            defaultSchemaService,
+          ),
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: {},
+          schemaService: defaultSchemaService,
         }),
       );
       expect(container.querySelectorAll('.doc-root')).toHaveLength(1);
@@ -54,7 +63,14 @@ describe('Render options', () => {
     test('menu collapsible panel in object', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel('en', nothing, jvNull, false, 0),
+          model: initialModel(
+            'en',
+            nothing,
+            jvNull,
+            false,
+            0,
+            defaultSchemaService,
+          ),
           path: JsPath.empty,
           value: jvObject([{ name: 'foo', value: jvNull }]),
           language: 'en',
@@ -68,7 +84,14 @@ describe('Render options', () => {
     test('menu collapsible panel in array', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel('en', nothing, jvNull, false, 0),
+          model: initialModel(
+            'en',
+            nothing,
+            jvNull,
+            false,
+            0,
+            defaultSchemaService,
+          ),
           path: JsPath.empty,
           value: jvArray([jvNull]),
           language: 'en',
@@ -100,10 +123,18 @@ describe('Render options', () => {
     test('hide menu document root', () => {
       const { container } = render(
         ViewJsonEditor({
-          model: initialModel('en', nothing, jvNull, false, 0),
+          model: initialModel(
+            'en',
+            nothing,
+            jvNull,
+            false,
+            0,
+            defaultSchemaService,
+          ),
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: { hideDocRoot: true },
+          schemaService: defaultSchemaService,
         }),
       );
       expect(container.querySelectorAll('.doc-root')).toHaveLength(0);
@@ -111,7 +142,14 @@ describe('Render options', () => {
     test('hide menu collapsible panel in object', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel('en', nothing, jvNull, false, 0),
+          model: initialModel(
+            'en',
+            nothing,
+            jvNull,
+            false,
+            0,
+            defaultSchemaService,
+          ),
           path: JsPath.empty,
           value: jvObject([{ name: 'foo', value: jvNull }]),
           language: 'en',
@@ -125,7 +163,14 @@ describe('Render options', () => {
     test('hide menu collapsible panel in array', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel('en', nothing, jvNull, false, 0),
+          model: initialModel(
+            'en',
+            nothing,
+            jvNull,
+            false,
+            0,
+            defaultSchemaService,
+          ),
           path: JsPath.empty,
           value: jvArray([jvNull]),
           language: 'en',

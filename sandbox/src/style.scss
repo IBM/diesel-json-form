@@ -1,0 +1,142 @@
+@use "@carbon/react" with (
+$font-path: "@ibm/plex"
+);
+@use "@carbon/themes";
+@use "@carbon/themes/scss/themes" as *;
+
+:root {
+  @include themes.theme(react.$white);
+}
+
+[data-carbon-theme="g10"] {
+  @include themes.theme(react.$white);
+}
+
+#sandbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui;
+}
+
+#sandbox.dark {
+  color: white;
+  background-color: black;
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+#sandbox .banner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 4px;
+}
+
+#sandbox .banner h1 {
+  flex-grow: 1;
+  padding: 0;
+  margin: 0;
+}
+
+#sandbox .banner div {
+  margin: 0px 1rem 0px 1rem;
+}
+
+.sub {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 33%;
+  padding: 4px;
+}
+
+.sub-head {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.sub-head h3 {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.editor-wrapper {
+  flex-grow: 1;
+  position: relative;
+}
+
+.editor-wrapper textarea {
+  height: 100%;
+  width: 100%;
+}
+
+.IntelliMirrorEditor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: 1px solid lightgray;
+}
+
+.schema-select {
+  margin-left: 12px;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.schema-value-at-select {
+  margin-left: 12px;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+
+footer.sandbox {
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background-color: black;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+footer.sandbox .powered-by {
+  font-size: 0.7rem;
+  padding-top: 6px;
+  padding-right: 4px;
+}
+
+footer.sandbox .spacer {
+  flex-grow: 1;
+}
+
+footer.sandbox .gas-station {
+  display: flex;
+  color: inherit;
+}
+
+#json-form {
+  flex-grow: 1;
+}
+
+#editor1,
+#editor2 {
+  height: 100%;
+}

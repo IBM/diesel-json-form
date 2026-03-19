@@ -27,7 +27,6 @@ import {
   nothing,
   Port,
   Sub,
-  Task,
   Tuple,
   updatePiped,
 } from 'tea-cup-core';
@@ -42,10 +41,10 @@ import {
   actionTriggerClicked,
   actionUpdateValue,
 } from './Actions';
-import { executeContextMenuAction } from './ContextMenu';
+import executeContextMenuAction from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { getValueAt, JsonValue, valueToAny } from './JsonValue';
+import { getValueAt, JsonValue, stringify } from './JsonValue';
 import { JsPath } from './JsPath';
 import {
   computeAll,
@@ -58,7 +57,6 @@ import {
 import {
   contextMenuMsg,
   Msg,
-  noOp,
   setDebounceMsMsg,
   setJsonStr,
   setStrictModeMsg,
@@ -71,6 +69,7 @@ import {
   ViewJsonValue,
 } from './renderer/Renderer';
 import { MenuOptionFilter, RenderOptions } from './RenderOptions';
+import { defaultSchemaService, SchemaService } from './SchemaService';
 
 export function init(
   language: string,
@@ -79,6 +78,7 @@ export function init(
   strictMode: boolean,
   rendererFactory: RendererFactory,
   debounceMs: number,
+  schemaService: SchemaService,
 ): [Model, Cmd<Msg>] {
   JsFacade.setLang(language);
   const model = initialModel(
@@ -87,6 +87,7 @@ export function init(
     initialValue,
     strictMode,
     debounceMs,
+    schemaService,
   );
   return reInitRenderers(model, rendererFactory);
 }
@@ -97,7 +98,7 @@ function reInitRenderers(
 ): [Model, Cmd<Msg>] {
   return model.validationResult
     .map((validationResult) => {
-      const renderers = JsFacade.getRenderers(validationResult);
+      const renderers = validationResult.getRenderers();
       const newCustomRenderers: Map<
         string,
         Maybe<CustomRendererModel>
@@ -112,7 +113,7 @@ function reInitRenderers(
             const m: Maybe<CustomRendererModel> =
               existingModel === undefined ? nothing : existingModel;
             const jValue: Maybe<JsonValue> = getValueAt(
-              model.root.b,
+              model.root,
               JsPath.parse(path),
             );
             if (jValue.type === 'Just') {
@@ -154,6 +155,7 @@ export interface ViewJsonEditorProps {
   readonly model: Model;
   readonly rendererFactory: RendererFactory;
   readonly renderOptions?: RenderOptions;
+  readonly schemaService: SchemaService;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
@@ -164,7 +166,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
         {!renderOptions?.hideDocRoot && (
           <div className={'doc-root'}>
             <em>{model.t('documentRoot')}</em>
-            <ArrayCounter value={model.root.b} />
+            <ArrayCounter value={model.root} />
             <MenuTrigger
               dispatch={dispatch}
               path={JsPath.empty}
@@ -177,7 +179,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
         <ViewJsonValue
           model={model}
           path={JsPath.empty}
-          value={model.root.b}
+          value={model.root}
           dispatch={dispatch}
           rendererFactory={props.rendererFactory}
           language={props.model.lang}
@@ -215,49 +217,27 @@ function withOutValueChanged(
   prevModel: Model,
   mac: [Model, Cmd<Msg>],
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
-  const prev = JSON.stringify(valueToAny(prevModel.root.b));
-  const cur = JSON.stringify(valueToAny(mac[0].root.b));
+  const prev = stringify(prevModel.root);
+  const cur = stringify(mac[0].root);
   return [
     mac[0],
     mac[1],
-    cur === prev ? nothing : just(outValueChanged(mac[0].root.b)),
+    cur === prev ? nothing : just(outValueChanged(mac[0].root)),
   ];
-}
-
-function selectTextCmd(path: JsPath): Cmd<Msg> {
-  const selectTask: Task<Error, string> = Task.fromLambda(() => {
-    const inputId = `input-${path.format('_')}`;
-    const input = document.getElementById(inputId);
-    if (!input) {
-      throw new Error(`input not found for path ${path.format()}`);
-    }
-    if (input instanceof HTMLInputElement) {
-      input.select();
-    }
-    return 'ok';
-  });
-  return Task.attempt(selectTask, () => noOp);
 }
 
 export function update(
   msg: Msg,
   model: Model,
   rendererFactory: RendererFactory,
+  schemaService: SchemaService,
   menuFilter?: MenuOptionFilter,
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
     case 'delete-property':
       return withOutValueChanged(model, actionDeleteValue(model, msg.path));
     case 'update-property': {
-      const mac = updatePiped(
-        model,
-        (model) => actionUpdateValue(model, msg.path, msg.value),
-        (model) => {
-          const cmd: Cmd<Msg> =
-            msg.selectText === true ? selectTextCmd(msg.path) : Cmd.none();
-          return [model, cmd];
-        },
-      );
+      const mac = actionUpdateValue(model, msg.path, msg.value);
       return withOutValueChanged(model, mac);
     }
     case 'add-property-clicked':
@@ -316,7 +296,8 @@ export function update(
                       updatePiped(
                         model,
                         (m) => closeMenu(m),
-                        (m) => executeContextMenuAction(m, out.data),
+                        (m) =>
+                          executeContextMenuAction(schemaService, m, out.data),
                       ),
                     )
                       .mapSecond((c) => Cmd.batch([cmd, c]))
@@ -333,7 +314,7 @@ export function update(
     case 'add-elem-clicked':
       return withOutValueChanged(
         model,
-        actionAddElementToArray(model, msg.path),
+        actionAddElementToArray(schemaService, model, msg.path),
       );
     case 'set-json-str': {
       return noOut(
@@ -344,6 +325,7 @@ export function update(
           model.strictMode,
           rendererFactory,
           model.debounceMs,
+          schemaService,
         ),
       );
     }
@@ -353,7 +335,7 @@ export function update(
     case 'add-property-btn-clicked': {
       return withOutValueChanged(
         model,
-        actionAddProperty(model, msg.path, msg.propertyName),
+        actionAddProperty(schemaService, model, msg.path, msg.propertyName),
       );
     }
     case 'no-op':
@@ -363,7 +345,7 @@ export function update(
     case 'set-debounce-ms':
       return noOut(noCmd({ ...model, debounceMs: msg.debounceMs }));
     case 'recompute-metadata': {
-      const newModel = computeAll(doValidate(model));
+      const newModel = computeAll(doValidate(schemaService, model));
       return withOutValueChanged(
         model,
         reInitRenderers(newModel, rendererFactory),
@@ -468,9 +450,12 @@ export interface JsonEditorProps {
   readonly debounceMs?: number;
   readonly renderOptions?: RenderOptions;
   readonly menuFilter?: MenuOptionFilter;
+  readonly schemaService?: SchemaService;
 }
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
+  const schemaService: SchemaService =
+    props.schemaService ?? defaultSchemaService;
   return (
     <Program
       init={() =>
@@ -481,6 +466,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           props.strictMode,
           props.rendererFactory,
           props.debounceMs || 500,
+          schemaService,
         )
       }
       view={(dispatch, model) => (
@@ -489,6 +475,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           model={model}
           rendererFactory={props.rendererFactory}
           renderOptions={props.renderOptions}
+          schemaService={schemaService}
         />
       )}
       update={(msg, model) => {
@@ -496,6 +483,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           msg,
           model,
           props.rendererFactory,
+          schemaService,
           props.menuFilter,
         );
         maco[2].forEach((outMsg) => {

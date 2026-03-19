@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-// Carbon theme
-@import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/themes/theme-maps';
-$carbon--theme: $carbon--theme--g10;
-@import '~carbon-components/scss/globals/scss/typography';
-@import '~carbon-components/scss/components/button/button';
-@import '~carbon-components/scss/components/text-input/text-input';
-@import '~carbon-components/scss/components/tooltip/tooltip';
-@import '~carbon-components/scss/components/checkbox/checkbox';
-@import '~carbon-components/scss/components/tag/tag';
-@import '~carbon-components/scss/components/combo-box/combo-box';
-@import '~carbon-components/scss/components/date-picker/date-picker';
-@import '~carbon-components/scss/components/time-picker/time-picker';
-@import '~carbon-components/scss/components/select/select';
+@use "@carbon/react/scss/spacing" as *;
+@use "@carbon/react/scss/colors" as *;
+@use "@carbon/react/scss/theme" as *;
+@use "@carbon/react/scss/type" as *;
 
 .diesel-json-editor {
   position: relative;
@@ -253,7 +244,7 @@ $carbon--theme: $carbon--theme--g10;
       }
 
       &.tm-active {
-        background-color: $hover-ui;
+        background-color: $background-active;
       }
 
       .tm-item__submenu {

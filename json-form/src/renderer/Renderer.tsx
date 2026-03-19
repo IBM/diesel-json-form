@@ -21,12 +21,19 @@ import {
   ComboBox,
   DatePicker,
   DatePickerInput,
+  DatePickerProps,
   SelectItem,
   Tag,
   TextInput,
   TimePicker,
   TimePickerSelect,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import {
+  Add,
+  ChevronDown,
+  ChevronUp,
+  OverflowMenuVertical,
+} from '@carbon/icons-react';
 import * as React from 'react';
 import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-core';
 import { box, Dim, pos } from 'tea-pop-core';
@@ -43,11 +50,6 @@ import {
 import { JsPath } from '../JsPath';
 import { CustomRendererModel, Model as FormModel } from '../Model';
 import { Msg } from '../Msg';
-
-import Add16 from '@carbon/icons-react/lib/add/16';
-import ChevronDown16 from '@carbon/icons-react/lib/chevron--down/16';
-import ChevronUp16 from '@carbon/icons-react/lib/chevron--up/16';
-import OverflowMenuVertical16 from '@carbon/icons-react/lib/overflow-menu--vertical/16';
 import { TFunction } from 'i18next';
 import { ViewValueProps } from './ViewValueProps';
 import { RenderOptions } from '../RenderOptions';
@@ -285,7 +287,7 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
                 .map((propName) => (
                   <div className="add-prop-row" key={propName}>
                     <Button
-                      renderIcon={Add16}
+                      renderIcon={Add}
                       kind={'ghost'}
                       onClick={() =>
                         dispatch({
@@ -333,7 +335,7 @@ function ExpandCollapseButton(props: ExpandCollapseButtonProps) {
   return (
     <Button
       kind={'ghost'}
-      renderIcon={props.collapsed ? ChevronUp16 : ChevronDown16}
+      renderIcon={props.collapsed ? ChevronUp : ChevronDown}
       iconDescription={props.t(
         props.collapsed ? 'icon.expand' : 'icon.collapse',
       )}
@@ -414,13 +416,11 @@ function ViewArray(p: ViewValueProps<JvArray>): React.ReactElement {
 function dispatchUpdateProperty(
   p: ViewValueProps<JsonValue>,
   newValue: JsonValue,
-  selectText?: boolean,
 ) {
   p.dispatch({
     tag: 'update-property',
     path: p.path,
     value: newValue,
-    selectText,
   });
 }
 
@@ -431,23 +431,15 @@ function ViewNumber(p: ViewValueProps<JvNumber>): React.ReactElement {
       labelText={t('numberValueLabel', { path: p.path.format('.') }).toString()}
       hideLabel={true}
       id={'input-' + p.path.format('_')}
-      type="number"
       value={p.value.value}
       disabled={p.model.adding.isJust()}
       invalidText={errorsToInvalidText(p)}
       invalid={isInvalid(p)}
       onChange={(evt) => {
-        let newValue = parseFloat(evt.target.value);
-        let selectText = false;
-        if (isNaN(newValue)) {
-          newValue = 0;
-          selectText = true;
-        }
-        dispatchUpdateProperty(
-          p,
-          { tag: 'jv-number', value: newValue },
-          selectText,
-        );
+        dispatchUpdateProperty(p, {
+          tag: 'jv-number',
+          value: evt.target.value,
+        });
       }}
     />
   );
@@ -517,13 +509,13 @@ function ViewStringWithCombo(p: ViewStringWithComboProps): React.ReactElement {
   return (
     <ComboBox
       id={'input-' + p.path.format('_')}
-      ariaLabel={t('stringValueComboLabel', {
+      aria-label={t('stringValueComboLabel', {
         path: p.path.format('.'),
       }).toString()}
       disabled={p.model.adding.isJust()}
       invalidText={errorsToInvalidText(p)}
       invalid={isInvalid(p)}
-      items={p.proposals}
+      items={[...p.proposals]}
       value={p.value.value}
       selectedItem={p.value.value}
       placeholder={''}
@@ -576,7 +568,6 @@ function MyTimePicker(props: MyTimePickerProps) {
           aria-label={t('timeValueLabel', {
             path: props.path.format('.'),
           }).toString()}
-          labelText={''}
           onChange={(event) => {
             const offset = event.target.value;
             const t = new MyTime(value);
@@ -605,33 +596,49 @@ interface MyDatePickerProps {
   readonly language: string;
 }
 
+function languageToPickerLocale(x: string): DatePickerProps['locale'] {
+  const parts = x.split('-');
+  // @ts-ignore
+  return parts[0];
+}
+
 function MyDatePicker(props: MyDatePickerProps) {
   const fmtPath = props.path.format('_');
   const { t } = props;
   return (
     <DatePicker
+      // @ts-ignore
       id={'date-picker-' + fmtPath}
       datePickerType="single"
       dateFormat={'Y-m-d'}
-      onChange={(dates, str) => {
-        props.onChange(str);
+      onChange={(dates) => {
+        if (dates.length === 1) {
+          const d = dates[0];
+          const s =
+            d.getFullYear() +
+            '-' +
+            ('0' + (d.getMonth() + 1)).slice(-2) +
+            '-' +
+            ('0' + d.getDate()).slice(-2);
+          props.onChange(s);
+        }
       }}
-      value={props.value}
-      /* @ts-ignore */
-      locale={props.language}
+      value={props.value} // need to set value twice
+      locale={languageToPickerLocale(props.language)}
     >
       <DatePickerInput
         id={'input-' + fmtPath}
         aria-label={t('dateValueLabel', {
           path: props.path.format('.'),
         }).toString()}
+        aria-autocomplete="none"
         labelText={''}
         hideLabel={true}
-        autoComplete={'off'}
-        value={props.value}
         onChange={(e) => {
           props.onChange(e.target.value);
         }}
+        // @ts-ignore
+        value={props.value} // need to set value twice
         invalidText={props.invalidText}
         invalid={props.isInvalid}
       />
@@ -835,7 +842,7 @@ export function MenuTrigger(props: MenuTriggerProps) {
       disabled={disabled}
       size={'sm'}
       kind={'ghost'}
-      renderIcon={OverflowMenuVertical16}
+      renderIcon={OverflowMenuVertical}
       tooltipPosition={'left'}
       hasIconOnly={true}
       onClick={onMenuTriggerClick(dispatch, path)}

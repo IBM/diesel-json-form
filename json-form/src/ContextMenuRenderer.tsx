@@ -19,19 +19,21 @@ import { MenuAction } from './ContextMenuActions';
 import React from 'react';
 import { JsonValue, JsonValueType, valueType } from './JsonValue';
 import { just, Maybe, Tuple } from 'tea-cup-core';
-import Add16 from '@carbon/icons-react/lib/add/16';
-import ArrowDown16 from '@carbon/icons-react/lib/arrow--down/16';
-import Arrows16 from '@carbon/icons-react/lib/arrows/16';
-import ArrowUp16 from '@carbon/icons-react/lib/arrow--up/16';
-import CheckboxChecked16 from '@carbon/icons-react/lib/checkbox--checked/16';
-import Close16 from '@carbon/icons-react/lib/close/16';
-import DecisionTree16 from '@carbon/icons-react/lib/decision-tree/16';
-import MagicWand16 from '@carbon/icons-react/lib/magic-wand/16';
-import NotAvailable16 from '@carbon/icons-react/lib/not-available/16';
-import StringInteger16 from '@carbon/icons-react/lib/string-integer/16';
-import StringText16 from '@carbon/icons-react/lib/string-text/16';
-import Table16 from '@carbon/icons-react/lib/table/16';
-import Types16 from '@carbon/icons-react/lib/types/16';
+import {
+  Add,
+  ArrowDown,
+  ArrowUp,
+  CheckboxChecked,
+  Close,
+  DecisionTree,
+  MagicWand,
+  Move,
+  NotAvailable,
+  StringInteger,
+  StringText,
+  Table,
+  Types,
+} from '@carbon/icons-react';
 import { TFunction } from 'i18next';
 
 export function contextMenuRenderer(
@@ -41,25 +43,25 @@ export function contextMenuRenderer(
     const iconAndLabel: () => Tuple<Maybe<React.ReactNode>, any> = () => {
       switch (a.tag) {
         case 'move': {
-          return Tuple.t2(just(<Arrows16 />), t('contextMenu.move'));
+          return Tuple.t2(just(<Move />), t('contextMenu.move'));
         }
         case 'move-up': {
-          return Tuple.t2(just(<ArrowUp16 />), t('contextMenu.moveUp'));
+          return Tuple.t2(just(<ArrowUp />), t('contextMenu.moveUp'));
         }
         case 'move-down': {
-          return Tuple.t2(just(<ArrowDown16 />), t('contextMenu.moveDown'));
+          return Tuple.t2(just(<ArrowDown />), t('contextMenu.moveDown'));
         }
         case 'propose': {
-          return Tuple.t2(just(<MagicWand16 />), t('contextMenu.propose'));
+          return Tuple.t2(just(<MagicWand />), t('contextMenu.propose'));
         }
         case 'delete': {
-          return Tuple.t2(just(<Close16 />), t('contextMenu.delete'));
+          return Tuple.t2(just(<Close />), t('contextMenu.delete'));
         }
         case 'proposal': {
           return Tuple.t2(typeIcon(valueType(a.value)), getItemLabel(a.value));
         }
         case 'types': {
-          return Tuple.t2(just(<Types16 />), t('contextMenu.changeType'));
+          return Tuple.t2(just(<Types />), t('contextMenu.changeType'));
         }
         case 'change-type': {
           const vt = valueType(a.value);
@@ -69,7 +71,7 @@ export function contextMenuRenderer(
           const label = a.isArray
             ? t('contextMenu.addElement')
             : t('contextMenu.addProperty');
-          return Tuple.t2(just(<Add16 />), label);
+          return Tuple.t2(just(<Add />), label);
         }
       }
     };
@@ -106,16 +108,16 @@ function getItemLabel(proposal: JsonValue): string {
 function typeIcon(t: JsonValueType) {
   switch (t) {
     case 'array':
-      return just(<Table16 />);
+      return just(<Table />);
     case 'boolean':
-      return just(<CheckboxChecked16 />);
+      return just(<CheckboxChecked />);
     case 'null':
-      return just(<NotAvailable16 />);
+      return just(<NotAvailable />);
     case 'number':
-      return just(<StringInteger16 />);
+      return just(<StringInteger />);
     case 'object':
-      return just(<DecisionTree16 />);
+      return just(<DecisionTree />);
     case 'string':
-      return just(<StringText16 />);
+      return just(<StringText />);
   }
 }
