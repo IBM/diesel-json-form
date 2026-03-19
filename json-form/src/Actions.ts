@@ -16,18 +16,16 @@
 
 import { contextMenuMsg, Msg, noOp } from './Msg';
 import { Cmd, just, maybeOf, noCmd, nothing, Task, Tuple } from 'tea-cup-core';
-import { getProposals, Model } from './Model';
+import { Model } from './Model';
 import { JsPath } from './JsPath';
 import {
   clearPropertiesIfObject,
   deleteValueAt,
   getValueAt,
   JsonValue,
-  jsonValueToFacadeValue,
   jvArray,
   JvArray,
   jvNull,
-  JvObject,
   jvObject,
   mapValueAt,
   mergeProperties,
@@ -40,8 +38,8 @@ import * as TPM from 'tea-pop-menu';
 import { createMenu, MenuAction } from './ContextMenuActions';
 import { Box } from 'tea-pop-core';
 import { Debouncer } from './Debouncer';
-import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { MenuOptionFilter } from './RenderOptions';
+import { SchemaService } from './SchemaService';
 
 export function actionDeleteValue(
   model: Model,
@@ -66,13 +64,10 @@ export function actionApplyProposal(
           const augmentedProposal = model.validationResult
             .andThen((vr) => {
               // TODO deep propose only for proposalIndex
-              const all = JsFacade.propose(vr, path.format(), 5);
+              const all = vr.propose(path, 5);
               return maybeOf(all[proposalIndex]);
             })
-            .map(JsFacade.toJsonValue)
-            .andThen((v) =>
-              v.tag === 'jv-object' ? just(v as JvObject) : nothing,
-            )
+            .andThen((v) => (v.tag === 'jv-object' ? just(v) : nothing))
             .withDefault(proposal);
 
           if (valueAtPath.tag === 'jv-object') {
@@ -157,6 +152,7 @@ export function actionConfirmAddProperty(
 }
 
 export function actionAddProperty(
+  service: SchemaService,
   model: Model,
   path: JsPath,
   propertyName: string,
@@ -171,15 +167,12 @@ export function actionAddProperty(
           { name: propertyName, value: jvNull },
         ]);
         const newRoot = setValueAt(model.root, path, newObject);
-        const newValidationResult = model.schema.map((schemaAny) =>
-          JsFacade.validate(
-            jsonValueToFacadeValue(schemaAny),
-            jsonValueToFacadeValue(newRoot),
-          ),
+        const newValidationResult = model.schema.map((schema) =>
+          service.validate(schema, newRoot),
         );
 
         const propertyProposals = newValidationResult
-          .map((vr) => getProposals(vr, path.append(propertyName), -1))
+          .map((vr) => vr.propose(path.append(propertyName), -1))
           .withDefault([])
           .map(clearPropertiesIfObject);
 
@@ -199,6 +192,7 @@ export function actionAddProperty(
 }
 
 export function actionAddElementToArray(
+  service: SchemaService,
   model: Model,
   path: JsPath,
 ): [Model, Cmd<Msg>] {
@@ -214,15 +208,12 @@ export function actionAddElementToArray(
         const tmpArray = jvArray([...array.elems, jvNull]);
         const tmpRoot = setValueAt(model.root, path, tmpArray);
 
-        const newValidationResult = model.schema.map((schemaAny) =>
-          JsFacade.validate(
-            jsonValueToFacadeValue(schemaAny),
-            jsonValueToFacadeValue(tmpRoot),
-          ),
+        const newValidationResult = model.schema.map((schema) =>
+          service.validate(schema, tmpRoot),
         );
 
         const proposals = newValidationResult
-          .map((vr) => getProposals(vr, path.append(newElemIndex), -1))
+          .map((vr) => vr.propose(path.append(newElemIndex), -1))
           .withDefault([]);
 
         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
@@ -280,7 +271,7 @@ export function actionTriggerClicked(
             root: model.root,
             path,
             proposals: model.validationResult
-              .map((vr) => getProposals(vr, path, -1))
+              .map((vr) => vr.propose(path, -1))
               .withDefault([]),
             valueAtPath,
             strictMode: model.strictMode,
