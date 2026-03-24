@@ -78,7 +78,12 @@ const schema = unsafeParseJsonValue(`
         }
     }`);
 
-const value = jvArray([jvNumber('123'), jvString('bar')]); //jvNumber('1234');
+// const schema = unsafeParseJsonValue(`
+//     {
+//         "type": "number"
+//     }`);
+
+const value = jvArray([jvNumber('123'), jvNumber('bar')]); //jvNumber('1234');
 
 jsonForm.render(defaultSchemaService, schema, value);
 

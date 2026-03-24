@@ -70,7 +70,7 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     const buttonDelete = button(
       {
         onclick: () => {
-          this.removeProperty(propertyIndex);
+          //   this.removeProperty(propertyIndex);
         },
       },
       text('delete'),
@@ -83,16 +83,16 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     };
   }
 
-  private removeProperty(index: number): void {
-    const objectProp = this._elems[index];
-    if (objectProp) {
-      this._elems.splice(index, 1);
-      objectProp.propertyElements.forEach((pElem) =>
-        this._wrapperElem.removeChild(pElem),
-      );
-      this.fireValueChanged(jvNull);
-    }
-  }
+  //   private removeProperty(index: number): void {
+  //     const objectProp = this._elems[index];
+  //     if (objectProp) {
+  //       this._elems.splice(index, 1);
+  //       objectProp.propertyElements.forEach((pElem) =>
+  //         this._wrapperElem.removeChild(pElem),
+  //       );
+  //       //   this.fireValueChanged(jvNull);
+  //     }
+  //   }
 
   //   private addProperty(name: string): void {
   //     // if (this.schemaInfos && this.path && this.args) {

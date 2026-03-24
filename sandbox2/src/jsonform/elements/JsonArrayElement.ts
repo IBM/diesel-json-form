@@ -38,9 +38,9 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
       this._elems.push(itemRow);
       wrapperElem.appendChild(itemRow.valueElem);
       wrapperElem.appendChild(itemRow.deleteButton);
-      //   itemRow.deleteButton.addEventListener('click', () => {
-      //     this.deleteItem(itemRow);
-      //   });
+      itemRow.deleteButton.addEventListener('click', () => {
+        this.deleteItem(itemRow);
+      });
     });
     this._addButtonElem.style.gridColumn = 'span 2';
     const addButton = button(
@@ -96,15 +96,12 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     // }
   }
 
-  //   private deleteItem(itemRow: ItemRow) {
-  //     const i = this._elems.indexOf(itemRow);
-  //     if (i !== -1) {
-  //       this._elems.splice(i, 1);
-  //       this._wrapperElem.removeChild(itemRow.valueElem);
-  //       this._wrapperElem.removeChild(itemRow.deleteButton);
-  //       this.fireValueChanged(jvArray([]));
-  //     }
-  //   }
+  private deleteItem(itemRow: ItemRow) {
+    debugger;
+    const elems = this._elems.map((e) => e.item);
+    const newElems = elems.filter((e) => e !== itemRow.item);
+    this.fireValueChanged(jvArray(newElems));
+  }
 
   //   getValue(): JvArray {
   //     return jvArray(this._elems.map((e) => e.valueElem.getValue()));
@@ -116,19 +113,32 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     value: JvArray,
   ): void {
     const oldElems = this._elems.map((e) => e.item);
-    if (value.elems.length !== oldElems.length) {
-      throw new Error('not implemented');
-    }
-    for (let i = 0; i < value.elems.length; i++) {
-      if (oldElems[i] === value.elems[i]) {
+    const newElems = new Set(value.elems);
+    const removedElems = new Set(oldElems.filter((oe) => !newElems.has(oe)));
+
+    const newThisElems = [];
+    for (const elem of this._elems) {
+      if (removedElems.has(elem.item)) {
+        this._wrapperElem.removeChild(elem.valueElem);
+        this._wrapperElem.removeChild(elem.deleteButton);
+      } else {
+        newThisElems.push(elem);
       }
     }
-
-    const newElems = new Set(value.elems);
-    for (const itemRow of this._elems) {
+    this._elems = newThisElems;
+    for (let i = 0; i < value.elems.length; i++) {
+      this._elems[i].valueElem.reRender(
+        schemaInfos,
+        path.append(i),
+        value.elems[i],
+      );
     }
 
-    const oldValue = args.value;
+    // const newElems = new Set(value.elems);
+    // for (const itemRow of this._elems) {
+    // }
+
+    // const oldValue = args.value;
     // const oldItems = new Set(oldValue.elems);
   }
 }

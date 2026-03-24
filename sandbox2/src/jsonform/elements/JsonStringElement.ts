@@ -25,7 +25,7 @@ export class JsonStringElement extends JsonValueElementBase<JvString> {
     const { value } = args;
     this._input.value = value.value;
     this._input.addEventListener('input', () => {
-      this.fireValueChanged(args.path, jvString(this._input.value));
+      this.fireValueChanged(jvString(this._input.value));
     });
     this.appendChild(this._input);
   }

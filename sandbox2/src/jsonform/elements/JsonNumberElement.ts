@@ -24,11 +24,11 @@ export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
   }
 
   protected doRender(args: RendererArgs<JvNumber>) {
-    const { value, path, valueChanged } = args;
+    const { value } = args;
     this._input.value = value.value;
     this._input.addEventListener('input', () => {
       const newValue = jvNumber(this._input.value);
-      valueChanged(path, newValue);
+      this.fireValueChanged(newValue);
     });
     this.appendChild(this._input);
   }

@@ -27,6 +27,7 @@ export class JsonFormElement extends HTMLElement {
   }
 
   private validate(schema: JsonValue, value: JsonValue): SchemaInfos {
+    console.log('validate', value);
     this._schema = schema;
     this._value = value;
     this._schemaInfos = new SchemaInfos(
@@ -55,6 +56,8 @@ export class JsonFormElement extends HTMLElement {
   }
 
   private onValueChanged(path: JsPath, newValue: JsonValue) {
+    console.log('onValueChanged', path, newValue);
+    debugger;
     const oldRoot = this._value;
     const newRoot = setValueAt(this._value, path, newValue);
     this._value = oldRoot;
@@ -64,7 +67,7 @@ export class JsonFormElement extends HTMLElement {
         this.removeChild(this._jsonValueElement);
         this.doRender(schemaInfos, newRoot);
       } else {
-        this._jsonValueElement.reRender(schemaInfos, path, newRoot);
+        this._jsonValueElement.reRender(schemaInfos, JsPath.empty, newRoot);
       }
     }
   }
