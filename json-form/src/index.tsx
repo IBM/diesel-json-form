@@ -22,3 +22,4 @@ export * from './OutMsg';
 export * from './Msg';
 export * from './renderer/Renderer';
 export * from './SchemaService';
+export * from './utils/diffLists';
