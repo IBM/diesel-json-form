@@ -23,6 +23,7 @@ import {
   jvArray,
   jvBool,
   jvNumber,
+  jvObject,
   jvString,
   parseJsonValue,
 } from '@diesel-parser/json-form';
@@ -70,11 +71,26 @@ function unsafeParseJsonValue(json: string): JsonValue {
   );
 }
 
+// const schema = unsafeParseJsonValue(`
+//     {
+//         "type": "array",
+//         "items": {
+//             "type": "number"
+//         }
+//     }`);
 const schema = unsafeParseJsonValue(`
     {
-        "type": "array",
-        "items": {
-            "type": "number"
+        "type": "object",
+        "properties": {
+            "foo": {
+                "type": "number"
+            },
+            "bar": {
+                "type": "string"
+            },
+            "toto": {
+                "type": "boolean"
+            }
         }
     }`);
 
@@ -83,7 +99,11 @@ const schema = unsafeParseJsonValue(`
 //         "type": "number"
 //     }`);
 
-const value = jvArray([jvNumber('123'), jvNumber('bar')]); //jvNumber('1234');
+// const value = jvArray([jvNumber('123'), jvNumber('bar')]); //jvNumber('1234');
+const value = jvObject([
+  { name: 'foo', value: jvNumber('123') },
+  { name: 'gnu', value: jvString('bar') },
+]);
 
 jsonForm.render(defaultSchemaService, schema, value);
 

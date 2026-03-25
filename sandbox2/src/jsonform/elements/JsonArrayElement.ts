@@ -113,13 +113,18 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     const oldElems = this._elems.map((e) => e.item);
 
     const diff = diffLists(oldElems, value.elems);
-    console.log('FW', diff);
+    // console.log('FW', diff);
 
     const newThisElems = [];
     for (const change of diff.changes) {
       switch (change.type) {
         case 'common': {
           newThisElems[change.newPos!] = this._elems[change.oldPos!];
+          newThisElems[change.newPos!].valueElem.reRender(
+            config,
+            path.append(change.newPos!),
+            change.value,
+          );
           break;
         }
         case 'add': {
@@ -129,9 +134,9 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
             value.elems[change.newPos!],
             change.newPos!,
           );
-          itemRow.deleteButton.addEventListener('click', () => {
-            this.deleteItem(itemRow);
-          });
+          //   itemRow.deleteButton.addEventListener('click', () => {
+          //     this.deleteItem(itemRow);
+          //   });
           newThisElems[change.newPos!] = itemRow;
           break;
         }
