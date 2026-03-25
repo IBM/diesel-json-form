@@ -76,8 +76,8 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     for (const change of diff.changes) {
       switch (change.type) {
         case 'common': {
-          newThisElems[change.newPos!] = this._elems[change.oldPos!];
-          newThisElems[change.newPos!].propertyValueElem.reRender(
+          newThisElems[change.rightIndex] = this._elems[change.leftIndex];
+          newThisElems[change.rightIndex].propertyValueElem.reRender(
             config,
             path.append(change.value.name),
             change.value.value,
@@ -86,11 +86,11 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
         }
         case 'add': {
           const op = this.renderProperty(change.value, config, path);
-          newThisElems[change.newPos!] = op;
+          newThisElems[change.rightIndex] = op;
           break;
         }
         case 'remove': {
-          this._elems[change.oldPos!].propertyElements.forEach((e) =>
+          this._elems[change.leftIndex].propertyElements.forEach((e) =>
             e.remove(),
           );
           break;

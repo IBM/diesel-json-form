@@ -14,7 +14,7 @@ describe('Diff Algorithm', () => {
       expect(result.changes[3]).toEqual({
         type: 'add',
         value: 'd',
-        newPos: 3,
+        rightIndex: 3,
       });
     });
 
@@ -27,7 +27,7 @@ describe('Diff Algorithm', () => {
       expect(result.changes[3]).toEqual({
         type: 'remove',
         value: 'd',
-        oldPos: 3,
+        leftIndex: 3,
       });
     });
 
@@ -128,8 +128,11 @@ describe('Diff Algorithm', () => {
     test('should track positions for common elements', () => {
       const result = diff('abc', 'abc');
       result.changes.forEach((change, idx) => {
-        expect(change.oldPos).toBe(idx);
-        expect(change.newPos).toBe(idx);
+        expect(change.type).toBe('common');
+        if (change.type === 'common') {
+          expect(change.leftIndex).toBe(idx);
+          expect(change.rightIndex).toBe(idx);
+        }
       });
     });
 
@@ -138,8 +141,10 @@ describe('Diff Algorithm', () => {
       const addChange = result.changes.find(
         (c) => c.type === 'add' && c.value === 'b',
       );
-      expect(addChange?.newPos).toBeDefined();
-      expect(addChange?.oldPos).toBeUndefined();
+      expect(addChange?.type).toBe('add');
+      if (addChange?.type === 'add') {
+        expect(addChange.rightIndex).toBe(1);
+      }
     });
 
     test('should track positions for deletions', () => {
@@ -147,8 +152,10 @@ describe('Diff Algorithm', () => {
       const removeChange = result.changes.find(
         (c) => c.type === 'remove' && c.value === 'b',
       );
-      expect(removeChange?.oldPos).toBeDefined();
-      expect(removeChange?.newPos).toBeUndefined();
+      expect(removeChange?.type).toBe('remove');
+      if (removeChange?.type === 'remove') {
+        expect(removeChange.leftIndex).toBe(1);
+      }
     });
   });
 });

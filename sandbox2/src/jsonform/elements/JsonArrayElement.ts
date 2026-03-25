@@ -119,10 +119,10 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     for (const change of diff.changes) {
       switch (change.type) {
         case 'common': {
-          newThisElems[change.newPos!] = this._elems[change.oldPos!];
-          newThisElems[change.newPos!].valueElem.reRender(
+          newThisElems[change.rightIndex] = this._elems[change.leftIndex];
+          newThisElems[change.rightIndex].valueElem.reRender(
             config,
-            path.append(change.newPos!),
+            path.append(change.rightIndex),
             change.value,
           );
           break;
@@ -131,18 +131,18 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
           const itemRow = this.createItemRow(
             config,
             path,
-            value.elems[change.newPos!],
-            change.newPos!,
+            value.elems[change.rightIndex],
+            change.rightIndex,
           );
           //   itemRow.deleteButton.addEventListener('click', () => {
           //     this.deleteItem(itemRow);
           //   });
-          newThisElems[change.newPos!] = itemRow;
+          newThisElems[change.rightIndex] = itemRow;
           break;
         }
         case 'remove': {
-          this._elems[change.oldPos!].valueElem.remove();
-          this._elems[change.oldPos!].deleteButton.remove();
+          this._elems[change.leftIndex].valueElem.remove();
+          this._elems[change.leftIndex].deleteButton.remove();
           break;
         }
       }
