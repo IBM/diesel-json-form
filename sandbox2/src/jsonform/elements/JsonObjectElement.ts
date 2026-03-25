@@ -1,14 +1,12 @@
 import {
-  JvObject,
-  JsonValue,
-  jvObject,
   JsonProperty,
+  JsonValue,
   JsPath,
-  jvNull,
+  JvObject,
 } from '@diesel-parser/json-form';
-import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
-import { RendererArgs } from '../RendererArgs';
 import { button, div, text } from '../HtmlBuilder';
+import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
+import { RenderConfig } from '../RendererConfig';
 
 interface ObjectProp {
   readonly propertyName: string;
@@ -36,12 +34,11 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     this._wrapperElem = div({});
   }
 
-  protected doRender(args: RendererArgs<JvObject>) {
-    const { path, value } = args;
+  protected doRender(config: RenderConfig, path: JsPath, value: JvObject) {
     this._wrapperElem.style.display = 'grid';
     this._wrapperElem.style.gridTemplateColumns = '1fr 1fr 1fr';
     value.properties.forEach((property, propertyIndex) => {
-      const op = this.renderProperty(property, args, path, propertyIndex);
+      const op = this.renderProperty(property, config, path, propertyIndex);
       this._elems.push(op);
     });
     this.appendChild(this._wrapperElem);
@@ -54,18 +51,18 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
 
   private renderProperty(
     property: JsonProperty,
-    args: RendererArgs<JvObject>,
+    config: RenderConfig,
     path: JsPath,
     propertyIndex: number,
   ): ObjectProp {
     const labelElem = div({}, text(property.name));
     this._wrapperElem.appendChild(labelElem);
-    const { renderer } = args;
-    const valueElem = renderer.render({
-      ...args,
-      path: path.append(property.name),
-      value: property.value,
-    });
+    const { renderer } = config;
+    const valueElem = renderer.render(
+      config,
+      path.append(property.name),
+      property.value,
+    );
     this._wrapperElem.appendChild(valueElem);
     const buttonDelete = button(
       {

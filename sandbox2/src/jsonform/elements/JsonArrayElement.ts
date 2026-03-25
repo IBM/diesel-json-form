@@ -1,15 +1,15 @@
 import {
-  JvArray,
+  diffLists,
   JsonValue,
-  jvArray,
   JsPath,
+  JvArray,
+  jvArray,
   jvNull,
   setValueAt,
 } from '@diesel-parser/json-form';
-import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
-import { RendererArgs } from '../RendererArgs';
 import { button, div, text } from '../HtmlBuilder';
-import { SchemaInfos } from '../SchemaInfos';
+import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
+import { RenderConfig } from '../RendererConfig';
 
 interface ItemRow {
   readonly item: JsonValue;
@@ -35,13 +35,12 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     super();
   }
 
-  protected doRender(args: RendererArgs<JvArray>) {
+  protected doRender(config: RenderConfig, path: JsPath, value: JvArray) {
     const wrapperElem = div({});
     wrapperElem.style.display = 'grid';
     wrapperElem.style.gridTemplateColumns = '1fr 1fr';
-    const { value } = args;
     value.elems.forEach((item, itemIndex) => {
-      const itemRow = this.createItemRow(args, item, itemIndex);
+      const itemRow = this.createItemRow(config, path, item, itemIndex);
       this._elems.push(itemRow);
       wrapperElem.appendChild(itemRow.valueElem);
       wrapperElem.appendChild(itemRow.deleteButton);
@@ -65,17 +64,14 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   }
 
   private createItemRow(
-    args: RendererArgs<JvArray>,
+    config: RenderConfig,
+    path: JsPath,
     item: JsonValue,
     itemIndex: number,
   ): ItemRow {
     const deleteButton = button({}, text('delete'));
-    const { renderer } = args;
-    const valueElem = renderer.render({
-      ...args,
-      path: args.path.append(itemIndex),
-      value: item,
-    });
+    const { renderer } = config;
+    const valueElem = renderer.render(config, path.append(itemIndex), item);
     return {
       item,
       valueElem,
@@ -84,7 +80,6 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   }
 
   private addElem() {
-    debugger;
     const elems = this._elems.map((e) => e.item);
     const newValue = jvArray([...elems, jvNull]);
     if (this.schemaInfos) {
@@ -102,23 +97,6 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
         this.fireValueChanged(newValue2);
       }
     }
-
-    // if (this.schemaInfos && this.path) {
-    //   const thisValue = this.getValue();
-    //   const root = this.schemaInfos.getRootValue();
-    //   const newRoot = setValueAt(root, this.path, newValue);
-    //   const validationResult = this.schemaInfos.validate(newRoot);
-    //   const proposals = getProposals(
-    //     validationResult,
-    //     this.path.append(newValue.elems.length - 1),
-    //     -1,
-    //   );
-    //   if (proposals.length > 0) {
-    //     const proposal = proposals[0];
-    //     console.log('proposal', proposal);
-    //   }
-    //   console.log(proposals);
-    // }
   }
 
   private deleteItem(itemRow: ItemRow) {
@@ -127,52 +105,59 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     this.fireValueChanged(jvArray(newElems));
   }
 
-  //   getValue(): JvArray {
-  //     return jvArray(this._elems.map((e) => e.valueElem.getValue()));
-  //   }
-
   protected doReRender(
-    schemaInfos: SchemaInfos,
+    config: RenderConfig,
     path: JsPath,
     value: JvArray,
   ): void {
-    debugger;
-
-    // A-n1   A
-    // B-n2   C
-    // C-n3   B
-
     const oldElems = this._elems.map((e) => e.item);
-    const newElems = new Set(value.elems);
-    const removedElems = new Set(oldElems.filter((oe) => !newElems.has(oe)));
 
-    const oldElemsSet = new Set(oldElems);
-    const addedElems = value.elems.filter((ne) => !oldElemsSet.has(ne));
+    const diff = diffLists(oldElems, value.elems);
+    console.log('FW', diff);
 
     const newThisElems = [];
-    for (const elem of this._elems) {
-      if (removedElems.has(elem.item)) {
-        this._wrapperElem.removeChild(elem.valueElem);
-        this._wrapperElem.removeChild(elem.deleteButton);
-      } else {
-        newThisElems.push(elem);
+    for (const change of diff.changes) {
+      switch (change.type) {
+        case 'common': {
+          newThisElems[change.newPos!] = this._elems[change.oldPos!];
+          break;
+        }
+        case 'add': {
+          const itemRow = this.createItemRow(
+            config,
+            path,
+            value.elems[change.newPos!],
+            change.newPos!,
+          );
+          itemRow.deleteButton.addEventListener('click', () => {
+            this.deleteItem(itemRow);
+          });
+          newThisElems[change.newPos!] = itemRow;
+          break;
+        }
+        case 'remove': {
+          this._elems[change.oldPos!].valueElem.remove();
+          this._elems[change.oldPos!].deleteButton.remove();
+          break;
+        }
       }
     }
+
+    const wrapperElem = div({});
+    wrapperElem.style.display = 'grid';
+    wrapperElem.style.gridTemplateColumns = '1fr 1fr';
+    newThisElems.forEach((itemRow) => {
+      wrapperElem.appendChild(itemRow.valueElem);
+      wrapperElem.appendChild(itemRow.deleteButton);
+      itemRow.deleteButton.addEventListener('click', () => {
+        this.deleteItem(itemRow);
+      });
+    });
+    wrapperElem.appendChild(this._addButtonElem);
+
     this._elems = newThisElems;
-
-    for (let i = 0; i < value.elems.length; i++) {
-      this._elems[i].valueElem.reRender(
-        schemaInfos,
-        path.append(i),
-        value.elems[i],
-      );
-    }
-
-    // const newElems = new Set(value.elems);
-    // for (const itemRow of this._elems) {
-    // }
-
-    // const oldValue = args.value;
-    // const oldItems = new Set(oldValue.elems);
+    this._wrapperElem.remove();
+    this._wrapperElem = wrapperElem;
+    this.appendChild(wrapperElem);
   }
 }

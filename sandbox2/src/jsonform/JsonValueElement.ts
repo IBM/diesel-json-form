@@ -1,11 +1,11 @@
 import { JsonValue, JsPath } from '@diesel-parser/json-form';
-import { RendererArgs } from './RendererArgs';
+import { RenderConfig } from './RendererConfig';
 import { SchemaInfos } from './SchemaInfos';
 import { JsonErrorList } from './elements/JsonErrorList';
 
 export interface JsonValueElement<T extends JsonValue> {
-  render(args: RendererArgs<T>): void;
-  reRender(schemaInfos: SchemaInfos, path: JsPath, value: T): void;
+  render(config: RenderConfig, path: JsPath, value: T): void;
+  reRender(config: RenderConfig, path: JsPath, value: T): void;
 }
 
 export abstract class JsonValueElementBase<T extends JsonValue>
@@ -19,26 +19,26 @@ export abstract class JsonValueElementBase<T extends JsonValue>
   private _path: JsPath = JsPath.empty;
   private _errorNode?: JsonErrorList;
   private _rendered: boolean = false;
-  private _valueChanged?: RendererArgs<T>['valueChanged'];
+  private _valueChanged?: RenderConfig['valueChanged'];
   private _schemaInfos?: SchemaInfos;
 
-  render(args: RendererArgs<T>): void {
-    console.log('render', args);
+  render(config: RenderConfig, path: JsPath, value: T): void {
     if (this._rendered) {
       throw new Error('already rendered');
     }
-    this._path = args.path;
-    this._valueChanged = args.valueChanged;
+    this._path = path;
+    this._valueChanged = config.valueChanged;
     this._rendered = true;
-    this.setAttribute('jf-path', args.path.format());
-    this._schemaInfos = args.schemaInfos;
-    this.doRender(args);
+    this.setAttribute('jf-path', path.format());
+    this._schemaInfos = config.schemaInfos;
+    this.doRender(config, path, value);
     this._errorNode = JsonErrorList.newInstance();
     this.appendChild(this._errorNode);
-    this._errorNode.errors = args.schemaInfos.getErrors(args.path);
+    this._errorNode.errors = config.schemaInfos.getErrors(path);
   }
 
-  reRender(schemaInfos: SchemaInfos, path: JsPath, value: T): void {
+  reRender(config: RenderConfig, path: JsPath, value: T): void {
+    const { schemaInfos } = config;
     this._path = path;
     console.log('reRender', schemaInfos, path, value);
     if (!this._rendered) {
@@ -48,10 +48,9 @@ export abstract class JsonValueElementBase<T extends JsonValue>
       throw new Error('no error node');
     }
     this.setAttribute('jf-path', path.format());
-    debugger;
     this._errorNode.errors = schemaInfos.getErrors(path);
     this._schemaInfos = schemaInfos;
-    this.doReRender(schemaInfos, path, value);
+    this.doReRender(config, path, value);
   }
 
   protected get schemaInfos(): SchemaInfos | undefined {
@@ -62,9 +61,13 @@ export abstract class JsonValueElementBase<T extends JsonValue>
     return this._path;
   }
 
-  protected abstract doRender(args: RendererArgs<T>): void;
+  protected abstract doRender(
+    config: RenderConfig,
+    path: JsPath,
+    value: T,
+  ): void;
   protected abstract doReRender(
-    schemaInfos: SchemaInfos,
+    config: RenderConfig,
     path: JsPath,
     value: T,
   ): void;

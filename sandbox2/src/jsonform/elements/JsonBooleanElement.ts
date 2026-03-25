@@ -1,8 +1,7 @@
 import { JsPath, JvBoolean, jvBool } from '@diesel-parser/json-form';
-import { JsonValueElementBase } from '../JsonValueElement';
-import { RendererArgs } from '../RendererArgs';
 import { input } from '../HtmlBuilder';
-import { SchemaInfos } from '../SchemaInfos';
+import { JsonValueElementBase } from '../JsonValueElement';
+import { RenderConfig } from '../RendererConfig';
 
 export class JsonBooleanElement extends JsonValueElementBase<JvBoolean> {
   static TAG_NAME = 'json-boolean';
@@ -21,8 +20,8 @@ export class JsonBooleanElement extends JsonValueElementBase<JvBoolean> {
     this._input = input({ type: 'checkbox' }) as HTMLInputElement;
   }
 
-  protected doRender(args: RendererArgs<JvBoolean>) {
-    const { value, path, valueChanged } = args;
+  protected doRender(config: RenderConfig, path: JsPath, value: JvBoolean) {
+    const { valueChanged } = config;
     this._input.checked = value.value;
     this._input.addEventListener('input', () => {
       valueChanged(path, jvBool(this._input.checked));
@@ -35,7 +34,7 @@ export class JsonBooleanElement extends JsonValueElementBase<JvBoolean> {
   }
 
   protected doReRender(
-    schemaInfos: SchemaInfos,
+    config: RenderConfig,
     path: JsPath,
     value: JvBoolean,
   ): void {

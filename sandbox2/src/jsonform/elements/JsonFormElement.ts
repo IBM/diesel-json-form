@@ -45,19 +45,20 @@ export class JsonFormElement extends HTMLElement {
   }
 
   private doRender(schemaInfos: SchemaInfos, value: JsonValue) {
-    this._jsonValueElement = this._renderer.render({
-      path: JsPath.empty,
+    this._jsonValueElement = this._renderer.render(
+      {
+        valueChanged: this.onValueChanged.bind(this),
+        schemaInfos,
+        renderer: this._renderer,
+      },
+      JsPath.empty,
       value,
-      valueChanged: this.onValueChanged.bind(this),
-      schemaInfos,
-      renderer: this._renderer,
-    });
+    );
     this.appendChild(this._jsonValueElement);
   }
 
   private onValueChanged(path: JsPath, newValue: JsonValue) {
     console.log('onValueChanged', path, newValue);
-    debugger;
     const oldRoot = this._value;
     const newRoot = setValueAt(this._value, path, newValue);
     this._value = oldRoot;
@@ -67,7 +68,12 @@ export class JsonFormElement extends HTMLElement {
         this.removeChild(this._jsonValueElement);
         this.doRender(schemaInfos, newRoot);
       } else {
-        this._jsonValueElement.reRender(schemaInfos, JsPath.empty, newRoot);
+        const config = {
+          valueChanged: this.onValueChanged.bind(this),
+          schemaInfos,
+          renderer: this._renderer,
+        };
+        this._jsonValueElement.reRender(config, JsPath.empty, newRoot);
       }
     }
   }

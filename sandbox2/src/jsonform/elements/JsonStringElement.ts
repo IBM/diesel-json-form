@@ -1,8 +1,7 @@
 import { JsPath, JvString, jvString } from '@diesel-parser/json-form';
-import { JsonValueElementBase } from '../JsonValueElement';
-import { RendererArgs } from '../RendererArgs';
 import { input } from '../HtmlBuilder';
-import { SchemaInfos } from '../SchemaInfos';
+import { JsonValueElementBase } from '../JsonValueElement';
+import { RenderConfig } from '../RendererConfig';
 
 export class JsonStringElement extends JsonValueElementBase<JvString> {
   static TAG_NAME = 'json-string';
@@ -21,8 +20,7 @@ export class JsonStringElement extends JsonValueElementBase<JvString> {
     this._input = input({}) as HTMLInputElement;
   }
 
-  protected doRender(args: RendererArgs<JvString>) {
-    const { value } = args;
+  protected doRender(config: RenderConfig, path: JsPath, value: JvString) {
     this._input.value = value.value;
     this._input.addEventListener('input', () => {
       this.fireValueChanged(jvString(this._input.value));
@@ -31,7 +29,7 @@ export class JsonStringElement extends JsonValueElementBase<JvString> {
   }
 
   protected doReRender(
-    schemaInfos: SchemaInfos,
+    config: RenderConfig,
     path: JsPath,
     value: JvString,
   ): void {

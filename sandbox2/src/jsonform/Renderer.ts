@@ -1,5 +1,6 @@
 import {
   JsonValue,
+  JsPath,
   JvArray,
   JvBoolean,
   JvNull,
@@ -8,7 +9,7 @@ import {
   JvString,
 } from '@diesel-parser/json-form';
 import { JsonValueElement } from './JsonValueElement';
-import { RendererArgs } from './RendererArgs';
+import { RenderConfig } from './RendererConfig';
 import { JsonStringElement } from './elements/JsonStringElement';
 import { JsonNumberElement } from './elements/JsonNumberElement';
 import { JsonBooleanElement } from './elements/JsonBooleanElement';
@@ -18,116 +19,105 @@ import { JsonNullElement } from './elements/JsonNullElement';
 import { JsRenderer } from '@diesel-parser/json-schema-facade-ts';
 
 export type ElementFactory<T extends JsonValue> = (
-  schemaValue: any,
-  args: RendererArgs<T>,
+  schemaValue: JsonValue,
+  config: RenderConfig,
+  path: JsPath,
+  value: T,
 ) => JsonValueElement<T> & HTMLElement;
 
 export class Renderer {
   private _registry: Map<string, ElementFactory<JsonValue>> = new Map();
 
   render(
-    args: RendererArgs<JsonValue>,
+    config: RenderConfig,
+    path: JsPath,
+    value: JsonValue,
   ): JsonValueElement<JsonValue> & HTMLElement {
-    const e = this.createElement(args);
-    e.render(args);
+    const e = this.createElement(config, path, value);
+    e.render(config, path, value);
     return e;
   }
 
   protected createElement(
-    args: RendererArgs<JsonValue>,
+    config: RenderConfig,
+    path: JsPath,
+    value: JsonValue,
   ): JsonValueElement<JsonValue> & HTMLElement {
-    const { schemaInfos, path } = args;
+    const { schemaInfos } = config;
     const renderer = schemaInfos.getRenderer(path);
     if (renderer) {
-      const e = this.createElementRenderer(renderer, args);
+      const e = this.createElementRenderer(renderer, config, path, value);
       if (e) {
         return e;
       } else {
         console.warn('no renderer found for key:' + renderer.key);
-        return this.createElementByType(args);
+        return this.createElementByType(value);
       }
     } else {
-      return this.createElementByType(args);
+      return this.createElementByType(value);
     }
   }
 
   private createElementByType(
-    args: RendererArgs<JsonValue>,
+    value: JsonValue,
   ): JsonValueElement<JsonValue> & HTMLElement {
-    const { value } = args;
     switch (value.tag) {
       case 'jv-string': {
-        return this.createElementString(args);
+        return this.createElementString();
       }
       case 'jv-number': {
-        return this.createElementNumber(args);
+        return this.createElementNumber();
       }
       case 'jv-boolean': {
-        return this.createElementBoolean(args);
+        return this.createElementBoolean();
       }
       case 'jv-object': {
-        return this.createElementObject(args);
+        return this.createElementObject();
       }
       case 'jv-array': {
-        return this.createElementArray(args);
+        return this.createElementArray();
       }
       case 'jv-null': {
-        return this.createElementNull(args);
+        return this.createElementNull();
       }
     }
   }
 
   private createElementRenderer(
     renderer: JsRenderer,
-    args: RendererArgs<JsonValue>,
+    config: RenderConfig,
+    path: JsPath,
+    value: JsonValue,
   ): (JsonValueElement<JsonValue> & HTMLElement) | undefined {
     const r = this._registry.get(renderer.key);
     if (r) {
-      return r(renderer.schemaValue, args);
+      return r(renderer.schemaValue, config, path, value);
     } else {
       return undefined;
     }
   }
 
-  protected createElementString(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    args: RendererArgs<JsonValue>,
-  ): JsonValueElement<JvString> & HTMLElement {
+  protected createElementString(): JsonValueElement<JvString> & HTMLElement {
     return JsonStringElement.newInstance();
   }
 
-  protected createElementNumber(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    args: RendererArgs<JsonValue>,
-  ): JsonValueElement<JvNumber> & HTMLElement {
+  protected createElementNumber(): JsonValueElement<JvNumber> & HTMLElement {
     return JsonNumberElement.newInstance();
   }
 
-  protected createElementBoolean(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    args: RendererArgs<JsonValue>,
-  ): JsonValueElement<JvBoolean> & HTMLElement {
+  protected createElementBoolean(): JsonValueElement<JvBoolean> & HTMLElement {
     return JsonBooleanElement.newInstance();
   }
 
-  protected createElementObject(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    args: RendererArgs<JsonValue>,
-  ): JsonValueElement<JvObject> & HTMLElement {
+  protected createElementObject(): JsonValueElement<JvObject> & HTMLElement {
     return JsonObjectElement.newInstance();
   }
 
-  protected createElementArray(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    args: RendererArgs<JsonValue>,
-  ): JsonValueElement<JvArray> & HTMLElement {
+  protected createElementArray(): JsonValueElement<JvArray> & HTMLElement {
     return JsonArrayElement.newInstance();
   }
 
-  protected createElementNull(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    args: RendererArgs<JsonValue>,
-  ): JsonValueElement<JvNull> & HTMLElement {
+  protected createElementNull(): JsonValueElement<JvNull> & HTMLElement {
     return JsonNullElement.newInstance();
   }
 }

@@ -1,8 +1,7 @@
 import { JsPath, JvNumber, jvNumber } from '@diesel-parser/json-form';
-import { JsonValueElementBase } from '../JsonValueElement';
-import { RendererArgs } from '../RendererArgs';
 import { input } from '../HtmlBuilder';
-import { SchemaInfos } from '../SchemaInfos';
+import { JsonValueElementBase } from '../JsonValueElement';
+import { RenderConfig } from '../RendererConfig';
 
 export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
   static TAG_NAME = 'json-number';
@@ -23,8 +22,7 @@ export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
     }) as HTMLInputElement;
   }
 
-  protected doRender(args: RendererArgs<JvNumber>) {
-    const { value } = args;
+  protected doRender(config: RenderConfig, path: JsPath, value: JvNumber) {
     this._input.value = value.value;
     this._input.addEventListener('input', () => {
       const newValue = jvNumber(this._input.value);
@@ -34,7 +32,7 @@ export class JsonNumberElement extends JsonValueElementBase<JvNumber> {
   }
 
   protected doReRender(
-    schemaInfos: SchemaInfos,
+    config: RenderConfig,
     path: JsPath,
     value: JvNumber,
   ): void {
