@@ -11,6 +11,7 @@ import {
 import { button, div, text } from '../HtmlBuilder';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RenderConfig } from '../RendererConfig';
+import { detectSingleUpdate } from './detectSingleUpdate';
 
 interface ObjectProp {
   readonly property: JsonProperty;
@@ -65,12 +66,14 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
   ): void {
     const oldProperties: JsonProperty[] = this._elems.map((e) => e.property);
 
-    const diff = diffLists(
+    const diff0 = diffLists(
       oldProperties,
       value.properties,
       (a, b) => a.name === b.name,
     );
-    // console.log('FW', diff);
+    // console.log('FW diff0', diff0);
+    const diff = detectSingleUpdate(diff0);
+    console.log('FW diff', diff);
 
     const newThisElems = [];
     for (const change of diff.changes) {

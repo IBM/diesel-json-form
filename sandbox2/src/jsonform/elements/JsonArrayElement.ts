@@ -10,6 +10,7 @@ import {
 import { button, div, text } from '../HtmlBuilder';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RenderConfig } from '../RendererConfig';
+import { detectSingleUpdate } from './detectSingleUpdate';
 
 interface ItemRow {
   readonly item: JsonValue;
@@ -112,8 +113,10 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   ): void {
     const oldElems = this._elems.map((e) => e.item);
 
-    const diff = diffLists(oldElems, value.elems);
-    // console.log('FW', diff);
+    const diff0 = diffLists(oldElems, value.elems);
+    // console.log('FW diff0', diff0);
+    const diff = detectSingleUpdate(diff0);
+    // console.log('FW diff', diff);
 
     const newThisElems = [];
     for (const change of diff.changes) {
