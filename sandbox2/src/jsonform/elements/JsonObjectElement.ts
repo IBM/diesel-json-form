@@ -3,8 +3,10 @@ import {
   JsonProperty,
   JsonValue,
   JsPath,
+  jvNull,
   jvObject,
   JvObject,
+  setValueAt,
 } from '@diesel-parser/json-form';
 import { button, div, text } from '../HtmlBuilder';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
@@ -52,7 +54,8 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     });
     this._wrapperElem = wrapperElem;
     this.appendChild(this._wrapperElem);
-    this.appendChild(this._propsToAddWrapper);
+
+    this.updatePropertiesToAdd();
   }
 
   protected doReRender(
@@ -83,9 +86,6 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
         }
         case 'add': {
           const op = this.renderProperty(change.value, config, path);
-          //   op.propertyElements[2].addEventListener('click', () => {V
-          //     this.removeProperty(op.property.name);
-          //   });
           newThisElems[change.newPos!] = op;
           break;
         }
@@ -113,7 +113,8 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     this._wrapperElem.remove();
     this._wrapperElem = wrapperElem;
     this.appendChild(this._wrapperElem);
-    // this.appendChild(this._propsToAddWrapper);
+
+    this.updatePropertiesToAdd();
   }
 
   private renderProperty(
@@ -139,91 +140,63 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     };
   }
 
+  private updatePropertiesToAdd() {
+    const propsToAddWrpper = div({});
+    const addNames = this.computePropertiesToAdd();
+    addNames.forEach((name) => {
+      const button1 = button({}, text(`add ${name}`));
+      button1.addEventListener('click', () => {
+        this.addProperty(name);
+      });
+      propsToAddWrpper.appendChild(button1);
+    });
+    this._propsToAddWrapper.remove();
+    this._propsToAddWrapper = propsToAddWrpper;
+    this.appendChild(this._propsToAddWrapper);
+  }
+
   private removeProperty(name: string): void {
     const properties = this._elems.map((e) => e.property);
     const newProperties = properties.filter((p) => p.name !== name);
     this.fireValueChanged(jvObject(newProperties));
   }
 
-  //   private addProperty(name: string): void {
-  //     // if (this.schemaInfos && this.path && this.args) {
-  //     //   const newPath = this.path.append(name);
-  //     //   const propOwner = this.getValue();
-  //     //   const newPropOwner: JvObject = {
-  //     //     ...propOwner,
-  //     //     properties: [
-  //     //       ...propOwner.properties,
-  //     //       {
-  //     //         name,
-  //     //         value: jvNull,
-  //     //       },
-  //     //     ],
-  //     //   };
-  //     //   const newRoot = setValueAt(
-  //     //     this.schemaInfos.getRootValue(),
-  //     //     this.path,
-  //     //     newPropOwner,
-  //     //   );
-  //     //   const validationResult = this.schemaInfos.validate(newRoot);
-  //     //   const proposals = getProposals(validationResult, newPath, -1);
-  //     //   if (proposals.length > 0) {
-  //     //     const propValue =
-  //     //       proposals[0].tag === 'jv-object' ? jvObject() : proposals[0];
-  //     //     const newProp = this.renderProperty(
-  //     //       {
-  //     //         name,
-  //     //         value: propValue,
-  //     //       },
-  //     //       this.args,
-  //     //       this.path,
-  //     //       this._elems.length,
-  //     //     );
-  //     //     this._elems.push(newProp);
-  //     //     this.fireValueChanged();
-  //     //   }
-  //     // }
-  //   }
-
-  private computePropertiesToAdd(): string[] {
-    // const validationResult = this.schemaInfos?.validationResult;
-    // if (validationResult && this.path) {
-    //   const proposals = getProposals(validationResult, this.path, -1);
-    //   const propNames = proposals.flatMap((proposal) => {
-    //     if (proposal.tag === 'jv-object') {
-    //       return proposal.properties.map((p) => p.name);
-    //     }
-    //     return [];
-    //   });
-    //   return propNames;
-    // }
-    return [];
+  private addProperty(name: string) {
+    const properties = this._elems.map((e) => e.property);
+    const newValue = jvObject([...properties, { name, value: jvNull }]);
+    if (this.schemaInfos) {
+      const root = this.schemaInfos.rootValue;
+      const newRoot = setValueAt(root, this.path, newValue);
+      const service = this.schemaInfos.schemaService;
+      const schema = this.schemaInfos.schema;
+      const validationResult = service.validate(schema, newRoot);
+      const proposals = validationResult.propose(this.path.append(name), -1);
+      if (proposals.length > 0) {
+        const newValue2 = jvObject([
+          ...properties,
+          { name, value: proposals[0] },
+        ]);
+        this.fireValueChanged(newValue2);
+      }
+    }
   }
 
-  //   onSchemaInfoChanged(schemaInfos: SchemaInfos): void {
-  // super.onSchemaInfoChanged(schemaInfos);
-  // empty(this._propsToAddWrapper);
-  // const propsToAdd = this.computePropertiesToAdd();
-  // const existingProps = new Set(this._elems.map((e) => e.propertyName));
-  // propsToAdd
-  //   .filter((propertyName) => !existingProps.has(propertyName))
-  //   .forEach((propertyName) => {
-  //     const propButton = button(
-  //       {
-  //         onclick: () => {
-  //           this.addProperty(propertyName);
-  //         },
-  //       },
-  //       text('+ ' + propertyName),
-  //     );
-  //     this._propsToAddWrapper.appendChild(propButton);
-  //   });
-  //   }
-
-  //   getValue(): JvObject {
-  //     return jvObject(
-  //       this._elems.map((x) => {
-  //         return { name: x.propertyName, value: x.propertyValueElem.getValue() };
-  //       }),
-  //     );
-  //   }
+  private computePropertiesToAdd(): string[] {
+    if (this.schemaInfos) {
+      const service = this.schemaInfos.schemaService;
+      const schema = this.schemaInfos.schema;
+      const root = this.schemaInfos.rootValue;
+      const validationResult = service.validate(schema, root);
+      const proposals = validationResult.propose(this.path, -1);
+      const propNames = proposals.flatMap((proposal) => {
+        if (proposal.tag === 'jv-object') {
+          return proposal.properties.map((p) => p.name);
+        }
+        return [];
+      });
+      const existing = new Set(this._elems.map((e) => e.property.name));
+      return propNames.filter((name) => !existing.has(name));
+    }
+    return [];
+  }
 }
