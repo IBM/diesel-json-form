@@ -16,10 +16,28 @@ export class SchemaInfos {
     new Map();
 
   private _validationResult: ValidationResult;
+  private _rootValue: JsonValue;
+  private _schema: JsonValue;
+  private _schemaService: SchemaService;
 
   constructor(service: SchemaService, value: JsonValue, schema: JsonValue) {
     this._validationResult = service.validate(schema, value);
+    this._rootValue = value;
+    this._schema = schema;
+    this._schemaService = service;
     this.update();
+  }
+
+  get rootValue(): JsonValue {
+    return this._rootValue;
+  }
+
+  get schema(): JsonValue {
+    return this._schema;
+  }
+
+  get schemaService(): SchemaService {
+    return this._schemaService;
   }
 
   getErrors(path: JsPath): ReadonlyArray<ValidationError> {

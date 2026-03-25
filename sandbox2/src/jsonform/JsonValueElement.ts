@@ -20,6 +20,7 @@ export abstract class JsonValueElementBase<T extends JsonValue>
   private _errorNode?: JsonErrorList;
   private _rendered: boolean = false;
   private _valueChanged?: RendererArgs<T>['valueChanged'];
+  private _schemaInfos?: SchemaInfos;
 
   render(args: RendererArgs<T>): void {
     console.log('render', args);
@@ -30,6 +31,7 @@ export abstract class JsonValueElementBase<T extends JsonValue>
     this._valueChanged = args.valueChanged;
     this._rendered = true;
     this.setAttribute('jf-path', args.path.format());
+    this._schemaInfos = args.schemaInfos;
     this.doRender(args);
     this._errorNode = JsonErrorList.newInstance();
     this.appendChild(this._errorNode);
@@ -48,7 +50,16 @@ export abstract class JsonValueElementBase<T extends JsonValue>
     this.setAttribute('jf-path', path.format());
     debugger;
     this._errorNode.errors = schemaInfos.getErrors(path);
+    this._schemaInfos = schemaInfos;
     this.doReRender(schemaInfos, path, value);
+  }
+
+  protected get schemaInfos(): SchemaInfos | undefined {
+    return this._schemaInfos;
+  }
+
+  protected get path(): JsPath {
+    return this._path;
   }
 
   protected abstract doRender(args: RendererArgs<T>): void;

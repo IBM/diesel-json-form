@@ -1,4 +1,11 @@
-import { JvArray, JsonValue, jvArray, JsPath } from '@diesel-parser/json-form';
+import {
+  JvArray,
+  JsonValue,
+  jvArray,
+  JsPath,
+  jvNull,
+  setValueAt,
+} from '@diesel-parser/json-form';
 import { JsonValueElement, JsonValueElementBase } from '../JsonValueElement';
 import { RendererArgs } from '../RendererArgs';
 import { button, div, text } from '../HtmlBuilder';
@@ -77,9 +84,27 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   }
 
   private addElem() {
+    debugger;
+    const elems = this._elems.map((e) => e.item);
+    const newValue = jvArray([...elems, jvNull]);
+    if (this.schemaInfos) {
+      const root = this.schemaInfos.rootValue;
+      const newRoot = setValueAt(root, this.path, newValue);
+      const service = this.schemaInfos.schemaService;
+      const schema = this.schemaInfos.schema;
+      const validationResult = service.validate(schema, newRoot);
+      const proposals = validationResult.propose(
+        this.path.append(newValue.elems.length - 1),
+        -1,
+      );
+      if (proposals.length > 0) {
+        const newValue2 = jvArray([...elems, proposals[0]]);
+        this.fireValueChanged(newValue2);
+      }
+    }
+
     // if (this.schemaInfos && this.path) {
     //   const thisValue = this.getValue();
-    //   const newValue = jvArray([...thisValue.elems, jvNull]);
     //   const root = this.schemaInfos.getRootValue();
     //   const newRoot = setValueAt(root, this.path, newValue);
     //   const validationResult = this.schemaInfos.validate(newRoot);
@@ -97,7 +122,6 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
   }
 
   private deleteItem(itemRow: ItemRow) {
-    debugger;
     const elems = this._elems.map((e) => e.item);
     const newElems = elems.filter((e) => e !== itemRow.item);
     this.fireValueChanged(jvArray(newElems));
@@ -112,9 +136,18 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
     path: JsPath,
     value: JvArray,
   ): void {
+    debugger;
+
+    // A-n1   A
+    // B-n2   C
+    // C-n3   B
+
     const oldElems = this._elems.map((e) => e.item);
     const newElems = new Set(value.elems);
     const removedElems = new Set(oldElems.filter((oe) => !newElems.has(oe)));
+
+    const oldElemsSet = new Set(oldElems);
+    const addedElems = value.elems.filter((ne) => !oldElemsSet.has(ne));
 
     const newThisElems = [];
     for (const elem of this._elems) {
@@ -126,6 +159,7 @@ export class JsonArrayElement extends JsonValueElementBase<JvArray> {
       }
     }
     this._elems = newThisElems;
+
     for (let i = 0; i < value.elems.length; i++) {
       this._elems[i].valueElem.reRender(
         schemaInfos,
