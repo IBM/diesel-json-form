@@ -73,7 +73,7 @@ export class JsonObjectElement extends JsonValueElementBase<JvObject> {
     );
     // console.log('FW diff0', diff0);
     const diff = detectSingleUpdate(diff0);
-    console.log('FW diff', diff);
+    // console.log('FW diff', diff);
 
     const newThisElems = [];
     for (const change of diff.changes) {
