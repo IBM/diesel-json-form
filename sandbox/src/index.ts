@@ -16,7 +16,7 @@
 
 import './style.css';
 import '@diesel-parser/json-form/dist/JsonEditor.css';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import * as JsonForm from '@diesel-parser/json-form';
 import { RendererFactory } from '@diesel-parser/json-form';
 
@@ -133,7 +133,8 @@ function initJsonForm(
   strictMode: boolean,
   debounceMs: number,
 ) {
-  ReactDOM.render(
+  const root = createRoot(jsonForm!);
+  root.render(
     JsonForm.JsonEditor({
       schema,
       value,
@@ -148,6 +149,5 @@ function initJsonForm(
       rendererFactory: MyRendererFactory,
       debounceMs,
     }),
-    jsonForm,
   );
 }
