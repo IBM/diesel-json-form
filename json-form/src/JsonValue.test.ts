@@ -33,9 +33,10 @@ import {
   setValueAt,
   stringify,
 } from './JsonValue';
-import { just, nothing, ok } from 'tea-cup-core';
+import { just, nothing, ok } from 'tea-cup-fp';
 import { JsPath } from './JsPath';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
+import { describe, test, expect } from 'vitest';
 
 function valueFromAny(value: any): JsonValue {
   const s = JSON.stringify(value);

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { render } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { JsPath } from './JsPath';
 import {
   MenuTrigger,
@@ -23,9 +22,10 @@ import {
 } from './renderer/Renderer';
 import { ViewJsonEditor } from './JsonEditor';
 import { initialModel } from './Model';
-import { nothing } from 'tea-cup-core';
+import { nothing } from 'tea-cup-fp';
 import { jvArray, jvNull, jvObject } from './JsonValue';
 import { defaultSchemaService } from './SchemaService';
+import { describe, test, expect } from 'vitest';
 
 describe('Render options', () => {
   describe('defaults', () => {
@@ -39,7 +39,7 @@ describe('Render options', () => {
           renderOptions: {},
         }),
       );
-      expect(container.querySelector('button')).not.toHaveAttribute('style');
+      expect(container.querySelector('button')!.style).toBeUndefined;
     });
     test('menu document root', () => {
       const { container } = render(
@@ -115,9 +115,8 @@ describe('Render options', () => {
           renderOptions: { hideMenuTooltip: true },
         }),
       );
-      expect(container.querySelector('button')).toHaveAttribute(
-        'style',
-        'overflow: hidden;',
+      expect(container.querySelector('button')!.style.overflow).toEqual(
+        'hidden',
       );
     });
     test('hide menu document root', () => {

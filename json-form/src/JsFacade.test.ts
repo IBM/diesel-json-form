@@ -16,6 +16,7 @@
 
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { jvObject, jvString, stringify } from './JsonValue';
+import { describe, test, expect } from 'vitest';
 
 describe('JsFacade', () => {
   test('should return schema validation markers when parsing', () => {

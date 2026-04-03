@@ -13,7 +13,7 @@ import {
   Maybe,
   noCmd,
   nothing,
-} from 'tea-cup-core';
+} from 'tea-cup-fp';
 import * as React from 'react';
 
 export type Msg =

@@ -15,7 +15,7 @@
  */
 
 import { contextMenuMsg, Msg, noOp } from './Msg';
-import { Cmd, just, maybeOf, noCmd, nothing, Task, Tuple } from 'tea-cup-core';
+import { Cmd, just, maybeOf, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
 import { Model } from './Model';
 import { JsPath } from './JsPath';
 import {

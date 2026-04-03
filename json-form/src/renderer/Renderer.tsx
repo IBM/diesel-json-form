@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as React from 'react';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 import {
   Button,
@@ -34,8 +35,7 @@ import {
   ChevronUp,
   OverflowMenuVertical,
 } from '@carbon/icons-react';
-import * as React from 'react';
-import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-core';
+import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-fp';
 import { box, Dim, pos } from 'tea-pop-core';
 import {
   JsonValue,
@@ -50,9 +50,9 @@ import {
 import { JsPath } from '../JsPath';
 import { CustomRendererModel, Model as FormModel } from '../Model';
 import { Msg } from '../Msg';
-import { TFunction } from 'i18next';
 import { ViewValueProps } from './ViewValueProps';
 import { RenderOptions } from '../RenderOptions';
+import { FormTFunction } from '../FormTFunction';
 
 export interface RendererInitArgs<Model> {
   readonly path: JsPath;
@@ -328,7 +328,7 @@ interface ExpandCollapseButtonProps {
   readonly collapsed: boolean;
   readonly dispatch: Dispatcher<Msg>;
   readonly path: JsPath;
-  readonly t: TFunction;
+  readonly t: FormTFunction;
 }
 
 function ExpandCollapseButton(props: ExpandCollapseButtonProps) {
@@ -541,7 +541,7 @@ interface MyTimePickerProps {
   readonly value: string;
   readonly isInvalid: boolean;
   readonly invalidText: string;
-  readonly t: TFunction;
+  readonly t: FormTFunction;
 }
 
 function MyTimePicker(props: MyTimePickerProps) {
@@ -592,7 +592,7 @@ interface MyDatePickerProps {
   readonly onChange: (s: string) => void;
   readonly isInvalid: boolean;
   readonly invalidText: string;
-  readonly t: TFunction;
+  readonly t: FormTFunction;
   readonly language: string;
 }
 
@@ -814,9 +814,9 @@ export function ViewErrors(props: ViewErrorsProps) {
   );
 }
 
-export const WrapErrors: React.FunctionComponent<ViewValueProps<JsonValue>> = (
-  p,
-) => {
+export const WrapErrors: React.FunctionComponent<
+  { children?: React.ReactNode | undefined } & ViewValueProps<JsonValue>
+> = (p) => {
   const errorsAtPath = getErrorsAtPath(p);
   return (
     <>
@@ -830,7 +830,7 @@ export interface MenuTriggerProps {
   readonly dispatch: Dispatcher<Msg>;
   readonly path: JsPath;
   readonly disabled: boolean;
-  readonly t: TFunction;
+  readonly t: FormTFunction;
   readonly renderOptions?: RenderOptions;
 }
 
