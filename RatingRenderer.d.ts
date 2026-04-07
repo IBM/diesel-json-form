@@ -1,5 +1,5 @@
 import { Renderer } from '@diesel-parser/json-form';
-import { Maybe } from 'tea-cup-core';
+import { Maybe } from 'tea-cup-fp';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 export type Msg = {
     tag: 'mouse-enter';
