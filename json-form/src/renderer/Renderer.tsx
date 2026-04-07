@@ -625,6 +625,7 @@ function MyDatePicker(props: MyDatePickerProps) {
       }}
       value={props.value} // need to set value twice
       locale={languageToPickerLocale(props.language)}
+      invalid={props.isInvalid}
     >
       <DatePickerInput
         id={'input-' + fmtPath}
@@ -640,7 +641,6 @@ function MyDatePicker(props: MyDatePickerProps) {
         // @ts-ignore
         value={props.value} // need to set value twice
         invalidText={props.invalidText}
-        invalid={props.isInvalid}
       />
     </DatePicker>
   );
