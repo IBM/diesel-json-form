@@ -197,11 +197,20 @@ function doComputePropsToAdd(
     switch (value.tag) {
       case 'jv-object': {
         // compute props for this object and recurse
+        const attrNames = new Set();
         const propNameProposals: string[] = validationResult
           .propose(path, -1)
           .flatMap((proposal) => {
             if (proposal.tag === 'jv-object') {
-              return proposal.properties.map((p) => p.name);
+              const objAttrs = proposal.properties.map((p) => p.name);
+              const res = [];
+              for (const name of objAttrs) {
+                if (!attrNames.has(name)) {
+                  attrNames.add(name);
+                  res.push(name);
+                }
+              }
+              return res;
             }
             return [];
           });
