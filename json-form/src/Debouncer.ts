@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Cmd, Dispatcher } from 'tea-cup-core';
+import { Cmd, Dispatcher } from 'tea-cup-fp';
 
 export class Debouncer<M> {
   private cmd?: DebounceCmd<M>;

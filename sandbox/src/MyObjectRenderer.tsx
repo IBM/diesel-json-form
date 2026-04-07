@@ -6,7 +6,7 @@ import {
   RendererInitArgs,
   RendererViewArgs,
 } from '@diesel-parser/json-form';
-import { Cmd, Maybe, noCmd, nothing } from 'tea-cup-core';
+import { Cmd, Maybe, noCmd, nothing } from 'tea-cup-fp';
 import * as React from 'react';
 
 export type Msg = string;

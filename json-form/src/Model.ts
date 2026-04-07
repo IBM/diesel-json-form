@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { just, Maybe, nothing } from 'tea-cup-core';
+import { just, Maybe, nothing } from 'tea-cup-fp';
 import { getValueAt, JsonValue } from './JsonValue';
 import { JsPath } from './JsPath';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
-import { TFunction } from 'i18next';
 import { initMyI18n } from './i18n/MyI18n';
 import {
   SchemaService,
   ValidationError,
   ValidationResult,
 } from './SchemaService';
+import { FormTFunction } from './FormTFunction';
 
 export interface Model {
   readonly schema: Maybe<JsonValue>;
@@ -38,7 +38,7 @@ export interface Model {
   readonly propertiesToAdd: ReadonlyMap<string, ReadonlyArray<string>>;
   readonly comboBoxes: ReadonlyMap<string, ReadonlyArray<string>>;
   readonly formats: ReadonlyMap<string, ReadonlyArray<string>>;
-  readonly t: TFunction;
+  readonly t: FormTFunction;
   readonly lang: string;
   readonly strictMode: boolean;
   readonly customRenderers: ReadonlyMap<string, Maybe<CustomRendererModel>>;

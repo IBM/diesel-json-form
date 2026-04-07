@@ -19,7 +19,7 @@ import { JsonValue } from './JsonValue';
 import * as TPM from 'tea-pop-menu';
 import { Box } from 'tea-pop-core';
 import { MenuAction } from './ContextMenuActions';
-import { Maybe } from 'tea-cup-core';
+import { Maybe } from 'tea-cup-fp';
 
 export interface HasPath {
   readonly path: JsPath;

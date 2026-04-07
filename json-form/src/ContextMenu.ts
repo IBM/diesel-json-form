@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Cmd, noCmd } from 'tea-cup-core';
+import { Cmd, noCmd } from 'tea-cup-fp';
 import {
   actionAddElementToArray,
   actionAddPropertyClicked,

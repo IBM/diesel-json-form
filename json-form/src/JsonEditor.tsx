@@ -29,7 +29,7 @@ import {
   Sub,
   Tuple,
   updatePiped,
-} from 'tea-cup-core';
+} from 'tea-cup-fp';
 import * as TPM from 'tea-pop-menu';
 import {
   actionAddElementToArray,

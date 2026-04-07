@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { just, Maybe, maybeOf, nothing } from 'tea-cup-core';
+import { just, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 
 export class JsPath {
   private constructor(private readonly _elems: ReadonlyArray<string>) {}
