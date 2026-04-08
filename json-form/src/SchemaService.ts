@@ -21,6 +21,7 @@ export interface ValidationResult {
   getRenderers(): ReadonlyMap<string, SchemaRenderer | undefined>;
   getFormats(format: JsPath): readonly string[];
   propose(path: JsPath, maxDepth?: number): readonly JsonValue[];
+  getDiscriminator(path: JsPath): string | undefined;
 }
 
 function toFacadeValue(jsonValue: JsonValue): JsFacade.JsonValue {
@@ -61,6 +62,9 @@ class JsFacadeValidationResult implements ValidationResult {
     return JsFacade.propose(this.result, path.format(), maxDepth).map(
       fromFacadeValue,
     );
+  }
+  getDiscriminator(path: JsPath): string | undefined {
+    return JsFacade.getDiscriminator(this.result, path.format());
   }
 }
 

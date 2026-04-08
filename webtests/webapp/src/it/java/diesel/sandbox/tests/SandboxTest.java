@@ -514,9 +514,9 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "  \"what\": \"schema.animal.Lion\"\n" +
                         "}");
         FObject fObject = f.objectAt(JsPath.empty);
-        fObject.assertEmptyProperties("endangered", "mane", "name", "sound", "type");
+        fObject.assertEmptyProperties("mane", "name", "sound", "type", "endangered");
         fObject.selectPropertyValue("what", "schema.animal.Elephant");
-        fObject.assertEmptyProperties("endangered", "name", "sound", "trunkLength", "tusk", "type");
+        fObject.assertEmptyProperties("trunkLength", "tusk", "name", "sound", "type", "endangered");
         sandbox.jsonEditor
                 .focus()
                 .clearText()
@@ -632,7 +632,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .clearText()
                 .typeText("{}");
-        fObject.assertEmptyProperties("children", "name");
+        fObject.assertEmptyProperties("name", "children");
         sandbox.jsonEditor
                 .focus()
                 .clearText()
