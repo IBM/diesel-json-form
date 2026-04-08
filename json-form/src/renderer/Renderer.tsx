@@ -213,8 +213,6 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
 
   const addingOwnerPath = model.adding.map((a) => a.ownerPath);
 
-  const existingPropertyNames = new Set(properties.map((p) => p.name));
-
   return (
     <div className="jv-object">
       {properties.length === 0 ? (
@@ -281,26 +279,23 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
         {maybeOf(model.propertiesToAdd.get(p.path.format()))
           .map((propNames) => (
             <>
-              {propNames
-                .filter((propName) => !existingPropertyNames.has(propName))
-                .sort()
-                .map((propName) => (
-                  <div className="add-prop-row" key={propName}>
-                    <Button
-                      renderIcon={Add}
-                      kind={'ghost'}
-                      onClick={() =>
-                        dispatch({
-                          tag: 'add-property-btn-clicked',
-                          path: p.path,
-                          propertyName: propName,
-                        })
-                      }
-                    >
-                      {propName}
-                    </Button>
-                  </div>
-                ))}
+              {propNames.map((propName) => (
+                <div className="add-prop-row" key={propName}>
+                  <Button
+                    renderIcon={Add}
+                    kind={'ghost'}
+                    onClick={() =>
+                      dispatch({
+                        tag: 'add-property-btn-clicked',
+                        path: p.path,
+                        propertyName: propName,
+                      })
+                    }
+                  >
+                    {propName}
+                  </Button>
+                </div>
+              ))}
             </>
           ))
           .withDefault(<></>)}

@@ -357,6 +357,46 @@ const Example_OneOfConst = `{
     }
 }`;
 
+const Example_OneOfConstDiscriminator = `{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://schema/animal/AnimalExtAn.json",
+    "oneOf": [
+        {
+            "$ref": "#/$defs/schema.animal.LionExtAn"
+        },
+        {
+            "$ref": "#/$defs/schema.animal.ElephantExtAn"
+        }
+    ],
+    "discriminator": "what",
+    "$defs": {
+        "schema.animal.LionExtAn": {
+            "type": "object",
+            "properties": {
+                "what": {
+                    "type": "string",
+                    "const": "schema.animal.LionExtAn"
+                },
+                "lion": {
+                    "type": "string"
+                }
+            }
+        },
+        "schema.animal.ElephantExtAn": {
+            "type": "object",
+            "properties": {
+                "what": {
+                    "type": "string",
+                    "const": "schema.animal.ElephantExtAn"
+                },
+                "elephant": {
+                    "type": "boolean"
+                }
+            }
+        }
+    }
+}`;
+
 export const samples = [
   ['All', '{}'],
   ['Long', Sample_Long],
@@ -378,6 +418,7 @@ export const samples = [
   ['RendererRating', Example_Renderer3],
   ['RendererObject', Example_Renderer4],
   ['OneOfConst', Example_OneOfConst],
+  ['OneOfConstDiscriminator', Example_OneOfConstDiscriminator],
 ];
 
 export const initialSchema = {};

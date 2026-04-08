@@ -197,6 +197,9 @@ function doComputePropsToAdd(
     switch (value.tag) {
       case 'jv-object': {
         // compute props for this object and recurse
+        const existingPropertyNames = new Set(
+          value.properties.map((p) => p.name),
+        );
         const attrNames = new Set();
         const propNameProposals: string[] = validationResult
           .propose(path, -1)
@@ -205,7 +208,7 @@ function doComputePropsToAdd(
               const objAttrs = proposal.properties.map((p) => p.name);
               const res = [];
               for (const name of objAttrs) {
-                if (!attrNames.has(name)) {
+                if (!existingPropertyNames.has(name) && !attrNames.has(name)) {
                   attrNames.add(name);
                   res.push(name);
                 }
@@ -214,15 +217,21 @@ function doComputePropsToAdd(
             }
             return [];
           });
-        props.set(path.format(), propNameProposals);
-        value.properties.forEach((prop) =>
-          doComputePropsToAdd(
-            model,
-            validationResult,
-            props,
-            path.append(prop.name),
-          ),
-        );
+
+        const d = validationResult.getDiscriminator(path);
+        if (d && attrNames.has(d)) {
+          props.set(path.format(), [d]);
+        } else {
+          props.set(path.format(), propNameProposals);
+          value.properties.forEach((prop) =>
+            doComputePropsToAdd(
+              model,
+              validationResult,
+              props,
+              path.append(prop.name),
+            ),
+          );
+        }
         break;
       }
       case 'jv-array': {
