@@ -163,7 +163,7 @@ function doComputeStringsMetadata(
       }
       case 'jv-string': {
         const proposals: ReadonlyArray<string> = validationResult
-          .propose(path, -1)
+          .propose(path)
           .flatMap((proposal) => {
             if (proposal.tag === 'jv-string') {
               return [proposal.value];
@@ -202,7 +202,7 @@ function doComputePropsToAdd(
         );
         const attrNames = new Set();
         const propNameProposals: string[] = validationResult
-          .propose(path, -1)
+          .propose(path)
           .flatMap((proposal) => {
             if (proposal.tag === 'jv-object') {
               const objAttrs = proposal.properties.map((p) => p.name);

@@ -40,6 +40,7 @@ import { Box } from 'tea-pop-core';
 import { Debouncer } from './Debouncer';
 import { MenuOptionFilter } from './RenderOptions';
 import { SchemaService } from './SchemaService';
+import { proposeNested } from './proposeNested';
 
 export function actionDeleteValue(
   model: Model,
@@ -52,6 +53,7 @@ export function actionDeleteValue(
 }
 
 export function actionApplyProposal(
+  schemaService: SchemaService,
   model: Model,
   path: JsPath,
   proposal: JsonValue,
@@ -61,10 +63,15 @@ export function actionApplyProposal(
     case 'jv-object': {
       const newProposal = getValueAt(model.root, path)
         .map((valueAtPath) => {
-          const augmentedProposal = model.validationResult
-            .andThen((vr) => {
-              // TODO deep propose only for proposalIndex
-              const all = vr.propose(path, 5);
+          const augmentedProposal = model.schema
+            .andThen((schema) => {
+              const all = proposeNested(
+                schema,
+                schemaService,
+                model.root,
+                path,
+                5,
+              );
               return maybeOf(all[proposalIndex]);
             })
             .andThen((v) => (v.tag === 'jv-object' ? just(v) : nothing))
@@ -172,7 +179,7 @@ export function actionAddProperty(
         );
 
         const propertyProposals = newValidationResult
-          .map((vr) => vr.propose(path.append(propertyName), -1))
+          .map((vr) => vr.propose(path.append(propertyName)))
           .withDefault([])
           .map(clearPropertiesIfObject);
 
@@ -213,7 +220,7 @@ export function actionAddElementToArray(
         );
 
         const proposals = newValidationResult
-          .map((vr) => vr.propose(path.append(newElemIndex), -1))
+          .map((vr) => vr.propose(path.append(newElemIndex)))
           .withDefault([]);
 
         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
@@ -271,7 +278,7 @@ export function actionTriggerClicked(
             root: model.root,
             path,
             proposals: model.validationResult
-              .map((vr) => vr.propose(path, -1))
+              .map((vr) => vr.propose(path))
               .withDefault([]),
             valueAtPath,
             strictMode: model.strictMode,
