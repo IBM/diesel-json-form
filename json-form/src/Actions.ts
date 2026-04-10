@@ -152,45 +152,6 @@ export function actionConfirmAddProperty(
     .withDefaultSupply(() => noCmd(newModel));
 }
 
-// export function actionAddProperty(
-//   model: Model,
-//   path: JsPath,
-//   propertyName: string,
-// ): [Model, Cmd<Msg>] {
-//   return getValueAt(model.root, path)
-//     .map<[Model, Cmd<Msg>]>((owner) => {
-//       if (owner.tag === 'jv-object') {
-//         // create the new object with a null value
-//         // because we need it to propose
-//         const newObject = jvObject([
-//           ...owner.properties,
-//           { name: propertyName, value: jvNull },
-//         ]);
-//         const newRoot = setValueAt(model.root, path, newObject);
-//         const newValidationResult = model.schema.map((schema) =>
-//           service.validate(schema, newRoot),
-//         );
-
-//         const propertyProposals = newValidationResult
-//           .map((vr) => vr.propose(path.append(propertyName)))
-//           .withDefault([])
-//           .map(clearPropertiesIfObject);
-
-//         const newObject2 = jvObject([
-//           ...owner.properties,
-//           {
-//             name: propertyName,
-//             value:
-//               propertyProposals.length === 0 ? jvNull : propertyProposals[0],
-//           },
-//         ]);
-//         return setRoot(model, setValueAt(model.root, path, newObject2));
-//       }
-//       return noCmd(model);
-//     })
-//     .withDefaultSupply(() => noCmd(model));
-// }
-
 // export function actionAddElementToArray(
 //   service: SchemaService,
 //   model: Model,
