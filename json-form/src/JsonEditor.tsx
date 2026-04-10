@@ -16,7 +16,7 @@
 
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import React from 'react';
-import { Program } from 'react-tea-cup';
+import { DevTools, Program } from 'react-tea-cup';
 import {
   Cmd,
   Dispatcher,
@@ -32,13 +32,10 @@ import {
 } from 'tea-cup-fp';
 import * as TPM from 'tea-pop-menu';
 import {
-  actionAddElementToArray,
-  actionAddProperty,
   actionAddPropertyClicked,
   actionConfirmAddProperty,
   actionDeleteValue,
   actionToggleExpandCollapsePath,
-  actionTriggerClicked,
   actionUpdateValue,
 } from './Actions';
 import executeContextMenuAction from './ContextMenu';
@@ -47,9 +44,7 @@ import { contextMenuRenderer } from './ContextMenuRenderer';
 import { getValueAt, JsonValue, stringify } from './JsonValue';
 import { JsPath } from './JsPath';
 import {
-  computeAll,
   CustomRendererModel,
-  doValidate,
   initialModel,
   Model,
   updateAddingPropertyName,
@@ -70,6 +65,7 @@ import {
 } from './renderer/Renderer';
 import { MenuOptionFilter, RenderOptions } from './RenderOptions';
 import { defaultSchemaService, SchemaService } from './SchemaService';
+import { computeAllCmd } from './ComputeAllTask';
 
 export function init(
   language: string,
@@ -87,67 +83,70 @@ export function init(
     initialValue,
     strictMode,
     debounceMs,
-    schemaService,
   );
-  return reInitRenderers(model, rendererFactory);
+  const cmd = schema
+    .map((s) => computeAllCmd(schemaService, s, initialValue))
+    .withDefaultSupply(() => Cmd.none());
+  return [model, cmd];
+  //   return reInitRenderers(model, rendererFactory);
 }
 
 function reInitRenderers(
   model: Model,
   customRendererFactory: RendererFactory,
 ): [Model, Cmd<Msg>] {
-  return model.validationResult
-    .map((validationResult) => {
-      const renderers = validationResult.getRenderers();
-      const newCustomRenderers: Map<
-        string,
-        Maybe<CustomRendererModel>
-      > = new Map();
-      const cmds: Cmd<Msg>[] = [];
-      for (const [path, rendererDef] of renderers) {
-        if (rendererDef !== undefined) {
-          const key = rendererDef.key;
-          const renderer = customRendererFactory.getRenderer(key);
-          if (renderer.type === 'Just') {
-            const existingModel = model.customRenderers.get(path);
-            const m: Maybe<CustomRendererModel> =
-              existingModel === undefined ? nothing : existingModel;
-            const jValue: Maybe<JsonValue> = getValueAt(
-              model.root,
-              JsPath.parse(path),
-            );
-            if (jValue.type === 'Just') {
-              const mac = renderer.value.reinit({
-                path: JsPath.parse(path),
-                formModel: model,
-                value: jValue.value,
-                model: m.map((x) => x.rendererModel),
-                schema: rendererDef.schemaValue,
-              });
-              const customRendererModel: CustomRendererModel = {
-                rendererModel: mac[0],
-                key,
+  if (model.validationState.tag === 'validated') {
+    const renderers = model.validationState.validationResult.getRenderers();
+    const newCustomRenderers: Map<
+      string,
+      Maybe<CustomRendererModel>
+    > = new Map();
+    const cmds: Cmd<Msg>[] = [];
+    for (const [path, rendererDef] of renderers) {
+      if (rendererDef !== undefined) {
+        const key = rendererDef.key;
+        const renderer = customRendererFactory.getRenderer(key);
+        if (renderer.type === 'Just') {
+          const existingModel = model.customRenderers.get(path);
+          const m: Maybe<CustomRendererModel> =
+            existingModel === undefined ? nothing : existingModel;
+          const jValue: Maybe<JsonValue> = getValueAt(
+            model.root,
+            JsPath.parse(path),
+          );
+          if (jValue.type === 'Just') {
+            const mac = renderer.value.reinit({
+              path: JsPath.parse(path),
+              formModel: model,
+              value: jValue.value,
+              model: m.map((x) => x.rendererModel),
+              schema: rendererDef.schemaValue,
+            });
+            const customRendererModel: CustomRendererModel = {
+              rendererModel: mac[0],
+              key,
+            };
+            newCustomRenderers.set(path, just(customRendererModel));
+            const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
+              return {
+                tag: 'renderer-child-msg',
+                path,
+                msg,
               };
-              newCustomRenderers.set(path, just(customRendererModel));
-              const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
-                return {
-                  tag: 'renderer-child-msg',
-                  path,
-                  msg,
-                };
-              });
-              cmds.push(cmd);
-            }
+            });
+            cmds.push(cmd);
           }
         }
       }
-      const newModel: Model = {
-        ...model,
-        customRenderers: newCustomRenderers,
-      };
-      return Tuple.t2n(newModel, Cmd.batch(cmds));
-    })
-    .withDefaultSupply(() => noCmd(model));
+    }
+    const newModel: Model = {
+      ...model,
+      customRenderers: newCustomRenderers,
+    };
+    return Tuple.t2n(newModel, Cmd.batch(cmds));
+  } else {
+    return noCmd(model);
+  }
 }
 
 export interface ViewJsonEditorProps {
@@ -233,6 +232,7 @@ export function update(
   schemaService: SchemaService,
   menuFilter?: MenuOptionFilter,
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
+  console.log(menuFilter);
   switch (msg.tag) {
     case 'delete-property':
       return withOutValueChanged(model, actionDeleteValue(model, msg.path));
@@ -266,9 +266,9 @@ export function update(
       );
     }
     case 'menu-trigger-clicked': {
-      return noOut(
-        actionTriggerClicked(model, msg.path, msg.refBox, menuFilter),
-      );
+      return noOut(noCmd(model));
+      //     actionTriggerClicked(model, msg.path, msg.refBox, menuFilter),
+      //   );
     }
     case 'menu-msg': {
       return withOutValueChanged(
@@ -312,10 +312,11 @@ export function update(
       );
     }
     case 'add-elem-clicked':
-      return withOutValueChanged(
-        model,
-        actionAddElementToArray(schemaService, model, msg.path),
-      );
+      return noOut(noCmd(model));
+    //   return withOutValueChanged(
+    //     model,
+    //     actionAddElementToArray(schemaService, model, msg.path),
+    //   );
     case 'set-json-str': {
       return noOut(
         init(
@@ -333,10 +334,11 @@ export function update(
       return noOut(actionToggleExpandCollapsePath(model, msg.path));
     }
     case 'add-property-btn-clicked': {
-      return withOutValueChanged(
-        model,
-        actionAddProperty(schemaService, model, msg.path, msg.propertyName),
-      );
+      return noOut(noCmd(model));
+      //   return withOutValueChanged(
+      //     model,
+      //     actionAddProperty(schemaService, model, msg.path, msg.propertyName),
+      //   );
     }
     case 'no-op':
       return noOut(noCmd(model));
@@ -345,10 +347,31 @@ export function update(
     case 'set-debounce-ms':
       return noOut(noCmd({ ...model, debounceMs: msg.debounceMs }));
     case 'recompute-metadata': {
-      const newModel = computeAll(doValidate(schemaService, model));
-      return withOutValueChanged(
-        model,
-        reInitRenderers(newModel, rendererFactory),
+      const cmd = model.schema
+        .map((s) => computeAllCmd(schemaService, s, model.root))
+        .withDefaultSupply(() => Cmd.none());
+      return noOut([model, cmd]);
+    }
+    case 'got-metadata': {
+      return noOut(
+        noCmd(
+          msg.r.match(
+            (metadata) => {
+              const newModel: Model = {
+                ...model,
+                errors: metadata.errors,
+                propertiesToAdd: metadata.propertiesToAdd,
+                comboBoxes: metadata.comboBoxes,
+                formats: metadata.formats,
+              };
+              return newModel;
+            },
+            (err) => {
+              console.error(err);
+              return model;
+            },
+          ),
+        ),
       );
     }
     case 'renderer-child-msg': {
@@ -453,6 +476,8 @@ export interface JsonEditorProps {
   readonly schemaService?: SchemaService;
 }
 
+const devTools = new DevTools<Model, Msg>().setVerbose(true).asGlobal();
+
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
   const schemaService: SchemaService =
     props.schemaService ?? defaultSchemaService;
@@ -496,7 +521,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
         return [maco[0], maco[1]];
       }}
       subscriptions={subscriptions}
-      // devTools={DevTools.init<Model, Msg>(window)}
+      {...devTools.getProgramProps()}
     />
   );
 }

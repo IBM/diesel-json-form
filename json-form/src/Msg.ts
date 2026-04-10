@@ -19,7 +19,8 @@ import { JsonValue } from './JsonValue';
 import * as TPM from 'tea-pop-menu';
 import { Box } from 'tea-pop-core';
 import { MenuAction } from './ContextMenuActions';
-import { Maybe } from 'tea-cup-fp';
+import { Maybe, Result } from 'tea-cup-fp';
+import { ValidationError } from './SchemaService';
 
 export interface HasPath {
   readonly path: JsPath;
@@ -41,6 +42,7 @@ export type Msg =
   | ToggleExpandCollapse
   | AddPropertyButtonClicked
   | RecomputeMetadata
+  | GotMetadata
   | NoOp
   | { tag: 'renderer-child-msg'; path: string; msg: any };
 
@@ -119,4 +121,23 @@ export interface AddElemClicked extends HasPath {
 
 export interface RecomputeMetadata {
   tag: 'recompute-metadata';
+}
+
+export interface Metadata {
+  readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;
+  readonly comboBoxes: Map<string, ReadonlyArray<string>>;
+  readonly formats: Map<string, ReadonlyArray<string>>;
+  readonly propertiesToAdd: Map<string, ReadonlyArray<string>>;
+}
+
+export interface GotMetadata {
+  tag: 'got-metadata';
+  r: Result<Error, Metadata>;
+}
+
+export function gotMetadata(r: Result<Error, Metadata>): Msg {
+  return {
+    tag: 'got-metadata',
+    r,
+  };
 }

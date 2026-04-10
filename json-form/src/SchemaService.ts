@@ -29,14 +29,18 @@ export interface SchemaRenderer {
 }
 
 export interface SchemaService {
-  validate(schema: JsonValue, instance: JsonValue): ValidationResult;
+  validate(schema: JsonValue, instance: JsonValue): Promise<ValidationResult>;
+  propose(
+    schema: JsonValue,
+    instance: JsonValue,
+    path: JsPath,
+  ): Promise<readonly JsonValue[]>;
 }
 
 export interface ValidationResult {
   getErrors(): readonly ValidationError[];
   getRenderers(): ReadonlyMap<string, SchemaRenderer | undefined>;
   getFormats(path: JsPath): readonly string[];
-  propose(path: JsPath): readonly JsonValue[];
   getDiscriminator(path: JsPath): string | undefined;
 }
 
@@ -56,14 +60,28 @@ function fromFacadeValue(facadeValue: JsFacade.JsonValue): JsonValue {
 }
 
 class JsFacadeSchemaService implements SchemaService {
-  validate(schema: JsonValue, instance: JsonValue): ValidationResult {
+  async validate(
+    schema: JsonValue,
+    instance: JsonValue,
+  ): Promise<ValidationResult> {
     const r = JsFacade.validate(toFacadeValue(schema), toFacadeValue(instance));
-    return new JsFacadeValidationResult(r);
+    return Promise.resolve(new JsFacadeValidationResult(r));
+  }
+
+  async propose(
+    schema: JsonValue,
+    instance: JsonValue,
+    path: JsPath,
+  ): Promise<readonly JsonValue[]> {
+    const r = JsFacade.validate(toFacadeValue(schema), toFacadeValue(instance));
+    return Promise.resolve(
+      JsFacade.propose(r, path.format(), -1).map(fromFacadeValue),
+    );
   }
 }
 
 class JsFacadeValidationResult implements ValidationResult {
-  constructor(private readonly result: JsFacade.JsValidationResult) {}
+  constructor(readonly result: JsFacade.JsValidationResult) {}
 
   getErrors(): readonly ValidationError[] {
     return JsFacade.getErrors(this.result);
@@ -73,11 +91,6 @@ class JsFacadeValidationResult implements ValidationResult {
   }
   getFormats(path: JsPath): readonly string[] {
     return JsFacade.getFormats(this.result, path.format());
-  }
-  propose(path: JsPath): readonly JsonValue[] {
-    return JsFacade.propose(this.result, path.format(), -1).map(
-      fromFacadeValue,
-    );
   }
   getDiscriminator(path: JsPath): string | undefined {
     return JsFacade.getDiscriminator(this.result, path.format());

@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-import { contextMenuMsg, Msg, noOp } from './Msg';
-import { Cmd, just, maybeOf, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
+import { Msg, noOp } from './Msg';
+import { Cmd, just, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
 import { Model } from './Model';
 import { JsPath } from './JsPath';
 import {
-  clearPropertiesIfObject,
   deleteValueAt,
   getValueAt,
   JsonValue,
-  jvArray,
-  JvArray,
   jvNull,
   jvObject,
   mapValueAt,
-  mergeProperties,
   MoveDirection,
   moveElement,
   moveProperty,
   setValueAt,
 } from './JsonValue';
-import * as TPM from 'tea-pop-menu';
-import { createMenu, MenuAction } from './ContextMenuActions';
-import { Box } from 'tea-pop-core';
 import { Debouncer } from './Debouncer';
-import { MenuOptionFilter } from './RenderOptions';
-import { SchemaService } from './SchemaService';
-import { proposeNested } from './proposeNested';
 
 export function actionDeleteValue(
   model: Model,
@@ -52,47 +42,47 @@ export function actionDeleteValue(
   );
 }
 
-export function actionApplyProposal(
-  schemaService: SchemaService,
-  model: Model,
-  path: JsPath,
-  proposal: JsonValue,
-  proposalIndex: number,
-): [Model, Cmd<Msg>] {
-  switch (proposal.tag) {
-    case 'jv-object': {
-      const newProposal = getValueAt(model.root, path)
-        .map((valueAtPath) => {
-          const augmentedProposal = model.schema
-            .andThen((schema) => {
-              const all = proposeNested(
-                schema,
-                schemaService,
-                model.root,
-                path,
-                5,
-              );
-              return maybeOf(all[proposalIndex]);
-            })
-            .andThen((v) => (v.tag === 'jv-object' ? just(v) : nothing))
-            .withDefault(proposal);
+// export function actionApplyProposal(
+//   schemaService: SchemaService,
+//   model: Model,
+//   path: JsPath,
+//   proposal: JsonValue,
+//   proposalIndex: number,
+// ): [Model, Cmd<Msg>] {
+//   switch (proposal.tag) {
+//     case 'jv-object': {
+//       const newProposal = getValueAt(model.root, path)
+//         .map((valueAtPath) => {
+//           const augmentedProposal = model.schema
+//             .andThen((schema) => {
+//               const all = proposeNested(
+//                 schema,
+//                 schemaService,
+//                 model.root,
+//                 path,
+//                 5,
+//               );
+//               return maybeOf(all[proposalIndex]);
+//             })
+//             .andThen((v) => (v.tag === 'jv-object' ? just(v) : nothing))
+//             .withDefault(proposal);
 
-          if (valueAtPath.tag === 'jv-object') {
-            // do not overwrite existing props
-            return mergeProperties(augmentedProposal, valueAtPath);
-          } else {
-            return augmentedProposal;
-          }
-        })
-        .withDefault(proposal);
+//           if (valueAtPath.tag === 'jv-object') {
+//             // do not overwrite existing props
+//             return mergeProperties(augmentedProposal, valueAtPath);
+//           } else {
+//             return augmentedProposal;
+//           }
+//         })
+//         .withDefault(proposal);
 
-      return doUpdateValue(model, path, newProposal);
-    }
-    default: {
-      return doUpdateValue(model, path, proposal);
-    }
-  }
-}
+//       return doUpdateValue(model, path, newProposal);
+//     }
+//     default: {
+//       return doUpdateValue(model, path, proposal);
+//     }
+//   }
+// }
 
 function doUpdateValue(
   model: Model,
@@ -158,140 +148,140 @@ export function actionConfirmAddProperty(
     .withDefaultSupply(() => noCmd(newModel));
 }
 
-export function actionAddProperty(
-  service: SchemaService,
-  model: Model,
-  path: JsPath,
-  propertyName: string,
-): [Model, Cmd<Msg>] {
-  return getValueAt(model.root, path)
-    .map<[Model, Cmd<Msg>]>((owner) => {
-      if (owner.tag === 'jv-object') {
-        // create the new object with a null value
-        // because we need it to propose
-        const newObject = jvObject([
-          ...owner.properties,
-          { name: propertyName, value: jvNull },
-        ]);
-        const newRoot = setValueAt(model.root, path, newObject);
-        const newValidationResult = model.schema.map((schema) =>
-          service.validate(schema, newRoot),
-        );
+// export function actionAddProperty(
+//   service: SchemaService,
+//   model: Model,
+//   path: JsPath,
+//   propertyName: string,
+// ): [Model, Cmd<Msg>] {
+//   return getValueAt(model.root, path)
+//     .map<[Model, Cmd<Msg>]>((owner) => {
+//       if (owner.tag === 'jv-object') {
+//         // create the new object with a null value
+//         // because we need it to propose
+//         const newObject = jvObject([
+//           ...owner.properties,
+//           { name: propertyName, value: jvNull },
+//         ]);
+//         const newRoot = setValueAt(model.root, path, newObject);
+//         const newValidationResult = model.schema.map((schema) =>
+//           service.validate(schema, newRoot),
+//         );
 
-        const propertyProposals = newValidationResult
-          .map((vr) => vr.propose(path.append(propertyName)))
-          .withDefault([])
-          .map(clearPropertiesIfObject);
+//         const propertyProposals = newValidationResult
+//           .map((vr) => vr.propose(path.append(propertyName)))
+//           .withDefault([])
+//           .map(clearPropertiesIfObject);
 
-        const newObject2 = jvObject([
-          ...owner.properties,
-          {
-            name: propertyName,
-            value:
-              propertyProposals.length === 0 ? jvNull : propertyProposals[0],
-          },
-        ]);
-        return setRoot(model, setValueAt(model.root, path, newObject2));
-      }
-      return noCmd(model);
-    })
-    .withDefaultSupply(() => noCmd(model));
-}
+//         const newObject2 = jvObject([
+//           ...owner.properties,
+//           {
+//             name: propertyName,
+//             value:
+//               propertyProposals.length === 0 ? jvNull : propertyProposals[0],
+//           },
+//         ]);
+//         return setRoot(model, setValueAt(model.root, path, newObject2));
+//       }
+//       return noCmd(model);
+//     })
+//     .withDefaultSupply(() => noCmd(model));
+// }
 
-export function actionAddElementToArray(
-  service: SchemaService,
-  model: Model,
-  path: JsPath,
-): [Model, Cmd<Msg>] {
-  return getValueAt(model.root, path)
-    .map<[Model, Cmd<Msg>]>((array) => {
-      if (array.tag === 'jv-array') {
-        const newElemIndex = array.elems.length;
+// export function actionAddElementToArray(
+//   service: SchemaService,
+//   model: Model,
+//   path: JsPath,
+// ): [Model, Cmd<Msg>] {
+//   return getValueAt(model.root, path)
+//     .map<[Model, Cmd<Msg>]>((array) => {
+//       if (array.tag === 'jv-array') {
+//         const newElemIndex = array.elems.length;
 
-        // we create a transient JsonValue with the array updated
-        // so that we have a value at new index path
-        // otherwise the proposals would be empty because
-        // no path matches the requested index
-        const tmpArray = jvArray([...array.elems, jvNull]);
-        const tmpRoot = setValueAt(model.root, path, tmpArray);
+//         // we create a transient JsonValue with the array updated
+//         // so that we have a value at new index path
+//         // otherwise the proposals would be empty because
+//         // no path matches the requested index
+//         const tmpArray = jvArray([...array.elems, jvNull]);
+//         const tmpRoot = setValueAt(model.root, path, tmpArray);
 
-        const newValidationResult = model.schema.map((schema) =>
-          service.validate(schema, tmpRoot),
-        );
+//         const newValidationResult = model.schema.map((schema) =>
+//           service.validate(schema, tmpRoot),
+//         );
 
-        const proposals = newValidationResult
-          .map((vr) => vr.propose(path.append(newElemIndex)))
-          .withDefault([]);
+//         const proposals = newValidationResult
+//           .map((vr) => vr.propose(path.append(newElemIndex)))
+//           .withDefault([]);
 
-        const proposal = maybeOf(proposals[0]).withDefault(jvNull);
-        const newArray: JvArray = {
-          ...array,
-          elems: [...array.elems, clearPropertiesIfObject(proposal)],
-        };
-        const newRoot = setValueAt(model.root, path, newArray);
-        return setRoot(model, newRoot);
-      }
-      return noCmd(model);
-    })
-    .withDefaultSupply(() => noCmd(model));
-}
+//         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
+//         const newArray: JvArray = {
+//           ...array,
+//           elems: [...array.elems, clearPropertiesIfObject(proposal)],
+//         };
+//         const newRoot = setValueAt(model.root, path, newArray);
+//         return setRoot(model, newRoot);
+//       }
+//       return noCmd(model);
+//     })
+//     .withDefaultSupply(() => noCmd(model));
+// }
 
-export function updateMenu(
-  model: Model,
-  mac: [TPM.Model<MenuAction>, Cmd<TPM.Msg<MenuAction>>],
-): [Model, Cmd<Msg>] {
-  return Tuple.fromNative(mac)
-    .mapFirst((mm) => {
-      return {
-        ...model,
-        menuModel: just(mm),
-      };
-    })
-    .mapSecond((mc) => mc.map(contextMenuMsg))
-    .toNative();
-}
+// export function updateMenu(
+//   model: Model,
+//   mac: [TPM.Model<MenuAction>, Cmd<TPM.Msg<MenuAction>>],
+// ): [Model, Cmd<Msg>] {
+//   return Tuple.fromNative(mac)
+//     .mapFirst((mm) => {
+//       return {
+//         ...model,
+//         menuModel: just(mm),
+//       };
+//     })
+//     .mapSecond((mc) => mc.map(contextMenuMsg))
+//     .toNative();
+// }
 
-export function actionTriggerClicked(
-  model: Model,
-  path: JsPath,
-  refBox: Box,
-  menuFilter?: MenuOptionFilter,
-): [Model, Cmd<Msg>] {
-  return getValueAt(model.root, path)
-    .map((valueAtPath) => {
-      const focusMenuCmd: Cmd<Msg> = Task.attempt(
-        Task.fromLambda(() => {
-          const e = document.getElementById('dummy-textarea') as HTMLElement;
-          if (e) {
-            e.focus();
-          }
-        }),
-        () => {
-          return noOp;
-        },
-      );
+// export function actionTriggerClicked(
+//   model: Model,
+//   path: JsPath,
+//   refBox: Box,
+//   menuFilter?: MenuOptionFilter,
+// ): [Model, Cmd<Msg>] {
+//   return getValueAt(model.root, path)
+//     .map((valueAtPath) => {
+//       const focusMenuCmd: Cmd<Msg> = Task.attempt(
+//         Task.fromLambda(() => {
+//           const e = document.getElementById('dummy-textarea') as HTMLElement;
+//           if (e) {
+//             e.focus();
+//           }
+//         }),
+//         () => {
+//           return noOp;
+//         },
+//       );
 
-      const mac: [Model, Cmd<Msg>] = updateMenu(
-        model,
-        TPM.open(
-          createMenu({
-            root: model.root,
-            path,
-            proposals: model.validationResult
-              .map((vr) => vr.propose(path))
-              .withDefault([]),
-            valueAtPath,
-            strictMode: model.strictMode,
-            menuFilter,
-          }),
-          refBox,
-        ),
-      );
+//       const mac: [Model, Cmd<Msg>] = updateMenu(
+//         model,
+//         TPM.open(
+//           createMenu({
+//             root: model.root,
+//             path,
+//             proposals: model.validationResult
+//               .map((vr) => vr.propose(path))
+//               .withDefault([]),
+//             valueAtPath,
+//             strictMode: model.strictMode,
+//             menuFilter,
+//           }),
+//           refBox,
+//         ),
+//       );
 
-      return Tuple.t2n(mac[0], Cmd.batch([mac[1], focusMenuCmd]));
-    })
-    .withDefaultSupply(() => noCmd(model));
-}
+//       return Tuple.t2n(mac[0], Cmd.batch([mac[1], focusMenuCmd]));
+//     })
+//     .withDefaultSupply(() => noCmd(model));
+// }
 
 export function actionToggleExpandCollapsePath(
   model: Model,

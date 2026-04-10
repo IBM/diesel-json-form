@@ -16,9 +16,6 @@
 
 import { Cmd, noCmd } from 'tea-cup-fp';
 import {
-  actionAddElementToArray,
-  actionAddPropertyClicked,
-  actionApplyProposal,
   actionDeleteValue,
   actionMoveValue,
   actionUpdateValue,
@@ -47,19 +44,20 @@ export default function executeContextMenuAction(
       return actionUpdateValue(model, action.path, action.value);
     }
     case 'proposal': {
-      return actionApplyProposal(
-        service,
-        model,
-        action.path,
-        action.value,
-        action.index,
-      );
+      return noCmd(model);
+      //   return actionApplyProposal(
+      //     service,
+      //     model,
+      //     action.path,
+      //     action.value,
+      //     action.index,
+      //   );
     }
     case 'add': {
       if (action.isArray) {
-        return actionAddElementToArray(service, model, action.path);
+        return noCmd(model); // actionAddElementToArray(service, model, action.path);
       } else {
-        return actionAddPropertyClicked(model, action.path);
+        return noCmd(model); //actionAddPropertyClicked(model, action.path);
       }
     }
     default:
