@@ -16,6 +16,7 @@
 
 import { Cmd, noCmd, Task } from 'tea-cup-fp';
 import {
+  actionAddPropertyClicked,
   actionDeleteValue,
   actionMoveValue,
   actionUpdateValue,
@@ -69,7 +70,7 @@ export default function executeContextMenuAction(
           })
           .withDefaultSupply(() => noCmd(model));
       } else {
-        return noCmd(model); //actionAddPropertyClicked(model, action.path);
+        return actionAddPropertyClicked(model, action.path);
       }
     }
     default:
