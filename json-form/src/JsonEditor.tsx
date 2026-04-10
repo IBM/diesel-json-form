@@ -340,7 +340,6 @@ export function update(
                       .toNative();
                   }
                 }
-                return Tuple.t2n(newModel, cmd);
               })
               .withDefaultSupply(() => Tuple.t2n(newModel, cmd));
           })
