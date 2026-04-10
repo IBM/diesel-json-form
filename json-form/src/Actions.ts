@@ -153,7 +153,6 @@ export function actionConfirmAddProperty(
 }
 
 // export function actionAddProperty(
-//   service: SchemaService,
 //   model: Model,
 //   path: JsPath,
 //   propertyName: string,

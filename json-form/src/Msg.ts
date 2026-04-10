@@ -44,6 +44,7 @@ export type Msg =
   | RecomputeMetadata
   | GotMetadata
   | GotMenuProposals
+  | GotAddProperty
   | NoOp
   | { tag: 'renderer-child-msg'; path: string; msg: any };
 
@@ -161,4 +162,16 @@ export function gotMenuProposals(
     refBox,
     path,
   });
+}
+
+export interface GotAddProperty {
+  tag: 'got-add-property';
+  r: Result<Error, JsonValue>;
+}
+
+export function gotAddProperty(r: Result<Error, JsonValue>): Msg {
+  return {
+    tag: 'got-add-property',
+    r,
+  };
 }

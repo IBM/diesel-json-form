@@ -39,6 +39,7 @@ import {
   actionToggleExpandCollapsePath,
   actionTriggerClicked,
   actionUpdateValue,
+  setRoot,
 } from './Actions';
 import executeContextMenuAction from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
@@ -53,6 +54,7 @@ import {
 } from './Model';
 import {
   contextMenuMsg,
+  gotAddProperty,
   gotMenuProposals,
   Msg,
   setDebounceMsMsg,
@@ -70,6 +72,7 @@ import { MenuOptionFilter, RenderOptions } from './RenderOptions';
 import { defaultSchemaService, SchemaService } from './SchemaService';
 import { computeAllCmd } from './ComputeAllTask';
 import { getMenuProposals } from './getMenuProposals';
+import { addPropertyTask } from './addProperty';
 
 export function init(
   language: string,
@@ -367,11 +370,33 @@ export function update(
       return noOut(actionToggleExpandCollapsePath(model, msg.path));
     }
     case 'add-property-btn-clicked': {
-      return noOut(noCmd(model));
-      //   return withOutValueChanged(
-      //     model,
-      //     actionAddProperty(schemaService, model, msg.path, msg.propertyName),
-      //   );
+      return noOut(
+        model.schema
+          .map<[Model, Cmd<Msg>]>((schema) => {
+            const t = addPropertyTask(
+              schemaService,
+              schema,
+              model.root,
+              msg.path,
+              msg.propertyName,
+            );
+            const cmd = Task.attempt(t, gotAddProperty);
+            return [model, cmd];
+          })
+          .withDefaultSupply(() => noCmd(model)),
+      );
+    }
+    case 'got-add-property': {
+      return msg.r.match(
+        (newRoot) => {
+          const mac = setRoot(model, newRoot);
+          return withOutValueChanged(model, mac);
+        },
+        (err) => {
+          console.error(err);
+          return noOut(noCmd(model));
+        },
+      );
     }
     case 'no-op':
       return noOut(noCmd(model));
