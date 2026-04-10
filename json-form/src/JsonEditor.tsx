@@ -27,6 +27,7 @@ import {
   nothing,
   Port,
   Sub,
+  Task,
   Tuple,
   updatePiped,
 } from 'tea-cup-fp';
@@ -36,12 +37,13 @@ import {
   actionConfirmAddProperty,
   actionDeleteValue,
   actionToggleExpandCollapsePath,
+  actionTriggerClicked,
   actionUpdateValue,
 } from './Actions';
 import executeContextMenuAction from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { getValueAt, JsonValue, stringify } from './JsonValue';
+import { JsonValue, stringify } from './JsonValue';
 import { JsPath } from './JsPath';
 import {
   CustomRendererModel,
@@ -51,6 +53,7 @@ import {
 } from './Model';
 import {
   contextMenuMsg,
+  gotMenuProposals,
   Msg,
   setDebounceMsMsg,
   setJsonStr,
@@ -66,6 +69,7 @@ import {
 import { MenuOptionFilter, RenderOptions } from './RenderOptions';
 import { defaultSchemaService, SchemaService } from './SchemaService';
 import { computeAllCmd } from './ComputeAllTask';
+import { getMenuProposals } from './getMenuProposals';
 
 export function init(
   language: string,
@@ -91,63 +95,63 @@ export function init(
   //   return reInitRenderers(model, rendererFactory);
 }
 
-function reInitRenderers(
-  model: Model,
-  customRendererFactory: RendererFactory,
-): [Model, Cmd<Msg>] {
-  if (model.validationState.tag === 'validated') {
-    const renderers = model.validationState.validationResult.getRenderers();
-    const newCustomRenderers: Map<
-      string,
-      Maybe<CustomRendererModel>
-    > = new Map();
-    const cmds: Cmd<Msg>[] = [];
-    for (const [path, rendererDef] of renderers) {
-      if (rendererDef !== undefined) {
-        const key = rendererDef.key;
-        const renderer = customRendererFactory.getRenderer(key);
-        if (renderer.type === 'Just') {
-          const existingModel = model.customRenderers.get(path);
-          const m: Maybe<CustomRendererModel> =
-            existingModel === undefined ? nothing : existingModel;
-          const jValue: Maybe<JsonValue> = getValueAt(
-            model.root,
-            JsPath.parse(path),
-          );
-          if (jValue.type === 'Just') {
-            const mac = renderer.value.reinit({
-              path: JsPath.parse(path),
-              formModel: model,
-              value: jValue.value,
-              model: m.map((x) => x.rendererModel),
-              schema: rendererDef.schemaValue,
-            });
-            const customRendererModel: CustomRendererModel = {
-              rendererModel: mac[0],
-              key,
-            };
-            newCustomRenderers.set(path, just(customRendererModel));
-            const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
-              return {
-                tag: 'renderer-child-msg',
-                path,
-                msg,
-              };
-            });
-            cmds.push(cmd);
-          }
-        }
-      }
-    }
-    const newModel: Model = {
-      ...model,
-      customRenderers: newCustomRenderers,
-    };
-    return Tuple.t2n(newModel, Cmd.batch(cmds));
-  } else {
-    return noCmd(model);
-  }
-}
+// function reInitRenderers(
+//   model: Model,
+//   customRendererFactory: RendererFactory,
+// ): [Model, Cmd<Msg>] {
+//   if (model.validationState.tag === 'validated') {
+//     const renderers = model.validationState.validationResult.getRenderers();
+//     const newCustomRenderers: Map<
+//       string,
+//       Maybe<CustomRendererModel>
+//     > = new Map();
+//     const cmds: Cmd<Msg>[] = [];
+//     for (const [path, rendererDef] of renderers) {
+//       if (rendererDef !== undefined) {
+//         const key = rendererDef.key;
+//         const renderer = customRendererFactory.getRenderer(key);
+//         if (renderer.type === 'Just') {
+//           const existingModel = model.customRenderers.get(path);
+//           const m: Maybe<CustomRendererModel> =
+//             existingModel === undefined ? nothing : existingModel;
+//           const jValue: Maybe<JsonValue> = getValueAt(
+//             model.root,
+//             JsPath.parse(path),
+//           );
+//           if (jValue.type === 'Just') {
+//             const mac = renderer.value.reinit({
+//               path: JsPath.parse(path),
+//               formModel: model,
+//               value: jValue.value,
+//               model: m.map((x) => x.rendererModel),
+//               schema: rendererDef.schemaValue,
+//             });
+//             const customRendererModel: CustomRendererModel = {
+//               rendererModel: mac[0],
+//               key,
+//             };
+//             newCustomRenderers.set(path, just(customRendererModel));
+//             const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
+//               return {
+//                 tag: 'renderer-child-msg',
+//                 path,
+//                 msg,
+//               };
+//             });
+//             cmds.push(cmd);
+//           }
+//         }
+//       }
+//     }
+//     const newModel: Model = {
+//       ...model,
+//       customRenderers: newCustomRenderers,
+//     };
+//     return Tuple.t2n(newModel, Cmd.batch(cmds));
+//   } else {
+//     return noCmd(model);
+//   }
+// }
 
 export interface ViewJsonEditorProps {
   readonly dispatch: Dispatcher<Msg>;
@@ -266,9 +270,38 @@ export function update(
       );
     }
     case 'menu-trigger-clicked': {
-      return noOut(noCmd(model));
-      //     actionTriggerClicked(model, msg.path, msg.refBox, menuFilter),
-      //   );
+      return noOut(
+        model.schema
+          .map<[Model, Cmd<Msg>]>((schema) => {
+            const t = getMenuProposals(
+              schemaService,
+              schema,
+              model.root,
+              msg.path,
+            );
+            const cmd = Task.attempt(t, gotMenuProposals(msg.path, msg.refBox));
+            return [model, cmd];
+          })
+          .withDefaultSupply(() => noCmd(model)),
+      );
+    }
+    case 'got-menu-proposals': {
+      return noOut(
+        msg.r.match(
+          (proposals) =>
+            actionTriggerClicked(
+              model,
+              msg.path,
+              msg.refBox,
+              proposals,
+              menuFilter,
+            ),
+          (err) => {
+            console.log(err);
+            return noCmd(model);
+          },
+        ),
+      );
     }
     case 'menu-msg': {
       return withOutValueChanged(
@@ -363,6 +396,10 @@ export function update(
                 propertiesToAdd: metadata.propertiesToAdd,
                 comboBoxes: metadata.comboBoxes,
                 formats: metadata.formats,
+                validationState: {
+                  tag: 'validated',
+                  validationResult: metadata.validationResult,
+                },
               };
               return newModel;
             },

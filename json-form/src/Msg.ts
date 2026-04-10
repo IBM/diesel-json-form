@@ -20,7 +20,7 @@ import * as TPM from 'tea-pop-menu';
 import { Box } from 'tea-pop-core';
 import { MenuAction } from './ContextMenuActions';
 import { Maybe, Result } from 'tea-cup-fp';
-import { ValidationError } from './SchemaService';
+import { ValidationError, ValidationResult } from './SchemaService';
 
 export interface HasPath {
   readonly path: JsPath;
@@ -43,6 +43,7 @@ export type Msg =
   | AddPropertyButtonClicked
   | RecomputeMetadata
   | GotMetadata
+  | GotMenuProposals
   | NoOp
   | { tag: 'renderer-child-msg'; path: string; msg: any };
 
@@ -124,6 +125,7 @@ export interface RecomputeMetadata {
 }
 
 export interface Metadata {
+  readonly validationResult: ValidationResult;
   readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;
   readonly comboBoxes: Map<string, ReadonlyArray<string>>;
   readonly formats: Map<string, ReadonlyArray<string>>;
@@ -140,4 +142,23 @@ export function gotMetadata(r: Result<Error, Metadata>): Msg {
     tag: 'got-metadata',
     r,
   };
+}
+
+export interface GotMenuProposals {
+  tag: 'got-menu-proposals';
+  r: Result<Error, ReadonlyArray<JsonValue>>;
+  refBox: Box;
+  path: JsPath;
+}
+
+export function gotMenuProposals(
+  path: JsPath,
+  refBox: Box,
+): (r: Result<Error, ReadonlyArray<JsonValue>>) => Msg {
+  return (r: Result<Error, ReadonlyArray<JsonValue>>) => ({
+    tag: 'got-menu-proposals',
+    r,
+    refBox,
+    path,
+  });
 }

@@ -45,6 +45,7 @@ function computeAllTask(
           comboBoxes,
           formats,
           propertiesToAdd,
+          validationResult,
         };
         return res;
       });

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Msg, noOp } from './Msg';
+import { contextMenuMsg, Msg, noOp } from './Msg';
 import { Cmd, just, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
 import { Model } from './Model';
 import { JsPath } from './JsPath';
@@ -31,6 +31,10 @@ import {
   setValueAt,
 } from './JsonValue';
 import { Debouncer } from './Debouncer';
+import { MenuOptionFilter } from './RenderOptions';
+import { Box } from 'tea-pop-core';
+import { createMenu, MenuAction } from './ContextMenuActions';
+import * as TPM from 'tea-pop-menu';
 
 export function actionDeleteValue(
   model: Model,
@@ -226,62 +230,61 @@ export function actionConfirmAddProperty(
 //     .withDefaultSupply(() => noCmd(model));
 // }
 
-// export function updateMenu(
-//   model: Model,
-//   mac: [TPM.Model<MenuAction>, Cmd<TPM.Msg<MenuAction>>],
-// ): [Model, Cmd<Msg>] {
-//   return Tuple.fromNative(mac)
-//     .mapFirst((mm) => {
-//       return {
-//         ...model,
-//         menuModel: just(mm),
-//       };
-//     })
-//     .mapSecond((mc) => mc.map(contextMenuMsg))
-//     .toNative();
-// }
+function updateMenu(
+  model: Model,
+  mac: [TPM.Model<MenuAction>, Cmd<TPM.Msg<MenuAction>>],
+): [Model, Cmd<Msg>] {
+  return Tuple.fromNative(mac)
+    .mapFirst((mm) => {
+      return {
+        ...model,
+        menuModel: just(mm),
+      };
+    })
+    .mapSecond((mc) => mc.map(contextMenuMsg))
+    .toNative();
+}
 
-// export function actionTriggerClicked(
-//   model: Model,
-//   path: JsPath,
-//   refBox: Box,
-//   menuFilter?: MenuOptionFilter,
-// ): [Model, Cmd<Msg>] {
-//   return getValueAt(model.root, path)
-//     .map((valueAtPath) => {
-//       const focusMenuCmd: Cmd<Msg> = Task.attempt(
-//         Task.fromLambda(() => {
-//           const e = document.getElementById('dummy-textarea') as HTMLElement;
-//           if (e) {
-//             e.focus();
-//           }
-//         }),
-//         () => {
-//           return noOp;
-//         },
-//       );
+export function actionTriggerClicked(
+  model: Model,
+  path: JsPath,
+  refBox: Box,
+  proposals: ReadonlyArray<JsonValue>,
+  menuFilter?: MenuOptionFilter,
+): [Model, Cmd<Msg>] {
+  return getValueAt(model.root, path)
+    .map((valueAtPath) => {
+      const focusMenuCmd: Cmd<Msg> = Task.attempt(
+        Task.fromLambda(() => {
+          const e = document.getElementById('dummy-textarea') as HTMLElement;
+          if (e) {
+            e.focus();
+          }
+        }),
+        () => {
+          return noOp;
+        },
+      );
 
-//       const mac: [Model, Cmd<Msg>] = updateMenu(
-//         model,
-//         TPM.open(
-//           createMenu({
-//             root: model.root,
-//             path,
-//             proposals: model.validationResult
-//               .map((vr) => vr.propose(path))
-//               .withDefault([]),
-//             valueAtPath,
-//             strictMode: model.strictMode,
-//             menuFilter,
-//           }),
-//           refBox,
-//         ),
-//       );
+      const mac: [Model, Cmd<Msg>] = updateMenu(
+        model,
+        TPM.open(
+          createMenu({
+            root: model.root,
+            path,
+            proposals,
+            valueAtPath,
+            strictMode: model.strictMode,
+            menuFilter,
+          }),
+          refBox,
+        ),
+      );
 
-//       return Tuple.t2n(mac[0], Cmd.batch([mac[1], focusMenuCmd]));
-//     })
-//     .withDefaultSupply(() => noCmd(model));
-// }
+      return Tuple.t2n(mac[0], Cmd.batch([mac[1], focusMenuCmd]));
+    })
+    .withDefaultSupply(() => noCmd(model));
+}
 
 export function actionToggleExpandCollapsePath(
   model: Model,
