@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Cmd, noCmd } from 'tea-cup-fp';
+import { Cmd, noCmd, Task } from 'tea-cup-fp';
 import {
   actionDeleteValue,
   actionMoveValue,
@@ -22,11 +22,12 @@ import {
 } from './Actions';
 import { MenuAction } from './ContextMenuActions';
 import { Model } from './Model';
-import { Msg } from './Msg';
+import { gotUpdatedValue, Msg } from './Msg';
 import { SchemaService } from './SchemaService';
+import { addElementToArrayTask } from './addElementToArray';
 
 export default function executeContextMenuAction(
-  service: SchemaService,
+  schemaService: SchemaService,
   model: Model,
   action: MenuAction,
 ): [Model, Cmd<Msg>] {
@@ -55,7 +56,18 @@ export default function executeContextMenuAction(
     }
     case 'add': {
       if (action.isArray) {
-        return noCmd(model); // actionAddElementToArray(service, model, action.path);
+        return model.schema
+          .map<[Model, Cmd<Msg>]>((schema) => {
+            const t = addElementToArrayTask(
+              schemaService,
+              schema,
+              model.root,
+              action.path,
+            );
+            const cmd = Task.attempt(t, gotUpdatedValue);
+            return [model, cmd];
+          })
+          .withDefaultSupply(() => noCmd(model));
       } else {
         return noCmd(model); //actionAddPropertyClicked(model, action.path);
       }

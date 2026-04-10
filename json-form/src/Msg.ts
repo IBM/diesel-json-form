@@ -33,7 +33,6 @@ export type Msg =
   | { tag: 'new-property-name-changed'; value: string }
   | { tag: 'new-property-name-key-down'; key: string }
   | { tag: 'add-prop-ok-cancel-clicked'; ok: boolean }
-  | AddElemClicked
   | ContextMenuMsg
   | MenuTriggerClicked
   | { tag: 'set-json-str'; schema: Maybe<JsonValue>; json: JsonValue }
@@ -44,7 +43,7 @@ export type Msg =
   | RecomputeMetadata
   | GotMetadata
   | GotMenuProposals
-  | GotAddProperty
+  | GotUpdatedValue
   | NoOp
   | { tag: 'renderer-child-msg'; path: string; msg: any };
 
@@ -117,10 +116,6 @@ export interface AddPropertyClicked extends HasPath {
   tag: 'add-property-clicked';
 }
 
-export interface AddElemClicked extends HasPath {
-  tag: 'add-elem-clicked';
-}
-
 export interface RecomputeMetadata {
   tag: 'recompute-metadata';
 }
@@ -164,14 +159,14 @@ export function gotMenuProposals(
   });
 }
 
-export interface GotAddProperty {
-  tag: 'got-add-property';
+export interface GotUpdatedValue {
+  tag: 'got-updated-value';
   r: Result<Error, JsonValue>;
 }
 
-export function gotAddProperty(r: Result<Error, JsonValue>): Msg {
+export function gotUpdatedValue(r: Result<Error, JsonValue>): Msg {
   return {
-    tag: 'got-add-property',
+    tag: 'got-updated-value',
     r,
   };
 }

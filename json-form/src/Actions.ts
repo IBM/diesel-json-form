@@ -152,44 +152,6 @@ export function actionConfirmAddProperty(
     .withDefaultSupply(() => noCmd(newModel));
 }
 
-// export function actionAddElementToArray(
-//   service: SchemaService,
-//   model: Model,
-//   path: JsPath,
-// ): [Model, Cmd<Msg>] {
-//   return getValueAt(model.root, path)
-//     .map<[Model, Cmd<Msg>]>((array) => {
-//       if (array.tag === 'jv-array') {
-//         const newElemIndex = array.elems.length;
-
-//         // we create a transient JsonValue with the array updated
-//         // so that we have a value at new index path
-//         // otherwise the proposals would be empty because
-//         // no path matches the requested index
-//         const tmpArray = jvArray([...array.elems, jvNull]);
-//         const tmpRoot = setValueAt(model.root, path, tmpArray);
-
-//         const newValidationResult = model.schema.map((schema) =>
-//           service.validate(schema, tmpRoot),
-//         );
-
-//         const proposals = newValidationResult
-//           .map((vr) => vr.propose(path.append(newElemIndex)))
-//           .withDefault([]);
-
-//         const proposal = maybeOf(proposals[0]).withDefault(jvNull);
-//         const newArray: JvArray = {
-//           ...array,
-//           elems: [...array.elems, clearPropertiesIfObject(proposal)],
-//         };
-//         const newRoot = setValueAt(model.root, path, newArray);
-//         return setRoot(model, newRoot);
-//       }
-//       return noCmd(model);
-//     })
-//     .withDefaultSupply(() => noCmd(model));
-// }
-
 function updateMenu(
   model: Model,
   mac: [TPM.Model<MenuAction>, Cmd<TPM.Msg<MenuAction>>],

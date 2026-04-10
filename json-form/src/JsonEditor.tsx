@@ -54,8 +54,8 @@ import {
 } from './Model';
 import {
   contextMenuMsg,
-  gotAddProperty,
   gotMenuProposals,
+  gotUpdatedValue,
   Msg,
   setDebounceMsMsg,
   setJsonStr,
@@ -347,12 +347,6 @@ export function update(
           .withDefaultSupply(() => noCmd(model)),
       );
     }
-    case 'add-elem-clicked':
-      return noOut(noCmd(model));
-    //   return withOutValueChanged(
-    //     model,
-    //     actionAddElementToArray(schemaService, model, msg.path),
-    //   );
     case 'set-json-str': {
       return noOut(
         init(
@@ -380,13 +374,13 @@ export function update(
               msg.path,
               msg.propertyName,
             );
-            const cmd = Task.attempt(t, gotAddProperty);
+            const cmd = Task.attempt(t, gotUpdatedValue);
             return [model, cmd];
           })
           .withDefaultSupply(() => noCmd(model)),
       );
     }
-    case 'got-add-property': {
+    case 'got-updated-value': {
       return msg.r.match(
         (newRoot) => {
           const mac = setRoot(model, newRoot);
