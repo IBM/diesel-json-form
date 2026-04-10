@@ -17,6 +17,7 @@
 import { Cmd, noCmd, Task } from 'tea-cup-fp';
 import {
   actionAddPropertyClicked,
+  actionApplyProposal,
   actionDeleteValue,
   actionMoveValue,
   actionUpdateValue,
@@ -46,14 +47,13 @@ export default function executeContextMenuAction(
       return actionUpdateValue(model, action.path, action.value);
     }
     case 'proposal': {
-      return noCmd(model);
-      //   return actionApplyProposal(
-      //     service,
-      //     model,
-      //     action.path,
-      //     action.value,
-      //     action.index,
-      //   );
+      return actionApplyProposal(
+        schemaService,
+        model,
+        action.path,
+        action.value,
+        action.index,
+      );
     }
     case 'add': {
       if (action.isArray) {

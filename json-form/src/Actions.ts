@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { contextMenuMsg, Msg, noOp } from './Msg';
+import { contextMenuMsg, gotUpdatedValue, Msg, noOp } from './Msg';
 import { Cmd, just, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
 import { Model } from './Model';
 import { JsPath } from './JsPath';
@@ -35,6 +35,8 @@ import { MenuOptionFilter } from './RenderOptions';
 import { Box } from 'tea-pop-core';
 import { createMenu, MenuAction } from './ContextMenuActions';
 import * as TPM from 'tea-pop-menu';
+import { applyProposalTask } from './applyProposal';
+import { SchemaService } from './SchemaService';
 
 export function actionDeleteValue(
   model: Model,
@@ -46,57 +48,27 @@ export function actionDeleteValue(
   );
 }
 
-// export function actionApplyProposal(
-//   schemaService: SchemaService,
-//   model: Model,
-//   path: JsPath,
-//   proposal: JsonValue,
-//   proposalIndex: number,
-// ): [Model, Cmd<Msg>] {
-//   switch (proposal.tag) {
-//     case 'jv-object': {
-//       const newProposal = getValueAt(model.root, path)
-//         .map((valueAtPath) => {
-//           const augmentedProposal = model.schema
-//             .andThen((schema) => {
-//               const all = proposeNested(
-//                 schema,
-//                 schemaService,
-//                 model.root,
-//                 path,
-//                 5,
-//               );
-//               return maybeOf(all[proposalIndex]);
-//             })
-//             .andThen((v) => (v.tag === 'jv-object' ? just(v) : nothing))
-//             .withDefault(proposal);
-
-//           if (valueAtPath.tag === 'jv-object') {
-//             // do not overwrite existing props
-//             return mergeProperties(augmentedProposal, valueAtPath);
-//           } else {
-//             return augmentedProposal;
-//           }
-//         })
-//         .withDefault(proposal);
-
-//       return doUpdateValue(model, path, newProposal);
-//     }
-//     default: {
-//       return doUpdateValue(model, path, proposal);
-//     }
-//   }
-// }
-
-function doUpdateValue(
+export function actionApplyProposal(
+  schemaService: SchemaService,
   model: Model,
   path: JsPath,
-  value: JsonValue,
+  proposal: JsonValue,
+  proposalIndex: number,
 ): [Model, Cmd<Msg>] {
-  if (path.isEmpty()) {
-    return setRoot(model, value);
-  }
-  return setRoot(model, setValueAt(model.root, path, value));
+  return model.schema
+    .map<[Model, Cmd<Msg>]>((schema) => {
+      const t = applyProposalTask(
+        schemaService,
+        schema,
+        model.root,
+        path,
+        proposal,
+        proposalIndex,
+      );
+      const cmd = Task.attempt(t, gotUpdatedValue);
+      return [model, cmd];
+    })
+    .withDefaultSupply(() => noCmd(model));
 }
 
 export function actionAddPropertyClicked(
@@ -272,7 +244,8 @@ export function actionUpdateValue(
   path: JsPath,
   value: JsonValue,
 ): [Model, Cmd<Msg>] {
-  return doUpdateValue(model, path, value);
+  const newRoot = setValueAt(model.root, path, value);
+  return setRoot(model, newRoot);
 }
 
 const debouncer = new Debouncer<Msg>();
