@@ -52,6 +52,8 @@ export async function proposeNested(
           }
         }
         res.push(jvObject(attrProposals));
+      } else {
+        res.push(x);
       }
     }
     return res;
