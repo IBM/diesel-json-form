@@ -16,7 +16,7 @@
 
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import React from 'react';
-import { Program } from 'react-tea-cup';
+import { DevTools, Program } from 'react-tea-cup';
 import {
   Cmd,
   Dispatcher,
@@ -386,10 +386,10 @@ export function update(
     case 'set-debounce-ms':
       return noOut(noCmd({ ...model, debounceMs: msg.debounceMs }));
     case 'recompute-metadata': {
-      //   const cmd = model.schema
-      //     .map((s) => computeAllCmd(schemaService, s, model.root))
-      //     .withDefaultSupply(() => Cmd.none());
-      return noOut([model, Cmd.none()]);
+      const cmd = model.schema
+        .map((s) => computeAllCmd(schemaService, s, model.root))
+        .withDefaultSupply(() => Cmd.none());
+      return noOut([model, cmd]);
     }
     case 'got-metadata': {
       return noOut(
@@ -517,7 +517,7 @@ export interface JsonEditorProps {
   readonly schemaService?: SchemaService;
 }
 
-// const devTools = new DevTools<Model, Msg>().setVerbose(true).asGlobal();
+const devTools = new DevTools<Model, Msg>().setVerbose(true).asGlobal();
 
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
   const schemaService: SchemaService =
@@ -561,7 +561,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
         return [maco[0], maco[1]];
       }}
       subscriptions={subscriptions}
-      //   {...devTools.getProgramProps()}
+      {...devTools.getProgramProps()}
     />
   );
 }
