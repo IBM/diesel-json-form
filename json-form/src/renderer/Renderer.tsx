@@ -660,7 +660,13 @@ function ViewStringWithFormats(
             <MyDatePicker
               path={p.path}
               value={p.value.value}
-              onChange={(s) => dispatchUpdateProperty(p, jvString(s))}
+              onChange={(s) =>
+                p.dispatch({
+                  tag: 'update-property',
+                  path: p.path,
+                  value: jvString(s),
+                })
+              }
               isInvalid={isInvalid(p)}
               invalidText={errorsToInvalidText(p)}
               t={p.model.t}
@@ -679,7 +685,11 @@ function ViewStringWithFormats(
                   value={dt.date}
                   onChange={(s) => {
                     const dt2 = dt.setDate(s);
-                    dispatchUpdateProperty(p, jvString(dt2.dateTime));
+                    p.dispatch({
+                      tag: 'update-property',
+                      path: p.path,
+                      value: jvString(dt2.dateTime),
+                    });
                   }}
                   isInvalid={invalid}
                   invalidText={errorsToInvalidText(p)}
@@ -692,7 +702,11 @@ function ViewStringWithFormats(
                   path={p.path}
                   onChange={(s) => {
                     const dt2 = dt.setTime(s);
-                    dispatchUpdateProperty(p, jvString(dt2.dateTime));
+                    p.dispatch({
+                      tag: 'update-property',
+                      path: p.path,
+                      value: jvString(dt2.dateTime),
+                    });
                   }}
                   value={dt.time.fullTime}
                   isInvalid={invalid}
@@ -707,7 +721,13 @@ function ViewStringWithFormats(
           return (
             <MyTimePicker
               path={p.path}
-              onChange={(s) => dispatchUpdateProperty(p, jvString(s))}
+              onChange={(s) =>
+                p.dispatch({
+                  tag: 'update-property',
+                  path: p.path,
+                  value: jvString(s),
+                })
+              }
               value={p.value.value}
               isInvalid={isInvalid(p)}
               invalidText={errorsToInvalidText(p)}
