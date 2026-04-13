@@ -44,7 +44,7 @@ import {
 import executeContextMenuAction from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { JsonValue, stringify } from './JsonValue';
+import { getValueAt, JsonValue, stringify } from './JsonValue';
 import { JsPath } from './JsPath';
 import {
   CustomRendererModel,
@@ -69,7 +69,11 @@ import {
   ViewJsonValue,
 } from './renderer/Renderer';
 import { MenuOptionFilter, RenderOptions } from './RenderOptions';
-import { defaultSchemaService, SchemaService } from './SchemaService';
+import {
+  defaultSchemaService,
+  SchemaRenderer,
+  SchemaService,
+} from './SchemaService';
 import { computeAllCmd } from './ComputeAllTask';
 import { getMenuProposals } from './getMenuProposals';
 import { addPropertyTask } from './addProperty';
@@ -79,7 +83,6 @@ export function init(
   schema: Maybe<JsonValue>,
   initialValue: JsonValue,
   strictMode: boolean,
-  rendererFactory: RendererFactory,
   debounceMs: number,
   schemaService: SchemaService,
 ): [Model, Cmd<Msg>] {
@@ -95,66 +98,58 @@ export function init(
     .map((s) => computeAllCmd(schemaService, s, initialValue))
     .withDefaultSupply(() => Cmd.none());
   return [model, cmd];
-  //   return reInitRenderers(model, rendererFactory);
 }
 
-// function reInitRenderers(
-//   model: Model,
-//   customRendererFactory: RendererFactory,
-// ): [Model, Cmd<Msg>] {
-//   if (model.validationState.tag === 'validated') {
-//     const renderers = model.validationState.validationResult.getRenderers();
-//     const newCustomRenderers: Map<
-//       string,
-//       Maybe<CustomRendererModel>
-//     > = new Map();
-//     const cmds: Cmd<Msg>[] = [];
-//     for (const [path, rendererDef] of renderers) {
-//       if (rendererDef !== undefined) {
-//         const key = rendererDef.key;
-//         const renderer = customRendererFactory.getRenderer(key);
-//         if (renderer.type === 'Just') {
-//           const existingModel = model.customRenderers.get(path);
-//           const m: Maybe<CustomRendererModel> =
-//             existingModel === undefined ? nothing : existingModel;
-//           const jValue: Maybe<JsonValue> = getValueAt(
-//             model.root,
-//             JsPath.parse(path),
-//           );
-//           if (jValue.type === 'Just') {
-//             const mac = renderer.value.reinit({
-//               path: JsPath.parse(path),
-//               formModel: model,
-//               value: jValue.value,
-//               model: m.map((x) => x.rendererModel),
-//               schema: rendererDef.schemaValue,
-//             });
-//             const customRendererModel: CustomRendererModel = {
-//               rendererModel: mac[0],
-//               key,
-//             };
-//             newCustomRenderers.set(path, just(customRendererModel));
-//             const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
-//               return {
-//                 tag: 'renderer-child-msg',
-//                 path,
-//                 msg,
-//               };
-//             });
-//             cmds.push(cmd);
-//           }
-//         }
-//       }
-//     }
-//     const newModel: Model = {
-//       ...model,
-//       customRenderers: newCustomRenderers,
-//     };
-//     return Tuple.t2n(newModel, Cmd.batch(cmds));
-//   } else {
-//     return noCmd(model);
-//   }
-// }
+function reInitRenderers(
+  model: Model,
+  renderers: ReadonlyMap<string, SchemaRenderer | undefined>,
+  customRendererFactory: RendererFactory,
+): [Model, Cmd<Msg>] {
+  const newCustomRenderers: Map<string, Maybe<CustomRendererModel>> = new Map();
+  const cmds: Cmd<Msg>[] = [];
+  for (const [path, rendererDef] of renderers) {
+    if (rendererDef !== undefined) {
+      const key = rendererDef.key;
+      const renderer = customRendererFactory.getRenderer(key);
+      if (renderer.type === 'Just') {
+        const existingModel = model.customRenderers.get(path);
+        const m: Maybe<CustomRendererModel> =
+          existingModel === undefined ? nothing : existingModel;
+        const jValue: Maybe<JsonValue> = getValueAt(
+          model.root,
+          JsPath.parse(path),
+        );
+        if (jValue.type === 'Just') {
+          const mac = renderer.value.reinit({
+            path: JsPath.parse(path),
+            formModel: model,
+            value: jValue.value,
+            model: m.map((x) => x.rendererModel),
+            schema: rendererDef.schemaValue,
+          });
+          const customRendererModel: CustomRendererModel = {
+            rendererModel: mac[0],
+            key,
+          };
+          newCustomRenderers.set(path, just(customRendererModel));
+          const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
+            return {
+              tag: 'renderer-child-msg',
+              path,
+              msg,
+            };
+          });
+          cmds.push(cmd);
+        }
+      }
+    }
+  }
+  const newModel: Model = {
+    ...model,
+    customRenderers: newCustomRenderers,
+  };
+  return Tuple.t2n(newModel, Cmd.batch(cmds));
+}
 
 export interface ViewJsonEditorProps {
   readonly dispatch: Dispatcher<Msg>;
@@ -398,23 +393,25 @@ export function update(
     }
     case 'got-metadata': {
       return noOut(
-        noCmd(
-          msg.r.match(
-            (metadata) => {
-              const newModel: Model = {
-                ...model,
-                errors: metadata.errors,
-                propertiesToAdd: metadata.propertiesToAdd,
-                comboBoxes: metadata.comboBoxes,
-                formats: metadata.formats,
-              };
-              return newModel;
-            },
-            (err) => {
-              console.error(err);
-              return model;
-            },
-          ),
+        msg.r.match(
+          (metadata) => {
+            const newModel: Model = {
+              ...model,
+              errors: metadata.errors,
+              propertiesToAdd: metadata.propertiesToAdd,
+              comboBoxes: metadata.comboBoxes,
+              formats: metadata.formats,
+            };
+            return reInitRenderers(
+              newModel,
+              metadata.renderers,
+              rendererFactory,
+            );
+          },
+          (err) => {
+            console.error(err);
+            return noCmd(model);
+          },
         ),
       );
     }
@@ -533,7 +530,6 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           props.schema,
           props.value,
           props.strictMode,
-          props.rendererFactory,
           props.debounceMs || 500,
           schemaService,
         )

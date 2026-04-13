@@ -1,6 +1,7 @@
 package diesel.sandbox.tests;
 
 import com.pojosontheweb.selenium.Findr;
+import static com.pojosontheweb.selenium.Findrs.attrEquals;
 import com.pojosontheweb.selenium.ManagedDriverJunit4TestBase;
 import diesel.json.*;
 import org.junit.After;
@@ -10,6 +11,7 @@ import org.junit.Test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
@@ -19,6 +21,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -750,6 +753,52 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .assertHasError("Invalid type: expected number");
 
         num.setValue("333").assertNoError();
+    }
+
+    @Test
+    public void testCustomRenderer() {
+        sandbox.selectSample("RendererRating");
+        sandbox.jsonEditor.replaceText("{\n" + //
+                "  \"name\": \"\",\n" + //
+                "  \"rating\": 0\n" + //
+                "}");
+
+        findRatings()
+                .where(ratingChecked(false))
+                .count(5)
+                .eval();
+
+        clickRating(2);
+
+        assertRating(0, true);
+        assertRating(1, true);
+        assertRating(2, true);
+        assertRating(3, false);
+        assertRating(4, false);
+
+        sandbox.jsonEditor.assertText("{\n" + //
+                "  \"name\": \"\",\n" + //
+                "  \"rating\": 3\n" + //
+                "}");
+    }
+
+    private Findr.ListFindr findRatings() {
+        return $$(".rating .rating-item");
+    }
+
+    private void clickRating(int index) {
+        findRatings().at(index).click();
+    }
+
+    private Predicate<WebElement> ratingChecked(boolean checked) {
+        return attrEquals("data-checked", "" + checked);
+    }
+
+    private void assertRating(int index, boolean checked) {
+        findRatings()
+                .at(index)
+                .where(ratingChecked(checked))
+                .eval();
     }
 
 }

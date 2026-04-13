@@ -46,6 +46,7 @@ function computeAllTask(
           formats,
           propertiesToAdd,
           validationResult,
+          renderers: validationResult.getRenderers(),
         };
         return res;
       });

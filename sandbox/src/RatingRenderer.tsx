@@ -41,6 +41,7 @@ export const RatingRenderer: Renderer<Model, Msg> = {
         <div
           key={index}
           className={'rating-item'}
+          data-checked={checked}
           onMouseEnter={() => dispatch({ tag: 'mouse-enter', index })}
           onMouseLeave={() => dispatch({ tag: 'mouse-leave' })}
           onClick={() => dispatch({ tag: 'rating-clicked', index })}
