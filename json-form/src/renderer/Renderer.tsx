@@ -59,7 +59,7 @@ export interface RendererInitArgs<Model> {
   readonly formModel: FormModel;
   readonly value: JsonValue;
   readonly model: Maybe<Model>;
-  readonly schema: any;
+  readonly schema: JsonValue;
 }
 
 export interface RendererViewArgs<Model, Msg> {

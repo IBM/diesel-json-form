@@ -25,7 +25,7 @@ export interface ValidationError {
 
 export interface SchemaRenderer {
   readonly key: string;
-  readonly schemaValue: any;
+  readonly schemaValue: JsonValue;
 }
 
 export interface SchemaService {
@@ -87,7 +87,20 @@ class JsFacadeValidationResult implements ValidationResult {
     return JsFacade.getErrors(this.result);
   }
   getRenderers(): ReadonlyMap<string, SchemaRenderer | undefined> {
-    return JsFacade.getRenderers(this.result);
+    const m = JsFacade.getRenderers(this.result);
+    const res = new Map<string, SchemaRenderer | undefined>();
+    for (const s of m.keys()) {
+      const jsRenderer = m.get(s);
+      res.set(s, undefined);
+      if (jsRenderer) {
+        const str = JsFacade.stringifyValue(jsRenderer.schemaValue);
+        const jsonValue = parseJsonValue(str);
+        if (jsonValue.tag === 'Ok') {
+          res.set(s, { key: jsRenderer.key, schemaValue: jsonValue.value });
+        }
+      }
+    }
+    return res;
   }
   getFormats(path: JsPath): readonly string[] {
     return JsFacade.getFormats(this.result, path.format());

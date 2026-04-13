@@ -4,16 +4,10 @@ import {
   jvString,
   RendererInitArgs,
   RendererViewArgs,
+  getValueAt,
+  JsPath,
 } from '@diesel-parser/json-form';
-import {
-  Cmd,
-  Decode as D,
-  Decoder,
-  just,
-  Maybe,
-  noCmd,
-  nothing,
-} from 'tea-cup-fp';
+import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-fp';
 import * as React from 'react';
 
 export type Msg =
@@ -24,13 +18,16 @@ export type Msg =
 export interface Model {
   readonly value: string;
   readonly isMouseOver: boolean;
-  readonly myConfigProp: Maybe<number>;
+  readonly myConfigProp: Maybe<string>;
 }
 
-const MyConfigPropDecoder: Decoder<number> = D.at(
-  ['renderer', 'myConfigProp'],
-  D.num,
-);
+function getConfigProp(schema: JsonValue): Maybe<string> {
+  const v = getValueAt(
+    schema,
+    JsPath.empty.append('renderer').append('myConfigProp'),
+  );
+  return v.andThen((jv) => (jv.tag === 'jv-number' ? just(jv.value) : nothing));
+}
 
 export const MyStringRenderer: Renderer<Model, Msg> = {
   reinit: function (args: RendererInitArgs<Model>): [Model, Cmd<Msg>] {
@@ -44,7 +41,7 @@ export const MyStringRenderer: Renderer<Model, Msg> = {
       .withDefaultSupply(() => ({
         value: strValue,
         isMouseOver: false,
-        myConfigProp: MyConfigPropDecoder.decodeValue(schema).toMaybe(),
+        myConfigProp: getConfigProp(schema),
       }));
     return noCmd(m);
   },
