@@ -407,10 +407,6 @@ export function update(
                 propertiesToAdd: metadata.propertiesToAdd,
                 comboBoxes: metadata.comboBoxes,
                 formats: metadata.formats,
-                validationState: {
-                  tag: 'validated',
-                  validationResult: metadata.validationResult,
-                },
               };
               return newModel;
             },

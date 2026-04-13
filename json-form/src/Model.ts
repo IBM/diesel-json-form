@@ -20,18 +20,12 @@ import { JsPath } from './JsPath';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
 import { initMyI18n } from './i18n/MyI18n';
-import { ValidationError, ValidationResult } from './SchemaService';
+import { ValidationError } from './SchemaService';
 import { FormTFunction } from './FormTFunction';
-
-export type ValidationState =
-  | { tag: 'none' }
-  | { tag: 'validating' }
-  | { tag: 'validated'; validationResult: ValidationResult };
 
 export interface Model {
   readonly schema: Maybe<JsonValue>;
   readonly root: JsonValue;
-  readonly validationState: ValidationState;
   readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;
   readonly adding: Maybe<AddingState>;
   readonly menuModel: Maybe<TPM.Model<MenuAction>>;
@@ -70,7 +64,6 @@ export function initialModel(
     t,
     schema,
     root,
-    validationState: { tag: 'none' },
     errors: new Map(),
     adding: nothing,
     menuModel: nothing,
