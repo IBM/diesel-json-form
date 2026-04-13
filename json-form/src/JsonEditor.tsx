@@ -239,7 +239,6 @@ export function update(
   schemaService: SchemaService,
   menuFilter?: MenuOptionFilter,
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
-  console.log(menuFilter);
   switch (msg.tag) {
     case 'delete-property':
       return withOutValueChanged(model, actionDeleteValue(model, msg.path));
@@ -300,7 +299,7 @@ export function update(
               menuFilter,
             ),
           (err) => {
-            console.log(err);
+            console.error(err);
             return noCmd(model);
           },
         ),
@@ -347,17 +346,11 @@ export function update(
       );
     }
     case 'set-json-str': {
-      return noOut(
-        init(
-          model.lang,
-          msg.schema,
-          msg.json,
-          model.strictMode,
-          rendererFactory,
-          model.debounceMs,
-          schemaService,
-        ),
-      );
+      const newModel: Model = {
+        ...model,
+        schema: msg.schema,
+      };
+      return noOut(setRoot(newModel, msg.json));
     }
     case 'toggle-expand-collapse': {
       return noOut(actionToggleExpandCollapsePath(model, msg.path));
