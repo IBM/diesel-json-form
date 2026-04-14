@@ -2,6 +2,8 @@ package diesel.sandbox.tests;
 
 import com.pojosontheweb.selenium.Findr;
 import static com.pojosontheweb.selenium.Findrs.attrEquals;
+import static com.pojosontheweb.selenium.Findrs.textEquals;
+
 import com.pojosontheweb.selenium.ManagedDriverJunit4TestBase;
 import diesel.json.*;
 import org.junit.After;
@@ -798,6 +800,41 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         findRatings()
                 .at(index)
                 .where(ratingChecked(checked))
+                .eval();
+    }
+
+    @Test
+    public void testRendererAccessSchema1() {
+        sandbox.selectSample("Renderer1");
+        assertMyConfigProp("Config prop is undefined");
+        sandbox.jsonEditor.replaceText("\"yalla\"");
+        assertMyStringValue("yalla");
+        clickConcat();
+        assertMyStringValue("yallaX");
+        sandbox.jsonEditor.assertText("\"yallaX\"");
+    }
+
+    @Test
+    public void testRendererAccessSchema2() {
+        sandbox.selectSample("Renderer2");
+        assertMyConfigProp("Config prop set to 123");
+    }
+
+    private void clickConcat() {
+        $(".my-string button")
+                .where(textEquals("Concat !"))
+                .click();
+    }
+
+    private void assertMyConfigProp(String expected) {
+        $(".my-string p")
+                .where(textEquals(expected))
+                .eval();
+    }
+
+    private void assertMyStringValue(String expected) {
+        $(".my-string .my-value")
+                .where(textEquals(expected))
                 .eval();
     }
 

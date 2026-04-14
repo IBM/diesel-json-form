@@ -57,7 +57,7 @@ export const MyStringRenderer: Renderer<Model, Msg> = {
           backgroundColor: model.isMouseOver ? 'red' : 'green',
         }}
       >
-        {model.value}
+        <div className="my-value">{model.value}</div>
         <button onClick={() => dispatch({ tag: 'button-clicked' })}>
           Concat !
         </button>
