@@ -39,7 +39,7 @@ export interface SchemaService {
 
 export interface ValidationResult {
   getErrors(): readonly ValidationError[];
-  getRenderers(): ReadonlyMap<string, SchemaRenderer | undefined>;
+  getRenderers(): ReadonlyMap<string, SchemaRenderer>;
   getFormats(path: JsPath): readonly string[];
   getDiscriminator(path: JsPath): string | undefined;
 }
@@ -86,12 +86,11 @@ class JsFacadeValidationResult implements ValidationResult {
   getErrors(): readonly ValidationError[] {
     return JsFacade.getErrors(this.result);
   }
-  getRenderers(): ReadonlyMap<string, SchemaRenderer | undefined> {
+  getRenderers(): ReadonlyMap<string, SchemaRenderer> {
     const m = JsFacade.getRenderers(this.result);
-    const res = new Map<string, SchemaRenderer | undefined>();
+    const res = new Map<string, SchemaRenderer>();
     for (const s of m.keys()) {
       const jsRenderer = m.get(s);
-      res.set(s, undefined);
       if (jsRenderer) {
         const str = JsFacade.stringifyValue(jsRenderer.schemaValue);
         const jsonValue = parseJsonValue(str);

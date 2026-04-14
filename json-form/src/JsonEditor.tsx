@@ -102,45 +102,43 @@ export function init(
 
 function reInitRenderers(
   model: Model,
-  renderers: ReadonlyMap<string, SchemaRenderer | undefined>,
+  renderers: ReadonlyMap<string, SchemaRenderer>,
   customRendererFactory: RendererFactory,
 ): [Model, Cmd<Msg>] {
   const newCustomRenderers: Map<string, Maybe<CustomRendererModel>> = new Map();
   const cmds: Cmd<Msg>[] = [];
   for (const [path, rendererDef] of renderers) {
-    if (rendererDef !== undefined) {
-      const key = rendererDef.key;
-      const renderer = customRendererFactory.getRenderer(key);
-      if (renderer.type === 'Just') {
-        const existingModel = model.customRenderers.get(path);
-        const m: Maybe<CustomRendererModel> =
-          existingModel === undefined ? nothing : existingModel;
-        const jValue: Maybe<JsonValue> = getValueAt(
-          model.root,
-          JsPath.parse(path),
-        );
-        if (jValue.type === 'Just') {
-          const mac = renderer.value.reinit({
-            path: JsPath.parse(path),
-            formModel: model,
-            value: jValue.value,
-            model: m.map((x) => x.rendererModel),
-            schema: rendererDef.schemaValue,
-          });
-          const customRendererModel: CustomRendererModel = {
-            rendererModel: mac[0],
-            key,
+    const key = rendererDef.key;
+    const renderer = customRendererFactory.getRenderer(key);
+    if (renderer.type === 'Just') {
+      const existingModel = model.customRenderers.get(path);
+      const m: Maybe<CustomRendererModel> =
+        existingModel === undefined ? nothing : existingModel;
+      const jValue: Maybe<JsonValue> = getValueAt(
+        model.root,
+        JsPath.parse(path),
+      );
+      if (jValue.type === 'Just') {
+        const mac = renderer.value.reinit({
+          path: JsPath.parse(path),
+          formModel: model,
+          value: jValue.value,
+          model: m.map((x) => x.rendererModel),
+          schema: rendererDef.schemaValue,
+        });
+        const customRendererModel: CustomRendererModel = {
+          rendererModel: mac[0],
+          key,
+        };
+        newCustomRenderers.set(path, just(customRendererModel));
+        const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
+          return {
+            tag: 'renderer-child-msg',
+            path,
+            msg,
           };
-          newCustomRenderers.set(path, just(customRendererModel));
-          const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
-            return {
-              tag: 'renderer-child-msg',
-              path,
-              msg,
-            };
-          });
-          cmds.push(cmd);
-        }
+        });
+        cmds.push(cmd);
       }
     }
   }

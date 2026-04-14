@@ -130,7 +130,7 @@ export interface Metadata {
   readonly comboBoxes: Map<string, ReadonlyArray<string>>;
   readonly formats: Map<string, ReadonlyArray<string>>;
   readonly propertiesToAdd: Map<string, ReadonlyArray<string>>;
-  readonly renderers: ReadonlyMap<string, SchemaRenderer | undefined>;
+  readonly renderers: ReadonlyMap<string, SchemaRenderer>;
 }
 
 export interface GotMetadata {

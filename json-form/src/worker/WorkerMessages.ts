@@ -1,12 +1,33 @@
 import { JsonValue } from '../JsonValue';
+import { JsPath } from '../JsPath';
+import { SchemaRenderer, ValidationError } from '../SchemaService';
 
 export interface ValidateRequest {
-  readonly id: string;
+  readonly tag: 'VALIDATE_REQUEST';
+  readonly id: number;
   readonly schema: JsonValue;
   readonly instance: JsonValue;
 }
 
 export interface ValidateResponse {
-  readonly id: string;
-  // readonly schemaValue
+  readonly tag: 'VALIDATE_RESPONSE';
+  readonly id: number;
+  readonly errors: readonly ValidationError[];
+  readonly renderers: ReadonlyMap<string, SchemaRenderer>;
+  readonly formats: ReadonlyMap<string, readonly string[]>;
+  readonly discriminators: ReadonlyMap<string, string>;
+}
+
+export interface ProposeRequest {
+  readonly tag: 'PROPOSE_REQUEST';
+  readonly id: number;
+  readonly schema: JsonValue;
+  readonly instance: JsonValue;
+  readonly path: JsPath;
+}
+
+export interface ProposeResponse {
+  readonly tag: 'PROPOSE_RESPONSE';
+  readonly id: number;
+  readonly proposals: readonly JsonValue[];
 }
