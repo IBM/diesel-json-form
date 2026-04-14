@@ -7,7 +7,6 @@ import static com.pojosontheweb.selenium.Findrs.textEquals;
 import com.pojosontheweb.selenium.ManagedDriverJunit4TestBase;
 import diesel.json.*;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.Dimension;
@@ -27,8 +26,6 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static org.hamcrest.text.IsEqualCompressingWhiteSpace.equalToCompressingWhiteSpace;
 
 public class SandboxTest extends ManagedDriverJunit4TestBase {
 
@@ -571,14 +568,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "]";
 
         sandbox.jsonEditor
-                .typeText(enumContent);
-
-        String content = sandbox.jsonEditor.getText();
-
-        Assert.assertTrue(
-                "ERROR : differences between content \"" + content + "\" and input \"" + enumContent
-                        + "\"",
-                equalToCompressingWhiteSpace(enumContent.trim()).matches(content.trim()));
+                .typeText(enumContent)
+                .assertText(enumContent);
 
         FArray fArray = form.arrayAt(JsPath.empty);
         fArray.assertLength(2);
@@ -587,27 +578,20 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         stringCell1.assertValue("FOO");
         stringCell1.setValue("BAR");
         stringCell1.assertValue("BAR");
-        // No error possible, we can only set a valid value here : looks strange I can
-        // set an unsupported value but no error
-        // even jsonEditor is not updated
-        content = sandbox.jsonEditor.getText();
-        String newEnumContent = "[\n" +
+        sandbox.jsonEditor.assertText("[\n" +
                 "  \"BAR\",\n" +
                 "  \"BAR\"\n" +
-                "]";
-        Assert.assertTrue(
-                "ERROR : differences between content \"" + content + "\" and input \"" + newEnumContent
-                        + "\"",
-                equalToCompressingWhiteSpace(newEnumContent.trim()).matches(content.trim()));
+                "]");
 
-        newEnumContent = "[\n" +
+        String newEnumContent = "[\n" +
                 "  \"BAR\",\n" +
                 "  \"TEAM\"\n" +
                 "]";
 
         sandbox.jsonEditor
                 .focus()
-                .replaceText(newEnumContent);
+                .replaceText(newEnumContent)
+                .assertText(newEnumContent);
 
         String expectedError = "Invalid value: should be one of \"FOO\" | \"BAR\"";
         fArray
