@@ -6,7 +6,12 @@ import {
   ValidationError,
   ValidationResult,
 } from '../SchemaService';
-import { ProposeResponse, ValidateResponse } from './WorkerMessages';
+import {
+  ProposeRequest,
+  ProposeResponse,
+  ValidateRequest,
+  ValidateResponse,
+} from './WorkerMessages';
 
 type PendingRequest = {
   readonly resolve: (o: any) => void;
@@ -51,7 +56,8 @@ export class WorkerClient implements SchemaService {
   validate(schema: JsonValue, instance: JsonValue): Promise<ValidationResult> {
     const counter = this.counter;
     this.counter++;
-    const validateRequest = {
+    const validateRequest: ValidateRequest = {
+      tag: 'VALIDATE_REQUEST',
       id: counter,
       schema,
       instance,
@@ -73,11 +79,12 @@ export class WorkerClient implements SchemaService {
   ): Promise<readonly JsonValue[]> {
     const counter = this.counter;
     this.counter++;
-    const proposeRequest = {
+    const proposeRequest: ProposeRequest = {
+      tag: 'PROPOSE_REQUEST',
       id: counter,
       schema,
       instance,
-      path,
+      path: path.format(),
     };
     const p = new Promise<readonly JsonValue[]>((resolve) => {
       const newPendingRequest: PendingRequest = {

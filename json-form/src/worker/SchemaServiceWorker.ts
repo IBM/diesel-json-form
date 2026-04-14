@@ -26,7 +26,11 @@ export class SchemaServiceWorker {
         case 'PROPOSE_REQUEST': {
           const proposeRequest = messageEvent.data as ProposeRequest;
           const { schema, instance, path } = proposeRequest;
-          const r = this.schemaService.propose(schema, instance, path);
+          const r = this.schemaService.propose(
+            schema,
+            instance,
+            JsPath.parse(path),
+          );
           r.then((proposals) =>
             this.handleProposeResult(proposeRequest, proposals),
           );

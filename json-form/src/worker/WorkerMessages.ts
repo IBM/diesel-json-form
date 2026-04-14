@@ -1,5 +1,4 @@
 import { JsonValue } from '../JsonValue';
-import { JsPath } from '../JsPath';
 import { SchemaRenderer, ValidationError } from '../SchemaService';
 
 export interface ValidateRequest {
@@ -23,7 +22,7 @@ export interface ProposeRequest {
   readonly id: number;
   readonly schema: JsonValue;
   readonly instance: JsonValue;
-  readonly path: JsPath;
+  readonly path: string;
 }
 
 export interface ProposeResponse {
