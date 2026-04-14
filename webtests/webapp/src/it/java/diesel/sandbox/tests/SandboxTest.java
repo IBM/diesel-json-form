@@ -117,18 +117,20 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
     @Test
     public void customerAge() {
+        String text = "{\n" +
+                "  \"customer\": {\n" +
+                "    \"firstName\": \"\",\n" +
+                "    \"lastName\": \"\",\n" +
+                "    \"amount\": 0,\n" +
+                "    \"age\": 0\n" +
+                "  }\n" +
+                "}";
         sandbox.selectSample(BeanContainingOtherBean);
         sandbox.jsonEditor
                 .focus()
                 .clearText()
-                .typeText("{\n" +
-                        "  \"customer\": {\n" +
-                        "    \"firstName\": \"\",\n" +
-                        "    \"lastName\": \"\",\n" +
-                        "    \"amount\": 0,\n" +
-                        "    \"age\": 0\n" +
-                        "  }\n" +
-                        "}");
+                .typeText(text)
+                .assertText(text);
         // .assertHasNoErrors();
         sandbox.jsonForm
                 .numberAt(JsPath.empty.append("customer").append("age"))

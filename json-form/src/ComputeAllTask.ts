@@ -3,6 +3,7 @@ import { gotMetadata, Metadata, Msg } from './Msg';
 import { SchemaService, ValidationResult } from './SchemaService';
 import { getValueAt, JsonValue } from './JsonValue';
 import { JsPath } from './JsPath';
+import { Model, nextPendingId } from './Model';
 
 function computeAllTask(
   schemaService: SchemaService,
@@ -54,14 +55,17 @@ function computeAllTask(
 }
 
 export function computeAllCmd(
+  model: Model,
   schemaService: SchemaService,
   schema: JsonValue,
   value: JsonValue,
-): Cmd<Msg> {
-  return Task.attempt(
+): [Model, Cmd<Msg>] {
+  const [newModel, newPendingId] = nextPendingId(model, 'got-metadata');
+  const cmd = Task.attempt(
     computeAllTask(schemaService, schema, value),
-    gotMetadata,
+    gotMetadata(newPendingId),
   );
+  return [newModel, cmd];
 }
 
 async function doComputePropsToAdd(

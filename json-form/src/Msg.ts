@@ -51,6 +51,8 @@ export type Msg =
   | NoOp
   | { tag: 'renderer-child-msg'; path: string; msg: any };
 
+export type GotMsg = GotMetadata | GotMenuProposals | GotUpdatedValue;
+
 export interface AddPropertyButtonClicked extends HasPath {
   tag: 'add-property-btn-clicked';
   readonly propertyName: string;
@@ -135,30 +137,35 @@ export interface Metadata {
 
 export interface GotMetadata {
   tag: 'got-metadata';
+  id: number;
   r: Result<Error, Metadata>;
 }
 
-export function gotMetadata(r: Result<Error, Metadata>): Msg {
-  return {
+export function gotMetadata(id: number): (r: Result<Error, Metadata>) => Msg {
+  return (r) => ({
     tag: 'got-metadata',
+    id,
     r,
-  };
+  });
 }
 
 export interface GotMenuProposals {
   tag: 'got-menu-proposals';
+  id: number;
   r: Result<Error, ReadonlyArray<JsonValue>>;
   refBox: Box;
   path: JsPath;
 }
 
 export function gotMenuProposals(
+  id: number,
   path: JsPath,
   refBox: Box,
 ): (r: Result<Error, ReadonlyArray<JsonValue>>) => Msg {
   return (r: Result<Error, ReadonlyArray<JsonValue>>) => ({
     tag: 'got-menu-proposals',
     r,
+    id,
     refBox,
     path,
   });
@@ -166,12 +173,16 @@ export function gotMenuProposals(
 
 export interface GotUpdatedValue {
   tag: 'got-updated-value';
+  id: number;
   r: Result<Error, JsonValue>;
 }
 
-export function gotUpdatedValue(r: Result<Error, JsonValue>): Msg {
-  return {
+export function gotUpdatedValue(
+  id: number,
+): (r: Result<Error, JsonValue>) => Msg {
+  return (r) => ({
     tag: 'got-updated-value',
+    id,
     r,
-  };
+  });
 }

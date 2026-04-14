@@ -23,7 +23,7 @@ import {
   actionUpdateValue,
 } from './Actions';
 import { MenuAction } from './ContextMenuActions';
-import { Model } from './Model';
+import { Model, nextPendingId } from './Model';
 import { gotUpdatedValue, Msg } from './Msg';
 import { SchemaService } from './SchemaService';
 import { addElementToArrayTask } from './addElementToArray';
@@ -65,8 +65,12 @@ export default function executeContextMenuAction(
               model.root,
               action.path,
             );
-            const cmd = Task.attempt(t, gotUpdatedValue);
-            return [model, cmd];
+            const [newModel, newPendingId] = nextPendingId(
+              model,
+              'got-updated-value',
+            );
+            const cmd = Task.attempt(t, gotUpdatedValue(newPendingId));
+            return [newModel, cmd];
           })
           .withDefaultSupply(() => noCmd(model));
       } else {

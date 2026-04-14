@@ -50,6 +50,7 @@ import {
   CustomRendererModel,
   initialModel,
   Model,
+  nextPendingId,
   updateAddingPropertyName,
 } from './Model';
 import {
@@ -94,10 +95,9 @@ export function init(
     strictMode,
     debounceMs,
   );
-  const cmd = schema
-    .map((s) => computeAllCmd(schemaService, s, initialValue))
-    .withDefaultSupply(() => Cmd.none());
-  return [model, cmd];
+  return schema
+    .map((s) => computeAllCmd(model, schemaService, s, initialValue))
+    .withDefaultSupply(() => noCmd(model));
 }
 
 function reInitRenderers(
@@ -274,8 +274,15 @@ export function update(
               model.root,
               msg.path,
             );
-            const cmd = Task.attempt(t, gotMenuProposals(msg.path, msg.refBox));
-            return [model, cmd];
+            const [newModel, newPendingId] = nextPendingId(
+              model,
+              'got-menu-proposals',
+            );
+            const cmd = Task.attempt(
+              t,
+              gotMenuProposals(newPendingId, msg.path, msg.refBox),
+            );
+            return [newModel, cmd];
           })
           .withDefaultSupply(() => noCmd(model)),
       );
@@ -359,8 +366,12 @@ export function update(
               msg.path,
               msg.propertyName,
             );
-            const cmd = Task.attempt(t, gotUpdatedValue);
-            return [model, cmd];
+            const [newModel, newPendingId] = nextPendingId(
+              model,
+              'got-updated-value',
+            );
+            const cmd = Task.attempt(t, gotUpdatedValue(newPendingId));
+            return [newModel, cmd];
           })
           .withDefaultSupply(() => noCmd(model)),
       );
@@ -384,34 +395,41 @@ export function update(
     case 'set-debounce-ms':
       return noOut(noCmd({ ...model, debounceMs: msg.debounceMs }));
     case 'recompute-metadata': {
-      const cmd = model.schema
-        .map((s) => computeAllCmd(schemaService, s, model.root))
-        .withDefaultSupply(() => Cmd.none());
-      return noOut([model, cmd]);
+      const mac = model.schema
+        .map((s) => computeAllCmd(model, schemaService, s, model.root))
+        .withDefaultSupply(() => noCmd(model));
+      return noOut(mac);
     }
     case 'got-metadata': {
-      return noOut(
-        msg.r.match(
-          (metadata) => {
-            const newModel: Model = {
-              ...model,
-              errors: metadata.errors,
-              propertiesToAdd: metadata.propertiesToAdd,
-              comboBoxes: metadata.comboBoxes,
-              formats: metadata.formats,
-            };
-            return reInitRenderers(
-              newModel,
-              metadata.renderers,
-              rendererFactory,
-            );
-          },
-          (err) => {
-            console.error(err);
-            return noCmd(model);
-          },
-        ),
-      );
+      const pendingId = model.pendingIds.get('got-metadata');
+      if (pendingId === msg.id) {
+        console.log('RVKB accepting reply', msg);
+        return noOut(
+          msg.r.match(
+            (metadata) => {
+              const newModel: Model = {
+                ...model,
+                errors: metadata.errors,
+                propertiesToAdd: metadata.propertiesToAdd,
+                comboBoxes: metadata.comboBoxes,
+                formats: metadata.formats,
+              };
+              return reInitRenderers(
+                newModel,
+                metadata.renderers,
+                rendererFactory,
+              );
+            },
+            (err) => {
+              console.error(err);
+              return noCmd(model);
+            },
+          ),
+        );
+      } else {
+        console.log('RVKB ignoring reply', msg);
+        return noOut(noCmd(model));
+      }
     }
     case 'renderer-child-msg': {
       const rendererModel = model.customRenderers.get(msg.path);

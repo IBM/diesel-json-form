@@ -16,7 +16,7 @@
 
 import { contextMenuMsg, gotUpdatedValue, Msg, noOp } from './Msg';
 import { Cmd, just, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
-import { Model } from './Model';
+import { Model, nextPendingId } from './Model';
 import { JsPath } from './JsPath';
 import {
   deleteValueAt,
@@ -65,8 +65,12 @@ export function actionApplyProposal(
         proposal,
         proposalIndex,
       );
-      const cmd = Task.attempt(t, gotUpdatedValue);
-      return [model, cmd];
+      const [newModel, newPendingId] = nextPendingId(
+        model,
+        'got-updated-value',
+      );
+      const cmd = Task.attempt(t, gotUpdatedValue(newPendingId));
+      return [newModel, cmd];
     })
     .withDefaultSupply(() => noCmd(model));
 }

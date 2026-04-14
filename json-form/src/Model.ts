@@ -22,6 +22,7 @@ import { MenuAction } from './ContextMenuActions';
 import { initMyI18n } from './i18n/MyI18n';
 import { ValidationError } from './SchemaService';
 import { FormTFunction } from './FormTFunction';
+import { GotMsg } from './Msg';
 
 export interface Model {
   readonly schema: Maybe<JsonValue>;
@@ -38,6 +39,7 @@ export interface Model {
   readonly strictMode: boolean;
   readonly customRenderers: ReadonlyMap<string, Maybe<CustomRendererModel>>;
   readonly debounceMs: number;
+  readonly pendingIds: Map<GotMsg['tag'], number>;
 }
 
 export interface CustomRendererModel {
@@ -74,8 +76,24 @@ export function initialModel(
     strictMode,
     customRenderers: new Map(),
     debounceMs: Math.max(0, debounceMs),
+    pendingIds: new Map(),
   };
   return model;
+}
+
+export function nextPendingId(
+  model: Model,
+  tag: GotMsg['tag'],
+): [Model, number] {
+  const pendingId = model.pendingIds.get(tag) ?? 0;
+  const newPendingId = pendingId + 1;
+  const newPendingIds = new Map(model.pendingIds);
+  newPendingIds.set(tag, newPendingId);
+  const newModel: Model = {
+    ...model,
+    pendingIds: newPendingIds,
+  };
+  return [newModel, newPendingId];
 }
 
 export function updateAddingPropertyName(
