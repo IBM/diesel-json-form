@@ -118,7 +118,9 @@ export class SchemaServiceWorker {
     const validateResponse: ValidateResponse = {
       tag: 'VALIDATE_RESPONSE',
       id: validateRequest.id,
-      errors: validationResult.getErrors(),
+      errors: validationResult
+        .getErrors()
+        .map((e) => ({ message: e.message, path: e.path })),
       renderers: validationResult.getRenderers(),
       formats,
       discriminators,
