@@ -824,4 +824,24 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .eval();
     }
 
+    @Test
+    public void testProposeSubProp() {
+        sandbox.selectSample(BeanContainingOtherBean);
+        sandbox.jsonForm
+                .objectAt(JsPath.empty)
+                .clickAddPropButton("customer");
+        sandbox.jsonForm
+                .objectAt(JsPath.empty)
+                .clickPropertyMenu("customer")
+                .clickPropose("{ firstName, lastName, amount, age }");
+        sandbox.jsonEditor.assertText("{\n" + //
+                "  \"customer\": {\n" + //
+                "    \"firstName\": \"\",\n" + //
+                "    \"lastName\": \"\",\n" + //
+                "    \"amount\": 0,\n" + //
+                "    \"age\": 0\n" + //
+                "  }\n" + //
+                "}");
+    }
+
 }

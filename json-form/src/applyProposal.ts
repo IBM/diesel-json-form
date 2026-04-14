@@ -1,5 +1,10 @@
 import { just, maybeOf, nothing, Task } from 'tea-cup-fp';
-import { getValueAt, JsonValue, mergeProperties } from './JsonValue';
+import {
+  getValueAt,
+  JsonValue,
+  mergeProperties,
+  setValueAt,
+} from './JsonValue';
 import { SchemaService } from './SchemaService';
 import { JsPath } from './JsPath';
 import { proposeNested } from './proposeNested';
@@ -17,7 +22,7 @@ export function applyProposalTask(
       return Task.fromPromise(() => {
         return proposeNested(schema, schemaService, root, path, 5);
       }).map((all) => {
-        return getValueAt(root, path)
+        const proposalToInsert = getValueAt(root, path)
           .map((valueAtPath) => {
             const augmentedProposal = maybeOf(all[proposalIndex])
               .andThen((v) => (v.tag === 'jv-object' ? just(v) : nothing))
@@ -31,10 +36,11 @@ export function applyProposalTask(
             }
           })
           .withDefault(proposal);
+        return setValueAt(root, path, proposalToInsert);
       });
     }
     default: {
-      return Task.succeed(proposal);
+      return Task.succeed(root);
     }
   }
 }
