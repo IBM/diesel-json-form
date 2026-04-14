@@ -366,12 +366,24 @@ export function update(
               msg.path,
               msg.propertyName,
             );
-            const [newModel, newPendingId] = nextPendingId(
-              model,
+            const propertiesToAdd = new Map(model.propertiesToAdd);
+            const newProperties = propertiesToAdd.get(msg.path.format());
+            if (newProperties) {
+              const newProperties2 = newProperties.filter(
+                (s) => s !== msg.propertyName,
+              );
+              propertiesToAdd.set(msg.path.format(), newProperties2);
+            }
+            const newModel1: Model = {
+              ...model,
+              propertiesToAdd,
+            };
+            const [newModel2, newPendingId] = nextPendingId(
+              newModel1,
               'got-updated-value',
             );
             const cmd = Task.attempt(t, gotUpdatedValue(newPendingId));
-            return [newModel, cmd];
+            return [newModel2, cmd];
           })
           .withDefaultSupply(() => noCmd(model)),
       );
