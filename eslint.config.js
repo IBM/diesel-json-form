@@ -11,7 +11,7 @@ module.exports = [
       '**/build/',
       '**/dist/',
       '**/target/',
-      '**/webpack.config.js',
+      '**/*webpack.config.js',
       '**/.DS_Store',
       '**/.vscode/',
       'eslint.config.js',
