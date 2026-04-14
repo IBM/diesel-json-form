@@ -31,6 +31,9 @@ MyRendererFactory.addRenderer('MyStringRenderer', MyStringRenderer);
 MyRendererFactory.addRenderer('RatingRenderer', RatingRenderer);
 MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
 
+const myworker = new Worker('myworker.bundle.js');
+const workerClient = new JsonForm.WorkerClient(myworker);
+
 editor1.getModel()?.onDidChangeContent(() => {
   sendJsonStr();
 });
@@ -147,6 +150,7 @@ function initJsonForm(
       strictMode,
       rendererFactory: MyRendererFactory,
       debounceMs,
+      schemaService: workerClient,
     }),
   );
 }
