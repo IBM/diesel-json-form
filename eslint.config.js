@@ -15,6 +15,7 @@ module.exports = [
       '**/.DS_Store',
       '**/.vscode/',
       'eslint.config.js',
+      '**/public/',
     ],
   },
   prettierRecommended,
