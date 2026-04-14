@@ -45,6 +45,7 @@ class DebounceCmd<M> extends Cmd<M> {
     this.timeout = setTimeout(() => {
       if (!this.canceled) {
         dispatch(this.msg);
+        this.cancel();
       }
     }, this.delay);
   }

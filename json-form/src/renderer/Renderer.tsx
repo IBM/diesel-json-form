@@ -419,6 +419,17 @@ function dispatchUpdateProperty(
   });
 }
 
+function dispatchUpdatePropertyDebounced(
+  p: ViewValueProps<JsonValue>,
+  newValue: JsonValue,
+) {
+  p.dispatch({
+    tag: 'update-property-debounced',
+    path: p.path,
+    value: newValue,
+  });
+}
+
 function ViewNumber(p: ViewValueProps<JvNumber>): React.ReactElement {
   const { t } = p.model;
   return (
@@ -431,7 +442,7 @@ function ViewNumber(p: ViewValueProps<JvNumber>): React.ReactElement {
       invalidText={errorsToInvalidText(p)}
       invalid={isInvalid(p)}
       onChange={(evt) => {
-        dispatchUpdateProperty(p, {
+        dispatchUpdatePropertyDebounced(p, {
           tag: 'jv-number',
           value: evt.target.value,
         });
@@ -471,7 +482,7 @@ function ViewStringDefault(p: ViewValueProps<JvString>): React.ReactElement {
       placeholder={t('stringValuePlaceholder')}
       onChange={(evt) => {
         const newStr = evt.target.value;
-        dispatchUpdateProperty(p, { tag: 'jv-string', value: newStr });
+        dispatchUpdatePropertyDebounced(p, { tag: 'jv-string', value: newStr });
       }}
     />
   );
@@ -521,7 +532,7 @@ function ViewStringWithCombo(p: ViewStringWithComboProps): React.ReactElement {
         });
       }}
       onInputChange={(text) => {
-        dispatchUpdateProperty(p, {
+        dispatchUpdatePropertyDebounced(p, {
           tag: 'jv-string',
           value: text ?? '',
         });
@@ -532,7 +543,7 @@ function ViewStringWithCombo(p: ViewStringWithComboProps): React.ReactElement {
 
 interface MyTimePickerProps {
   readonly path: JsPath;
-  readonly onChange: (value: string) => void;
+  readonly onChange: (value: string, debounce: boolean) => void;
   readonly value: string;
   readonly isInvalid: boolean;
   readonly invalidText: string;
@@ -549,7 +560,7 @@ function MyTimePicker(props: MyTimePickerProps) {
       onChange={(e) => {
         const t = new MyTime(value);
         const replaced = t.setTime(e.target.value);
-        onChange(replaced.fullTime);
+        onChange(replaced.fullTime, true);
       }}
       pattern="([0-1]\d|2[0-3]):([0-5]\d)(:[0-5]\d(\.(\d{1,3}))?)?"
       maxLength={12}
@@ -566,7 +577,7 @@ function MyTimePicker(props: MyTimePickerProps) {
           onChange={(event) => {
             const offset = event.target.value;
             const t = new MyTime(value);
-            onChange(t.setOffset(offset).fullTime);
+            onChange(t.setOffset(offset).fullTime, false);
           }}
           value={new MyTime(value).offset}
         >
@@ -584,7 +595,7 @@ function MyTimePicker(props: MyTimePickerProps) {
 interface MyDatePickerProps {
   readonly path: JsPath;
   readonly value: string;
-  readonly onChange: (s: string) => void;
+  readonly onChange: (s: string, debounce: boolean) => void;
   readonly isInvalid: boolean;
   readonly invalidText: string;
   readonly t: FormTFunction;
@@ -615,7 +626,7 @@ function MyDatePicker(props: MyDatePickerProps) {
             ('0' + (d.getMonth() + 1)).slice(-2) +
             '-' +
             ('0' + d.getDate()).slice(-2);
-          props.onChange(s);
+          props.onChange(s, false);
         }
       }}
       value={props.value} // need to set value twice
@@ -631,7 +642,7 @@ function MyDatePicker(props: MyDatePickerProps) {
         labelText={''}
         hideLabel={true}
         onChange={(e) => {
-          props.onChange(e.target.value);
+          props.onChange(e.target.value, true);
         }}
         // @ts-ignore
         value={props.value} // need to set value twice
@@ -660,13 +671,7 @@ function ViewStringWithFormats(
             <MyDatePicker
               path={p.path}
               value={p.value.value}
-              onChange={(s) =>
-                p.dispatch({
-                  tag: 'update-property',
-                  path: p.path,
-                  value: jvString(s),
-                })
-              }
+              onChange={(s) => dispatchUpdateProperty(p, jvString(s))}
               isInvalid={isInvalid(p)}
               invalidText={errorsToInvalidText(p)}
               t={p.model.t}
@@ -683,13 +688,16 @@ function ViewStringWithFormats(
                 <MyDatePicker
                   path={p.path}
                   value={dt.date}
-                  onChange={(s) => {
+                  onChange={(s, debounce) => {
                     const dt2 = dt.setDate(s);
-                    p.dispatch({
-                      tag: 'update-property',
-                      path: p.path,
-                      value: jvString(dt2.dateTime),
-                    });
+                    if (debounce) {
+                      dispatchUpdatePropertyDebounced(
+                        p,
+                        jvString(dt2.dateTime),
+                      );
+                    } else {
+                      dispatchUpdateProperty(p, jvString(dt2.dateTime));
+                    }
                   }}
                   isInvalid={invalid}
                   invalidText={errorsToInvalidText(p)}
@@ -700,13 +708,16 @@ function ViewStringWithFormats(
               <div className={'date-time-picker__time'}>
                 <MyTimePicker
                   path={p.path}
-                  onChange={(s) => {
+                  onChange={(s, debounce) => {
                     const dt2 = dt.setTime(s);
-                    p.dispatch({
-                      tag: 'update-property',
-                      path: p.path,
-                      value: jvString(dt2.dateTime),
-                    });
+                    if (debounce) {
+                      dispatchUpdatePropertyDebounced(
+                        p,
+                        jvString(dt2.dateTime),
+                      );
+                    } else {
+                      dispatchUpdateProperty(p, jvString(dt2.dateTime));
+                    }
                   }}
                   value={dt.time.fullTime}
                   isInvalid={invalid}
@@ -721,13 +732,7 @@ function ViewStringWithFormats(
           return (
             <MyTimePicker
               path={p.path}
-              onChange={(s) =>
-                p.dispatch({
-                  tag: 'update-property',
-                  path: p.path,
-                  value: jvString(s),
-                })
-              }
+              onChange={(s) => dispatchUpdateProperty(p, jvString(s))}
               value={p.value.value}
               isInvalid={isInvalid(p)}
               invalidText={errorsToInvalidText(p)}

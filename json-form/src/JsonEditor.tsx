@@ -44,7 +44,7 @@ import {
 import executeContextMenuAction from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { getValueAt, JsonValue, stringify } from './JsonValue';
+import { getValueAt, JsonValue, setValueAt, stringify } from './JsonValue';
 import { JsPath } from './JsPath';
 import {
   CustomRendererModel,
@@ -78,6 +78,7 @@ import {
 import { computeAllCmd } from './ComputeAllTask';
 import { getMenuProposals } from './getMenuProposals';
 import { addPropertyTask } from './addProperty';
+import { Debouncer } from './Debouncer';
 
 export function init(
   language: string,
@@ -225,6 +226,8 @@ function withOutValueChanged(
   ];
 }
 
+const debouncer: Debouncer<Msg> = new Debouncer();
+
 export function update(
   msg: Msg,
   model: Model,
@@ -234,10 +237,27 @@ export function update(
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
     case 'delete-property':
-      return withOutValueChanged(model, actionDeleteValue(model, msg.path));
+      return withOutValueChanged(
+        model,
+        actionDeleteValue(schemaService, model, msg.path),
+      );
     case 'update-property': {
-      const mac = actionUpdateValue(model, msg.path, msg.value);
+      const mac = actionUpdateValue(schemaService, model, msg.path, msg.value);
       return withOutValueChanged(model, mac);
+    }
+    case 'update-property-debounced': {
+      const newRoot = setValueAt(model.root, msg.path, msg.value);
+      const newModel: Model = {
+        ...model,
+        root: newRoot,
+      };
+      const cmd = debouncer.debounce(
+        {
+          tag: 'recompute-metadata',
+        },
+        model.debounceMs,
+      );
+      return withOutValueChanged(model, [newModel, cmd]);
     }
     case 'add-property-clicked':
       return noOut(actionAddPropertyClicked(model, msg.path));
@@ -248,12 +268,12 @@ export function update(
         case 'Enter':
           return withOutValueChanged(
             model,
-            actionConfirmAddProperty(model, true),
+            actionConfirmAddProperty(schemaService, model, true),
           );
         case 'Escape':
           return withOutValueChanged(
             model,
-            actionConfirmAddProperty(model, false),
+            actionConfirmAddProperty(schemaService, model, false),
           );
         default:
           return noOut(noCmd(model));
@@ -261,7 +281,7 @@ export function update(
     case 'add-prop-ok-cancel-clicked': {
       return withOutValueChanged(
         model,
-        actionConfirmAddProperty(model, msg.ok),
+        actionConfirmAddProperty(schemaService, model, msg.ok),
       );
     }
     case 'menu-trigger-clicked': {
@@ -350,7 +370,7 @@ export function update(
         ...model,
         schema: msg.schema,
       };
-      return noOut(setRoot(newModel, msg.json));
+      return noOut(setRoot(schemaService, newModel, msg.json));
     }
     case 'toggle-expand-collapse': {
       return noOut(actionToggleExpandCollapsePath(model, msg.path));
@@ -391,7 +411,7 @@ export function update(
     case 'got-updated-value': {
       return msg.r.match(
         (newRoot) => {
-          const mac = setRoot(model, newRoot);
+          const mac = setRoot(schemaService, model, newRoot);
           return withOutValueChanged(model, mac);
         },
         (err) => {
@@ -477,6 +497,7 @@ export function update(
             }
             case 'Just': {
               const mac2 = actionUpdateValue(
+                schemaService,
                 newModel,
                 JsPath.parse(msg.path),
                 newValue.value,

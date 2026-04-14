@@ -35,16 +35,16 @@ export default function executeContextMenuAction(
 ): [Model, Cmd<Msg>] {
   switch (action.tag) {
     case 'delete': {
-      return actionDeleteValue(model, action.path);
+      return actionDeleteValue(schemaService, model, action.path);
     }
     case 'move-down': {
-      return actionMoveValue(model, action.path, 'down');
+      return actionMoveValue(schemaService, model, action.path, 'down');
     }
     case 'move-up': {
-      return actionMoveValue(model, action.path, 'up');
+      return actionMoveValue(schemaService, model, action.path, 'up');
     }
     case 'change-type': {
-      return actionUpdateValue(model, action.path, action.value);
+      return actionUpdateValue(schemaService, model, action.path, action.value);
     }
     case 'proposal': {
       return actionApplyProposal(

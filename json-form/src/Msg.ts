@@ -33,6 +33,7 @@ export interface HasPath {
 export type Msg =
   | DeleteProperty
   | UpdateProperty
+  | UpdatePropertyDebounced
   | AddPropertyClicked
   | { tag: 'new-property-name-changed'; value: string }
   | { tag: 'new-property-name-key-down'; key: string }
@@ -115,6 +116,11 @@ export interface DeleteProperty extends HasPath {
 
 export interface UpdateProperty extends HasPath {
   tag: 'update-property';
+  value: JsonValue;
+}
+
+export interface UpdatePropertyDebounced extends HasPath {
+  tag: 'update-property-debounced';
   value: JsonValue;
 }
 

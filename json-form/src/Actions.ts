@@ -30,19 +30,21 @@ import {
   moveProperty,
   setValueAt,
 } from './JsonValue';
-import { Debouncer } from './Debouncer';
 import { MenuOptionFilter } from './RenderOptions';
 import { Box } from 'tea-pop-core';
 import { createMenu, MenuAction } from './ContextMenuActions';
 import * as TPM from 'tea-pop-menu';
 import { applyProposalTask } from './applyProposal';
 import { SchemaService } from './SchemaService';
+import { computeAllCmd } from './ComputeAllTask';
 
 export function actionDeleteValue(
+  schemaService: SchemaService,
   model: Model,
   path: JsPath,
 ): [Model, Cmd<Msg>] {
   return setRoot(
+    schemaService,
     model,
     deleteValueAt(model.root, path).withDefault(model.root),
   );
@@ -100,6 +102,8 @@ export function actionAddPropertyClicked(
 }
 
 export function actionConfirmAddProperty(
+  schemaService: SchemaService,
+
   model: Model,
   commit: boolean,
 ): [Model, Cmd<Msg>] {
@@ -123,7 +127,7 @@ export function actionConfirmAddProperty(
           );
         }
         return just(owningValue);
-      }).map((newRoot) => setRoot(newModel, newRoot));
+      }).map((newRoot) => setRoot(schemaService, newModel, newRoot));
     })
     .withDefaultSupply(() => noCmd(newModel));
 }
@@ -201,6 +205,7 @@ export function actionToggleExpandCollapsePath(
 }
 
 export function actionMoveValue(
+  schemaService: SchemaService,
   model: Model,
   path: JsPath,
   direction: MoveDirection,
@@ -218,7 +223,7 @@ export function actionMoveValue(
                 lastPathElem,
                 direction,
               );
-              return setRoot(model, newRoot);
+              return setRoot(schemaService, model, newRoot);
             }
             case 'jv-array': {
               const index = parseInt(lastPathElem);
@@ -231,7 +236,7 @@ export function actionMoveValue(
                 index,
                 direction,
               );
-              return setRoot(model, newRoot);
+              return setRoot(schemaService, model, newRoot);
             }
             default: {
               return noCmd(model);
@@ -244,25 +249,26 @@ export function actionMoveValue(
 }
 
 export function actionUpdateValue(
+  schemaService: SchemaService,
   model: Model,
   path: JsPath,
   value: JsonValue,
 ): [Model, Cmd<Msg>] {
   const newRoot = setValueAt(model.root, path, value);
-  return setRoot(model, newRoot);
+  return setRoot(schemaService, model, newRoot);
 }
 
-const debouncer = new Debouncer<Msg>();
-
-export function setRoot(model: Model, root: JsonValue): [Model, Cmd<Msg>] {
-  const cmd = debouncer.debounce(
-    { tag: 'recompute-metadata' },
-    model.debounceMs,
-  );
+export function setRoot(
+  schemaService: SchemaService,
+  model: Model,
+  root: JsonValue,
+): [Model, Cmd<Msg>] {
   const newModel: Model = {
     ...model,
     root,
     adding: nothing,
   };
-  return [newModel, cmd];
+  return newModel.schema
+    .map((s) => computeAllCmd(newModel, schemaService, s, newModel.root))
+    .withDefaultSupply(() => noCmd(newModel));
 }
