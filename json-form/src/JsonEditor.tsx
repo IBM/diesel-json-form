@@ -403,7 +403,6 @@ export function update(
     case 'got-metadata': {
       const pendingId = model.pendingIds.get('got-metadata');
       if (pendingId === msg.id) {
-        console.log('RVKB accepting reply', msg);
         return noOut(
           msg.r.match(
             (metadata) => {
@@ -427,7 +426,6 @@ export function update(
           ),
         );
       } else {
-        console.log('RVKB ignoring reply', msg);
         return noOut(noCmd(model));
       }
     }
