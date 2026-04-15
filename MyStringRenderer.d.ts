@@ -10,6 +10,6 @@ export type Msg = {
 export interface Model {
     readonly value: string;
     readonly isMouseOver: boolean;
-    readonly myConfigProp: Maybe<number>;
+    readonly myConfigProp: Maybe<string>;
 }
 export declare const MyStringRenderer: Renderer<Model, Msg>;
