@@ -143,6 +143,7 @@ function initJsonForm(
       value,
       language: navigator.language,
       onChange: (value: JsonForm.JsonValue) => {
+        console.log('FORM value changed', value);
         if (syncPanesCb.checked) {
           JsonForm.stringify(value, '  ').forEach((s) => editor2.setValue(s));
         }

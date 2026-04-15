@@ -9,25 +9,31 @@ import {
 import {
   ProposeRequest,
   ProposeResponse,
+  RejectedResponse,
   ValidateRequest,
   ValidateResponse,
 } from './WorkerMessages';
 
 type PendingRequest = {
   readonly resolve: (o: any) => void;
+  readonly reject: (o: any) => void;
 };
 
 export class WorkerClient implements SchemaService {
   private counter: number = 0;
   private pending: Map<number, PendingRequest> = new Map();
 
-  private resolveRequest(id: number, o: any) {
+  private resolveRequest(id: number, resolve: boolean, o: any) {
     const pendingRequest = this.pending.get(id);
     if (pendingRequest) {
-      pendingRequest.resolve(o);
+      if (resolve) {
+        pendingRequest.resolve(o);
+      } else {
+        pendingRequest.reject(o);
+      }
       this.pending.delete(id);
     } else {
-      console.error('Got validate response for non existing request', id);
+      console.error('Got response for non existing request', id);
     }
   }
 
@@ -35,14 +41,19 @@ export class WorkerClient implements SchemaService {
     worker.addEventListener('message', (messageEvent) => {
       const data = messageEvent.data;
       switch (data.tag) {
+        case 'REJECTED_RESPONSE': {
+          const r = data as RejectedResponse;
+          this.resolveRequest(r.id, false, r.message);
+          break;
+        }
         case 'VALIDATE_RESPONSE': {
           const r = data as ValidateResponse;
-          this.resolveRequest(r.id, new WorkerValidationResult(r));
+          this.resolveRequest(r.id, true, new WorkerValidationResult(r));
           break;
         }
         case 'PROPOSE_RESPONSE': {
           const r = data as ProposeResponse;
-          this.resolveRequest(r.id, r.proposals);
+          this.resolveRequest(r.id, true, r.proposals);
           break;
         }
         default: {
@@ -62,9 +73,10 @@ export class WorkerClient implements SchemaService {
       schema,
       instance,
     };
-    const p = new Promise<ValidationResult>((resolve) => {
+    const p = new Promise<ValidationResult>((resolve, reject) => {
       const newPendingRequest: PendingRequest = {
         resolve,
+        reject,
       };
       this.pending.set(counter, newPendingRequest);
       this.worker.postMessage(validateRequest);
@@ -86,9 +98,10 @@ export class WorkerClient implements SchemaService {
       instance,
       path: path.format(),
     };
-    const p = new Promise<readonly JsonValue[]>((resolve) => {
+    const p = new Promise<readonly JsonValue[]>((resolve, reject) => {
       const newPendingRequest: PendingRequest = {
         resolve,
+        reject,
       };
       this.pending.set(counter, newPendingRequest);
       this.worker.postMessage(proposeRequest);

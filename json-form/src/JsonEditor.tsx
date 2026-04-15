@@ -306,20 +306,17 @@ export function update(
       );
     }
     case 'got-menu-proposals': {
+      if (msg.r.tag === 'Err') {
+        console.warn(msg.r.err);
+      }
+      const proposals = msg.r.toMaybe().withDefault([]);
       return noOut(
-        msg.r.match(
-          (proposals) =>
-            actionTriggerClicked(
-              model,
-              msg.path,
-              msg.refBox,
-              proposals,
-              menuFilter,
-            ),
-          (err) => {
-            console.error(err);
-            return noCmd(model);
-          },
+        actionTriggerClicked(
+          model,
+          msg.path,
+          msg.refBox,
+          proposals,
+          menuFilter,
         ),
       );
     }
@@ -413,7 +410,7 @@ export function update(
           return withOutValueChanged(model, mac);
         },
         (err) => {
-          console.error(err);
+          console.warn(err);
           return noOut(noCmd(model));
         },
       );
@@ -450,7 +447,7 @@ export function update(
               );
             },
             (err) => {
-              console.error(err);
+              console.warn(err);
               return noCmd(model);
             },
           ),

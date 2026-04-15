@@ -4,12 +4,27 @@ import { SchemaService, ValidationResult } from '../SchemaService';
 import {
   ProposeRequest,
   ProposeResponse,
+  RejectedResponse,
   ValidateRequest,
   ValidateResponse,
 } from './WorkerMessages';
 
 export class SchemaServiceWorker {
   constructor(private readonly schemaService: SchemaService) {}
+
+  private postRejection(
+    id: number,
+    requestTag: RejectedResponse['requestTag'],
+    message: string,
+  ) {
+    const rejected: RejectedResponse = {
+      tag: 'REJECTED_RESPONSE',
+      id,
+      requestTag,
+      message,
+    };
+    postMessage(rejected);
+  }
 
   init() {
     addEventListener('message', (messageEvent) => {
@@ -20,6 +35,8 @@ export class SchemaServiceWorker {
           const r = this.schemaService.validate(schema, instance);
           r.then((validationResult) =>
             this.handleValidationResult(validateRequest, validationResult),
+          ).catch((e) =>
+            this.postRejection(validateRequest.id, validateRequest.tag, e),
           );
           break;
         }
@@ -33,6 +50,8 @@ export class SchemaServiceWorker {
           );
           r.then((proposals) =>
             this.handleProposeResult(proposeRequest, proposals),
+          ).catch((e) =>
+            this.postRejection(proposeRequest.id, proposeRequest.tag, e),
           );
           break;
         }

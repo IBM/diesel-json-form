@@ -30,3 +30,10 @@ export interface ProposeResponse {
   readonly id: number;
   readonly proposals: readonly JsonValue[];
 }
+
+export interface RejectedResponse {
+  readonly tag: 'REJECTED_RESPONSE';
+  readonly requestTag: ValidateRequest['tag'] | ProposeRequest['tag'];
+  readonly id: number;
+  readonly message: string;
+}
