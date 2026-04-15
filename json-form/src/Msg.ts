@@ -19,7 +19,12 @@ import { JsonValue } from './JsonValue';
 import * as TPM from 'tea-pop-menu';
 import { Box } from 'tea-pop-core';
 import { MenuAction } from './ContextMenuActions';
-import { Maybe } from 'tea-cup-fp';
+import { Maybe, Result } from 'tea-cup-fp';
+import {
+  SchemaRenderer,
+  ValidationError,
+  ValidationResult,
+} from './SchemaService';
 
 export interface HasPath {
   readonly path: JsPath;
@@ -28,11 +33,11 @@ export interface HasPath {
 export type Msg =
   | DeleteProperty
   | UpdateProperty
+  | UpdatePropertyDebounced
   | AddPropertyClicked
   | { tag: 'new-property-name-changed'; value: string }
   | { tag: 'new-property-name-key-down'; key: string }
   | { tag: 'add-prop-ok-cancel-clicked'; ok: boolean }
-  | AddElemClicked
   | ContextMenuMsg
   | MenuTriggerClicked
   | { tag: 'set-json-str'; schema: Maybe<JsonValue>; json: JsonValue }
@@ -41,8 +46,13 @@ export type Msg =
   | ToggleExpandCollapse
   | AddPropertyButtonClicked
   | RecomputeMetadata
+  | GotMetadata
+  | GotMenuProposals
+  | GotUpdatedValue
   | NoOp
   | { tag: 'renderer-child-msg'; path: string; msg: any };
+
+export type GotMsg = GotMetadata | GotMenuProposals | GotUpdatedValue;
 
 export interface AddPropertyButtonClicked extends HasPath {
   tag: 'add-property-btn-clicked';
@@ -109,14 +119,76 @@ export interface UpdateProperty extends HasPath {
   value: JsonValue;
 }
 
+export interface UpdatePropertyDebounced extends HasPath {
+  tag: 'update-property-debounced';
+  value: JsonValue;
+}
+
 export interface AddPropertyClicked extends HasPath {
   tag: 'add-property-clicked';
 }
 
-export interface AddElemClicked extends HasPath {
-  tag: 'add-elem-clicked';
-}
-
 export interface RecomputeMetadata {
   tag: 'recompute-metadata';
+}
+
+export interface Metadata {
+  readonly validationResult: ValidationResult;
+  readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;
+  readonly comboBoxes: Map<string, ReadonlyArray<string>>;
+  readonly formats: Map<string, ReadonlyArray<string>>;
+  readonly propertiesToAdd: Map<string, ReadonlyArray<string>>;
+  readonly renderers: ReadonlyMap<string, SchemaRenderer>;
+}
+
+export interface GotMetadata {
+  tag: 'got-metadata';
+  id: number;
+  r: Result<Error, Metadata>;
+}
+
+export function gotMetadata(id: number): (r: Result<Error, Metadata>) => Msg {
+  return (r) => ({
+    tag: 'got-metadata',
+    id,
+    r,
+  });
+}
+
+export interface GotMenuProposals {
+  tag: 'got-menu-proposals';
+  id: number;
+  r: Result<Error, ReadonlyArray<JsonValue>>;
+  refBox: Box;
+  path: JsPath;
+}
+
+export function gotMenuProposals(
+  id: number,
+  path: JsPath,
+  refBox: Box,
+): (r: Result<Error, ReadonlyArray<JsonValue>>) => Msg {
+  return (r: Result<Error, ReadonlyArray<JsonValue>>) => ({
+    tag: 'got-menu-proposals',
+    r,
+    id,
+    refBox,
+    path,
+  });
+}
+
+export interface GotUpdatedValue {
+  tag: 'got-updated-value';
+  id: number;
+  r: Result<Error, JsonValue>;
+}
+
+export function gotUpdatedValue(
+  id: number,
+): (r: Result<Error, JsonValue>) => Msg {
+  return (r) => ({
+    tag: 'got-updated-value',
+    id,
+    r,
+  });
 }

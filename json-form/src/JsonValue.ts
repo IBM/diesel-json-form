@@ -342,7 +342,7 @@ function mkSpaces(space: string, indentLevel: number): string {
   return s;
 }
 
-export function stringify(value: JsonValue, space?: string): string {
+export function stringify(value: JsonValue, space?: string): Maybe<string> {
   return doStringify(value, space);
 }
 
@@ -350,55 +350,109 @@ const numberRegex = new RegExp(
   '^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$',
 );
 
+export function isValidNumberLiteral(s: string): boolean {
+  return numberRegex.test(s);
+}
+
 function doStringify(
   value: JsonValue,
   space?: string,
   indentLevel: number = 1,
-): string {
+): Maybe<string> {
   switch (value.tag) {
     case 'jv-null':
-      return 'null';
+      return just('null');
     case 'jv-string':
-      return `"${escapeDoubleQuotes(value.value)}"`;
+      return just(`"${escapeDoubleQuotes(value.value)}"`);
     case 'jv-boolean':
-      return value.value ? 'true' : 'false';
+      return just(value.value ? 'true' : 'false');
     case 'jv-number':
-      if (!numberRegex.test(value.value)) {
-        return `"${escapeDoubleQuotes(value.value)}"`;
+      if (!isValidNumberLiteral(value.value)) {
+        return nothing;
       } else {
-        return value.value;
+        return just(value.value);
       }
     case 'jv-array': {
       if (space) {
         const indent = mkSpaces(space, indentLevel);
-        const elemLines = value.elems.map((elem) => {
+        const elemLines = [];
+        for (const elem of value.elems) {
           const elemVal = doStringify(elem, space, indentLevel + 1);
-          return indent + elemVal;
-        });
+          switch (elemVal.type) {
+            case 'Just': {
+              elemLines.push(indent + elemVal.value);
+              break;
+            }
+            case 'Nothing': {
+              return nothing;
+            }
+          }
+        }
         let elems = elemLines.join(',\n');
         if (elemLines.length > 0) {
           elems += '\n';
         }
-        return `[\n${elems}${mkSpaces(space, indentLevel - 1)}]`;
+        return just(`[\n${elems}${mkSpaces(space, indentLevel - 1)}]`);
       } else {
-        return `[${value.elems.map((e) => stringify(e, space)).join(',')}]`;
+        const res = [];
+        for (const e of value.elems) {
+          const str = stringify(e, space);
+          switch (str.type) {
+            case 'Just': {
+              res.push(str.value);
+              break;
+            }
+            case 'Nothing': {
+              return nothing;
+            }
+          }
+        }
+        return just(`[${res.join(',')}]`);
       }
     }
 
     case 'jv-object': {
       if (space) {
         const indent = mkSpaces(space, indentLevel);
-        const propLines = value.properties.map((p) => {
+        const propLines = [];
+        for (const p of value.properties) {
           const propVal = doStringify(p.value, space, indentLevel + 1);
-          return indent + '"' + escapeDoubleQuotes(p.name) + '": ' + propVal;
-        });
+          switch (propVal.type) {
+            case 'Just': {
+              propLines.push(
+                indent +
+                  '"' +
+                  escapeDoubleQuotes(p.name) +
+                  '": ' +
+                  propVal.value,
+              );
+              break;
+            }
+            case 'Nothing': {
+              return nothing;
+            }
+          }
+        }
         let props = propLines.join(',\n');
         if (propLines.length > 0) {
           props += '\n';
         }
-        return `{\n${props}${mkSpaces(space, indentLevel - 1)}}`;
+        return just(`{\n${props}${mkSpaces(space, indentLevel - 1)}}`);
       } else {
-        return `{${value.properties.map((p) => '"' + escapeDoubleQuotes(p.name) + '":' + stringify(p.value, space)).join(',')}}`;
+        const res = [];
+        for (const p of value.properties) {
+          const str = stringify(p.value, space);
+          switch (str.type) {
+            case 'Just': {
+              res.push('"' + escapeDoubleQuotes(p.name) + '":' + str.value);
+              break;
+            }
+            case 'Nothing': {
+              return nothing;
+            }
+          }
+        }
+        return just(`{${res.join(',')}}`);
       }
     }
   }

@@ -49,9 +49,9 @@ function getSchema(): JsonValue {
   return schema.value;
 }
 
-describe('SchemaService', () => {
-  test('propose -1', () => {
-    assertSchemaProposals(getSchema(), jvObject(), JsPath.empty, -1, [
+describe('SchemaService', async () => {
+  test('propose -1', async () => {
+    await assertSchemaProposals(getSchema(), jvObject(), JsPath.empty, -1, [
       jvObject([
         {
           name: 'foo',
@@ -61,8 +61,8 @@ describe('SchemaService', () => {
     ]);
   });
 
-  test('propose 0', () => {
-    assertSchemaProposals(getSchema(), jvObject(), JsPath.empty, 0, [
+  test('propose 0', async () => {
+    await assertSchemaProposals(getSchema(), jvObject(), JsPath.empty, 0, [
       jvObject([
         {
           name: 'foo',
@@ -72,8 +72,8 @@ describe('SchemaService', () => {
     ]);
   });
 
-  test('propose 1', () => {
-    assertSchemaProposals(getSchema(), jvObject(), JsPath.empty, 1, [
+  test('propose 1', async () => {
+    await assertSchemaProposals(getSchema(), jvObject(), JsPath.empty, 1, [
       jvObject([
         {
           name: 'foo',
@@ -83,8 +83,8 @@ describe('SchemaService', () => {
     ]);
   });
 
-  test('propose nested', () => {
-    assertSchemaProposals(getSchema(), jvObject(), JsPath.empty, 5, [
+  test('propose 5', async () => {
+    await assertSchemaProposals(getSchema(), jvObject(), JsPath.empty, 5, [
       jvObject([
         {
           name: 'foo',
@@ -95,13 +95,19 @@ describe('SchemaService', () => {
   });
 });
 
-function assertSchemaProposals(
+async function assertSchemaProposals(
   schema: JsonValue,
   root: JsonValue,
   path: JsPath,
   maxDepth: number,
   expected: readonly JsonValue[],
 ) {
-  const res = proposeNested(schema, defaultSchemaService, root, path, maxDepth);
+  const res = await proposeNested(
+    schema,
+    defaultSchemaService,
+    root,
+    path,
+    maxDepth,
+  );
   expect(res).toEqual(expected);
 }

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { Cmd, noCmd } from 'tea-cup-fp';
+import { Cmd, noCmd, Task } from 'tea-cup-fp';
 import {
-  actionAddElementToArray,
   actionAddPropertyClicked,
   actionApplyProposal,
   actionDeleteValue,
@@ -24,31 +23,32 @@ import {
   actionUpdateValue,
 } from './Actions';
 import { MenuAction } from './ContextMenuActions';
-import { Model } from './Model';
-import { Msg } from './Msg';
+import { Model, nextPendingId } from './Model';
+import { gotUpdatedValue, Msg } from './Msg';
 import { SchemaService } from './SchemaService';
+import { addElementToArrayTask } from './addElementToArray';
 
 export default function executeContextMenuAction(
-  service: SchemaService,
+  schemaService: SchemaService,
   model: Model,
   action: MenuAction,
 ): [Model, Cmd<Msg>] {
   switch (action.tag) {
     case 'delete': {
-      return actionDeleteValue(model, action.path);
+      return actionDeleteValue(schemaService, model, action.path);
     }
     case 'move-down': {
-      return actionMoveValue(model, action.path, 'down');
+      return actionMoveValue(schemaService, model, action.path, 'down');
     }
     case 'move-up': {
-      return actionMoveValue(model, action.path, 'up');
+      return actionMoveValue(schemaService, model, action.path, 'up');
     }
     case 'change-type': {
-      return actionUpdateValue(model, action.path, action.value);
+      return actionUpdateValue(schemaService, model, action.path, action.value);
     }
     case 'proposal': {
       return actionApplyProposal(
-        service,
+        schemaService,
         model,
         action.path,
         action.value,
@@ -57,7 +57,22 @@ export default function executeContextMenuAction(
     }
     case 'add': {
       if (action.isArray) {
-        return actionAddElementToArray(service, model, action.path);
+        return model.schema
+          .map<[Model, Cmd<Msg>]>((schema) => {
+            const t = addElementToArrayTask(
+              schemaService,
+              schema,
+              model.root,
+              action.path,
+            );
+            const [newModel, newPendingId] = nextPendingId(
+              model,
+              'got-updated-value',
+            );
+            const cmd = Task.attempt(t, gotUpdatedValue(newPendingId));
+            return [newModel, cmd];
+          })
+          .withDefaultSupply(() => noCmd(model));
       } else {
         return actionAddPropertyClicked(model, action.path);
       }

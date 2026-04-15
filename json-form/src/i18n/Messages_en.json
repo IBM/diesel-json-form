@@ -24,5 +24,6 @@
   },
   "icon.openMenu": "Open menu",
   "icon.expand": "Expand",
-  "icon.collapse": "Collapse"
+  "icon.collapse": "Collapse",
+  "invalid.number": "Not a valid number"
 }

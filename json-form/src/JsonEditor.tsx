@@ -27,35 +27,36 @@ import {
   nothing,
   Port,
   Sub,
+  Task,
   Tuple,
   updatePiped,
 } from 'tea-cup-fp';
 import * as TPM from 'tea-pop-menu';
 import {
-  actionAddElementToArray,
-  actionAddProperty,
   actionAddPropertyClicked,
   actionConfirmAddProperty,
   actionDeleteValue,
   actionToggleExpandCollapsePath,
   actionTriggerClicked,
   actionUpdateValue,
+  setRoot,
 } from './Actions';
 import executeContextMenuAction from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { getValueAt, JsonValue, stringify } from './JsonValue';
+import { getValueAt, JsonValue, setValueAt } from './JsonValue';
 import { JsPath } from './JsPath';
 import {
-  computeAll,
   CustomRendererModel,
-  doValidate,
   initialModel,
   Model,
+  nextPendingId,
   updateAddingPropertyName,
 } from './Model';
 import {
   contextMenuMsg,
+  gotMenuProposals,
+  gotUpdatedValue,
   Msg,
   setDebounceMsMsg,
   setJsonStr,
@@ -69,14 +70,21 @@ import {
   ViewJsonValue,
 } from './renderer/Renderer';
 import { MenuOptionFilter, RenderOptions } from './RenderOptions';
-import { defaultSchemaService, SchemaService } from './SchemaService';
+import {
+  defaultSchemaService,
+  SchemaRenderer,
+  SchemaService,
+} from './SchemaService';
+import { computeAllCmd } from './ComputeAllTask';
+import { getMenuProposals } from './getMenuProposals';
+import { addPropertyTask } from './addProperty';
+import { Debouncer } from './Debouncer';
 
 export function init(
   language: string,
   schema: Maybe<JsonValue>,
   initialValue: JsonValue,
   strictMode: boolean,
-  rendererFactory: RendererFactory,
   debounceMs: number,
   schemaService: SchemaService,
 ): [Model, Cmd<Msg>] {
@@ -87,67 +95,59 @@ export function init(
     initialValue,
     strictMode,
     debounceMs,
-    schemaService,
   );
-  return reInitRenderers(model, rendererFactory);
+  return schema
+    .map((s) => computeAllCmd(model, schemaService, s, initialValue))
+    .withDefaultSupply(() => noCmd(model));
 }
 
 function reInitRenderers(
   model: Model,
+  renderers: ReadonlyMap<string, SchemaRenderer>,
   customRendererFactory: RendererFactory,
 ): [Model, Cmd<Msg>] {
-  return model.validationResult
-    .map((validationResult) => {
-      const renderers = validationResult.getRenderers();
-      const newCustomRenderers: Map<
-        string,
-        Maybe<CustomRendererModel>
-      > = new Map();
-      const cmds: Cmd<Msg>[] = [];
-      for (const [path, rendererDef] of renderers) {
-        if (rendererDef !== undefined) {
-          const key = rendererDef.key;
-          const renderer = customRendererFactory.getRenderer(key);
-          if (renderer.type === 'Just') {
-            const existingModel = model.customRenderers.get(path);
-            const m: Maybe<CustomRendererModel> =
-              existingModel === undefined ? nothing : existingModel;
-            const jValue: Maybe<JsonValue> = getValueAt(
-              model.root,
-              JsPath.parse(path),
-            );
-            if (jValue.type === 'Just') {
-              const mac = renderer.value.reinit({
-                path: JsPath.parse(path),
-                formModel: model,
-                value: jValue.value,
-                model: m.map((x) => x.rendererModel),
-                schema: rendererDef.schemaValue,
-              });
-              const customRendererModel: CustomRendererModel = {
-                rendererModel: mac[0],
-                key,
-              };
-              newCustomRenderers.set(path, just(customRendererModel));
-              const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
-                return {
-                  tag: 'renderer-child-msg',
-                  path,
-                  msg,
-                };
-              });
-              cmds.push(cmd);
-            }
-          }
-        }
+  const newCustomRenderers: Map<string, Maybe<CustomRendererModel>> = new Map();
+  const cmds: Cmd<Msg>[] = [];
+  for (const [path, rendererDef] of renderers) {
+    const key = rendererDef.key;
+    const renderer = customRendererFactory.getRenderer(key);
+    if (renderer.type === 'Just') {
+      const existingModel = model.customRenderers.get(path);
+      const m: Maybe<CustomRendererModel> =
+        existingModel === undefined ? nothing : existingModel;
+      const jValue: Maybe<JsonValue> = getValueAt(
+        model.root,
+        JsPath.parse(path),
+      );
+      if (jValue.type === 'Just') {
+        const mac = renderer.value.reinit({
+          path: JsPath.parse(path),
+          formModel: model,
+          value: jValue.value,
+          model: m.map((x) => x.rendererModel),
+          schema: rendererDef.schemaValue,
+        });
+        const customRendererModel: CustomRendererModel = {
+          rendererModel: mac[0],
+          key,
+        };
+        newCustomRenderers.set(path, just(customRendererModel));
+        const cmd: Cmd<Msg> = mac[1].map((msg: any) => {
+          return {
+            tag: 'renderer-child-msg',
+            path,
+            msg,
+          };
+        });
+        cmds.push(cmd);
       }
-      const newModel: Model = {
-        ...model,
-        customRenderers: newCustomRenderers,
-      };
-      return Tuple.t2n(newModel, Cmd.batch(cmds));
-    })
-    .withDefaultSupply(() => noCmd(model));
+    }
+  }
+  const newModel: Model = {
+    ...model,
+    customRenderers: newCustomRenderers,
+  };
+  return Tuple.t2n(newModel, Cmd.batch(cmds));
 }
 
 export interface ViewJsonEditorProps {
@@ -217,14 +217,14 @@ function withOutValueChanged(
   prevModel: Model,
   mac: [Model, Cmd<Msg>],
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
-  const prev = stringify(prevModel.root);
-  const cur = stringify(mac[0].root);
-  return [
-    mac[0],
-    mac[1],
-    cur === prev ? nothing : just(outValueChanged(mac[0].root)),
-  ];
+  const outMsg =
+    prevModel.root === mac[0].root
+      ? nothing
+      : just(outValueChanged(mac[0].root));
+  return [mac[0], mac[1], outMsg];
 }
+
+const debouncer: Debouncer<Msg> = new Debouncer();
 
 export function update(
   msg: Msg,
@@ -235,10 +235,27 @@ export function update(
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
   switch (msg.tag) {
     case 'delete-property':
-      return withOutValueChanged(model, actionDeleteValue(model, msg.path));
+      return withOutValueChanged(
+        model,
+        actionDeleteValue(schemaService, model, msg.path),
+      );
     case 'update-property': {
-      const mac = actionUpdateValue(model, msg.path, msg.value);
+      const mac = actionUpdateValue(schemaService, model, msg.path, msg.value);
       return withOutValueChanged(model, mac);
+    }
+    case 'update-property-debounced': {
+      const newRoot = setValueAt(model.root, msg.path, msg.value);
+      const newModel: Model = {
+        ...model,
+        root: newRoot,
+      };
+      const cmd = debouncer.debounce(
+        {
+          tag: 'recompute-metadata',
+        },
+        model.debounceMs,
+      );
+      return withOutValueChanged(model, [newModel, cmd]);
     }
     case 'add-property-clicked':
       return noOut(actionAddPropertyClicked(model, msg.path));
@@ -249,12 +266,12 @@ export function update(
         case 'Enter':
           return withOutValueChanged(
             model,
-            actionConfirmAddProperty(model, true),
+            actionConfirmAddProperty(schemaService, model, true),
           );
         case 'Escape':
           return withOutValueChanged(
             model,
-            actionConfirmAddProperty(model, false),
+            actionConfirmAddProperty(schemaService, model, false),
           );
         default:
           return noOut(noCmd(model));
@@ -262,12 +279,45 @@ export function update(
     case 'add-prop-ok-cancel-clicked': {
       return withOutValueChanged(
         model,
-        actionConfirmAddProperty(model, msg.ok),
+        actionConfirmAddProperty(schemaService, model, msg.ok),
       );
     }
     case 'menu-trigger-clicked': {
       return noOut(
-        actionTriggerClicked(model, msg.path, msg.refBox, menuFilter),
+        model.schema
+          .map<[Model, Cmd<Msg>]>((schema) => {
+            const t = getMenuProposals(
+              schemaService,
+              schema,
+              model.root,
+              msg.path,
+            );
+            const [newModel, newPendingId] = nextPendingId(
+              model,
+              'got-menu-proposals',
+            );
+            const cmd = Task.attempt(
+              t,
+              gotMenuProposals(newPendingId, msg.path, msg.refBox),
+            );
+            return [newModel, cmd];
+          })
+          .withDefaultSupply(() => noCmd(model)),
+      );
+    }
+    case 'got-menu-proposals': {
+      if (msg.r.tag === 'Err') {
+        console.warn(msg.r.err);
+      }
+      const proposals = msg.r.toMaybe().withDefault([]);
+      return noOut(
+        actionTriggerClicked(
+          model,
+          msg.path,
+          msg.refBox,
+          proposals,
+          menuFilter,
+        ),
       );
     }
     case 'menu-msg': {
@@ -304,38 +354,65 @@ export function update(
                       .toNative();
                   }
                 }
-                return Tuple.t2n(newModel, cmd);
               })
               .withDefaultSupply(() => Tuple.t2n(newModel, cmd));
           })
           .withDefaultSupply(() => noCmd(model)),
       );
     }
-    case 'add-elem-clicked':
-      return withOutValueChanged(
-        model,
-        actionAddElementToArray(schemaService, model, msg.path),
-      );
     case 'set-json-str': {
-      return noOut(
-        init(
-          model.lang,
-          msg.schema,
-          msg.json,
-          model.strictMode,
-          rendererFactory,
-          model.debounceMs,
-          schemaService,
-        ),
-      );
+      const newModel: Model = {
+        ...model,
+        schema: msg.schema,
+      };
+      return noOut(setRoot(schemaService, newModel, msg.json));
     }
     case 'toggle-expand-collapse': {
       return noOut(actionToggleExpandCollapsePath(model, msg.path));
     }
     case 'add-property-btn-clicked': {
-      return withOutValueChanged(
-        model,
-        actionAddProperty(schemaService, model, msg.path, msg.propertyName),
+      return noOut(
+        model.schema
+          .map<[Model, Cmd<Msg>]>((schema) => {
+            const t = addPropertyTask(
+              schemaService,
+              schema,
+              model.root,
+              msg.path,
+              msg.propertyName,
+            );
+            const propertiesToAdd = new Map(model.propertiesToAdd);
+            const newProperties = propertiesToAdd.get(msg.path.format());
+            if (newProperties) {
+              const newProperties2 = newProperties.filter(
+                (s) => s !== msg.propertyName,
+              );
+              propertiesToAdd.set(msg.path.format(), newProperties2);
+            }
+            const newModel1: Model = {
+              ...model,
+              propertiesToAdd,
+            };
+            const [newModel2, newPendingId] = nextPendingId(
+              newModel1,
+              'got-updated-value',
+            );
+            const cmd = Task.attempt(t, gotUpdatedValue(newPendingId));
+            return [newModel2, cmd];
+          })
+          .withDefaultSupply(() => noCmd(model)),
+      );
+    }
+    case 'got-updated-value': {
+      return msg.r.match(
+        (newRoot) => {
+          const mac = setRoot(schemaService, model, newRoot);
+          return withOutValueChanged(model, mac);
+        },
+        (err) => {
+          console.warn(err);
+          return noOut(noCmd(model));
+        },
       );
     }
     case 'no-op':
@@ -345,11 +422,39 @@ export function update(
     case 'set-debounce-ms':
       return noOut(noCmd({ ...model, debounceMs: msg.debounceMs }));
     case 'recompute-metadata': {
-      const newModel = computeAll(doValidate(schemaService, model));
-      return withOutValueChanged(
-        model,
-        reInitRenderers(newModel, rendererFactory),
-      );
+      const mac = model.schema
+        .map((s) => computeAllCmd(model, schemaService, s, model.root))
+        .withDefaultSupply(() => noCmd(model));
+      return noOut(mac);
+    }
+    case 'got-metadata': {
+      const pendingId = model.pendingIds.get('got-metadata');
+      if (pendingId === msg.id) {
+        return noOut(
+          msg.r.match(
+            (metadata) => {
+              const newModel: Model = {
+                ...model,
+                errors: metadata.errors,
+                propertiesToAdd: metadata.propertiesToAdd,
+                comboBoxes: metadata.comboBoxes,
+                formats: metadata.formats,
+              };
+              return reInitRenderers(
+                newModel,
+                metadata.renderers,
+                rendererFactory,
+              );
+            },
+            (err) => {
+              console.warn(err);
+              return noCmd(model);
+            },
+          ),
+        );
+      } else {
+        return noOut(noCmd(model));
+      }
     }
     case 'renderer-child-msg': {
       const rendererModel = model.customRenderers.get(msg.path);
@@ -387,6 +492,7 @@ export function update(
             }
             case 'Just': {
               const mac2 = actionUpdateValue(
+                schemaService,
                 newModel,
                 JsPath.parse(msg.path),
                 newValue.value,
@@ -453,6 +559,8 @@ export interface JsonEditorProps {
   readonly schemaService?: SchemaService;
 }
 
+// const devTools = new DevTools<Model, Msg>().setVerbose(true).asGlobal();
+
 export function JsonEditor(props: JsonEditorProps): React.ReactElement {
   const schemaService: SchemaService =
     props.schemaService ?? defaultSchemaService;
@@ -464,7 +572,6 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           props.schema,
           props.value,
           props.strictMode,
-          props.rendererFactory,
           props.debounceMs || 500,
           schemaService,
         )
@@ -496,7 +603,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
         return [maco[0], maco[1]];
       }}
       subscriptions={subscriptions}
-      // devTools={DevTools.init<Model, Msg>(window)}
+      //   {...devTools.getProgramProps()}
     />
   );
 }

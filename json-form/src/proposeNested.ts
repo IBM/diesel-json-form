@@ -18,48 +18,45 @@ import { JsonProperty, JsonValue, jvObject, setValueAt } from './JsonValue';
 import { JsPath } from './JsPath';
 import { SchemaService } from './SchemaService';
 
-export function proposeNested(
+export async function proposeNested(
   schema: JsonValue,
   service: SchemaService,
   root: JsonValue,
   path: JsPath,
   maxDepth: number,
-): readonly JsonValue[] {
-  const vr = service.validate(schema, root);
-  const proposals = distinct(vr.propose(path));
+): Promise<readonly JsonValue[]> {
+  const proposals = distinct(await service.propose(schema, root, path));
   if (maxDepth < 0) {
     return proposals;
   } else {
-    return proposals.map((x) => {
-      switch (x.tag) {
-        case 'jv-object': {
-          const newRoot = setValueAt(root, path, x);
-          const attrProposals = x.properties.flatMap((attr) => {
-            const attrProposals2 = proposeNested(
-              schema,
-              service,
-              newRoot,
-              path.append(attr.name),
-              maxDepth - 1,
-            );
-            const head = attrProposals2[0];
-            if (head) {
-              const p: JsonProperty = {
-                ...attr,
-                value: head,
-              };
-              return [p];
-            } else {
-              return [];
-            }
-          });
-          return jvObject(attrProposals);
+    const res: JsonValue[] = [];
+    for (const x of proposals) {
+      if (x.tag === 'jv-object') {
+        const newRoot = setValueAt(root, path, x);
+        const attrProposals: JsonProperty[] = [];
+        for (const attr of x.properties) {
+          const attrProposals2 = await proposeNested(
+            schema,
+            service,
+            newRoot,
+            path.append(attr.name),
+            maxDepth - 1,
+          );
+          const head = attrProposals2[0];
+          if (head) {
+            const p: JsonProperty = {
+              ...attr,
+              value: head,
+            };
+            attrProposals.push(p);
+          }
         }
-        default: {
-          return x;
-        }
+        res.push(jvObject(attrProposals));
+      } else {
+        res.push(x);
       }
-    });
+    }
+    return res;
   }
 }
 

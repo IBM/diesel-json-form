@@ -44,14 +44,7 @@ describe('Render options', () => {
     test('menu document root', () => {
       const { container } = render(
         ViewJsonEditor({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: {},
@@ -63,14 +56,7 @@ describe('Render options', () => {
     test('menu collapsible panel in object', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           path: JsPath.empty,
           value: jvObject([{ name: 'foo', value: jvNull }]),
           language: 'en',
@@ -84,14 +70,7 @@ describe('Render options', () => {
     test('menu collapsible panel in array', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           path: JsPath.empty,
           value: jvArray([jvNull]),
           language: 'en',
@@ -122,14 +101,7 @@ describe('Render options', () => {
     test('hide menu document root', () => {
       const { container } = render(
         ViewJsonEditor({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: { hideDocRoot: true },
@@ -141,14 +113,7 @@ describe('Render options', () => {
     test('hide menu collapsible panel in object', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           path: JsPath.empty,
           value: jvObject([{ name: 'foo', value: jvNull }]),
           language: 'en',
@@ -162,14 +127,7 @@ describe('Render options', () => {
     test('hide menu collapsible panel in array', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           path: JsPath.empty,
           value: jvArray([jvNull]),
           language: 'en',

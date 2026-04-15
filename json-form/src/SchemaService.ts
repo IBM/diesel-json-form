@@ -17,6 +17,7 @@
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { JsonValue, parseJsonValue, stringify } from './JsonValue';
 import { JsPath } from './JsPath';
+import { map2, Maybe } from 'tea-cup-fp';
 
 export interface ValidationError {
   readonly path: string;
@@ -25,24 +26,27 @@ export interface ValidationError {
 
 export interface SchemaRenderer {
   readonly key: string;
-  readonly schemaValue: any;
+  readonly schemaValue: JsonValue;
 }
 
 export interface SchemaService {
-  validate(schema: JsonValue, instance: JsonValue): ValidationResult;
+  validate(schema: JsonValue, instance: JsonValue): Promise<ValidationResult>;
+  propose(
+    schema: JsonValue,
+    instance: JsonValue,
+    path: JsPath,
+  ): Promise<readonly JsonValue[]>;
 }
 
 export interface ValidationResult {
   getErrors(): readonly ValidationError[];
-  getRenderers(): ReadonlyMap<string, SchemaRenderer | undefined>;
+  getRenderers(): ReadonlyMap<string, SchemaRenderer>;
   getFormats(path: JsPath): readonly string[];
-  propose(path: JsPath): readonly JsonValue[];
   getDiscriminator(path: JsPath): string | undefined;
 }
 
-function toFacadeValue(jsonValue: JsonValue): JsFacade.JsonValue {
-  const s = stringify(jsonValue);
-  return JsFacade.parseValue(s);
+function toFacadeValue(jsonValue: JsonValue): Maybe<JsFacade.JsonValue> {
+  return stringify(jsonValue).map(JsFacade.parseValue);
 }
 
 function fromFacadeValue(facadeValue: JsFacade.JsonValue): JsonValue {
@@ -55,29 +59,66 @@ function fromFacadeValue(facadeValue: JsFacade.JsonValue): JsonValue {
   );
 }
 
+function doValidate(
+  schema: JsonValue,
+  instance: JsonValue,
+): Promise<JsFacade.JsValidationResult> {
+  return map2(
+    toFacadeValue(schema),
+    toFacadeValue(instance),
+    (schemaValue, instanceValue) =>
+      JsFacade.validate(schemaValue, instanceValue),
+  )
+    .map((vr) => Promise.resolve(vr))
+    .withDefaultSupply(() => Promise.reject('Broken schema or instance'));
+}
+
 class JsFacadeSchemaService implements SchemaService {
-  validate(schema: JsonValue, instance: JsonValue): ValidationResult {
-    const r = JsFacade.validate(toFacadeValue(schema), toFacadeValue(instance));
-    return new JsFacadeValidationResult(r);
+  async validate(
+    schema: JsonValue,
+    instance: JsonValue,
+  ): Promise<ValidationResult> {
+    return doValidate(schema, instance).then(
+      (vr) => new JsFacadeValidationResult(vr),
+    );
+  }
+
+  async propose(
+    schema: JsonValue,
+    instance: JsonValue,
+    path: JsPath,
+  ): Promise<readonly JsonValue[]> {
+    return doValidate(schema, instance).then((r) =>
+      Promise.resolve(
+        JsFacade.propose(r, path.format(), -1).map(fromFacadeValue),
+      ),
+    );
   }
 }
 
 class JsFacadeValidationResult implements ValidationResult {
-  constructor(private readonly result: JsFacade.JsValidationResult) {}
+  constructor(readonly result: JsFacade.JsValidationResult) {}
 
   getErrors(): readonly ValidationError[] {
     return JsFacade.getErrors(this.result);
   }
-  getRenderers(): ReadonlyMap<string, SchemaRenderer | undefined> {
-    return JsFacade.getRenderers(this.result);
+  getRenderers(): ReadonlyMap<string, SchemaRenderer> {
+    const m = JsFacade.getRenderers(this.result);
+    const res = new Map<string, SchemaRenderer>();
+    for (const s of m.keys()) {
+      const jsRenderer = m.get(s);
+      if (jsRenderer) {
+        const str = JsFacade.stringifyValue(jsRenderer.schemaValue);
+        const jsonValue = parseJsonValue(str);
+        if (jsonValue.tag === 'Ok') {
+          res.set(s, { key: jsRenderer.key, schemaValue: jsonValue.value });
+        }
+      }
+    }
+    return res;
   }
   getFormats(path: JsPath): readonly string[] {
     return JsFacade.getFormats(this.result, path.format());
-  }
-  propose(path: JsPath): readonly JsonValue[] {
-    return JsFacade.propose(this.result, path.format(), -1).map(
-      fromFacadeValue,
-    );
   }
   getDiscriminator(path: JsPath): string | undefined {
     return JsFacade.getDiscriminator(this.result, path.format());

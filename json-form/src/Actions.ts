@@ -14,39 +14,37 @@
  * limitations under the License.
  */
 
-import { contextMenuMsg, Msg, noOp } from './Msg';
-import { Cmd, just, maybeOf, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
-import { Model } from './Model';
+import { contextMenuMsg, gotUpdatedValue, Msg, noOp } from './Msg';
+import { Cmd, just, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
+import { Model, nextPendingId } from './Model';
 import { JsPath } from './JsPath';
 import {
-  clearPropertiesIfObject,
   deleteValueAt,
   getValueAt,
   JsonValue,
-  jvArray,
-  JvArray,
   jvNull,
   jvObject,
   mapValueAt,
-  mergeProperties,
   MoveDirection,
   moveElement,
   moveProperty,
   setValueAt,
 } from './JsonValue';
-import * as TPM from 'tea-pop-menu';
-import { createMenu, MenuAction } from './ContextMenuActions';
-import { Box } from 'tea-pop-core';
-import { Debouncer } from './Debouncer';
 import { MenuOptionFilter } from './RenderOptions';
+import { Box } from 'tea-pop-core';
+import { createMenu, MenuAction } from './ContextMenuActions';
+import * as TPM from 'tea-pop-menu';
+import { applyProposalTask } from './applyProposal';
 import { SchemaService } from './SchemaService';
-import { proposeNested } from './proposeNested';
+import { computeAllCmd } from './ComputeAllTask';
 
 export function actionDeleteValue(
+  schemaService: SchemaService,
   model: Model,
   path: JsPath,
 ): [Model, Cmd<Msg>] {
   return setRoot(
+    schemaService,
     model,
     deleteValueAt(model.root, path).withDefault(model.root),
   );
@@ -59,50 +57,24 @@ export function actionApplyProposal(
   proposal: JsonValue,
   proposalIndex: number,
 ): [Model, Cmd<Msg>] {
-  switch (proposal.tag) {
-    case 'jv-object': {
-      const newProposal = getValueAt(model.root, path)
-        .map((valueAtPath) => {
-          const augmentedProposal = model.schema
-            .andThen((schema) => {
-              const all = proposeNested(
-                schema,
-                schemaService,
-                model.root,
-                path,
-                5,
-              );
-              return maybeOf(all[proposalIndex]);
-            })
-            .andThen((v) => (v.tag === 'jv-object' ? just(v) : nothing))
-            .withDefault(proposal);
-
-          if (valueAtPath.tag === 'jv-object') {
-            // do not overwrite existing props
-            return mergeProperties(augmentedProposal, valueAtPath);
-          } else {
-            return augmentedProposal;
-          }
-        })
-        .withDefault(proposal);
-
-      return doUpdateValue(model, path, newProposal);
-    }
-    default: {
-      return doUpdateValue(model, path, proposal);
-    }
-  }
-}
-
-function doUpdateValue(
-  model: Model,
-  path: JsPath,
-  value: JsonValue,
-): [Model, Cmd<Msg>] {
-  if (path.isEmpty()) {
-    return setRoot(model, value);
-  }
-  return setRoot(model, setValueAt(model.root, path, value));
+  return model.schema
+    .map<[Model, Cmd<Msg>]>((schema) => {
+      const t = applyProposalTask(
+        schemaService,
+        schema,
+        model.root,
+        path,
+        proposal,
+        proposalIndex,
+      );
+      const [newModel, newPendingId] = nextPendingId(
+        model,
+        'got-updated-value',
+      );
+      const cmd = Task.attempt(t, gotUpdatedValue(newPendingId));
+      return [newModel, cmd];
+    })
+    .withDefaultSupply(() => noCmd(model));
 }
 
 export function actionAddPropertyClicked(
@@ -130,6 +102,8 @@ export function actionAddPropertyClicked(
 }
 
 export function actionConfirmAddProperty(
+  schemaService: SchemaService,
+
   model: Model,
   commit: boolean,
 ): [Model, Cmd<Msg>] {
@@ -153,90 +127,12 @@ export function actionConfirmAddProperty(
           );
         }
         return just(owningValue);
-      }).map((newRoot) => setRoot(newModel, newRoot));
+      }).map((newRoot) => setRoot(schemaService, newModel, newRoot));
     })
     .withDefaultSupply(() => noCmd(newModel));
 }
 
-export function actionAddProperty(
-  service: SchemaService,
-  model: Model,
-  path: JsPath,
-  propertyName: string,
-): [Model, Cmd<Msg>] {
-  return getValueAt(model.root, path)
-    .map<[Model, Cmd<Msg>]>((owner) => {
-      if (owner.tag === 'jv-object') {
-        // create the new object with a null value
-        // because we need it to propose
-        const newObject = jvObject([
-          ...owner.properties,
-          { name: propertyName, value: jvNull },
-        ]);
-        const newRoot = setValueAt(model.root, path, newObject);
-        const newValidationResult = model.schema.map((schema) =>
-          service.validate(schema, newRoot),
-        );
-
-        const propertyProposals = newValidationResult
-          .map((vr) => vr.propose(path.append(propertyName)))
-          .withDefault([])
-          .map(clearPropertiesIfObject);
-
-        const newObject2 = jvObject([
-          ...owner.properties,
-          {
-            name: propertyName,
-            value:
-              propertyProposals.length === 0 ? jvNull : propertyProposals[0],
-          },
-        ]);
-        return setRoot(model, setValueAt(model.root, path, newObject2));
-      }
-      return noCmd(model);
-    })
-    .withDefaultSupply(() => noCmd(model));
-}
-
-export function actionAddElementToArray(
-  service: SchemaService,
-  model: Model,
-  path: JsPath,
-): [Model, Cmd<Msg>] {
-  return getValueAt(model.root, path)
-    .map<[Model, Cmd<Msg>]>((array) => {
-      if (array.tag === 'jv-array') {
-        const newElemIndex = array.elems.length;
-
-        // we create a transient JsonValue with the array updated
-        // so that we have a value at new index path
-        // otherwise the proposals would be empty because
-        // no path matches the requested index
-        const tmpArray = jvArray([...array.elems, jvNull]);
-        const tmpRoot = setValueAt(model.root, path, tmpArray);
-
-        const newValidationResult = model.schema.map((schema) =>
-          service.validate(schema, tmpRoot),
-        );
-
-        const proposals = newValidationResult
-          .map((vr) => vr.propose(path.append(newElemIndex)))
-          .withDefault([]);
-
-        const proposal = maybeOf(proposals[0]).withDefault(jvNull);
-        const newArray: JvArray = {
-          ...array,
-          elems: [...array.elems, clearPropertiesIfObject(proposal)],
-        };
-        const newRoot = setValueAt(model.root, path, newArray);
-        return setRoot(model, newRoot);
-      }
-      return noCmd(model);
-    })
-    .withDefaultSupply(() => noCmd(model));
-}
-
-export function updateMenu(
+function updateMenu(
   model: Model,
   mac: [TPM.Model<MenuAction>, Cmd<TPM.Msg<MenuAction>>],
 ): [Model, Cmd<Msg>] {
@@ -255,6 +151,7 @@ export function actionTriggerClicked(
   model: Model,
   path: JsPath,
   refBox: Box,
+  proposals: ReadonlyArray<JsonValue>,
   menuFilter?: MenuOptionFilter,
 ): [Model, Cmd<Msg>] {
   return getValueAt(model.root, path)
@@ -277,9 +174,7 @@ export function actionTriggerClicked(
           createMenu({
             root: model.root,
             path,
-            proposals: model.validationResult
-              .map((vr) => vr.propose(path))
-              .withDefault([]),
+            proposals,
             valueAtPath,
             strictMode: model.strictMode,
             menuFilter,
@@ -310,6 +205,7 @@ export function actionToggleExpandCollapsePath(
 }
 
 export function actionMoveValue(
+  schemaService: SchemaService,
   model: Model,
   path: JsPath,
   direction: MoveDirection,
@@ -327,7 +223,7 @@ export function actionMoveValue(
                 lastPathElem,
                 direction,
               );
-              return setRoot(model, newRoot);
+              return setRoot(schemaService, model, newRoot);
             }
             case 'jv-array': {
               const index = parseInt(lastPathElem);
@@ -340,7 +236,7 @@ export function actionMoveValue(
                 index,
                 direction,
               );
-              return setRoot(model, newRoot);
+              return setRoot(schemaService, model, newRoot);
             }
             default: {
               return noCmd(model);
@@ -353,24 +249,26 @@ export function actionMoveValue(
 }
 
 export function actionUpdateValue(
+  schemaService: SchemaService,
   model: Model,
   path: JsPath,
   value: JsonValue,
 ): [Model, Cmd<Msg>] {
-  return doUpdateValue(model, path, value);
+  const newRoot = setValueAt(model.root, path, value);
+  return setRoot(schemaService, model, newRoot);
 }
 
-const debouncer = new Debouncer<Msg>();
-
-export function setRoot(model: Model, root: JsonValue): [Model, Cmd<Msg>] {
-  const cmd = debouncer.debounce(
-    { tag: 'recompute-metadata' },
-    model.debounceMs,
-  );
+export function setRoot(
+  schemaService: SchemaService,
+  model: Model,
+  root: JsonValue,
+): [Model, Cmd<Msg>] {
   const newModel: Model = {
     ...model,
     root,
     adding: nothing,
   };
-  return [newModel, cmd];
+  return newModel.schema
+    .map((s) => computeAllCmd(newModel, schemaService, s, newModel.root))
+    .withDefaultSupply(() => noCmd(newModel));
 }

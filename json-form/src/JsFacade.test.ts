@@ -21,14 +21,13 @@ import { describe, test, expect } from 'vitest';
 describe('JsFacade', () => {
   test('should return schema validation markers when parsing', () => {
     const parseRequest = { text: 'true' };
-    const parser = JsFacade.getJsonParser(
-      JsFacade.parseValue(
-        stringify(jvObject([{ name: 'type', value: jvString('string') }])),
-      ),
-    );
+    const value = stringify(
+      jvObject([{ name: 'type', value: jvString('string') }]),
+    ).withDefault('DID NOT PARSE');
+    const parser = JsFacade.getJsonParser(JsFacade.parseValue(value));
     const res = parser.parse(parseRequest);
     expect(res.success).toBe(true);
-    expect(res.error).toBeUndefined;
+    expect(res.error).toBeUndefined();
     expect(res.markers.length).toBe(1);
     expect(res.markers[0].offset).toBe(0);
     expect(res.markers[0].length).toBe(4);
@@ -52,7 +51,7 @@ describe('JsFacade', () => {
     const parser = JsFacade.getJsonParser(schema);
     const res = parser.predict(predictRequest);
     expect(res.success).toBe(true);
-    expect(res.error).toBeUndefined;
+    expect(res.error).toBeUndefined();
     expect(res.proposals.length).toBe(3);
     expect(res.proposals[0].text).toBe('}');
     expect(res.proposals[1].text).toBe('"foo"');
