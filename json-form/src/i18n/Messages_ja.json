@@ -24,5 +24,6 @@
   },
   "icon.openMenu": "メニューを開く",
   "icon.expand": "展開",
-  "icon.collapse": "省略"
+  "icon.collapse": "省略",
+  "invalid.number": "有効な番号ではありません"
 }

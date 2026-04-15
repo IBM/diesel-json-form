@@ -44,7 +44,7 @@ import {
 import executeContextMenuAction from './ContextMenu';
 import { MenuAction } from './ContextMenuActions';
 import { contextMenuRenderer } from './ContextMenuRenderer';
-import { getValueAt, JsonValue, setValueAt, stringify } from './JsonValue';
+import { getValueAt, JsonValue, setValueAt } from './JsonValue';
 import { JsPath } from './JsPath';
 import {
   CustomRendererModel,
@@ -217,13 +217,11 @@ function withOutValueChanged(
   prevModel: Model,
   mac: [Model, Cmd<Msg>],
 ): [Model, Cmd<Msg>, Maybe<OutMsg>] {
-  const prev = stringify(prevModel.root);
-  const cur = stringify(mac[0].root);
-  return [
-    mac[0],
-    mac[1],
-    cur === prev ? nothing : just(outValueChanged(mac[0].root)),
-  ];
+  const outMsg =
+    prevModel.root === mac[0].root
+      ? nothing
+      : just(outValueChanged(mac[0].root));
+  return [mac[0], mac[1], outMsg];
 }
 
 const debouncer: Debouncer<Msg> = new Debouncer();

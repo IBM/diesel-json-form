@@ -38,6 +38,7 @@ import {
 import { Cmd, Dispatcher, Maybe, maybeOf } from 'tea-cup-fp';
 import { box, Dim, pos } from 'tea-pop-core';
 import {
+  isValidNumberLiteral,
   JsonValue,
   JvArray,
   JvBoolean,
@@ -460,6 +461,16 @@ function errorsToInvalidText(p: ViewValueProps<JsonValue>): string {
 function getErrorsAtPath(
   p: ViewValueProps<JsonValue>,
 ): ReadonlyArray<JsValidationError> {
+  const value = p.value;
+  if (value.tag === 'jv-number' && !isValidNumberLiteral(value.value)) {
+    return [
+      {
+        message: p.model.t('invalid.number'),
+        path: p.path.format(),
+      },
+    ];
+  }
+
   return p.model.errors.get(p.path.format()) ?? [];
 }
 

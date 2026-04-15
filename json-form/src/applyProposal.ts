@@ -40,7 +40,7 @@ export function applyProposalTask(
       });
     }
     default: {
-      return Task.succeed(root);
+      return Task.succeed(setValueAt(root, path, proposal));
     }
   }
 }

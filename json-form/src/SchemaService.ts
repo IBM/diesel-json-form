@@ -17,6 +17,7 @@
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { JsonValue, parseJsonValue, stringify } from './JsonValue';
 import { JsPath } from './JsPath';
+import { map2, Maybe } from 'tea-cup-fp';
 
 export interface ValidationError {
   readonly path: string;
@@ -44,9 +45,8 @@ export interface ValidationResult {
   getDiscriminator(path: JsPath): string | undefined;
 }
 
-function toFacadeValue(jsonValue: JsonValue): JsFacade.JsonValue {
-  const s = stringify(jsonValue);
-  return JsFacade.parseValue(s);
+function toFacadeValue(jsonValue: JsonValue): Maybe<JsFacade.JsonValue> {
+  return stringify(jsonValue).map(JsFacade.parseValue);
 }
 
 function fromFacadeValue(facadeValue: JsFacade.JsonValue): JsonValue {
@@ -59,13 +59,28 @@ function fromFacadeValue(facadeValue: JsFacade.JsonValue): JsonValue {
   );
 }
 
+function doValidate(
+  schema: JsonValue,
+  instance: JsonValue,
+): Promise<JsFacade.JsValidationResult> {
+  return map2(
+    toFacadeValue(schema),
+    toFacadeValue(instance),
+    (schemaValue, instanceValue) =>
+      JsFacade.validate(schemaValue, instanceValue),
+  )
+    .map((vr) => Promise.resolve(vr))
+    .withDefaultSupply(() => Promise.reject('Broken schema or instance'));
+}
+
 class JsFacadeSchemaService implements SchemaService {
   async validate(
     schema: JsonValue,
     instance: JsonValue,
   ): Promise<ValidationResult> {
-    const r = JsFacade.validate(toFacadeValue(schema), toFacadeValue(instance));
-    return Promise.resolve(new JsFacadeValidationResult(r));
+    return doValidate(schema, instance).then(
+      (vr) => new JsFacadeValidationResult(vr),
+    );
   }
 
   async propose(
@@ -73,9 +88,10 @@ class JsFacadeSchemaService implements SchemaService {
     instance: JsonValue,
     path: JsPath,
   ): Promise<readonly JsonValue[]> {
-    const r = JsFacade.validate(toFacadeValue(schema), toFacadeValue(instance));
-    return Promise.resolve(
-      JsFacade.propose(r, path.format(), -1).map(fromFacadeValue),
+    return doValidate(schema, instance).then((r) =>
+      Promise.resolve(
+        JsFacade.propose(r, path.format(), -1).map(fromFacadeValue),
+      ),
     );
   }
 }

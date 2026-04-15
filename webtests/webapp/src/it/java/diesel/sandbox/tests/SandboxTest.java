@@ -721,7 +721,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .findInput()
                 .sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE);
 
-        num.assertHasError("Invalid type: expected number");
+        num.assertHasError("Not a valid number");
 
         num.findInput().sendKeys("1");
 
@@ -731,6 +731,15 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void testNumberInvalid() {
         sandbox.schemaEditor.replaceText("{\"type\":\"number\"}");
+        doTestInvalidNumber();
+    }
+
+    @Test
+    public void testNumberInvalidNoSchema() {
+        doTestInvalidNumber();
+    }
+
+    private void doTestInvalidNumber() {
         sandbox.jsonEditor.replaceText("123");
         FNumber num = sandbox.jsonForm.numberAt(JsPath.empty);
 
@@ -738,7 +747,9 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         num
                 .setValue("abcdef")
-                .assertHasError("Invalid type: expected number");
+                .assertHasError("Not a valid number");
+
+        sandbox.jsonEditor.assertText("123");
 
         num.setValue("333").assertNoError();
     }

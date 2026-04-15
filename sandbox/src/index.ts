@@ -144,7 +144,8 @@ function initJsonForm(
       language: navigator.language,
       onChange: (value: JsonForm.JsonValue) => {
         if (syncPanesCb.checked) {
-          editor2.setValue(JsonForm.stringify(value, '  '));
+          console.log('RVKB', value);
+          JsonForm.stringify(value, '  ').forEach((s) => editor2.setValue(s));
         }
       },
       strictMode,

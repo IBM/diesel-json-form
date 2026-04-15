@@ -21,11 +21,10 @@ import { describe, test, expect } from 'vitest';
 describe('JsFacade', () => {
   test('should return schema validation markers when parsing', () => {
     const parseRequest = { text: 'true' };
-    const parser = JsFacade.getJsonParser(
-      JsFacade.parseValue(
-        stringify(jvObject([{ name: 'type', value: jvString('string') }])),
-      ),
-    );
+    const value = stringify(
+      jvObject([{ name: 'type', value: jvString('string') }]),
+    ).withDefault('DID NOT PARSE');
+    const parser = JsFacade.getJsonParser(JsFacade.parseValue(value));
     const res = parser.parse(parseRequest);
     expect(res.success).toBe(true);
     expect(res.error).toBeUndefined();
