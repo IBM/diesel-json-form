@@ -20,7 +20,7 @@
     "react-dom": "^19.2.4",
     "react-tea-cup": "^5.1.1",
     "tea-cup-fp": "^1.1.1",
-    "@diesel-parser/json-form": "^6.1.0",
+    "@diesel-parser/json-form": "^7.0.0",
     "@diesel-parser/monaco": "~0.1.0",
     "monaco-editor-workers": "0.45.0",
     "tea-pop-core": "^6.0.1",
