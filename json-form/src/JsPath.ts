@@ -68,6 +68,9 @@ export class JsPath {
     if (path === '') {
       return JsPath.empty;
     }
+    if (path.startsWith('/')) {
+      throw 'Invalid path : ' + path + ", leading slash isn't allowed";
+    }
     const parts = path.split('/');
     return new JsPath(parts);
   }

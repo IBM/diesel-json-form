@@ -30,14 +30,14 @@ function test(
   title: string,
   schema: string,
   value: string,
-  path: string,
+  path: JsPath,
   expected: readonly string[],
 ) {
   return new TckTest(
     title,
     parseUnsafe(title, schema),
     parseUnsafe(title, value),
-    JsPath.parse(path),
+    path,
     expected.map((e) => parseUnsafe(title, e)),
   );
 }
@@ -252,11 +252,13 @@ const SCHEMA_ONEOF_CONST = `{
 }`;
 
 export const TCK_TESTS: TckTest[] = [
-  test('schema propose bool', `{ "type": "boolean" }`, 'null', '/', [
+  test('schema propose bool', `{ "type": "boolean" }`, 'null', JsPath.empty, [
     'true',
     'false',
   ]),
-  test('schema propose object', `{ "type": "object" }`, 'null', '/', ['{}']),
+  test('schema propose object', `{ "type": "object" }`, 'null', JsPath.empty, [
+    '{}',
+  ]),
   test(
     'propose property',
     `{
@@ -267,27 +269,43 @@ export const TCK_TESTS: TckTest[] = [
     }
 }`,
     'null',
-    '/',
+    JsPath.empty,
     [`{"foo":null}`],
   ),
-  test('propose attr nested', SCHEMA_NESTED, 'null', '/', [`{"foo": null}`]),
-  test('propose array', `{"type": "array"}`, 'null', '/', [`[]`]),
-  test('at path nested', SCHEMA_NESTED, `{"foo":null}`, '/foo', [
-    `{"bar": null}`,
+  test('propose attr nested', SCHEMA_NESTED, 'null', JsPath.empty, [
+    `{"foo": null}`,
   ]),
-  test('propose at path array', SCHEMA_ARRAY, '[]', '/0', [`0`]),
-  test('propose at path array 2', SCHEMA_ARRAY, '[0]', '/0', [`0`]),
-  test('examples long', EXAMPLES.LONG, 'null', '/', ['0', 'null']),
-  test('examples string', EXAMPLES.STRING, 'null', '/', ['""', 'null']),
-  test('examples EnumArray 1', EXAMPLES.ENUM_ARRAY, 'null', '/', [
+  test('propose array', `{"type": "array"}`, 'null', JsPath.empty, [`[]`]),
+  test(
+    'at path nested',
+    SCHEMA_NESTED,
+    `{"foo":null}`,
+    JsPath.empty.append('foo'),
+    [`{"bar": null}`],
+  ),
+  test('propose at path array', SCHEMA_ARRAY, '[]', JsPath.empty.append(0), [
+    `0`,
+  ]),
+  test('propose at path array 2', SCHEMA_ARRAY, '[0]', JsPath.empty.append(0), [
+    `0`,
+  ]),
+  test('examples long', EXAMPLES.LONG, 'null', JsPath.empty, ['0', 'null']),
+  test('examples string', EXAMPLES.STRING, 'null', JsPath.empty, [
+    '""',
+    'null',
+  ]),
+  test('examples EnumArray 1', EXAMPLES.ENUM_ARRAY, 'null', JsPath.empty, [
     '[]',
     'null',
   ]),
-  test('examples EnumArray 2', EXAMPLES.ENUM_ARRAY, '[]', '/0', [
-    '"FOO"',
-    '"BAR"',
-  ]),
-  test('examples Cycle 1', EXAMPLES.CYCLE, 'null', '/', [
+  test(
+    'examples EnumArray 2',
+    EXAMPLES.ENUM_ARRAY,
+    '[]',
+    JsPath.empty.append(0),
+    ['"FOO"', '"BAR"'],
+  ),
+  test('examples Cycle 1', EXAMPLES.CYCLE, 'null', JsPath.empty, [
     '{"next":null,"name":null}',
   ]),
   test(
@@ -300,10 +318,10 @@ export const TCK_TESTS: TckTest[] = [
         "next": {}
     }
 }`,
-    '/next',
+    JsPath.empty.append('next'),
     ['{"next":null,"name":null}'],
   ),
-  test('examples Poly 1', EXAMPLES.POLYMORPHISM, '{}', '/', [
+  test('examples Poly 1', EXAMPLES.POLYMORPHISM, '{}', JsPath.empty, [
     '{}',
     '{"what":"schema.animal.Lion"}',
     '{"mane":null}',
@@ -311,15 +329,18 @@ export const TCK_TESTS: TckTest[] = [
     '{"what":"schema.animal.Elephant"}',
     '{"trunkLength":null,"tusk":null}',
   ]),
-  test('examples Poly 2', EXAMPLES.POLYMORPHISM, '{"what":""}', '/what', [
-    '"schema.animal.Lion"',
-    '"schema.animal.Elephant"',
-  ]),
+  test(
+    'examples Poly 2',
+    EXAMPLES.POLYMORPHISM,
+    '{"what":""}',
+    JsPath.empty.append('what'),
+    ['"schema.animal.Lion"', '"schema.animal.Elephant"'],
+  ),
   test(
     'examples Poly 3',
     EXAMPLES.POLYMORPHISM,
     '{"what": "schema.animal.Elephant"}',
-    '/',
+    JsPath.empty,
     [
       '{}',
       '{"what":"schema.animal.Elephant"}',
@@ -331,7 +352,7 @@ export const TCK_TESTS: TckTest[] = [
     'examples Poly 4',
     EXAMPLES.POLYMORPHISM,
     '{"what": "schema.animal.Lion"}',
-    '/',
+    JsPath.empty,
     [
       '{}',
       '{"what":"schema.animal.Lion"}',
@@ -343,21 +364,21 @@ export const TCK_TESTS: TckTest[] = [
     'do not propose empty string if there is an enum',
     EXAMPLES.ENUM_ARRAY_WITHOUT_NULL,
     '[]',
-    '/0',
+    JsPath.empty.append(0),
     ['"FOO"', '"BAR"'],
   ),
   test(
     'propose enum in array at index 1',
     EXAMPLES.ENUM_ARRAY_WITHOUT_NULL,
     '["FOO",null]',
-    '/1',
+    JsPath.empty.append(1),
     ['"FOO"', '"BAR"'],
   ),
   test(
     'propose enum in array at invalid index',
     EXAMPLES.ENUM_ARRAY_WITHOUT_NULL,
     '["FOO"]',
-    '/1',
+    JsPath.empty.append(1),
     [],
   ),
   test(
@@ -374,7 +395,7 @@ export const TCK_TESTS: TckTest[] = [
  }
 }`,
     '{}',
-    '/',
+    JsPath.empty,
     ['{"foo":"bar"}'],
   ),
   test(
@@ -393,7 +414,7 @@ export const TCK_TESTS: TckTest[] = [
  ]
 }`,
     '{}',
-    '/',
+    JsPath.empty,
     ['{"foo":"bar"}'],
   ),
   test(
@@ -415,7 +436,7 @@ export const TCK_TESTS: TckTest[] = [
  ]
 }`,
     '{}',
-    '/',
+    JsPath.empty,
     ['{"foo":"bar"}', '{"foo":"baz"}'],
   ),
   test(
@@ -440,17 +461,17 @@ export const TCK_TESTS: TckTest[] = [
  }
 }`,
     '{}',
-    '/',
+    JsPath.empty,
     ['{"foo":"yalla"}', '{"foo":"bar"}', '{"foo":"baz"}'],
   ),
   test(
     'propose oneOf with const',
     SCHEMA_ONEOF_CONST,
     '{"what":"schema.animal.LionExtAn"}',
-    '/',
+    JsPath.empty,
     ['{"what":"schema.animal.LionExtAn","lion":null}'],
   ),
-  test('propose oneOf with const 2', SCHEMA_ONEOF_CONST, '{}', '/', [
+  test('propose oneOf with const 2', SCHEMA_ONEOF_CONST, '{}', JsPath.empty, [
     '{"what":"schema.animal.LionExtAn","lion":null}',
     '{"what":"schema.animal.ElephantExtAn","elephant":null}',
   ]),
