@@ -24,3 +24,4 @@ export * from './renderer/Renderer';
 export * from './SchemaService';
 export * from './worker/SchemaServiceWorker';
 export * from './worker/WorkerClient';
+export * from './other/TypedJsonSchemaService';

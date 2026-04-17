@@ -18,7 +18,10 @@ import './style.css';
 import '@diesel-parser/json-form/dist/JsonEditor.css';
 import { createRoot } from 'react-dom/client';
 import * as JsonForm from '@diesel-parser/json-form';
-import { RendererFactory } from '@diesel-parser/json-form';
+import {
+  RendererFactory,
+  TypedJsonSchemaService,
+} from '@diesel-parser/json-form';
 
 import { editor1, editor2 } from './text-editor';
 import { MyStringRenderer } from './MyStringRenderer';
@@ -31,8 +34,8 @@ MyRendererFactory.addRenderer('MyStringRenderer', MyStringRenderer);
 MyRendererFactory.addRenderer('RatingRenderer', RatingRenderer);
 MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
 
-const myworker = new Worker('myworker.bundle.js');
-const workerClient = new JsonForm.WorkerClient(myworker);
+// const myworker = new Worker('myworker.bundle.js');
+// const workerClient = new JsonForm.WorkerClient(myworker);
 
 editor1.getModel()?.onDidChangeContent(() => {
   sendJsonStr();
@@ -130,7 +133,7 @@ switch (valueRes.tag) {
   }
 }
 
-function initJsonForm(
+async function initJsonForm(
   schema: any,
   value: any,
   strictMode: boolean,
@@ -151,7 +154,8 @@ function initJsonForm(
       strictMode,
       rendererFactory: MyRendererFactory,
       debounceMs,
-      schemaService: workerClient,
+      //   schemaService: workerClient,
+      schemaService: await TypedJsonSchemaService.load(),
     }),
   );
 }

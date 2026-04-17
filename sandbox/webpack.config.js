@@ -57,5 +57,10 @@ module.exports = {
     new CopyPlugin({
       patterns: [{ from: './public', to: '.' }],
     }),
+    new CopyPlugin({
+      patterns: [
+        { from: '../node_modules/typed-json-ts/dist/typedJson.wasm', to: '.' },
+      ],
+    }),
   ],
 };

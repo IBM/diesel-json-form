@@ -1,9 +1,5 @@
-import {
-  BasicOutput,
-  SuggestionOutput,
-  toValueWithMeta,
-  TypedJson,
-} from 'typed-json-ts';
+import { map2 } from 'tea-cup-fp';
+import { BasicOutput, toValueWithMeta, TypedJson } from 'typed-json-ts';
 import { JsonValue, parseJsonValue, stringify } from '../JsonValue';
 import { JsPath } from '../JsPath';
 import {
@@ -12,7 +8,6 @@ import {
   ValidationError,
   ValidationResult,
 } from '../SchemaService';
-import { map2 } from 'tea-cup-fp';
 
 export class TypedJsonSchemaService implements SchemaService {
   static async load(
@@ -32,7 +27,12 @@ export class TypedJsonSchemaService implements SchemaService {
       (schemaValue: string, instanceValue) =>
         this.typedJson.validate(schemaValue, instanceValue),
     )
-      .map((r) => r.then((r) => new TypedJsonValidationResult(r)))
+      .map((r) =>
+        r.then((r) => {
+          console.log('validate', r);
+          return new TypedJsonValidationResult(r);
+        }),
+      )
       .withDefaultSupply(() => Promise.reject('Broken schema or instance'));
   }
 
@@ -48,14 +48,16 @@ export class TypedJsonSchemaService implements SchemaService {
         const suggestOutputs = await this.typedJson.suggest(
           schemaValue,
           instanceValue,
-          path.format(),
-          true,
+          path.isEmpty() ? '' : '/' + path.format(),
+          false,
         );
+        console.log('propose', path.format(), suggestOutputs);
         const vs = toValueWithMeta(suggestOutputs)
           .map((v) => v.value)
-          .map((v) => '' + v);
+          .map((v) => JSON.stringify(v));
         return vs.map((v) =>
           parseJsonValue(v).withDefaultSupply(() => {
+            console.error('Invalid JSON', v);
             throw new Error('Invalid JSON');
           }),
         );
@@ -64,6 +66,7 @@ export class TypedJsonSchemaService implements SchemaService {
   }
 }
 
+// TODO propose to typed-json-ts
 // function flattenSuggestionOutputValues(
 //   suggestOutput: readonly SuggestionOutput[],
 // ): readonly string[] {
@@ -83,12 +86,12 @@ class TypedJsonValidationResult implements ValidationResult {
   }
 
   getRenderers(): ReadonlyMap<string, SchemaRenderer> {
-    throw new Error('Method not implemented.');
+    return new Map();
   }
   getFormats(path: JsPath): readonly string[] {
-    throw new Error('Method not implemented.');
+    return [];
   }
   getDiscriminator(path: JsPath): string | undefined {
-    throw new Error('Method not implemented.');
+    return undefined;
   }
 }
