@@ -7,7 +7,8 @@
     "@diesel-parser/json-schema-facade-ts": "^0.15.0",
     "i18next": "^20.6.1",
     "tea-pop-core": "^6.0.1",
-    "tea-pop-menu": "^6.0.1"
+    "tea-pop-menu": "^6.0.1",
+    "typed-json-ts": "^0.1.0"
   },
   "peerDependencies": {
     "@carbon/react": "^1.100.0",
