@@ -6,7 +6,8 @@ import { JsPath } from '../JsPath';
 
 describe('TypedJsonSchemaService', async () => {
   const service = await TypedJsonSchemaService.load(
-    readFileSync('../node_modules/typed-json-ts/dist/typedJson.wasm').buffer,
+    readFileSync('../node_modules/typed-json-ts/dist/wasm/typedJson.wasm')
+      .buffer,
   );
 
   test('should be loadable', async () => {

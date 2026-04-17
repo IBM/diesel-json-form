@@ -1,52 +1,52 @@
 {
-  "name": "@diesel-parser/json-form",
-  "version": "7.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "dependencies": {
-    "@diesel-parser/json-schema-facade-ts": "^0.15.0",
-    "i18next": "^20.6.1",
-    "tea-pop-core": "^6.0.1",
-    "tea-pop-menu": "^6.0.1",
-    "typed-json-ts": "^0.1.0"
-  },
-  "peerDependencies": {
-    "@carbon/react": "^1.100.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-tea-cup": "^5.1.1",
-    "tea-cup-fp": "^1.1.1"
-  },
-  "devDependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/react": "^16.2.0",
-    "@types/react": "^19.1.13",
-    "@types/react-dom": "^19.1.9",
-    "jsdom": "^29.0.1",
-    "npm-scripts-watcher": "^1.0.2",
-    "rimraf": "^6.0.1",
-    "sass": "^1.81.0",
-    "vitest": "^3.2.4"
-  },
-  "scripts": {
-    "build": "npm run clean && npm run lint && npm run build:ts && npm run test && npm run build:sass",
-    "build:ts": "tsc",
-    "watch:ts": "tsc -w",
-    "build:sass-dev": "sass --source-map --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
-    "build:sass": "sass --style=compressed --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
-    "clean": "rimraf dist",
-    "test": "vitest --run",
-    "watch": "npm-scripts-watcher",
-    "prettify": "prettier --write .",
-    "lint": "eslint '**/*.{js,ts,tsx}'",
-    "lint:fix": "eslint '**/*.{js,ts,tsx}' --fix"
-  },
-  "watch": {
-    "src/**/!(*.test|*.spec).{ts,tsx}": [
-      "build:ts"
-    ],
-    "src/**/*.scss": [
-      "build:sass"
-    ]
-  }
+    "name": "@diesel-parser/json-form",
+    "version": "7.0.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+        "@diesel-parser/json-schema-facade-ts": "^0.15.0",
+        "i18next": "^20.6.1",
+        "tea-pop-core": "^6.0.1",
+        "tea-pop-menu": "^6.0.1",
+        "typed-json-ts": "^0.2.1"
+    },
+    "peerDependencies": {
+        "@carbon/react": "^1.100.0",
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4",
+        "react-tea-cup": "^5.1.1",
+        "tea-cup-fp": "^1.1.1"
+    },
+    "devDependencies": {
+        "@testing-library/dom": "^10.4.0",
+        "@testing-library/react": "^16.2.0",
+        "@types/react": "^19.1.13",
+        "@types/react-dom": "^19.1.9",
+        "jsdom": "^29.0.1",
+        "npm-scripts-watcher": "^1.0.2",
+        "rimraf": "^6.0.1",
+        "sass": "^1.81.0",
+        "vitest": "^3.2.4"
+    },
+    "scripts": {
+        "build": "npm run clean && npm run lint && npm run build:ts && npm run test && npm run build:sass",
+        "build:ts": "tsc",
+        "watch:ts": "tsc -w",
+        "build:sass-dev": "sass --source-map --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
+        "build:sass": "sass --style=compressed --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
+        "clean": "rimraf dist",
+        "test": "vitest --run",
+        "watch": "npm-scripts-watcher",
+        "prettify": "prettier --write .",
+        "lint": "eslint '**/*.{js,ts,tsx}'",
+        "lint:fix": "eslint '**/*.{js,ts,tsx}' --fix"
+    },
+    "watch": {
+        "src/**/!(*.test|*.spec).{ts,tsx}": [
+            "build:ts"
+        ],
+        "src/**/*.scss": [
+            "build:sass"
+        ]
+    }
 }
