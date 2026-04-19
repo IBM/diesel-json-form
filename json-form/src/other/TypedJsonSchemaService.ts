@@ -18,7 +18,7 @@ export class TypedJsonSchemaService implements SchemaService {
     );
   }
 
-  private constructor(public readonly typedJson: TypedJson) {}
+  private constructor(public readonly typedJson: TypedJson) { }
 
   validate(schema: JsonValue, instance: JsonValue): Promise<ValidationResult> {
     return map2(
@@ -49,7 +49,6 @@ export class TypedJsonSchemaService implements SchemaService {
           schemaValue,
           instanceValue,
           path.isEmpty() ? '' : '/' + path.format(),
-          false,
         );
         console.log('propose', path.format(), suggestOutputs);
         const vs = toValueWithMeta(suggestOutputs)
@@ -74,15 +73,15 @@ export class TypedJsonSchemaService implements SchemaService {
 // }
 
 class TypedJsonValidationResult implements ValidationResult {
-  constructor(private readonly r: BasicOutput) {}
+  constructor(private readonly r: BasicOutput) { }
 
   getErrors(): readonly ValidationError[] {
     return this.r.valid
       ? []
       : (this.r.errors?.map((e) => ({
-          message: e.error,
-          path: e.instanceLocation.slice(1),
-        })) ?? []);
+        message: e.error,
+        path: e.instanceLocation.slice(1),
+      })) ?? []);
   }
 
   getRenderers(): ReadonlyMap<string, SchemaRenderer> {

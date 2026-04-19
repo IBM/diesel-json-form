@@ -59,7 +59,7 @@ module.exports = {
     }),
     new CopyPlugin({
       patterns: [
-        { from: '../node_modules/typed-json-ts/dist/typedJson.wasm', to: '.' },
+        { from: '../node_modules/typed-json-ts/dist/wasm/typedJson.wasm', to: './wasm' },
       ],
     }),
   ],

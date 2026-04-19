@@ -155,7 +155,7 @@ async function initJsonForm(
       rendererFactory: MyRendererFactory,
       debounceMs,
       //   schemaService: workerClient,
-      schemaService: await TypedJsonSchemaService.load(),
+      schemaService: await TypedJsonSchemaService.load('wasm/typedJson.wasm'),
     }),
   );
 }
