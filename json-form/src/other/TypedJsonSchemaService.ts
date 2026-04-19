@@ -8,6 +8,7 @@ import {
   ValidationError,
   ValidationResult,
 } from '../SchemaService';
+import { BasicOutput2 } from './basicOutput';
 
 export class TypedJsonSchemaService implements SchemaService {
   static async load(
@@ -18,7 +19,7 @@ export class TypedJsonSchemaService implements SchemaService {
     );
   }
 
-  private constructor(public readonly typedJson: TypedJson) { }
+  private constructor(public readonly typedJson: TypedJson) {}
 
   validate(schema: JsonValue, instance: JsonValue): Promise<ValidationResult> {
     return map2(
@@ -73,24 +74,44 @@ export class TypedJsonSchemaService implements SchemaService {
 // }
 
 class TypedJsonValidationResult implements ValidationResult {
-  constructor(private readonly r: BasicOutput) { }
+  constructor(private readonly r: BasicOutput) {}
 
   getErrors(): readonly ValidationError[] {
     return this.r.valid
       ? []
       : (this.r.errors?.map((e) => ({
-        message: e.error,
-        path: e.instanceLocation.slice(1),
-      })) ?? []);
+          message: e.error,
+          path: e.instanceLocation.slice(1),
+        })) ?? []);
   }
 
   getRenderers(): ReadonlyMap<string, SchemaRenderer> {
-    return new Map();
+    const bo2 = this.r as BasicOutput2;
+    const kvs: [string, SchemaRenderer][] =
+      bo2.annotations
+        ?.filter((a) => a.keywordLocation.endsWith('/renderer'))
+        .map((a) => [a.instanceLocation.slice(1), a.value as SchemaRenderer]) ??
+      [];
+    return new Map([...kvs]);
   }
+
   getFormats(path: JsPath): readonly string[] {
-    return [];
+    const bo2 = this.r as BasicOutput2;
+    const formats =
+      bo2.annotations
+        ?.filter((a) => a.keywordLocation.endsWith('/format'))
+        .filter((a) => a.instanceLocation.slice(1) == path.format())
+        .map((a) => a.value as string) ?? [];
+    return formats;
   }
+
   getDiscriminator(path: JsPath): string | undefined {
-    return undefined;
+    const bo2 = this.r as BasicOutput2;
+    const formats =
+      bo2.annotations
+        ?.filter((a) => a.keywordLocation.endsWith('/descriminator'))
+        .filter((a) => a.instanceLocation.slice(1) == path.format())
+        .map((a) => a.value as string) ?? [];
+    return formats[0];
   }
 }
