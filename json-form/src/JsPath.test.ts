@@ -42,6 +42,13 @@ describe('JsPath', () => {
     expect(JsPath.parse('foo').parent()).toEqual(just(JsPath.empty));
     expect(JsPath.parse('foo/bar').parent()).toEqual(just(JsPath.parse('foo')));
   });
+  test('is parent of', () => {
+    expect(JsPath.empty.isParentOf(JsPath.empty)).toBe(false);
+    expect(JsPath.parse('foo').isParentOf(JsPath.parse('foo'))).toBe(false);
+    expect(JsPath.parse('foo').isParentOf(JsPath.parse('foo/bar'))).toBe(true);
+    expect(JsPath.parse('foo/bar').isParentOf(JsPath.parse('foo'))).toBe(false);
+    expect(JsPath.parse('foo').isParentOf(JsPath.parse('bar'))).toBe(false);
+  });
   test('leading slash throws', () => {
     expect(() => JsPath.parse('/')).toThrowError(
       "Invalid path : /, leading slash isn't allowed",
