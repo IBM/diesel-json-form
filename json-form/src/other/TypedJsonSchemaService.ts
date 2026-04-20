@@ -1,6 +1,13 @@
 import { map2 } from 'tea-cup-fp';
 import { BasicOutput, toValueWithMeta, TypedJson } from 'typed-json-ts';
-import { JsonValue, parseJsonValue, stringify } from '../JsonValue';
+import {
+  JsonValue,
+  jvNull,
+  jvObject,
+  jvString,
+  parseJsonValue,
+  stringify,
+} from '../JsonValue';
 import { JsPath } from '../JsPath';
 import {
   SchemaRenderer,
@@ -90,8 +97,27 @@ class TypedJsonValidationResult implements ValidationResult {
     const kvs: [string, SchemaRenderer][] =
       bo2.annotations
         ?.filter((a) => a.keywordLocation.endsWith('/renderer'))
-        .map((a) => [a.instanceLocation.slice(1), a.value as SchemaRenderer]) ??
-      [];
+        .map((a) => [
+          a.instanceLocation.slice(1),
+          typeof a.value === 'string'
+            ? {
+                key: a.value,
+                schemaValue: parseJsonValue(
+                  JSON.stringify(a.value),
+                ).withDefault(jvNull),
+              }
+            : typeof (a.value as any)['key'] === 'string'
+              ? {
+                  key: (a.value as any)['key'] as string,
+                  schemaValue: parseJsonValue(
+                    JSON.stringify(a.value),
+                  ).withDefault(jvNull),
+                }
+              : parseJsonValue(JSON.stringify(a.value))
+                  .map((v) => v as unknown as SchemaRenderer)
+                  .withDefault({ key: '?', schemaValue: jvNull }),
+        ]) ?? [];
+    console.log('FW', kvs, bo2);
     return new Map([...kvs]);
   }
 
