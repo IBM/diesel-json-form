@@ -19,6 +19,8 @@ import { samples } from './initdata';
 import {
   defaultSchemaService,
   JsonValue,
+  jvArray,
+  jvBool,
   jvNumber,
   jvObject,
   jvString,
@@ -95,7 +97,18 @@ const schema = unsafeParseJsonValue(`
 // const value = jvArray([jvNumber('123'), jvNumber('bar')]); //jvNumber('1234');
 const value = jvObject([
   { name: 'foo', value: jvNumber('123') },
-  { name: 'gnu', value: jvString('bar') },
+  {
+    name: 'gnu',
+    value: jvArray([
+      jvNumber('222'),
+      jvString('bar'),
+      jvBool(true),
+      jvObject([
+        { name: 'hey', value: jvString('there') },
+        { name: 'gniii', value: jvBool(false) },
+      ]),
+    ]),
+  },
 ]);
 
 jsonForm.init(defaultSchemaService, schema, value);
