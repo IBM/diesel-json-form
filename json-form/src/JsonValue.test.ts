@@ -33,9 +33,10 @@ import {
   setValueAt,
   stringify,
 } from './JsonValue';
-import { just, nothing, ok } from 'tea-cup-core';
+import { just, nothing, ok } from 'tea-cup-fp';
 import { JsPath } from './JsPath';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
+import { describe, test, expect } from 'vitest';
 
 function valueFromAny(value: any): JsonValue {
   const s = JSON.stringify(value);
@@ -410,32 +411,43 @@ describe('JsonValue', () => {
   });
 
   describe('stringify', () => {
+    function doStringify(v: JsonValue, space?: string): string {
+      return stringify(v, space).withDefaultSupply(() => {
+        throw 'bad json';
+      });
+    }
+
+    test('invalid number', () => {
+      const s = stringify(jvNumber('not a number'));
+      expect(s).toEqual(nothing);
+    });
+
     test('string', () => {
-      expect(stringify(jvString('yalla'))).toEqual('"yalla"');
+      expect(doStringify(jvString('yalla'))).toEqual('"yalla"');
     });
     test('string escaped', () => {
-      expect(stringify(jvString('ya"lla'))).toEqual('"ya\\"lla"');
-      expect(stringify(jvString('ya\\"lla'))).toEqual('"ya\\"lla"');
+      expect(doStringify(jvString('ya"lla'))).toEqual('"ya\\"lla"');
+      expect(doStringify(jvString('ya\\"lla'))).toEqual('"ya\\"lla"');
     });
     test('number', () => {
-      expect(stringify(jvNumber('123'))).toEqual('123');
-      expect(stringify(jvNumber('9999999999999999'))).toEqual(
+      expect(doStringify(jvNumber('123'))).toEqual('123');
+      expect(doStringify(jvNumber('9999999999999999'))).toEqual(
         '9999999999999999',
       );
     });
     test('null', () => {
-      expect(stringify(jvNull)).toEqual('null');
+      expect(doStringify(jvNull)).toEqual('null');
     });
     test('boolean', () => {
-      expect(stringify(jvBool(true))).toEqual('true');
+      expect(doStringify(jvBool(true))).toEqual('true');
     });
     test('object', () => {
-      expect(stringify(jvObject([{ name: 'foo', value: jvNull }]))).toEqual(
+      expect(doStringify(jvObject([{ name: 'foo', value: jvNull }]))).toEqual(
         '{"foo":null}',
       );
     });
     test('array', () => {
-      expect(stringify(jvArray([jvBool(false), jvNumber('123')]))).toEqual(
+      expect(doStringify(jvArray([jvBool(false), jvNumber('123')]))).toEqual(
         '[false,123]',
       );
     });
@@ -448,13 +460,13 @@ describe('JsonValue', () => {
     const o = valueFromAny(raw);
 
     test('complex', () => {
-      expect(stringify(o)).toEqual(JSON.stringify(raw));
+      expect(doStringify(o)).toEqual(JSON.stringify(raw));
     });
 
     describe('with indent', () => {
       function roundtrip(o: any) {
         const expected = JSON.stringify(o, undefined, '  ');
-        expect(stringify(valueFromAny(o), '  ')).toEqual(expected);
+        expect(doStringify(valueFromAny(o), '  ')).toEqual(expected);
       }
 
       test('object simple', () => {

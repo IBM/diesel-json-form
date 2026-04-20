@@ -16,7 +16,7 @@
 
 import './style.css';
 import '@diesel-parser/json-form/dist/JsonEditor.css';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import * as JsonForm from '@diesel-parser/json-form';
 import { RendererFactory } from '@diesel-parser/json-form';
 
@@ -30,6 +30,9 @@ const MyRendererFactory = new RendererFactory();
 MyRendererFactory.addRenderer('MyStringRenderer', MyStringRenderer);
 MyRendererFactory.addRenderer('RatingRenderer', RatingRenderer);
 MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
+
+const myworker = new Worker('myworker.bundle.js');
+const workerClient = new JsonForm.WorkerClient(myworker);
 
 editor1.getModel()?.onDidChangeContent(() => {
   sendJsonStr();
@@ -133,21 +136,22 @@ function initJsonForm(
   strictMode: boolean,
   debounceMs: number,
 ) {
-  ReactDOM.render(
+  const root = createRoot(jsonForm!);
+  root.render(
     JsonForm.JsonEditor({
       schema,
       value,
       language: navigator.language,
       onChange: (value: JsonForm.JsonValue) => {
-        console.log('value changed');
+        console.log('FORM value changed', value);
         if (syncPanesCb.checked) {
-          editor2.setValue(JsonForm.stringify(value, '  '));
+          JsonForm.stringify(value, '  ').forEach((s) => editor2.setValue(s));
         }
       },
       strictMode,
       rendererFactory: MyRendererFactory,
       debounceMs,
+      schemaService: workerClient,
     }),
-    jsonForm,
   );
 }

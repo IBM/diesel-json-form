@@ -24,5 +24,6 @@
   },
   "icon.openMenu": "Öppna meny",
   "icon.expand": "Expandera",
-  "icon.collapse": "Komprimera"
+  "icon.collapse": "Komprimera",
+  "invalid.number": "Inte ett giltigt nummer"
 }

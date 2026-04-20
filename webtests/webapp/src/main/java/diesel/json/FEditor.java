@@ -6,8 +6,6 @@ import org.openqa.selenium.JavascriptExecutor;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-
 public class FEditor extends AbstractPageObject {
 
     private final String id;
@@ -17,13 +15,7 @@ public class FEditor extends AbstractPageObject {
     public FEditor(Findr f, String id) {
         super(f.$("#" + id));
         this.id = id;
-        this.windowEditorRef= "window." + this.id;
-    }
-
-    public FEditor assertText(String expectedText) {
-        String value = getText();
-        assertEquals(expectedText, value);
-        return this;
+        this.windowEditorRef = "window." + this.id;
     }
 
     public FEditor clearText() {
@@ -52,10 +44,12 @@ public class FEditor extends AbstractPageObject {
         return this;
     }
 
-    public String getText() {
-        return getFindr().eval(e ->
-                (String) js.executeScript("return " + windowEditorRef + ".getValue();")
-        );
+    public FEditor assertText(String expected) {
+        getFindr().where(e -> {
+            String value = (String) js.executeScript("return " + windowEditorRef + ".getValue();");
+            return expected.equals(value.trim());
+        }).eval();
+        return this;
     }
 
     public FEditor replaceText(String newText) {

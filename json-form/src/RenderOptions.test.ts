@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { render } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { JsPath } from './JsPath';
 import {
   MenuTrigger,
@@ -23,9 +22,10 @@ import {
 } from './renderer/Renderer';
 import { ViewJsonEditor } from './JsonEditor';
 import { initialModel } from './Model';
-import { nothing } from 'tea-cup-core';
+import { nothing } from 'tea-cup-fp';
 import { jvArray, jvNull, jvObject } from './JsonValue';
 import { defaultSchemaService } from './SchemaService';
+import { describe, test, expect } from 'vitest';
 
 describe('Render options', () => {
   describe('defaults', () => {
@@ -39,19 +39,12 @@ describe('Render options', () => {
           renderOptions: {},
         }),
       );
-      expect(container.querySelector('button')).not.toHaveAttribute('style');
+      expect(container.querySelector('button')!.style).toBeUndefined;
     });
     test('menu document root', () => {
       const { container } = render(
         ViewJsonEditor({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: {},
@@ -63,14 +56,7 @@ describe('Render options', () => {
     test('menu collapsible panel in object', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           path: JsPath.empty,
           value: jvObject([{ name: 'foo', value: jvNull }]),
           language: 'en',
@@ -84,14 +70,7 @@ describe('Render options', () => {
     test('menu collapsible panel in array', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           path: JsPath.empty,
           value: jvArray([jvNull]),
           language: 'en',
@@ -115,22 +94,14 @@ describe('Render options', () => {
           renderOptions: { hideMenuTooltip: true },
         }),
       );
-      expect(container.querySelector('button')).toHaveAttribute(
-        'style',
-        'overflow: hidden;',
+      expect(container.querySelector('button')!.style.overflow).toEqual(
+        'hidden',
       );
     });
     test('hide menu document root', () => {
       const { container } = render(
         ViewJsonEditor({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: { hideDocRoot: true },
@@ -142,14 +113,7 @@ describe('Render options', () => {
     test('hide menu collapsible panel in object', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           path: JsPath.empty,
           value: jvObject([{ name: 'foo', value: jvNull }]),
           language: 'en',
@@ -163,14 +127,7 @@ describe('Render options', () => {
     test('hide menu collapsible panel in array', () => {
       const { container } = render(
         ViewJsonValue({
-          model: initialModel(
-            'en',
-            nothing,
-            jvNull,
-            false,
-            0,
-            defaultSchemaService,
-          ),
+          model: initialModel('en', nothing, jvNull, false, 0),
           path: JsPath.empty,
           value: jvArray([jvNull]),
           language: 'en',

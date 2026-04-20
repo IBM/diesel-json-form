@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { diffLists, formatDiffResult } from './diffLists';
 
 const diff = (oldStr: string, newStr: string) =>

@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { OptionsLcs, calculateLcs } from './lcs';
 
 const lcs = (s1: string, s2: string, options?: OptionsLcs<string>) =>

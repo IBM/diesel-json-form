@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-import { just, Maybe, nothing } from 'tea-cup-core';
+import { Maybe, nothing } from 'tea-cup-fp';
 import { getValueAt, JsonValue } from './JsonValue';
 import { JsPath } from './JsPath';
 import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions';
-import { TFunction } from 'i18next';
 import { initMyI18n } from './i18n/MyI18n';
-import {
-  SchemaService,
-  ValidationError,
-  ValidationResult,
-} from './SchemaService';
+import { ValidationError } from './SchemaService';
+import { FormTFunction } from './FormTFunction';
+import { GotMsg } from './Msg';
 
 export interface Model {
   readonly schema: Maybe<JsonValue>;
   readonly root: JsonValue;
-  readonly validationResult: Maybe<ValidationResult>;
   readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;
   readonly adding: Maybe<AddingState>;
   readonly menuModel: Maybe<TPM.Model<MenuAction>>;
@@ -38,11 +34,12 @@ export interface Model {
   readonly propertiesToAdd: ReadonlyMap<string, ReadonlyArray<string>>;
   readonly comboBoxes: ReadonlyMap<string, ReadonlyArray<string>>;
   readonly formats: ReadonlyMap<string, ReadonlyArray<string>>;
-  readonly t: TFunction;
+  readonly t: FormTFunction;
   readonly lang: string;
   readonly strictMode: boolean;
   readonly customRenderers: ReadonlyMap<string, Maybe<CustomRendererModel>>;
   readonly debounceMs: number;
+  readonly pendingIds: Map<GotMsg['tag'], number>;
 }
 
 export interface CustomRendererModel {
@@ -56,189 +53,12 @@ export interface AddingState {
   readonly isDuplicate: boolean;
 }
 
-export function doValidate(service: SchemaService, model: Model): Model {
-  return model.schema
-    .map((s) => {
-      const validationResult = just(service.validate(s, model.root));
-      return {
-        ...model,
-        validationResult,
-      };
-    })
-    .withDefault(model);
-}
-
-export function computeErrors(model: Model): Model {
-  const errors = model.validationResult
-    .map((vr) => vr.getErrors())
-    .map((jsErrors) => {
-      const res = new Map();
-      jsErrors.forEach((err) => {
-        const errsAtPath = res.get(err.path);
-        if (errsAtPath) {
-          res.set(err.path, [...errsAtPath, err]);
-        } else {
-          res.set(err.path, [err]);
-        }
-      });
-      return res;
-    })
-    .withDefaultSupply(() => new Map<string, ReadonlyArray<ValidationError>>());
-
-  return {
-    ...model,
-    errors,
-  };
-}
-
-export function computePropertiesToAdd(model: Model): Model {
-  return model.validationResult
-    .map((validationResult) => {
-      const propertiesToAdd = new Map<string, ReadonlyArray<string>>();
-      doComputePropsToAdd(model, validationResult, propertiesToAdd);
-      const newModel: Model = {
-        ...model,
-        propertiesToAdd,
-      };
-      return newModel;
-    })
-    .withDefault(model);
-}
-
-interface StringsMetadata {
-  readonly comboBoxes: Map<string, ReadonlyArray<string>>;
-  readonly formats: Map<string, ReadonlyArray<string>>;
-}
-
-export function computeStringsMetadata(model: Model): Model {
-  return model.validationResult
-    .map((validationResult) => {
-      const comboBoxes = new Map<string, ReadonlyArray<string>>();
-      const formats = new Map<string, ReadonlyArray<string>>();
-      const metadata: StringsMetadata = {
-        comboBoxes,
-        formats,
-      };
-      doComputeStringsMetadata(model, validationResult, metadata);
-      const newModel: Model = {
-        ...model,
-        comboBoxes,
-        formats,
-      };
-      return newModel;
-    })
-    .withDefault(model);
-}
-
-function doComputeStringsMetadata(
-  model: Model,
-  validationResult: ValidationResult,
-  metadata: StringsMetadata,
-  path: JsPath = JsPath.empty,
-): void {
-  getValueAt(model.root, path).forEach((value) => {
-    switch (value.tag) {
-      case 'jv-object': {
-        value.properties.forEach((prop) =>
-          doComputeStringsMetadata(
-            model,
-            validationResult,
-            metadata,
-            path.append(prop.name),
-          ),
-        );
-        break;
-      }
-      case 'jv-array': {
-        // recurse
-        value.elems.forEach((elem, elemIndex) =>
-          doComputeStringsMetadata(
-            model,
-            validationResult,
-            metadata,
-            path.append(elemIndex),
-          ),
-        );
-        break;
-      }
-      case 'jv-string': {
-        const proposals: ReadonlyArray<string> = validationResult
-          .propose(path, -1)
-          .flatMap((proposal) => {
-            if (proposal.tag === 'jv-string') {
-              return [proposal.value];
-            } else {
-              return [];
-            }
-          })
-          .filter((s) => s !== '');
-
-        if (proposals.length > 0) {
-          metadata.comboBoxes.set(path.format(), proposals);
-        }
-
-        const formats: ReadonlyArray<string> =
-          validationResult.getFormats(path);
-        if (formats.length > 0) {
-          metadata.formats.set(path.format(), formats);
-        }
-      }
-    }
-  });
-}
-
-function doComputePropsToAdd(
-  model: Model,
-  validationResult: ValidationResult,
-  props: Map<string, ReadonlyArray<string>>,
-  path: JsPath = JsPath.empty,
-): void {
-  getValueAt(model.root, path).forEach((value) => {
-    switch (value.tag) {
-      case 'jv-object': {
-        // compute props for this object and recurse
-        const propNameProposals: string[] = validationResult
-          .propose(path, -1)
-          .flatMap((proposal) => {
-            if (proposal.tag === 'jv-object') {
-              return proposal.properties.map((p) => p.name);
-            }
-            return [];
-          });
-        props.set(path.format(), propNameProposals);
-        value.properties.forEach((prop) =>
-          doComputePropsToAdd(
-            model,
-            validationResult,
-            props,
-            path.append(prop.name),
-          ),
-        );
-        break;
-      }
-      case 'jv-array': {
-        // recurse
-        value.elems.forEach((elem, elemIndex) =>
-          doComputePropsToAdd(
-            model,
-            validationResult,
-            props,
-            path.append(elemIndex),
-          ),
-        );
-        break;
-      }
-    }
-  });
-}
-
 export function initialModel(
   lang: string,
   schema: Maybe<JsonValue>,
   root: JsonValue,
   strictMode: boolean,
   debounceMs: number,
-  service: SchemaService,
 ): Model {
   const t = initMyI18n(lang);
   const model: Model = {
@@ -246,7 +66,6 @@ export function initialModel(
     t,
     schema,
     root,
-    validationResult: nothing,
     errors: new Map(),
     adding: nothing,
     menuModel: nothing,
@@ -257,13 +76,24 @@ export function initialModel(
     strictMode,
     customRenderers: new Map(),
     debounceMs: Math.max(0, debounceMs),
+    pendingIds: new Map(),
   };
-
-  return computeAll(doValidate(service, model));
+  return model;
 }
 
-export function computeAll(model: Model): Model {
-  return computeStringsMetadata(computePropertiesToAdd(computeErrors(model)));
+export function nextPendingId(
+  model: Model,
+  tag: GotMsg['tag'],
+): [Model, number] {
+  const pendingId = model.pendingIds.get(tag) ?? 0;
+  const newPendingId = pendingId + 1;
+  const newPendingIds = new Map(model.pendingIds);
+  newPendingIds.set(tag, newPendingId);
+  const newModel: Model = {
+    ...model,
+    pendingIds: newPendingIds,
+  };
+  return [newModel, newPendingId];
 }
 
 export function updateAddingPropertyName(

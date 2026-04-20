@@ -23,3 +23,5 @@ export * from './Msg';
 export * from './renderer/Renderer';
 export * from './SchemaService';
 export * from './utils/diffLists';
+export * from './worker/SchemaServiceWorker';
+export * from './worker/WorkerClient';

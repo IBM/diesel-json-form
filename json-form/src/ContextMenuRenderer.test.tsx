@@ -32,6 +32,7 @@ import {
 import { JsPath } from './JsPath';
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
 import { MenuOptions } from './RenderOptions';
+import { describe, test, expect } from 'vitest';
 
 describe('Change type menu', () => {
   test('[SM: ON, P: 1, V: valid] ' + 'no types menu', () => {

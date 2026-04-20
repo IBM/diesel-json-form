@@ -8,19 +8,22 @@
     "prettify": "prettier --write .",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "eslint '**/*.{js,ts}' --fix",
-    "build": "yarn lint && webpack",
+    "build": "npm run lint && webpack",
     "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
   },
   "dependencies": {
-    "tea-cup-core": "^2.1.0",
-    "@diesel-parser/json-form": "^5.2.2"
+    "tea-cup-fp": "^1.1.1",
+    "@diesel-parser/json-form": "^7.0.0"
   },
   "devDependencies": {
+    "@diesel-parser/ts-facade": "~0.32.2",
+    "@types/vscode": "~1.100.0",
     "copy-webpack-plugin": "^13.0.0",
     "css-loader": "^7.0.0",
     "file-loader": "^6.2.0",
     "gh-pages": "^6.0.0",
     "html-webpack-plugin": "^5.3.1",
+    "sass": "^1.81.0",
     "shx": "~0.4.0",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.2.2",

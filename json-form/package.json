@@ -1,34 +1,31 @@
 {
   "name": "@diesel-parser/json-form",
-  "version": "5.2.2",
+  "version": "7.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@diesel-parser/json-schema-facade-ts": "^0.13.1",
+    "@diesel-parser/json-schema-facade-ts": "^0.15.0",
     "i18next": "^20.6.1",
-    "tea-pop-core": "^5.0.0",
-    "tea-pop-menu": "^5.0.0"
+    "tea-pop-core": "^6.0.1",
+    "tea-pop-menu": "^6.0.1"
   },
   "peerDependencies": {
-    "@carbon/icons-react": "^11.53.0",
-    "@carbon/react": "^1.71.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-tea-cup": "^2.2.3",
-    "tea-cup-core": "^2.2.3"
+    "@carbon/react": "^1.100.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-tea-cup": "^5.1.1",
+    "tea-cup-fp": "^1.1.1"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.4.8",
-    "@testing-library/react": "12",
-    "@types/jest": "^26.0.20",
-    "@types/react": "^17.0.83",
-    "@types/react-dom": "^17.0.25",
-    "jest": "24.9.0",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "jsdom": "^29.0.1",
     "npm-scripts-watcher": "^1.0.2",
     "rimraf": "^6.0.1",
     "sass": "^1.81.0",
-    "ts-jest": "24.3.0"
+    "vitest": "^3.2.4"
   },
   "scripts": {
     "build": "npm run clean && npm run lint && npm run build:ts && npm run test && npm run build:sass",
@@ -37,8 +34,7 @@
     "build:sass-dev": "sass --source-map --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
     "build:sass": "sass --style=compressed --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
     "clean": "rimraf dist",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "vitest --run",
     "watch": "npm-scripts-watcher",
     "prettify": "prettier --write .",
     "lint": "eslint '**/*.{js,ts,tsx}'",
