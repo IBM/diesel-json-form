@@ -58,6 +58,7 @@ export class JsonForm extends HTMLElement {
           .validate(this.schema, value)
           .then((vr) => {
             this.validationData = ValidationData.fromValidationResult(vr);
+            console.log('validated', value, this.validationData);
             this.root?.setValidationData(this.validationData, JsPath.empty);
           })
           .catch((err) => {

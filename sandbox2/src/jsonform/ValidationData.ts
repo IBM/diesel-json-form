@@ -31,7 +31,6 @@ export class ValidationData {
   getErrors(path: JsPath): ValidationError[] {
     const errs = this.errors.get(path.format());
     const res = errs === undefined ? [] : errs;
-    console.log('RVKB', path, res);
     return res;
   }
 

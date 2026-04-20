@@ -20,9 +20,9 @@ export class JsonObjectElement extends JsonElement<JvObject> {
 
   private findProps(): readonly [string, JsonElement<JsonValue>][] {
     if (this.table) {
-      const rows = [...this.table.querySelectorAll('tbody > tr')];
+      const rows = [...this.table.querySelectorAll(':scope > tbody > tr')];
       return rows.flatMap((tr) => {
-        const cells = tr.querySelectorAll('* > td');
+        const cells = tr.querySelectorAll(':scope > td');
         const cell0 = cells[0];
         const cell1 = cells[1];
         if (cell0 && cell1) {
@@ -42,8 +42,9 @@ export class JsonObjectElement extends JsonElement<JvObject> {
   }
 
   toValue(): JvObject {
+    const props = this.findProps();
     return jvObject(
-      this.findProps().map(([name, elem]) => ({ name, value: elem.toValue() })),
+      props.map(([name, elem]) => ({ name, value: elem.toValue() })),
     );
   }
 
@@ -51,7 +52,7 @@ export class JsonObjectElement extends JsonElement<JvObject> {
     if (this.table) {
       this.removeChild(this.table);
     }
-    const newTable = table({}, [
+    const newTable = table({ border: '1px solid gray' }, [
       tbody(
         {},
         value.properties.map((property) =>
