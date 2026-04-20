@@ -7,7 +7,10 @@ import { JsonNumberElement } from './JsonNumberElement';
 import { JsonObjectElement } from './JsonObjectElement';
 import { JsonArrayElement } from './JsonArrayElement';
 
-export function createDom(value: JsonValue): JsonElement<JsonValue> {
+export function createDom(
+  value: JsonValue,
+  onChange: () => void,
+): JsonElement<JsonValue> {
   const mkNodes: () => JsonElement<JsonValue> = () => {
     switch (value.tag) {
       case 'jv-null':
@@ -25,6 +28,6 @@ export function createDom(value: JsonValue): JsonElement<JsonValue> {
     }
   };
   const root = mkNodes();
-  root.fromValue(value);
+  root.fromValue(value, onChange);
   return root;
 }

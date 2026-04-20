@@ -47,7 +47,7 @@ export class JsonObjectElement extends JsonElement<JvObject> {
     );
   }
 
-  fromValue(value: JvObject): void {
+  fromValue(value: JvObject, onChange: () => void): void {
     if (this.table) {
       this.removeChild(this.table);
     }
@@ -57,7 +57,7 @@ export class JsonObjectElement extends JsonElement<JvObject> {
         value.properties.map((property) =>
           tr({}, [
             td({}, [text(property.name)]),
-            td({}, [createDom(property.value)]),
+            td({}, [createDom(property.value, onChange)]),
           ]),
         ),
       ),

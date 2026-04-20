@@ -14,8 +14,11 @@ export class JsonStringElement extends JsonElement<JvString> {
     });
   }
 
-  fromValue(value: JvString) {
+  fromValue(value: JvString, onChange: () => void) {
     this.input.value = value.value;
+    this.input.addEventListener('input', () => {
+      onChange();
+    });
   }
 
   toValue(): JvString {

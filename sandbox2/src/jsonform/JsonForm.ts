@@ -4,11 +4,10 @@ import {
   JsPath,
   jvNull,
   SchemaService,
-  ValidationResult,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { createDom } from './createDom';
-import { ValidationData } from './ValidationData';
+import { computeInvalidNumberErrors, ValidationData } from './ValidationData';
 
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
@@ -16,6 +15,7 @@ export class JsonForm extends HTMLElement {
   private root?: JsonElement<JsonValue>;
   private schemaService: SchemaService = defaultSchemaService;
   private schema?: JsonValue;
+  private validationData: ValidationData = ValidationData.empty();
 
   constructor() {
     super();
@@ -34,32 +34,36 @@ export class JsonForm extends HTMLElement {
     if (this.root) {
       this.removeChild(this.root);
     }
-    const newRoot = createDom(value);
+    const newRoot = createDom(value, this.validate.bind(this));
     this.root = newRoot;
     this.appendChild(newRoot);
     this.validate();
   }
 
   private validate() {
-    if (this.schemaService && this.schema) {
-      const value = this.toValue();
-      this.schemaService
-        .validate(this.schema, value)
-        .then((vr) => this.gotValidationResult(vr, value))
-        .catch((err) => {
-          console.error('validate error', err);
-        });
+    const value = this.toValue();
+    const invalidNumbers = computeInvalidNumberErrors(value);
+    if (invalidNumbers.size > 0) {
+      // no need to validate but handle invalid numbers
+      if (this.validationData) {
+        this.validationData.setInvalidNumberErrors(invalidNumbers);
+      } else {
+        this.validationData = ValidationData.empty();
+        this.validationData.setInvalidNumberErrors(invalidNumbers);
+      }
+      this.root?.setValidationData(this.validationData, JsPath.empty);
+    } else {
+      if (this.schemaService && this.schema) {
+        this.schemaService
+          .validate(this.schema, value)
+          .then((vr) => {
+            this.validationData = ValidationData.fromValidationResult(vr);
+            this.root?.setValidationData(this.validationData, JsPath.empty);
+          })
+          .catch((err) => {
+            console.error('validate error', err);
+          });
+      }
     }
-  }
-
-  private gotValidationResult(
-    validationResult: ValidationResult,
-    value: JsonValue,
-  ) {
-    console.log('gotValidationResult', validationResult, value);
-    this.root?.setValidationData(
-      new ValidationData(validationResult),
-      JsPath.empty,
-    );
   }
 }

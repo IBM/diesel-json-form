@@ -18,8 +18,11 @@ export class JsonNumberElement extends JsonElement<JvNumber> {
     return jvNumber(this.input.value);
   }
 
-  fromValue(value: JvNumber) {
+  fromValue(value: JvNumber, onChange: () => void) {
     this.input.value = value.value;
+    this.input.addEventListener('input', () => {
+      onChange();
+    });
   }
 
   connectedCallback() {

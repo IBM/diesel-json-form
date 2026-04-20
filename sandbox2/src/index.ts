@@ -78,13 +78,14 @@ const schema = unsafeParseJsonValue(`
         "type": "object",
         "properties": {
             "foo": {
-                "type": "string"
+                "type": "number"
             },
             "bar": {
                 "type": "string"
             },
             "toto": {
-                "type": "boolean"
+                "type": "boolean",
+                "const": true
             }
         }
     }`);
@@ -114,7 +115,10 @@ const value = jvObject([
       ]),
     ]),
   },
+  { name: 'toto', value: jvBool(false) },
 ]);
+// const value = jvObject([{ name: 'foo', value: jvNumber('123') }]);
+
 // const value = jvString('yolo');
 
 jsonForm.init(defaultSchemaService, schema, value);

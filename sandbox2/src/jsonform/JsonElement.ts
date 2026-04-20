@@ -11,7 +11,7 @@ export abstract class JsonElement<T extends JsonValue> extends HTMLElement {
 
   abstract toValue(): T;
 
-  abstract fromValue(value: T): void;
+  abstract fromValue(value: T, onChange: () => void): void;
 
   setValidationData(validationData: ValidationData, path: JsPath): void {
     this.updateErrors(validationData, path);
@@ -27,7 +27,7 @@ export abstract class JsonElement<T extends JsonValue> extends HTMLElement {
 
   protected updateErrors(validationData: ValidationData, path: JsPath): void {
     if (this.errorsNode) {
-      this.removeChild(this.errorsNode);
+      this.errorsNode.remove();
     }
     const newErrors = createErrorsNode(validationData, path);
     this.errorsNode = newErrors;
@@ -40,7 +40,7 @@ export function createErrorsNode(
   path: JsPath,
 ): HTMLElement {
   return ul(
-    {},
+    { className: 'json-error-list' },
     validationData
       .getErrors(path)
       .map((error) => li({}, [text(error.message)])),

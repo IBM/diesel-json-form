@@ -31,14 +31,16 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     return jvArray(this.findElems().map((elem) => elem.toValue()));
   }
 
-  fromValue(value: JvArray): void {
+  fromValue(value: JvArray, onChange: () => void): void {
     if (this.table) {
       this.removeChild(this.table);
     }
     const newTable = table({}, [
       tbody(
         {},
-        value.elems.map((elem) => tr({}, [td({}, [createDom(elem)])])),
+        value.elems.map((elem) =>
+          tr({}, [td({}, [createDom(elem, onChange)])]),
+        ),
       ),
     ]);
     this.table = newTable;
