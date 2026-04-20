@@ -2,15 +2,15 @@ export type DeepPartial<T> = Partial<{ [P in keyof T]: DeepPartial<T[P]> }>;
 
 type NodeBuilder<K extends keyof HTMLElementTagNameMap> = (
   a: DeepPartial<HTMLElementTagNameMap[K]>,
-  ...c: Node[]
+  c?: Node[],
 ) => HTMLElementTagNameMap[K];
 
 export function node<K extends keyof HTMLElementTagNameMap>(
   tag: K,
 ): NodeBuilder<K> {
-  return (a: DeepPartial<HTMLElementTagNameMap[K]>, ...c: Node[]) => {
+  return (a: DeepPartial<HTMLElementTagNameMap[K]>, c: Node[] | undefined) => {
     const n: HTMLElementTagNameMap[K] = document.createElement(tag);
-    c.forEach((child) => n.appendChild(child));
+    c && c.forEach((child) => n.appendChild(child));
     const keys = Object.keys(a) as Array<keyof typeof a>;
     keys.forEach((k) => setProperty(n, k, getProperty(a, k)));
     return n;
@@ -33,6 +33,10 @@ export const label = node('label');
 export const ul = node('ul');
 export const li = node('li');
 export const button = node('button');
+export const table = node('table');
+export const tbody = node('tbody');
+export const tr = node('tr');
+export const td = node('td');
 
 export function text(s: string): Text {
   return document.createTextNode(s);

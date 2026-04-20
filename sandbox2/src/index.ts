@@ -16,33 +16,26 @@
 
 import './style.css';
 import { samples } from './initdata';
-import { JsonFormElement } from './jsonform/elements/JsonFormElement';
 import {
   defaultSchemaService,
   JsonValue,
-  jvArray,
-  jvBool,
   jvNumber,
   jvObject,
   jvString,
   parseJsonValue,
 } from '@diesel-parser/json-form';
-import { JsonNullElement } from './jsonform/elements/JsonNullElement';
-import { JsonArrayElement } from './jsonform/elements/JsonArrayElement';
-import { JsonObjectElement } from './jsonform/elements/JsonObjectElement';
-import { JsonBooleanElement } from './jsonform/elements/JsonBooleanElement';
-import { JsonNumberElement } from './jsonform/elements/JsonNumberElement';
-import { JsonStringElement } from './jsonform/elements/JsonStringElement';
-import { JsonErrorList } from './jsonform/elements/JsonErrorList';
+import { JsonForm } from './jsonform/JsonForm';
+import { defineCustomElements } from './jsonform/defineCustomElements';
+// customElements.define(JsonFormElement.TAG_NAME, JsonFormElement);
+// customElements.define(JsonStringElement.TAG_NAME, JsonStringElement);
+// customElements.define(JsonNumberElement.TAG_NAME, JsonNumberElement);
+// customElements.define(JsonBooleanElement.TAG_NAME, JsonBooleanElement);
+// customElements.define(JsonArrayElement.TAG_NAME, JsonArrayElement);
+// customElements.define(JsonObjectElement.TAG_NAME, JsonObjectElement);
+// customElements.define(JsonNullElement.TAG_NAME, JsonNullElement);
+// customElements.define(JsonErrorList.TAG_NAME, JsonErrorList);
 
-customElements.define(JsonFormElement.TAG_NAME, JsonFormElement);
-customElements.define(JsonStringElement.TAG_NAME, JsonStringElement);
-customElements.define(JsonNumberElement.TAG_NAME, JsonNumberElement);
-customElements.define(JsonBooleanElement.TAG_NAME, JsonBooleanElement);
-customElements.define(JsonArrayElement.TAG_NAME, JsonArrayElement);
-customElements.define(JsonObjectElement.TAG_NAME, JsonObjectElement);
-customElements.define(JsonNullElement.TAG_NAME, JsonNullElement);
-customElements.define(JsonErrorList.TAG_NAME, JsonErrorList);
+defineCustomElements();
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
@@ -60,7 +53,7 @@ samples
 
 // const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
 
-const jsonForm = document.getElementById('my-form') as JsonFormElement;
+const jsonForm = document.getElementById('my-form') as JsonForm;
 
 function unsafeParseJsonValue(json: string): JsonValue {
   return parseJsonValue(json).match(
@@ -105,7 +98,9 @@ const value = jvObject([
   { name: 'gnu', value: jvString('bar') },
 ]);
 
-jsonForm.render(defaultSchemaService, schema, value);
+jsonForm.init(defaultSchemaService, schema, value);
+
+console.log('toValue:', jsonForm.toValue());
 
 // sampleSchemaSelect.addEventListener('change', () => {
 //   taSchema.value = sampleSchemaSelect.value;
