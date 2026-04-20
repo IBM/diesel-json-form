@@ -78,7 +78,7 @@ const schema = unsafeParseJsonValue(`
         "type": "object",
         "properties": {
             "foo": {
-                "type": "number"
+                "type": "string"
             },
             "bar": {
                 "type": "string"
@@ -88,6 +88,11 @@ const schema = unsafeParseJsonValue(`
             }
         }
     }`);
+
+// const schema = unsafeParseJsonValue(`
+//     {
+//         "type": "number"
+//     }`);
 
 // const schema = unsafeParseJsonValue(`
 //     {
@@ -110,6 +115,7 @@ const value = jvObject([
     ]),
   },
 ]);
+// const value = jvString('yolo');
 
 jsonForm.init(defaultSchemaService, schema, value);
 

@@ -1,7 +1,8 @@
-import { JsonValue, jvArray, JvArray } from '@diesel-parser/json-form';
+import { JsonValue, JsPath, jvArray, JvArray } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { table, tbody, td, tr } from './HtmlBuilder';
 import { createDom } from './createDom';
+import { ValidationData } from './ValidationData';
 
 export class JsonArrayElement extends JsonElement<JvArray> {
   static TAG_NAME = 'json-array';
@@ -12,23 +13,22 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     super();
   }
 
-  toValue(): JvArray {
+  private findElems(): readonly JsonElement<JsonValue>[] {
     if (this.table) {
       const rows = this.table.querySelectorAll('tbody > tr');
-      const elems: JsonValue[] = [];
-      rows.forEach((tr) => {
-        const cell = tr.querySelector('* > td');
-        if (cell) {
-          const cellElem = cell.firstChild;
-          if (cellElem && cellElem instanceof JsonElement) {
-            elems.push(cellElem.toValue());
-          }
+      return [...rows].flatMap((elem) => {
+        if (elem && elem instanceof JsonElement) {
+          return [elem];
         }
+        return [];
       });
-      return jvArray(elems);
     } else {
-      return jvArray();
+      return [];
     }
+  }
+
+  toValue(): JvArray {
+    return jvArray(this.findElems().map((elem) => elem.toValue()));
   }
 
   fromValue(value: JvArray): void {
@@ -43,5 +43,14 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     ]);
     this.table = newTable;
     this.appendChild(newTable);
+  }
+
+  protected doSetValidationData(
+    validationData: ValidationData,
+    path: JsPath,
+  ): void {
+    this.findElems().forEach((elem, index) =>
+      elem.setValidationData(validationData, path.append(index)),
+    );
   }
 }
