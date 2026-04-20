@@ -45,6 +45,9 @@ export class JsPath {
   }
 
   append(elem: string | number): JsPath {
+    if (typeof elem === 'string' && containsNonEscapedSlash(elem)) {
+      throw `Invalid path element : ${elem}, contains non-escaped slash`;
+    }
     return new JsPath(this._elems.concat([elem.toString()]));
   }
 
@@ -61,7 +64,9 @@ export class JsPath {
   }
 
   isParentOf(child: JsPath): boolean {
-    return child.format().startsWith(this.format());
+    const childFmt = child.format();
+    const thisFmt = this.format();
+    return childFmt !== thisFmt && childFmt.startsWith(thisFmt);
   }
 
   static parse(path: string) {
@@ -71,9 +76,26 @@ export class JsPath {
     if (path.startsWith('/')) {
       throw 'Invalid path : ' + path + ", leading slash isn't allowed";
     }
+    if (path.endsWith('/')) {
+      throw 'Invalid path : ' + path + ", trailing slash isn't allowed";
+    }
     const parts = path.split('/');
     return new JsPath(parts);
   }
 
   static empty: JsPath = new JsPath([]);
+}
+
+export function containsNonEscapedSlash(s: string): boolean {
+  const i = s.indexOf('/');
+  if (i !== -1) {
+    const head = s.substring(0, i);
+    if (!head.endsWith('\\')) {
+      return true;
+    }
+    const tail = s.substring(i + 1);
+    return containsNonEscapedSlash(tail);
+  } else {
+    return false;
+  }
 }
