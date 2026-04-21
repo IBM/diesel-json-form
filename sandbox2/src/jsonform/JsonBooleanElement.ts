@@ -17,6 +17,7 @@ export class JsonBooleanElement extends JsonElement<JvBoolean> {
   toValue(): JvBoolean {
     return jvBool(this.input.checked);
   }
+
   fromValue(value: JvBoolean, onChange: () => void) {
     this.input.checked = value.value;
     this.input.addEventListener('input', onChange);

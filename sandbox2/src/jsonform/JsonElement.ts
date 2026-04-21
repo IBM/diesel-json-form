@@ -47,4 +47,8 @@ export abstract class JsonElement<T extends JsonValue> extends HTMLElement {
       this.appendChild(this.errorsNode);
     }
   }
+
+  getChildren(): readonly [JsPath, JsonElement<JsonValue>][] {
+    return [];
+  }
 }

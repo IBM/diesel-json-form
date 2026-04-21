@@ -12,6 +12,7 @@ import { JsonElement } from './JsonElement';
 import { createDom } from './createDom';
 import { computeInvalidNumberErrors } from './computeInvalidNumberErrors';
 import { emptyMetadata } from '@diesel-parser/json-form/dist/Metadata';
+import { just, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
@@ -44,6 +45,35 @@ export class JsonForm extends HTMLElement {
     this.validate();
   }
 
+  getSchema(): JsonValue | undefined {
+    return this.schema;
+  }
+
+  getPath(elem: JsonElement<JsonValue>): Maybe<JsPath> {
+    return maybeOf(this.root).andThen((root) =>
+      this.doGetPath(root, elem, JsPath.empty),
+    );
+  }
+
+  private doGetPath(
+    current: JsonElement<JsonValue>,
+    target: JsonElement<JsonValue>,
+    path: JsPath,
+  ): Maybe<JsPath> {
+    if (current === target) {
+      return just(path);
+    }
+    const children = current.getChildren();
+    for (let i = 0; i < children.length; i++) {
+      const [childPath, child] = children[i];
+      const res = this.doGetPath(child, target, path.concat(childPath));
+      if (res.type === 'Just') {
+        return res;
+      }
+    }
+    return nothing;
+  }
+
   private validate() {
     const value = this.toValue();
     const invalidNumbers = computeInvalidNumberErrors(value);
@@ -55,6 +85,7 @@ export class JsonForm extends HTMLElement {
       if (this.schemaService && this.schema) {
         validateAndComputeMetadata(this.schemaService, this.schema, value)
           .then((metadata) => {
+            console.log('got metadata', value, metadata);
             this.root?.setMetadata(metadata, JsPath.empty);
           })
           .catch((err) => {
@@ -69,6 +100,7 @@ function addErrorsToMetadata(
   errors: Map<string, ValidationError[]>,
   metadata: Metadata,
 ): Metadata {
+  debugger;
   const newErrors = new Map<string, readonly ValidationError[]>(
     metadata.errors,
   );

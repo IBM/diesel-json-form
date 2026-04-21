@@ -77,4 +77,11 @@ export class JsonObjectElement extends JsonElement<JvObject> {
       elem.setMetadata(metadata, path.append(name)),
     );
   }
+
+  getChildren(): readonly [JsPath, JsonElement<JsonValue>][] {
+    return this.findProps().map((prop) => [
+      JsPath.empty.append(prop[0]),
+      prop[1],
+    ]);
+  }
 }

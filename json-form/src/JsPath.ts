@@ -51,6 +51,11 @@ export class JsPath {
     return new JsPath(this._elems.concat([elem.toString()]));
   }
 
+  concat(other: JsPath): JsPath {
+    const newElems = this.elems.concat(other.elems);
+    return new JsPath(newElems);
+  }
+
   parent(): Maybe<JsPath> {
     if (this._elems.length === 0) {
       return nothing;

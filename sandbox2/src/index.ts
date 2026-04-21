@@ -28,14 +28,6 @@ import {
 } from '@diesel-parser/json-form';
 import { JsonForm } from './jsonform/JsonForm';
 import { defineCustomElements } from './jsonform/defineCustomElements';
-// customElements.define(JsonFormElement.TAG_NAME, JsonFormElement);
-// customElements.define(JsonStringElement.TAG_NAME, JsonStringElement);
-// customElements.define(JsonNumberElement.TAG_NAME, JsonNumberElement);
-// customElements.define(JsonBooleanElement.TAG_NAME, JsonBooleanElement);
-// customElements.define(JsonArrayElement.TAG_NAME, JsonArrayElement);
-// customElements.define(JsonObjectElement.TAG_NAME, JsonObjectElement);
-// customElements.define(JsonNullElement.TAG_NAME, JsonNullElement);
-// customElements.define(JsonErrorList.TAG_NAME, JsonErrorList);
 
 defineCustomElements();
 
@@ -66,33 +58,29 @@ function unsafeParseJsonValue(json: string): JsonValue {
   );
 }
 
-// const schema = unsafeParseJsonValue(`
-//     {
-//         "type": "array",
-//         "items": {
-//             "type": "number"
-//         }
-//     }`);
 const schema = unsafeParseJsonValue(`
     {
-        "type": "object",
-        "properties": {
-            "foo": {
-                "type": "number"
-            },
-            "bar": {
-                "type": "string"
-            },
-            "toto": {
-                "type": "boolean",
-                "const": true
-            }
+        "type": "array",
+        "items": {
+            "type": "number"
         }
     }`);
 
 // const schema = unsafeParseJsonValue(`
 //     {
-//         "type": "number"
+//         "type": "object",
+//         "properties": {
+//             "foo": {
+//                 "type": "number"
+//             },
+//             "bar": {
+//                 "type": "string"
+//             },
+//             "toto": {
+//                 "type": "boolean",
+//                 "const": true
+//             }
+//         }
 //     }`);
 
 // const schema = unsafeParseJsonValue(`
@@ -100,26 +88,27 @@ const schema = unsafeParseJsonValue(`
 //         "type": "number"
 //     }`);
 
-// const value = jvArray([jvNumber('123'), jvNumber('bar')]); //jvNumber('1234');
-const value = jvObject([
-  { name: 'foo', value: jvNumber('123') },
-  {
-    name: 'gnu',
-    value: jvArray([
-      jvNumber('222'),
-      jvString('bar'),
-      jvBool(true),
-      jvObject([
-        { name: 'hey', value: jvString('there') },
-        { name: 'gniii', value: jvBool(false) },
-      ]),
-    ]),
-  },
-  { name: 'toto', value: jvBool(false) },
-]);
+const value = jvArray([jvNumber('123'), jvNumber('456')]); //jvNumber('1234');
+
+// const value = jvObject([
+//   { name: 'foo', value: jvNumber('123') },
+//   {
+//     name: 'gnu',
+//     value: jvArray([
+//       jvNumber('222'),
+//       jvString('bar'),
+//       jvBool(true),
+//       jvObject([
+//         { name: 'hey', value: jvString('there') },
+//         { name: 'gniii', value: jvBool(false) },
+//       ]),
+//     ]),
+//   },
+//   { name: 'toto', value: jvBool(false) },
+// ]);
 // const value = jvObject([{ name: 'foo', value: jvNumber('123') }]);
 
-// const value = jvString('yolo');
+// const value = jvNumber('123');
 
 jsonForm.init(defaultSchemaService, schema, value);
 
