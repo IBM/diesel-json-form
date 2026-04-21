@@ -66,7 +66,7 @@ taJson.addEventListener('input', () => {
 });
 
 btnFromForm.addEventListener('click', () => {
-  const value = stringify(jsonForm.toValue()).withDefault(
+  const value = stringify(jsonForm.toValue(), '  ').withDefault(
     'Broken JSON from form (invalid numbers)',
   );
   taJson.value = value;

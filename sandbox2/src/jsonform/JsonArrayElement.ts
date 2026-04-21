@@ -1,5 +1,5 @@
 import {
-  defaultSchemaService,
+  clearPropertiesIfObject,
   JsonValue,
   JsPath,
   jvArray,
@@ -22,7 +22,6 @@ export class JsonArrayElement extends JsonElement<JvArray> {
   private table?: HTMLTableElement;
   private onChange?: () => void;
   private counter: number = 0;
-  private schemaService: SchemaService = defaultSchemaService;
 
   constructor() {
     super();
@@ -62,7 +61,7 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     }
   }
 
-  private mkRow(elem: JsonValue): Element {
+  private mkRow(schemaService: SchemaService, elem: JsonValue): Element {
     if (this.onChange) {
       const counter = this.counter;
       this.counter++;
@@ -71,7 +70,7 @@ export class JsonArrayElement extends JsonElement<JvArray> {
         this.deleteElement(counter);
       });
       const row = tr({}, [
-        td({}, [createDom(elem, this.onChange, this.schemaService)]),
+        td({}, [createDom(elem, this.onChange, schemaService)]),
         td({}, [btn]),
       ]);
       row.setAttribute('rowId', counter.toString());
@@ -87,14 +86,13 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     schemaService: SchemaService,
   ): void {
     this.onChange = onChange;
-    this.schemaService = schemaService;
     if (this.table) {
       this.removeChild(this.table);
     }
     const newTable = table({ border: '1px solid gray' }, [
       tbody(
         {},
-        value.elems.map((elem) => this.mkRow(elem)),
+        value.elems.map((elem) => this.mkRow(schemaService, elem)),
       ),
     ]);
     this.table = newTable;
@@ -120,23 +118,27 @@ export class JsonArrayElement extends JsonElement<JvArray> {
           schemaService
             .propose(schema, tmpRoot, p.append(newElemIndex))
             .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
-            .then((proposal) => this.appendElemToArray(proposal))
+            .then(clearPropertiesIfObject)
+            .then((proposal) => this.appendElemToArray(schemaService, proposal))
             .catch(() => {
               console.warn('broken json', tmpRoot);
-              this.appendElemToArray(jvString(''));
+              this.appendElemToArray(schemaService, jvString(''));
             });
         });
       } else {
-        this.appendElemToArray(jvString(''));
+        this.appendElemToArray(schemaService, jvString(''));
       }
     });
   }
 
-  private appendElemToArray(elem: JsonValue): void {
+  private appendElemToArray(
+    schemaService: SchemaService,
+    elem: JsonValue,
+  ): void {
     if (this.table) {
       const tbody = this.table.querySelector(':scope > tbody');
       if (tbody) {
-        const row = this.mkRow(elem);
+        const row = this.mkRow(schemaService, elem);
         tbody.appendChild(row);
       }
     }

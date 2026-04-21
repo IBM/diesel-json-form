@@ -67,6 +67,10 @@ export class JsonForm extends HTMLElement {
     return this.schema;
   }
 
+  getSchemaService(): SchemaService {
+    return this.schemaService;
+  }
+
   getPath(elem: JsonElement<JsonValue>): Maybe<JsPath> {
     return maybeOf(this.root).andThen((root) =>
       this.doGetPath(root, elem, JsPath.empty),
