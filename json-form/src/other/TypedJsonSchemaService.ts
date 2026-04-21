@@ -1,13 +1,11 @@
 import { map2 } from 'tea-cup-fp';
-import { BasicOutput, toValueWithMeta, TypedJson } from 'typed-json-ts';
 import {
-  JsonValue,
-  jvNull,
-  jvObject,
-  jvString,
-  parseJsonValue,
-  stringify,
-} from '../JsonValue';
+  OutputUnit,
+  toValueWithMeta,
+  TypedJson,
+  VerboseOutput,
+} from 'typed-json-ts';
+import { JsonValue, jvNull, parseJsonValue, stringify } from '../JsonValue';
 import { JsPath } from '../JsPath';
 import {
   SchemaRenderer,
@@ -15,7 +13,6 @@ import {
   ValidationError,
   ValidationResult,
 } from '../SchemaService';
-import { BasicOutput2 } from './basicOutput';
 
 export class TypedJsonSchemaService implements SchemaService {
   static async load(
@@ -33,7 +30,7 @@ export class TypedJsonSchemaService implements SchemaService {
       stringify(schema),
       stringify(instance),
       (schemaValue: string, instanceValue) =>
-        this.typedJson.validate(schemaValue, instanceValue),
+        this.typedJson.validateVerbose(schemaValue, instanceValue),
     )
       .map((r) =>
         r.then((r) => {
@@ -73,71 +70,71 @@ export class TypedJsonSchemaService implements SchemaService {
   }
 }
 
-// TODO propose to typed-json-ts
-// function flattenSuggestionOutputValues(
-//   suggestOutput: readonly SuggestionOutput[],
-// ): readonly string[] {
-//   return [];
-// }
-
 class TypedJsonValidationResult implements ValidationResult {
-  constructor(private readonly r: BasicOutput) {}
+  constructor(private readonly r: VerboseOutput) {}
 
   getErrors(): readonly ValidationError[] {
-    return this.r.valid
-      ? []
-      : (this.r.errors?.map((e) => ({
-          message: e.error,
-          path: e.instanceLocation.slice(1),
-        })) ?? []);
+    return invalidLeafOutputUnits(this.r).map((o) => ({
+      message: (o as any).error,
+      path: o.instanceLocation.slice(1),
+    }));
   }
 
   getRenderers(): ReadonlyMap<string, SchemaRenderer> {
-    const bo2 = this.r as BasicOutput2;
     const kvs: [string, SchemaRenderer][] =
-      bo2.annotations
+      validLeafOutputUnits(this.r)
         ?.filter((a) => a.keywordLocation.endsWith('/renderer'))
         .map((a) => [
           a.instanceLocation.slice(1),
-          typeof a.value === 'string'
+          typeof (a as any).annotation === 'string'
             ? {
-                key: a.value,
+                key: (a as any).annotation,
                 schemaValue: parseJsonValue(
-                  JSON.stringify(a.value),
+                  JSON.stringify((a as any).annotation),
                 ).withDefault(jvNull),
               }
-            : typeof (a.value as any)['key'] === 'string'
+            : typeof ((a as any).annotation as any)['key'] === 'string'
               ? {
-                  key: (a.value as any)['key'] as string,
+                  key: ((a as any).annotation as any)['key'] as string,
                   schemaValue: parseJsonValue(
-                    JSON.stringify(a.value),
+                    JSON.stringify((a as any).annotation),
                   ).withDefault(jvNull),
                 }
-              : parseJsonValue(JSON.stringify(a.value))
+              : parseJsonValue(JSON.stringify((a as any).annotation))
                   .map((v) => v as unknown as SchemaRenderer)
                   .withDefault({ key: '?', schemaValue: jvNull }),
         ]) ?? [];
-    console.log('FW', kvs, bo2);
     return new Map([...kvs]);
   }
 
   getFormats(path: JsPath): readonly string[] {
-    const bo2 = this.r as BasicOutput2;
     const formats =
-      bo2.annotations
+      validLeafOutputUnits(this.r)
         ?.filter((a) => a.keywordLocation.endsWith('/format'))
         .filter((a) => a.instanceLocation.slice(1) == path.format())
-        .map((a) => a.value as string) ?? [];
+        .map((a) => (a as any).annotation as string) ?? [];
+    console.log('FW formats', formats, this.r);
     return formats;
   }
 
   getDiscriminator(path: JsPath): string | undefined {
-    const bo2 = this.r as BasicOutput2;
     const formats =
-      bo2.annotations
+      validLeafOutputUnits(this.r)
         ?.filter((a) => a.keywordLocation.endsWith('/descriminator'))
         .filter((a) => a.instanceLocation.slice(1) == path.format())
-        .map((a) => a.value as string) ?? [];
+        .map((a) => (a as any).annotation as string) ?? [];
     return formats[0];
   }
+}
+
+function invalidLeafOutputUnits(o: OutputUnit): readonly OutputUnit[] {
+  const units = o.valid ? [] : (o.errors ?? []);
+  const deep = units.flatMap(invalidLeafOutputUnits).filter((o) => !o.valid);
+  return units.length > 0 ? deep : o.valid ? [] : [o];
+}
+
+function validLeafOutputUnits(o: OutputUnit): readonly OutputUnit[] {
+  const units = [...(o.errors ?? []), ...(o.annotations ?? [])];
+  const deep = units.flatMap(validLeafOutputUnits).filter((o) => o.valid);
+  return units.length > 0 ? deep : o.valid ? [o] : [];
 }
