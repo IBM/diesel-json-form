@@ -120,7 +120,11 @@ export class JsonArrayElement extends JsonElement<JvArray> {
           schemaService
             .propose(schema, tmpRoot, p.append(newElemIndex))
             .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
-            .then((proposal) => this.appendElemToArray(proposal));
+            .then((proposal) => this.appendElemToArray(proposal))
+            .catch(() => {
+              console.warn('broken json', tmpRoot);
+              this.appendElemToArray(jvString(''));
+            });
         });
       } else {
         this.appendElemToArray(jvString(''));

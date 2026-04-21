@@ -3,6 +3,7 @@ import {
   JsPath,
   Metadata,
   SchemaService,
+  ValidationError,
 } from '@diesel-parser/json-form';
 import { li, text, ul } from './HtmlBuilder';
 
@@ -33,12 +34,23 @@ export abstract class JsonElement<T extends JsonValue> extends HTMLElement {
     path: JsPath,
   ): void {}
 
-  protected updateErrors(metadata: Metadata, path: JsPath): void {
+  protected getErrors(
+    metadata: Metadata,
+    path: JsPath,
+  ): readonly ValidationError[] {
+    return metadata.errors.get(path.format()) ?? [];
+  }
+
+  private updateErrors(metadata: Metadata, path: JsPath): void {
+    const errors = this.getErrors(metadata, path);
+    this.updateErrorNode(errors);
+  }
+
+  private updateErrorNode(errors: readonly ValidationError[]) {
     if (this.errorsNode) {
       this.errorsNode.remove();
       delete this.errorsNode;
     }
-    const errors = metadata.errors.get(path.format()) ?? [];
     if (errors.length > 0) {
       this.errorsNode = ul(
         { className: 'json-error-list' },
