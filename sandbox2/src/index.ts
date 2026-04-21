@@ -18,13 +18,10 @@ import './style.css';
 import { samples } from './initdata';
 import {
   defaultSchemaService,
-  JsonValue,
-  jvArray,
-  jvBool,
-  jvNumber,
+  jvNull,
   jvObject,
-  jvString,
   parseJsonValue,
+  stringify,
 } from '@diesel-parser/json-form';
 import { JsonForm } from './jsonform/JsonForm';
 import { defineCustomElements } from './jsonform/defineCustomElements';
@@ -40,105 +37,73 @@ samples
     const e = document.createElement('option');
     e.value = s[1];
     e.innerHTML = s[0];
-    // e.selected = e.value.indexOf('BeanContaining') !== -1;
     return e;
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-// const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
+const initialSchema = `{"type":"number"}`;
+const schema = parseJsonValue(initialSchema).toMaybe().withDefault(jvObject());
+
+const initialValue = `123`;
+const value = parseJsonValue(initialValue).toMaybe().withDefault(jvObject());
+
+const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
+taSchema.value = initialSchema;
+const taJson = document.getElementById('ta-json') as HTMLTextAreaElement;
+taJson.value = initialValue;
+
+const btnFromForm = document.getElementById(
+  'btn-from-form',
+) as HTMLButtonElement;
+
+taJson.addEventListener('input', () => {
+  try {
+    JSON.parse(taJson.value);
+    btnToForm.disabled = false;
+  } catch (err) {
+    btnToForm.disabled = true;
+  }
+});
+
+btnFromForm.addEventListener('click', () => {
+  const value = stringify(jsonForm.toValue()).withDefault(
+    'Broken JSON from form (invalid numbers)',
+  );
+  taJson.value = value;
+});
+
+const btnToForm = document.getElementById('btn-to-form') as HTMLButtonElement;
+
+btnToForm.addEventListener('click', () => {
+  const value = parseJsonValue(taJson.value).withDefault(jvNull);
+  const schema = parseJsonValue(taSchema.value);
+  switch (schema.tag) {
+    case 'Ok': {
+      jsonForm.init(defaultSchemaService, schema.value, value);
+      break;
+    }
+    case 'Err': {
+      console.warn("schema isn't valid");
+      break;
+    }
+  }
+});
 
 const jsonForm = document.getElementById('my-form') as JsonForm;
-
-function unsafeParseJsonValue(json: string): JsonValue {
-  return parseJsonValue(json).match(
-    (v) => v,
-    () => {
-      throw new Error('booom');
-    },
-  );
-}
-
-const schema = unsafeParseJsonValue(`
-    {
-        "type": "array",
-        "items": {
-            "type": "number"
-        }
-    }`);
-
-// const schema = unsafeParseJsonValue(`
-//     {
-//         "type": "object",
-//         "properties": {
-//             "foo": {
-//                 "type": "number"
-//             },
-//             "bar": {
-//                 "type": "string"
-//             },
-//             "toto": {
-//                 "type": "boolean",
-//                 "const": true
-//             }
-//         }
-//     }`);
-
-// const schema = unsafeParseJsonValue(`
-//     {
-//         "type": "number"
-//     }`);
-
-const value = jvArray([jvNumber('123'), jvNumber('456')]); //jvNumber('1234');
-
-// const value = jvObject([
-//   { name: 'foo', value: jvNumber('123') },
-//   {
-//     name: 'gnu',
-//     value: jvArray([
-//       jvNumber('222'),
-//       jvString('bar'),
-//       jvBool(true),
-//       jvObject([
-//         { name: 'hey', value: jvString('there') },
-//         { name: 'gniii', value: jvBool(false) },
-//       ]),
-//     ]),
-//   },
-//   { name: 'toto', value: jvBool(false) },
-// ]);
-// const value = jvObject([{ name: 'foo', value: jvNumber('123') }]);
-
-// const value = jvNumber('123');
-
 jsonForm.init(defaultSchemaService, schema, value);
+jsonForm.addChangeListener((value) => {
+  btnFromForm.disabled = !stringify(value)
+    .map(() => true)
+    .withDefault(false);
+});
 
-console.log('toValue:', jsonForm.toValue());
+taJson.value = stringify(jsonForm.toValue(), '  ').withDefault('broken json');
 
-// sampleSchemaSelect.addEventListener('change', () => {
-//   taSchema.value = sampleSchemaSelect.value;
-//   // editor1.setValue(sampleSchemaSelect.value);
-//   // sendJsonStr();
-//   //   jsonForm.schema = JSON.parse(taSchema.value);
-
-//   //   jsonForm.schema = JSON.parse(taSchema.value);
-//   //   jsonForm.render(jvString('yalla'));
-// });
-
-// sampleSchemaSelect.value = 'BeanContainingOtherBean';
-
-// const value = 'yalla';
-
-// const value = [1, 2, 'foo', true, { foo: 'bar' }];
-
-// const value = {};
-
-// jsonForm.schema = {};
-
-// valueFromAny(value).match(
-//   (v) => jsonForm.render(v),
-//   (err) => {
-//     throw err;
-//   },
-// );
-
-// jsonForm.value = toJsonNode('turbo');
+sampleSchemaSelect.addEventListener('change', () => {
+  taSchema.value = sampleSchemaSelect.value;
+  const value = jsonForm.toValue();
+  parseJsonValue(taSchema.value).match(
+    (schema) => jsonForm.init(defaultSchemaService, schema, value),
+    (err) => console.error(err),
+  );
+});

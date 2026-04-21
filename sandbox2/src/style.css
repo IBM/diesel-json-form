@@ -15,8 +15,8 @@
 }
 
 .main {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: auto auto auto;
   flex-grow: 1;
 }
 
@@ -41,7 +41,7 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  width: 33%;
+  /* width: 33%; */
   padding: 4px;
 }
 

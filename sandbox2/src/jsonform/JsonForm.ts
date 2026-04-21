@@ -13,6 +13,8 @@ import { createDom } from './createDom';
 import { emptyMetadata } from '@diesel-parser/json-form/dist/Metadata';
 import { just, map2, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 
+export type ChangeListener = (value: JsonValue) => void;
+
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
 
@@ -20,6 +22,23 @@ export class JsonForm extends HTMLElement {
   private schemaService: SchemaService = defaultSchemaService;
   private schema?: JsonValue;
   private metadata: Metadata = emptyMetadata;
+
+  private changeListeners: ChangeListener[] = [];
+
+  addChangeListener(l: ChangeListener) {
+    this.changeListeners.push(l);
+  }
+
+  removeChangeListener(l: ChangeListener) {
+    const i = this.changeListeners.indexOf(l);
+    this.changeListeners.splice(i);
+  }
+
+  private fireChanged(value: JsonValue) {
+    for (const l of this.changeListeners) {
+      l(value);
+    }
+  }
 
   constructor() {
     super();
@@ -76,6 +95,7 @@ export class JsonForm extends HTMLElement {
   private validate() {
     if (this.schemaService && this.schema) {
       const value = this.toValue();
+      this.fireChanged(value);
       const validJson = map2(
         stringify(this.schema),
         stringify(value),
