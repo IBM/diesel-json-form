@@ -8,6 +8,7 @@ import {
 } from '@diesel-parser/json-form';
 import { input } from './HtmlBuilder';
 import { JsonElement } from './JsonElement';
+import { findEnclosingForm } from './findEnclosingForm';
 
 export class JsonNumberElement extends JsonElement<JvNumber> {
   static TAG_NAME = 'json-number';
@@ -25,10 +26,10 @@ export class JsonNumberElement extends JsonElement<JvNumber> {
     return jvNumber(this.input.value);
   }
 
-  fromValue(value: JvNumber, onChange: () => void) {
+  fromValue(value: JvNumber) {
     this.input.value = value.value;
     this.input.addEventListener('input', () => {
-      onChange();
+      findEnclosingForm(this).onChange();
     });
   }
 

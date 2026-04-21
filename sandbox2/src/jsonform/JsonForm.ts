@@ -40,6 +40,10 @@ export class JsonForm extends HTMLElement {
     }
   }
 
+  onChange(): void {
+    this.validate();
+  }
+
   constructor() {
     super();
   }
@@ -57,7 +61,7 @@ export class JsonForm extends HTMLElement {
     if (this.root) {
       this.removeChild(this.root);
     }
-    const newRoot = createDom(value, this.validate.bind(this), schemaService);
+    const newRoot = createDom(value);
     this.root = newRoot;
     this.appendChild(newRoot);
     this.validate();
@@ -97,9 +101,9 @@ export class JsonForm extends HTMLElement {
   }
 
   private validate() {
+    const value = this.toValue();
+    this.fireChanged(value);
     if (this.schemaService && this.schema) {
-      const value = this.toValue();
-      this.fireChanged(value);
       const validJson = map2(
         stringify(this.schema),
         stringify(value),

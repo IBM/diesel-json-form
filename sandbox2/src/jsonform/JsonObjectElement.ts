@@ -7,7 +7,6 @@ import {
   jvObject,
   JvObject,
   Metadata,
-  SchemaService,
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
@@ -20,7 +19,6 @@ export class JsonObjectElement extends JsonElement<JvObject> {
 
   private table: HTMLTableElement = table({ border: '1px solid gray' });
   private propertiesNode: HTMLElement = div({});
-  private onChange?: () => void;
 
   constructor() {
     super();
@@ -57,28 +55,17 @@ export class JsonObjectElement extends JsonElement<JvObject> {
     );
   }
 
-  private mkRow(
-    schemaService: SchemaService,
-    property: JsonProperty,
-    onChange: () => void,
-  ): Element {
+  private mkRow(property: JsonProperty): Element {
     return tr({}, [
       td({}, [text(property.name)]),
-      td({}, [createDom(property.value, onChange, schemaService)]),
+      td({}, [createDom(property.value)]),
     ]);
   }
 
-  fromValue(
-    value: JvObject,
-    onChange: () => void,
-    schemaService: SchemaService,
-  ): void {
-    this.onChange = onChange;
+  fromValue(value: JvObject): void {
     const newBody = tbody(
       {},
-      value.properties.map((property) =>
-        this.mkRow(schemaService, property, onChange),
-      ),
+      value.properties.map((property) => this.mkRow(property)),
     );
     empty(this.table);
     this.table.appendChild(newBody);
@@ -118,22 +105,19 @@ export class JsonObjectElement extends JsonElement<JvObject> {
         .getSchemaService()
         .propose(schema, newRoot, path.value.append(propertyName))
         .then((proposals) => {
-          if (this.onChange) {
-            const propertyProposals = proposals.map(clearPropertiesIfObject);
-            const proposal = propertyProposals[0];
-            if (proposal) {
-              // append the prop
-              const p: JsonProperty = {
-                name: propertyName,
-                value: proposal,
-              };
-              const schemaService = findEnclosingForm(this).getSchemaService();
-              const row = this.mkRow(schemaService, p, this.onChange);
-              const tbody = this.table.querySelector(':scope > tbody');
-              if (tbody) {
-                tbody.append(row);
-                this.onChange();
-              }
+          const propertyProposals = proposals.map(clearPropertiesIfObject);
+          const proposal = propertyProposals[0];
+          if (proposal) {
+            // append the prop
+            const p: JsonProperty = {
+              name: propertyName,
+              value: proposal,
+            };
+            const row = this.mkRow(p);
+            const tbody = this.table.querySelector(':scope > tbody');
+            if (tbody) {
+              tbody.append(row);
+              form.onChange();
             }
           }
         })

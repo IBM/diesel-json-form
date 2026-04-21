@@ -7,7 +7,6 @@ import {
   jvNull,
   jvString,
   Metadata,
-  SchemaService,
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
@@ -20,7 +19,6 @@ export class JsonArrayElement extends JsonElement<JvArray> {
   static TAG_NAME = 'json-array';
 
   private table?: HTMLTableElement;
-  private onChange?: () => void;
   private counter: number = 0;
 
   constructor() {
@@ -57,42 +55,30 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     );
     if (row) {
       row.remove();
-      this.onChange?.();
+      findEnclosingForm(this).onChange();
     }
   }
 
-  private mkRow(schemaService: SchemaService, elem: JsonValue): Element {
-    if (this.onChange) {
-      const counter = this.counter;
-      this.counter++;
-      const btn = button({}, [text('delete elem')]);
-      btn.addEventListener('click', () => {
-        this.deleteElement(counter);
-      });
-      const row = tr({}, [
-        td({}, [createDom(elem, this.onChange, schemaService)]),
-        td({}, [btn]),
-      ]);
-      row.setAttribute('rowId', counter.toString());
-      return row;
-    } else {
-      throw 'onChange not available';
-    }
+  private mkRow(elem: JsonValue): Element {
+    const counter = this.counter;
+    this.counter++;
+    const btn = button({}, [text('delete elem')]);
+    btn.addEventListener('click', () => {
+      this.deleteElement(counter);
+    });
+    const row = tr({}, [td({}, [createDom(elem)]), td({}, [btn])]);
+    row.setAttribute('rowId', counter.toString());
+    return row;
   }
 
-  fromValue(
-    value: JvArray,
-    onChange: () => void,
-    schemaService: SchemaService,
-  ): void {
-    this.onChange = onChange;
+  fromValue(value: JvArray): void {
     if (this.table) {
       this.removeChild(this.table);
     }
     const newTable = table({ border: '1px solid gray' }, [
       tbody(
         {},
-        value.elems.map((elem) => this.mkRow(schemaService, elem)),
+        value.elems.map((elem) => this.mkRow(elem)),
       ),
     ]);
     this.table = newTable;
@@ -115,30 +101,28 @@ export class JsonArrayElement extends JsonElement<JvArray> {
         const path = form.getPath(this);
         path.forEach((p) => {
           const tmpRoot = setValueAt(root, p, tmpArray);
-          schemaService
+          form
+            .getSchemaService()
             .propose(schema, tmpRoot, p.append(newElemIndex))
             .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
             .then(clearPropertiesIfObject)
-            .then((proposal) => this.appendElemToArray(schemaService, proposal))
+            .then((proposal) => this.appendElemToArray(proposal))
             .catch(() => {
               console.warn('broken json', tmpRoot);
-              this.appendElemToArray(schemaService, jvString(''));
+              this.appendElemToArray(jvString(''));
             });
         });
       } else {
-        this.appendElemToArray(schemaService, jvString(''));
+        this.appendElemToArray(jvString(''));
       }
     });
   }
 
-  private appendElemToArray(
-    schemaService: SchemaService,
-    elem: JsonValue,
-  ): void {
+  private appendElemToArray(elem: JsonValue): void {
     if (this.table) {
       const tbody = this.table.querySelector(':scope > tbody');
       if (tbody) {
-        const row = this.mkRow(schemaService, elem);
+        const row = this.mkRow(elem);
         tbody.appendChild(row);
       }
     }

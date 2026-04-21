@@ -2,7 +2,6 @@ import {
   JsonValue,
   JsPath,
   Metadata,
-  SchemaService,
   ValidationError,
 } from '@diesel-parser/json-form';
 import { li, text, ul } from './HtmlBuilder';
@@ -16,11 +15,7 @@ export abstract class JsonElement<T extends JsonValue> extends HTMLElement {
 
   abstract toValue(): T;
 
-  abstract fromValue(
-    value: T,
-    onChange: () => void,
-    schemaService: SchemaService,
-  ): void;
+  abstract fromValue(value: T): void;
 
   setMetadata(metadata: Metadata, path: JsPath): void {
     this.updateErrors(metadata, path);
