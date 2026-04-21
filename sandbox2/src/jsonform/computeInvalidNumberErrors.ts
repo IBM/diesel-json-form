@@ -1,46 +1,9 @@
 import {
-  isValidNumberLiteral,
   JsonValue,
   JsPath,
   ValidationError,
-  ValidationResult,
+  isValidNumberLiteral,
 } from '@diesel-parser/json-form';
-
-export class ValidationData {
-  static fromValidationResult(
-    validationResult: ValidationResult,
-  ): ValidationData {
-    const errors = new Map();
-    for (const e of validationResult.getErrors()) {
-      let errsAtPath = errors.get(e.path);
-      if (!errsAtPath) {
-        errsAtPath = [];
-        errors.set(e.path, errsAtPath);
-      }
-      errsAtPath.push(e);
-    }
-    return new ValidationData(errors);
-  }
-
-  static empty(): ValidationData {
-    return new ValidationData(new Map());
-  }
-
-  constructor(private errors: Map<string, ValidationError[]>) {}
-
-  getErrors(path: JsPath): ValidationError[] {
-    const errs = this.errors.get(path.format());
-    const res = errs === undefined ? [] : errs;
-    return res;
-  }
-
-  setInvalidNumberErrors(invalidNumbers: Map<string, ValidationError[]>) {
-    for (const path of invalidNumbers.keys()) {
-      const errs = invalidNumbers.get(path) ?? [];
-      this.errors.set(path, errs);
-    }
-  }
-}
 
 export function computeInvalidNumberErrors(
   value: JsonValue,

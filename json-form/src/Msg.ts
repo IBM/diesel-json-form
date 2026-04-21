@@ -20,11 +20,7 @@ import * as TPM from 'tea-pop-menu';
 import { Box } from 'tea-pop-core';
 import { MenuAction } from './ContextMenuActions';
 import { Maybe, Result } from 'tea-cup-fp';
-import {
-  SchemaRenderer,
-  ValidationError,
-  ValidationResult,
-} from './SchemaService';
+import { Metadata } from './Metadata';
 
 export interface HasPath {
   readonly path: JsPath;
@@ -130,15 +126,6 @@ export interface AddPropertyClicked extends HasPath {
 
 export interface RecomputeMetadata {
   tag: 'recompute-metadata';
-}
-
-export interface Metadata {
-  readonly validationResult: ValidationResult;
-  readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;
-  readonly comboBoxes: Map<string, ReadonlyArray<string>>;
-  readonly formats: Map<string, ReadonlyArray<string>>;
-  readonly propertiesToAdd: Map<string, ReadonlyArray<string>>;
-  readonly renderers: ReadonlyMap<string, SchemaRenderer>;
 }
 
 export interface GotMetadata {

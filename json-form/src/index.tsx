@@ -25,3 +25,5 @@ export * from './SchemaService';
 export * from './utils/diffLists';
 export * from './worker/SchemaServiceWorker';
 export * from './worker/WorkerClient';
+export * from './Metadata';
+export * from './ComputeAllTask';

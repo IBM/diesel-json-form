@@ -1,14 +1,21 @@
-import { JsonValue, JsPath, jvArray, JvArray } from '@diesel-parser/json-form';
+import {
+  JsonValue,
+  JsPath,
+  jvArray,
+  JvArray,
+  Metadata,
+  SchemaService,
+} from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { button, table, tbody, td, text, tr } from './HtmlBuilder';
 import { createDom } from './createDom';
-import { ValidationData } from './ValidationData';
 
 export class JsonArrayElement extends JsonElement<JvArray> {
   static TAG_NAME = 'json-array';
 
   private table?: HTMLTableElement;
   private onChange?: () => void;
+  private counter: number = 0;
 
   constructor() {
     super();
@@ -16,7 +23,7 @@ export class JsonArrayElement extends JsonElement<JvArray> {
 
   private findRows(): Element[] {
     if (this.table) {
-      return [...this.table.querySelectorAll('tbody > tr')];
+      return [...this.table.querySelectorAll(':scope > tbody > tr')];
     } else {
       return [];
     }
@@ -35,13 +42,21 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     return jvArray(this.findElems().map((elem) => elem.toValue()));
   }
 
-  private deleteElement(index: number) {
-    const rows = this.findRows();
-    rows[index].remove();
-    this.onChange?.();
+  private deleteElement(rowId: number) {
+    const row = this.findRows().find(
+      (e) => e.getAttribute('rowId') === rowId.toString(),
+    );
+    if (row) {
+      row.remove();
+      this.onChange?.();
+    }
   }
 
-  fromValue(value: JvArray, onChange: () => void): void {
+  fromValue(
+    value: JvArray,
+    onChange: () => void,
+    schemaService: SchemaService,
+  ): void {
     this.onChange = onChange;
     if (this.table) {
       this.removeChild(this.table);
@@ -49,25 +64,32 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     const newTable = table({ border: '1px solid gray' }, [
       tbody(
         {},
-        value.elems.map((elem, elemIndex) => {
+        value.elems.map((elem) => {
+          const counter = this.counter;
+          this.counter++;
           const btn = button({}, [text('delete elem')]);
           btn.addEventListener('click', () => {
-            this.deleteElement(elemIndex);
+            this.deleteElement(counter);
           });
-          return tr({}, [td({}, [createDom(elem, onChange)]), td({}, [btn])]);
+          const row = tr({}, [
+            td({}, [createDom(elem, onChange, schemaService)]),
+            td({}, [btn]),
+          ]);
+          row.setAttribute('rowId', counter.toString());
+          return row;
         }),
       ),
     ]);
     this.table = newTable;
     this.appendChild(newTable);
+    const addBtn = button({}, [text('Add item')]);
+    this.appendChild(addBtn);
+    addBtn.addEventListener('click', () => {});
   }
 
-  protected doSetValidationData(
-    validationData: ValidationData,
-    path: JsPath,
-  ): void {
+  protected doSetMetadata(metadata: Metadata, path: JsPath): void {
     this.findElems().forEach((elem, index) =>
-      elem.setValidationData(validationData, path.append(index)),
+      elem.setMetadata(metadata, path.append(index)),
     );
   }
 }

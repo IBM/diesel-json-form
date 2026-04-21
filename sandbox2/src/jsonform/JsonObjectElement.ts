@@ -3,11 +3,12 @@ import {
   JsPath,
   jvObject,
   JvObject,
+  Metadata,
+  SchemaService,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { table, tbody, td, text, tr } from './HtmlBuilder';
 import { createDom } from './createDom';
-import { ValidationData } from './ValidationData';
 
 export class JsonObjectElement extends JsonElement<JvObject> {
   static TAG_NAME = 'json-object';
@@ -48,7 +49,11 @@ export class JsonObjectElement extends JsonElement<JvObject> {
     );
   }
 
-  fromValue(value: JvObject, onChange: () => void): void {
+  fromValue(
+    value: JvObject,
+    onChange: () => void,
+    schemaService: SchemaService,
+  ): void {
     if (this.table) {
       this.removeChild(this.table);
     }
@@ -58,7 +63,7 @@ export class JsonObjectElement extends JsonElement<JvObject> {
         value.properties.map((property) =>
           tr({}, [
             td({}, [text(property.name)]),
-            td({}, [createDom(property.value, onChange)]),
+            td({}, [createDom(property.value, onChange, schemaService)]),
           ]),
         ),
       ),
@@ -67,9 +72,9 @@ export class JsonObjectElement extends JsonElement<JvObject> {
     this.appendChild(newTable);
   }
 
-  protected doSetValidationData(validationData: ValidationData, path: JsPath) {
+  protected doSetMetadata(metadata: Metadata, path: JsPath) {
     this.findProps().forEach(([name, elem]) =>
-      elem.setValidationData(validationData, path.append(name)),
+      elem.setMetadata(metadata, path.append(name)),
     );
   }
 }

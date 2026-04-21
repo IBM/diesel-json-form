@@ -3,11 +3,15 @@ import {
   JsonValue,
   JsPath,
   jvNull,
+  Metadata,
   SchemaService,
+  validateAndComputeMetadata,
+  ValidationError,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { createDom } from './createDom';
-import { computeInvalidNumberErrors, ValidationData } from './ValidationData';
+import { computeInvalidNumberErrors } from './computeInvalidNumberErrors';
+import { emptyMetadata } from '@diesel-parser/json-form/dist/Metadata';
 
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
@@ -15,7 +19,7 @@ export class JsonForm extends HTMLElement {
   private root?: JsonElement<JsonValue>;
   private schemaService: SchemaService = defaultSchemaService;
   private schema?: JsonValue;
-  private validationData: ValidationData = ValidationData.empty();
+  private metadata: Metadata = emptyMetadata;
 
   constructor() {
     super();
@@ -34,7 +38,7 @@ export class JsonForm extends HTMLElement {
     if (this.root) {
       this.removeChild(this.root);
     }
-    const newRoot = createDom(value, this.validate.bind(this));
+    const newRoot = createDom(value, this.validate.bind(this), schemaService);
     this.root = newRoot;
     this.appendChild(newRoot);
     this.validate();
@@ -45,21 +49,13 @@ export class JsonForm extends HTMLElement {
     const invalidNumbers = computeInvalidNumberErrors(value);
     if (invalidNumbers.size > 0) {
       // no need to validate but handle invalid numbers
-      if (this.validationData) {
-        this.validationData.setInvalidNumberErrors(invalidNumbers);
-      } else {
-        this.validationData = ValidationData.empty();
-        this.validationData.setInvalidNumberErrors(invalidNumbers);
-      }
-      this.root?.setValidationData(this.validationData, JsPath.empty);
+      this.metadata = addErrorsToMetadata(invalidNumbers, this.metadata);
+      this.root?.setMetadata(this.metadata, JsPath.empty);
     } else {
       if (this.schemaService && this.schema) {
-        this.schemaService
-          .validate(this.schema, value)
-          .then((vr) => {
-            this.validationData = ValidationData.fromValidationResult(vr);
-            console.log('validated', value, this.validationData);
-            this.root?.setValidationData(this.validationData, JsPath.empty);
+        validateAndComputeMetadata(this.schemaService, this.schema, value)
+          .then((metadata) => {
+            this.root?.setMetadata(metadata, JsPath.empty);
           })
           .catch((err) => {
             console.error('validate error', err);
@@ -67,4 +63,21 @@ export class JsonForm extends HTMLElement {
       }
     }
   }
+}
+
+function addErrorsToMetadata(
+  errors: Map<string, ValidationError[]>,
+  metadata: Metadata,
+): Metadata {
+  const newErrors = new Map<string, readonly ValidationError[]>(
+    metadata.errors,
+  );
+  for (const path of errors.keys()) {
+    const errs = errors.get(path) ?? [];
+    newErrors.set(path, errs);
+  }
+  return {
+    ...metadata,
+    errors: newErrors,
+  };
 }

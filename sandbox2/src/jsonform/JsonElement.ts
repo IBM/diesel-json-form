@@ -1,6 +1,10 @@
-import { JsonValue, JsPath } from '@diesel-parser/json-form';
+import {
+  JsonValue,
+  JsPath,
+  Metadata,
+  SchemaService,
+} from '@diesel-parser/json-form';
 import { li, text, ul } from './HtmlBuilder';
-import { ValidationData } from './ValidationData';
 
 export abstract class JsonElement<T extends JsonValue> extends HTMLElement {
   private errorsNode?: HTMLElement;
@@ -11,38 +15,36 @@ export abstract class JsonElement<T extends JsonValue> extends HTMLElement {
 
   abstract toValue(): T;
 
-  abstract fromValue(value: T, onChange: () => void): void;
+  abstract fromValue(
+    value: T,
+    onChange: () => void,
+    schemaService: SchemaService,
+  ): void;
 
-  setValidationData(validationData: ValidationData, path: JsPath): void {
-    this.updateErrors(validationData, path);
-    this.doSetValidationData(validationData, path);
+  setMetadata(metadata: Metadata, path: JsPath): void {
+    this.updateErrors(metadata, path);
+    this.doSetMetadata(metadata, path);
   }
 
-  protected doSetValidationData(
+  protected doSetMetadata(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    validationData: ValidationData,
+    metadata: Metadata,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     path: JsPath,
   ): void {}
 
-  protected updateErrors(validationData: ValidationData, path: JsPath): void {
+  protected updateErrors(metadata: Metadata, path: JsPath): void {
     if (this.errorsNode) {
       this.errorsNode.remove();
+      delete this.errorsNode;
     }
-    const newErrors = createErrorsNode(validationData, path);
-    this.errorsNode = newErrors;
-    this.appendChild(newErrors);
+    const errors = metadata.errors.get(path.format()) ?? [];
+    if (errors.length > 0) {
+      this.errorsNode = ul(
+        { className: 'json-error-list' },
+        errors.map((error) => li({}, [text(error.message)])),
+      );
+      this.appendChild(this.errorsNode);
+    }
   }
-}
-
-export function createErrorsNode(
-  validationData: ValidationData,
-  path: JsPath,
-): HTMLElement {
-  return ul(
-    { className: 'json-error-list' },
-    validationData
-      .getErrors(path)
-      .map((error) => li({}, [text(error.message)])),
-  );
 }

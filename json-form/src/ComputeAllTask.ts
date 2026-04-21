@@ -1,5 +1,6 @@
 import { Cmd, Task } from 'tea-cup-fp';
-import { gotMetadata, Metadata, Msg } from './Msg';
+import { gotMetadata, Msg } from './Msg';
+import { Metadata } from './Metadata';
 import { SchemaService, ValidationResult } from './SchemaService';
 import { getValueAt, JsonValue } from './JsonValue';
 import { JsPath } from './JsPath';
@@ -11,47 +12,54 @@ function computeAllTask(
   value: JsonValue,
 ): Task<Error, Metadata> {
   return Task.fromPromise(() => {
-    return schemaService
-      .validate(schema, value)
-      .then(async (validationResult) => {
-        const errors = new Map();
-        validationResult.getErrors().forEach((err) => {
-          const errsAtPath = errors.get(err.path);
-          if (errsAtPath) {
-            errors.set(err.path, [...errsAtPath, err]);
-          } else {
-            errors.set(err.path, [err]);
-          }
-        });
-        const propertiesToAdd = new Map<string, ReadonlyArray<string>>();
-        await doComputePropsToAdd(
-          schemaService,
-          schema,
-          value,
-          validationResult,
-          propertiesToAdd,
-        );
-        const comboBoxes = new Map<string, ReadonlyArray<string>>();
-        const formats = new Map<string, ReadonlyArray<string>>();
-        await doComputeStringsMetadata(
-          schemaService,
-          schema,
-          value,
-          validationResult,
-          comboBoxes,
-          formats,
-        );
-        const res: Metadata = {
-          errors,
-          comboBoxes,
-          formats,
-          propertiesToAdd,
-          validationResult,
-          renderers: validationResult.getRenderers(),
-        };
-        return res;
-      });
+    return validateAndComputeMetadata(schemaService, schema, value);
   });
+}
+
+export async function validateAndComputeMetadata(
+  schemaService: SchemaService,
+  schema: JsonValue,
+  value: JsonValue,
+): Promise<Metadata> {
+  return schemaService
+    .validate(schema, value)
+    .then(async (validationResult) => {
+      const errors = new Map();
+      validationResult.getErrors().forEach((err) => {
+        const errsAtPath = errors.get(err.path);
+        if (errsAtPath) {
+          errors.set(err.path, [...errsAtPath, err]);
+        } else {
+          errors.set(err.path, [err]);
+        }
+      });
+      const propertiesToAdd = new Map<string, ReadonlyArray<string>>();
+      await doComputePropsToAdd(
+        schemaService,
+        schema,
+        value,
+        validationResult,
+        propertiesToAdd,
+      );
+      const comboBoxes = new Map<string, ReadonlyArray<string>>();
+      const formats = new Map<string, ReadonlyArray<string>>();
+      await doComputeStringsMetadata(
+        schemaService,
+        schema,
+        value,
+        validationResult,
+        comboBoxes,
+        formats,
+      );
+      const res: Metadata = {
+        errors,
+        comboBoxes,
+        formats,
+        propertiesToAdd,
+        renderers: validationResult.getRenderers(),
+      };
+      return res;
+    });
 }
 
 export function computeAllCmd(

@@ -1,4 +1,4 @@
-import { JsonValue } from '@diesel-parser/json-form';
+import { JsonValue, SchemaService } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { JsonStringElement } from './JsonStringElement';
 import { JsonNullElement } from './JsonNullElement';
@@ -10,6 +10,7 @@ import { JsonArrayElement } from './JsonArrayElement';
 export function createDom(
   value: JsonValue,
   onChange: () => void,
+  schemaService: SchemaService,
 ): JsonElement<JsonValue> {
   const mkNodes: () => JsonElement<JsonValue> = () => {
     switch (value.tag) {
@@ -28,6 +29,6 @@ export function createDom(
     }
   };
   const root = mkNodes();
-  root.fromValue(value, onChange);
+  root.fromValue(value, onChange, schemaService);
   return root;
 }
