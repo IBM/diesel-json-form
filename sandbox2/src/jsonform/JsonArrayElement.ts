@@ -10,10 +10,16 @@ import {
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import { button, table, tbody, td, text, tr } from './HtmlBuilder';
+import { button, div, node, table, tbody, td, text, tr } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { maybeOf } from 'tea-cup-fp';
+import {
+  item,
+  MenuElement,
+  separator,
+  subMenu,
+} from '../contextmenu/ContextMenu';
 
 export class JsonArrayElement extends JsonElement<JvArray> {
   static TAG_NAME = 'json-array';
@@ -62,12 +68,36 @@ export class JsonArrayElement extends JsonElement<JvArray> {
   private mkRow(elem: JsonValue): Element {
     const counter = this.counter;
     this.counter++;
-    const btn = button({}, [text('delete elem')]);
-    btn.addEventListener('click', () => {
-      this.deleteElement(counter);
-    });
+    const btn = button({}, [text('...')]);
     const row = tr({}, [td({}, [createDom(elem)]), td({}, [btn])]);
     row.setAttribute('rowId', counter.toString());
+    btn.addEventListener('click', () => {
+      MenuElement.open(
+        [
+          item(div({}, [text('delete')]), () => {
+            this.deleteElement(counter);
+          }),
+          item(div({}, [text('is')])),
+          separator(),
+          item(div({}, [text('a')])),
+          item(div({}, [text('test')])),
+          subMenu(div({}, [text('sub-menu')]), () =>
+            Promise.resolve([
+              item(div({}, [text('foo')])),
+              item(div({}, [text('bar')])),
+              subMenu(div({}, [text('baz')]), () =>
+                Promise.resolve([
+                  item(div({}, [text('gniiiiiii')])),
+                  item(div({}, [text('qsdlkjdqslkj sdqj')])),
+                ]),
+              ),
+            ]),
+          ),
+        ],
+        btn,
+      );
+      //   this.deleteElement(counter);
+    });
     return row;
   }
 

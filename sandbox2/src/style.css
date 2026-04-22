@@ -134,3 +134,16 @@ json-string.json-error input {
 .json-error-list {
   color: red;
 }
+
+.ctmn-highlighted > div {
+  background-color: gray;
+}
+
+.ctmn-sub-menu-item {
+  display: flex;
+  flex-direction: row;
+}
+
+.ctmn-sub-menu-item-content {
+  flex-grow: 1;
+}

@@ -41,10 +41,10 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{"type":"number"}`;
+const initialSchema = `{"type":"array"}`;
 const schema = parseJsonValue(initialSchema).toMaybe().withDefault(jvObject());
 
-const initialValue = `123`;
+const initialValue = `[]`;
 const value = parseJsonValue(initialValue).toMaybe().withDefault(jvObject());
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;

@@ -37,6 +37,7 @@ export const table = node('table');
 export const tbody = node('tbody');
 export const tr = node('tr');
 export const td = node('td');
+export const textarea = node('textarea');
 
 export function text(s: string): Text {
   return document.createTextNode(s);
