@@ -147,3 +147,26 @@ json-string.json-error input {
 .ctmn-sub-menu-item-content {
   flex-grow: 1;
 }
+
+.json-array-items {
+  display: flex;
+  flex-direction: column;
+}
+
+collapsible-section {
+  display: flex;
+  flex-direction: row;
+}
+
+collapsible-section > .right-pane {
+  flex-grow: 1;
+}
+
+collapsible-section > .right-pane > .label-row {
+  display: flex;
+  flex-direction: row;
+}
+
+collapsible-section > .right-pane > .label-row > .label-container {
+  flex-grow: 1;
+}

@@ -11,6 +11,7 @@ import {
   MenuItemSeparator,
   MenuItemSub,
 } from '../contextmenu/ContextMenu';
+import { CollapsibleSection } from './CollapsibleSection';
 
 export function defineCustomElements() {
   customElements.define(JsonForm.TAG_NAME, JsonForm);
@@ -24,4 +25,5 @@ export function defineCustomElements() {
   customElements.define(MenuItem.TAG_NAME, MenuItem);
   customElements.define(MenuItemSeparator.TAG_NAME, MenuItemSeparator);
   customElements.define(MenuItemSub.TAG_NAME, MenuItemSub);
+  customElements.define(CollapsibleSection.TAG_NAME, CollapsibleSection);
 }
