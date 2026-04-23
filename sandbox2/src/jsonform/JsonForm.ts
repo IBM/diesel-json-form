@@ -25,6 +25,8 @@ export class JsonForm extends HTMLElement {
 
   private changeListeners: ChangeListener[] = [];
 
+  private static VALIDATION_COUNTER = 0;
+
   addChangeListener(l: ChangeListener) {
     this.changeListeners.push(l);
   }
@@ -110,11 +112,21 @@ export class JsonForm extends HTMLElement {
         () => true,
       ).withDefault(false);
       if (validJson) {
+        JsonForm.VALIDATION_COUNTER++;
+        const validationCounter = JsonForm.VALIDATION_COUNTER;
+        console.log('validate', validationCounter);
         validateAndComputeMetadata(this.schemaService, this.schema, value)
           .then((metadata) => {
-            console.log('got metadata', value, metadata);
-            this.metadata = metadata;
-            this.root?.setMetadata(metadata, JsPath.empty);
+            if (validationCounter === JsonForm.VALIDATION_COUNTER) {
+              console.log(
+                'validate',
+                validationCounter,
+                JsonForm.VALIDATION_COUNTER,
+              );
+              console.log('got metadata', value, metadata);
+              this.metadata = metadata;
+              this.root?.setMetadata(metadata, JsPath.empty);
+            }
           })
           .catch((err) => {
             console.error('validate error', err);

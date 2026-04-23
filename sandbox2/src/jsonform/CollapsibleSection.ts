@@ -19,6 +19,8 @@ export class CollapsibleSection extends HTMLElement {
   static TEXT_EXPANDED = '-';
   static TEXT_COLLAPSED = '+';
 
+  private static TRIGGER_COUNT = 0;
+
   constructor() {
     super();
     this.expandCollapseButton = button({}, [
@@ -30,11 +32,20 @@ export class CollapsibleSection extends HTMLElement {
     this.menuButton = button({}, [text('...')]);
     this.menuButton.addEventListener('click', () => {
       if (this.menu) {
+        CollapsibleSection.TRIGGER_COUNT++;
+        const triggerCount = CollapsibleSection.TRIGGER_COUNT;
+        console.log('context menu', triggerCount);
         this.menuButton.disabled = true;
-        this.menu().then((i) => {
-          MenuElement.open(i, this.menuButton);
-          this.menuButton.disabled = false;
-        });
+        this.menu()
+          .then((i) => {
+            if (CollapsibleSection.TRIGGER_COUNT === triggerCount) {
+              console.log('open menu', triggerCount);
+              MenuElement.open(i, this.menuButton);
+            }
+          })
+          .finally(() => {
+            this.menuButton.disabled = false;
+          });
       }
     });
     this.contentContainer = div({ className: 'collapsible-content' }, []);

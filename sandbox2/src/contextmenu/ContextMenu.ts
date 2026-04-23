@@ -29,12 +29,11 @@ export function subMenu(
 }
 
 export class MenuElement extends HTMLElement {
-  private focusNode: HTMLTextAreaElement = this.createFocusNode();
-
   static TAG_NAME = 'ctmn-menu';
 
   private static menuStack: MenuElement[] = [];
   private static glassPane?: HTMLElement;
+  private static focusNode?: HTMLTextAreaElement;
 
   constructor() {
     super();
@@ -44,19 +43,17 @@ export class MenuElement extends HTMLElement {
     s.backgroundColor = 'white';
   }
 
-  private createFocusNode(): HTMLTextAreaElement {
+  private static createFocusNode(): HTMLTextAreaElement {
     const fn = textarea({});
     const s = fn.style;
     s.height = px(0);
     s.width = px(0);
     s.border = 'none';
     s.padding = '0';
-    document.body.appendChild(fn);
-    this.focusNode = fn;
     fn.addEventListener('keydown', (e) => {
       switch (e.key) {
         case 'Escape': {
-          MenuElement.closeAll();
+          MenuElement.closeLast();
           break;
         }
         default: {
@@ -68,6 +65,13 @@ export class MenuElement extends HTMLElement {
     return fn;
   }
 
+  private static addFocusNodeIfNeeded() {
+    if (!MenuElement.focusNode) {
+      MenuElement.focusNode = MenuElement.createFocusNode();
+      document.body.appendChild(MenuElement.focusNode);
+    }
+  }
+
   private static addGlassPaneIfNeeded() {
     if (!MenuElement.glassPane) {
       MenuElement.glassPane = div({ className: 'ctmn-glasspane' });
@@ -76,17 +80,35 @@ export class MenuElement extends HTMLElement {
     }
   }
 
+  static closeLast(): void {
+    console.log('closeLast', MenuElement.menuStack);
+    if (MenuElement.menuStack.length === 1) {
+      MenuElement.closeAll();
+    } else {
+      const elem = MenuElement.menuStack.pop();
+      console.log('closeLast after pop', MenuElement.menuStack);
+      elem?.remove();
+    }
+  }
+
   static closeAll(): void {
+    console.log('closeAll', MenuElement.menuStack);
     for (const m of MenuElement.menuStack) {
       m.remove();
     }
+    MenuElement.menuStack = [];
     if (MenuElement.glassPane) {
       MenuElement.glassPane.remove();
       delete MenuElement.glassPane;
     }
+    if (MenuElement.focusNode) {
+      MenuElement.focusNode.remove();
+      delete MenuElement.focusNode;
+    }
   }
 
   static closeAfter(menu: MenuElement): void {
+    console.log('closeAfter', MenuElement.menuStack);
     const menuIndex = MenuElement.menuStack.indexOf(menu);
     if (menuIndex !== -1) {
       const newStack = [];
@@ -105,19 +127,21 @@ export class MenuElement extends HTMLElement {
     if (items.length === 0) {
       return;
     }
-    this.addGlassPaneIfNeeded();
+    MenuElement.addGlassPaneIfNeeded();
+    MenuElement.addFocusNodeIfNeeded();
     const menu = new MenuElement();
     for (const item of items) {
       menu.appendChild(item);
     }
     menu.open(anchor);
     MenuElement.menuStack.push(menu);
+    console.log('open', MenuElement.menuStack);
   }
 
   private open(anchor: Element) {
     document.body.append(this);
     this.place(anchor);
-    this.focusNode.focus();
+    MenuElement.focusNode?.focus();
   }
 
   private place(anchor: Element) {
