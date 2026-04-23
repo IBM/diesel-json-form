@@ -472,6 +472,18 @@ export function parseJsonValue(v: string): Result<string, JsonValue> {
   }
 }
 
+export function parseJsonValueUnsafe(v: string): JsonValue {
+  const value = parseJsonValue(v);
+  switch (value.tag) {
+    case 'Ok': {
+      return value.value;
+    }
+    case 'Err': {
+      throw 'broken json : ' + v;
+    }
+  }
+}
+
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   return String(error);

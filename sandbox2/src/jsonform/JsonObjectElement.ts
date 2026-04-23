@@ -10,41 +10,45 @@ import {
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import { button, div, empty, table, tbody, td, text, tr } from './HtmlBuilder';
+import { button, div, empty, text } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
+import { CollapsibleSection } from './CollapsibleSection';
+import { createMenu } from './createMenu';
 
 export class JsonObjectElement extends JsonElement<JvObject> {
   static TAG_NAME = 'json-object';
 
-  private table: HTMLTableElement = table({ border: '1px solid gray' });
+  private elemsContainer: HTMLElement = div({ className: 'json-object-props' });
   private propertiesNode: HTMLElement = div({});
+
+  private static ATTR_PROP_NAME = 'json-property-name';
 
   constructor() {
     super();
-  }
-
-  connectedCallback() {
-    this.appendChild(this.table);
+    this.appendChild(this.elemsContainer);
     this.appendChild(this.propertiesNode);
   }
 
-  private findProps(): readonly [string, JsonElement<JsonValue>][] {
-    const rows = [...this.table.querySelectorAll(':scope > tbody > tr')];
-    return rows.flatMap((tr) => {
-      const cells = tr.querySelectorAll(':scope > td');
-      const cell0 = cells[0];
-      const cell1 = cells[1];
-      if (cell0 && cell1) {
-        const name: string | null = cell0.textContent;
-        if (name) {
-          const propValue = cell1.firstChild;
-          if (propValue && propValue instanceof JsonElement) {
-            return [[name, propValue]];
-          }
-        }
+  private findSections(): CollapsibleSection[] {
+    const rows = [];
+    for (const s of this.elemsContainer.children) {
+      if (s instanceof CollapsibleSection) {
+        rows.push(s);
       }
-      return [];
+    }
+    return rows;
+  }
+
+  private findProps(): readonly [string, JsonElement<JsonValue>][] {
+    return this.findSections().flatMap((s) => {
+      const propName = s.getAttribute(JsonObjectElement.ATTR_PROP_NAME);
+      const elem = s.getContent();
+      if (propName && elem) {
+        return [[propName, elem]];
+      } else {
+        return [];
+      }
     });
   }
 
@@ -56,19 +60,42 @@ export class JsonObjectElement extends JsonElement<JvObject> {
   }
 
   private mkRow(property: JsonProperty): Element {
-    return tr({}, [
-      td({}, [text(property.name)]),
-      td({}, [createDom(property.value)]),
-    ]);
+    const collapsibleSection = new CollapsibleSection();
+    collapsibleSection.setTitle(property.name);
+    collapsibleSection.setContent(createDom(property.value));
+    collapsibleSection.setAttribute(
+      JsonObjectElement.ATTR_PROP_NAME,
+      property.name,
+    );
+    collapsibleSection.setMenuItems(() => {
+      const form = findEnclosingForm(this);
+      const schema = form.getSchema();
+      if (!schema) {
+        return Promise.resolve([]);
+      }
+      return form
+        .getPath(this)
+        .map((path) =>
+          createMenu(
+            form.getSchemaService(),
+            schema,
+            form.toValue(),
+            path.append(property.name),
+            false,
+          ),
+        )
+        .withDefaultSupply(() => Promise.resolve([]));
+    });
+    return collapsibleSection;
   }
 
   fromValue(value: JvObject): void {
-    const newBody = tbody(
-      {},
-      value.properties.map((property) => this.mkRow(property)),
+    if (this.elemsContainer) {
+      empty(this.elemsContainer);
+    }
+    value.properties.forEach((prop) =>
+      this.elemsContainer.appendChild(this.mkRow(prop)),
     );
-    empty(this.table);
-    this.table.appendChild(newBody);
   }
 
   protected doSetMetadata(metadata: Metadata, path: JsPath) {
@@ -114,11 +141,8 @@ export class JsonObjectElement extends JsonElement<JvObject> {
               value: proposal,
             };
             const row = this.mkRow(p);
-            const tbody = this.table.querySelector(':scope > tbody');
-            if (tbody) {
-              tbody.append(row);
-              form.onChange();
-            }
+            this.elemsContainer.appendChild(row);
+            form.onChange();
           }
         })
         .catch((err) => console.error('error', err));

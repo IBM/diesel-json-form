@@ -18,9 +18,8 @@ import './style.css';
 import { samples } from './initdata';
 import {
   defaultSchemaService,
-  jvNull,
-  jvObject,
   parseJsonValue,
+  parseJsonValueUnsafe,
   stringify,
 } from '@diesel-parser/json-form';
 import { JsonForm } from './jsonform/JsonForm';
@@ -41,11 +40,19 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{"type":"array"}`;
-const schema = parseJsonValue(initialSchema).toMaybe().withDefault(jvObject());
+const initialSchema = `{"type":"object"}`;
+const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `[1,2]`;
-const value = parseJsonValue(initialValue).toMaybe().withDefault(jvObject());
+const initialValue = `{
+    "foo": "bar", 
+    "baz": {
+        "x": [
+            1,
+            2
+        ]
+    }
+}`;
+const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
 taSchema.value = initialSchema;
@@ -66,27 +73,19 @@ taJson.addEventListener('input', () => {
 });
 
 btnFromForm.addEventListener('click', () => {
-  const value = stringify(jsonForm.toValue(), '  ').withDefault(
+  const value = jsonForm.toValue();
+  const valueStr = stringify(value, '  ').withDefault(
     'Broken JSON from form (invalid numbers)',
   );
-  taJson.value = value;
+  taJson.value = valueStr;
 });
 
 const btnToForm = document.getElementById('btn-to-form') as HTMLButtonElement;
 
 btnToForm.addEventListener('click', () => {
-  const value = parseJsonValue(taJson.value).withDefault(jvNull);
-  const schema = parseJsonValue(taSchema.value);
-  switch (schema.tag) {
-    case 'Ok': {
-      jsonForm.init(defaultSchemaService, schema.value, value);
-      break;
-    }
-    case 'Err': {
-      console.warn("schema isn't valid");
-      break;
-    }
-  }
+  const value = parseJsonValueUnsafe(taJson.value);
+  const schema = parseJsonValueUnsafe(taSchema.value);
+  jsonForm.init(defaultSchemaService, schema, value);
 });
 
 const jsonForm = document.getElementById('my-form') as JsonForm;
@@ -96,8 +95,6 @@ jsonForm.addChangeListener((value) => {
     .map(() => true)
     .withDefault(false);
 });
-
-taJson.value = stringify(jsonForm.toValue(), '  ').withDefault('broken json');
 
 sampleSchemaSelect.addEventListener('change', () => {
   taSchema.value = sampleSchemaSelect.value;

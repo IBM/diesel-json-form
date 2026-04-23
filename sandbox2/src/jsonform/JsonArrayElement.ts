@@ -69,38 +69,6 @@ export class JsonArrayElement extends JsonElement<JvArray> {
         .withDefaultSupply(() => Promise.resolve([]));
     });
     return collapsibleSection;
-
-    // const btn = button({}, [text('...')]);
-    // const row = tr({}, [td({}, [createDom(elem)]), td({}, [btn])]);
-    // row.setAttribute('rowId', counter.toString());
-    // btn.addEventListener('click', () => {
-    //   MenuElement.open(
-    //     [
-    //       item(div({}, [text('delete')]), () => {
-    //         this.deleteElement(counter);
-    //       }),
-    //       item(div({}, [text('is')])),
-    //       separator(),
-    //       item(div({}, [text('a')])),
-    //       item(div({}, [text('test')])),
-    //       subMenu(div({}, [text('sub-menu')]), () =>
-    //         Promise.resolve([
-    //           item(div({}, [text('foo')])),
-    //           item(div({}, [text('bar')])),
-    //           subMenu(div({}, [text('baz')]), () =>
-    //             Promise.resolve([
-    //               item(div({}, [text('gniiiiiii')])),
-    //               item(div({}, [text('qsdlkjdqslkj sdqj')])),
-    //             ]),
-    //           ),
-    //         ]),
-    //       ),
-    //     ],
-    //     btn,
-    //   );
-    //   //   this.deleteElement(counter);
-    // });
-    // return row;
   }
 
   fromValue(value: JvArray): void {
