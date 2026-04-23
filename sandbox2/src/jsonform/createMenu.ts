@@ -19,7 +19,11 @@ import {
   subMenu,
 } from '../contextmenu/ContextMenu';
 import { div, text } from './HtmlBuilder';
-import { MenuActions } from '../contextmenu/MenuActions';
+import {
+  AddMenuAction,
+  DeleteMenuAction,
+  MenuActions,
+} from '../contextmenu/MenuActions';
 
 function label(s: string): Element {
   return div({}, [text(s)]);
@@ -36,15 +40,11 @@ export function createMenu(
   return getValueAt(root, path)
     .map((valueAtPath) =>
       schemaService.propose(schema, root, path).then((proposals) => {
+        const isArray = valueAtPath.tag === 'jv-array';
         const addItems: () => MenuItem[] = () => {
-          const isArray = valueAtPath.tag === 'jv-array';
           const isObject = !strictMode && valueAtPath.tag === 'jv-object';
-          if (isArray || isObject) {
-            return [
-              item(label('add'), () => {
-                menuActions.add?.();
-              }),
-            ];
+          if (menuActions.add && (isArray || isObject)) {
+            return [new AddMenuAction(isArray, menuActions.add).createItem()];
           }
           return [];
         };
@@ -82,11 +82,9 @@ export function createMenu(
           ? [subMenu(label('move'), () => Promise.resolve(moveMenuItems()))]
           : [];
 
-        const deleteItems = [
-          item(label('delete'), () => {
-            menuActions.delete?.();
-          }),
-        ];
+        const deleteItems = menuActions.delete
+          ? [new DeleteMenuAction(menuActions.delete).createItem()]
+          : [];
 
         const changeTypes = createTypesMenu(
           path,

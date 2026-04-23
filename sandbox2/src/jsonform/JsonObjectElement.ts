@@ -61,14 +61,20 @@ export class JsonObjectElement extends JsonElement<JvObject> {
     );
   }
 
-  private findPropElement(propertyName: string): Maybe<JsonElement<JsonValue>> {
+  private findPropSection(propertyName: string): Maybe<CollapsibleSection> {
     for (const s of this.findSections()) {
       const sectionPropName = s.getAttribute(JsonObjectElement.ATTR_PROP_NAME);
       if (sectionPropName === propertyName) {
-        return maybeOf(s.getContent());
+        return just(s);
       }
     }
     return nothing;
+  }
+
+  private findPropElement(propertyName: string): Maybe<JsonElement<JsonValue>> {
+    return this.findPropSection(propertyName).andThen((s) =>
+      maybeOf(s.getContent()),
+    );
   }
 
   private mkRow(property: JsonProperty): Element {
@@ -95,6 +101,12 @@ export class JsonObjectElement extends JsonElement<JvObject> {
             path.append(property.name),
             false,
             {
+              delete: () => {
+                this.findPropSection(property.name).forEach((s) => {
+                  s.remove();
+                  findEnclosingForm(this).onChange();
+                });
+              },
               add: () => {
                 switch (property.value.tag) {
                   case 'jv-object': {

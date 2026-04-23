@@ -65,6 +65,7 @@ export class JsonArrayElement extends JsonElement<JvArray> {
       if (!schema) {
         return Promise.resolve([]);
       }
+      debugger;
       return form
         .getPath(this)
         .map((path) =>
@@ -76,6 +77,7 @@ export class JsonArrayElement extends JsonElement<JvArray> {
             false,
             {
               delete: () => {
+                debugger;
                 const section = this.findSections()[index];
                 if (section) {
                   section.remove();
