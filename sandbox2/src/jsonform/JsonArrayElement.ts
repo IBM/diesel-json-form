@@ -9,7 +9,7 @@ import {
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import { div, empty } from './HtmlBuilder';
+import { div, empty, moveElementDown, moveElementUp } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -103,16 +103,14 @@ export class JsonArrayElement extends JsonElement<JvArray> {
   }
 
   private moveUp(section: CollapsibleSection) {
-    if (section.previousElementSibling) {
-      section.parentNode?.insertBefore(section, section.previousElementSibling);
+    if (moveElementUp(section)) {
       this.refreshItemNumbers();
       findEnclosingForm(this).onChange();
     }
   }
 
   private moveDown(section: CollapsibleSection) {
-    if (section.nextElementSibling) {
-      section.parentNode?.insertBefore(section.nextElementSibling, section);
+    if (moveElementDown(section)) {
       this.refreshItemNumbers();
       findEnclosingForm(this).onChange();
     }

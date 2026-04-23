@@ -10,7 +10,14 @@ import {
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import { button, div, empty, text } from './HtmlBuilder';
+import {
+  button,
+  div,
+  empty,
+  moveElementDown,
+  moveElementUp,
+  text,
+} from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -102,44 +109,16 @@ export class JsonObjectElement extends JsonElement<JvObject> {
             false,
             {
               delete: () => {
-                this.findPropSection(property.name).forEach((s) => {
-                  s.remove();
-                  findEnclosingForm(this).onChange();
-                });
+                this.delete(collapsibleSection);
               },
               add: () => {
-                switch (property.value.tag) {
-                  case 'jv-object': {
-                    this.findPropElement(property.name)
-                      .andThen((e) => {
-                        if (e instanceof JsonObjectElement) {
-                          return just(e);
-                        }
-                        return nothing;
-                      })
-                      .forEach((objElem) => {
-                        // TODO
-                        console.log(objElem);
-                        debugger;
-                      });
-                    break;
-                  }
-                  case 'jv-array': {
-                    this.findPropElement(property.name)
-                      .andThen((e) => {
-                        if (e instanceof JsonArrayElement) {
-                          return just(e);
-                        }
-                        return nothing;
-                      })
-                      .forEach((arrayElem) => {
-                        arrayElem.appendItem();
-                      });
-                  }
-                  default: {
-                    break;
-                  }
-                }
+                this.add(property);
+              },
+              moveUp: () => {
+                this.moveUp(collapsibleSection);
+              },
+              moveDown: () => {
+                this.moveDown(collapsibleSection);
               },
             },
           ),
@@ -147,6 +126,58 @@ export class JsonObjectElement extends JsonElement<JvObject> {
         .withDefaultSupply(() => Promise.resolve([]));
     });
     return collapsibleSection;
+  }
+
+  private delete(s: CollapsibleSection): void {
+    s.remove();
+    findEnclosingForm(this).onChange();
+  }
+
+  private moveUp(s: CollapsibleSection): void {
+    if (moveElementUp(s)) {
+      findEnclosingForm(this).onChange();
+    }
+  }
+
+  private moveDown(s: CollapsibleSection): void {
+    if (moveElementDown(s)) {
+      findEnclosingForm(this).onChange();
+    }
+  }
+
+  private add(property: JsonProperty): void {
+    switch (property.value.tag) {
+      case 'jv-object': {
+        this.findPropElement(property.name)
+          .andThen((e) => {
+            if (e instanceof JsonObjectElement) {
+              return just(e);
+            }
+            return nothing;
+          })
+          .forEach((objElem) => {
+            // TODO
+            console.log(objElem);
+            debugger;
+          });
+        break;
+      }
+      case 'jv-array': {
+        this.findPropElement(property.name)
+          .andThen((e) => {
+            if (e instanceof JsonArrayElement) {
+              return just(e);
+            }
+            return nothing;
+          })
+          .forEach((arrayElem) => {
+            arrayElem.appendItem();
+          });
+      }
+      default: {
+        break;
+      }
+    }
   }
 
   fromValue(value: JvObject): void {
