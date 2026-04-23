@@ -23,6 +23,8 @@ import {
   AddMenuAction,
   DeleteMenuAction,
   MenuActions,
+  MoveDownMenuAction,
+  MoveUpMenuAction,
 } from '../contextmenu/MenuActions';
 
 function label(s: string): Element {
@@ -37,6 +39,7 @@ export function createMenu(
   strictMode: boolean,
   menuActions: MenuActions,
 ): Promise<AbstractMenuItemElement[]> {
+  console.log('createMenu', path.format());
   return getValueAt(root, path)
     .map((valueAtPath) =>
       schemaService.propose(schema, root, path).then((proposals) => {
@@ -72,8 +75,14 @@ export function createMenu(
           const index = indexOfPathInParent(root, path);
           const canMoveUp = index > 0;
           const canMoveDown = index >= 0 && index < nbItems - 1;
-          const moveUpItems = canMoveUp ? [item(label('move up'))] : [];
-          const moveDownItems = canMoveDown ? [item(label('move down'))] : [];
+          const moveUpItems =
+            menuActions.moveUp && canMoveUp
+              ? [new MoveUpMenuAction(menuActions.moveUp).createItem()]
+              : [];
+          const moveDownItems =
+            menuActions.moveDown && canMoveDown
+              ? [new MoveDownMenuAction(menuActions.moveDown).createItem()]
+              : [];
 
           return moveUpItems.concat(moveDownItems);
         };

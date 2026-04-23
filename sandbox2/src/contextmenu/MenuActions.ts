@@ -31,3 +31,15 @@ export class DeleteMenuAction extends MenuAction {
     super('Delete', action);
   }
 }
+
+export class MoveUpMenuAction extends MenuAction {
+  constructor(action: () => void) {
+    super('Move up', action);
+  }
+}
+
+export class MoveDownMenuAction extends MenuAction {
+  constructor(action: () => void) {
+    super('Move down', action);
+  }
+}

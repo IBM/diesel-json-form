@@ -55,9 +55,8 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     });
   }
 
-  private mkRow(elem: JsonValue, index: number): Element {
+  private mkRow(elem: JsonValue): Element {
     const collapsibleSection = new CollapsibleSection();
-    collapsibleSection.setTitle('#' + index);
     collapsibleSection.setContent(createDom(elem));
     collapsibleSection.setMenuItems(() => {
       const form = findEnclosingForm(this);
@@ -65,32 +64,58 @@ export class JsonArrayElement extends JsonElement<JvArray> {
       if (!schema) {
         return Promise.resolve([]);
       }
-      debugger;
-      return form
-        .getPath(this)
-        .map((path) =>
-          createMenu(
-            form.getSchemaService(),
-            schema,
-            form.toValue(),
-            path.append(index),
-            false,
-            {
-              delete: () => {
-                debugger;
-                const section = this.findSections()[index];
-                if (section) {
-                  section.remove();
-                  this.refreshItemNumbers();
-                  form.onChange();
-                }
+      const rowIndex = this.findSections().indexOf(collapsibleSection);
+      if (rowIndex !== -1) {
+        return form
+          .getPath(this)
+          .map((path) =>
+            createMenu(
+              form.getSchemaService(),
+              schema,
+              form.toValue(),
+              path.append(rowIndex),
+              false,
+              {
+                delete: () => {
+                  this.delete(collapsibleSection);
+                },
+                moveUp: () => {
+                  this.moveUp(collapsibleSection);
+                },
+                moveDown: () => {
+                  this.moveDown(collapsibleSection);
+                },
               },
-            },
-          ),
-        )
-        .withDefaultSupply(() => Promise.resolve([]));
+            ),
+          )
+          .withDefaultSupply(() => Promise.resolve([]));
+      } else {
+        return Promise.resolve([]);
+      }
     });
     return collapsibleSection;
+  }
+
+  private delete(section: CollapsibleSection) {
+    section.remove();
+    this.refreshItemNumbers();
+    findEnclosingForm(this).onChange();
+  }
+
+  private moveUp(section: CollapsibleSection) {
+    if (section.previousElementSibling) {
+      section.parentNode?.insertBefore(section, section.previousElementSibling);
+      this.refreshItemNumbers();
+      findEnclosingForm(this).onChange();
+    }
+  }
+
+  private moveDown(section: CollapsibleSection) {
+    if (section.nextElementSibling) {
+      section.parentNode?.insertBefore(section.nextElementSibling, section);
+      this.refreshItemNumbers();
+      findEnclosingForm(this).onChange();
+    }
   }
 
   appendItem(): void {
@@ -126,9 +151,9 @@ export class JsonArrayElement extends JsonElement<JvArray> {
   }
 
   appendValue(value: JsonValue): void {
-    const nbSections = this.findSections().length;
-    const newRow = this.mkRow(value, nbSections);
+    const newRow = this.mkRow(value);
     this.elemsContainer.appendChild(newRow);
+    this.refreshItemNumbers();
     findEnclosingForm(this).onChange();
   }
 
@@ -136,9 +161,10 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     if (this.elemsContainer) {
       empty(this.elemsContainer);
     }
-    value.elems.forEach((elem, index) =>
-      this.elemsContainer.appendChild(this.mkRow(elem, index)),
+    value.elems.forEach((elem) =>
+      this.elemsContainer.appendChild(this.mkRow(elem)),
     );
+    this.refreshItemNumbers();
   }
 
   protected doSetMetadata(metadata: Metadata, path: JsPath): void {
