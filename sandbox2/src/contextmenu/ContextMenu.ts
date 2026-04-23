@@ -80,7 +80,7 @@ export class MenuElement extends HTMLElement {
     }
   }
 
-  static closeLast(): void {
+  private static closeLast(): void {
     console.log('closeLast', MenuElement.menuStack);
     if (MenuElement.menuStack.length === 1) {
       MenuElement.closeAll();
