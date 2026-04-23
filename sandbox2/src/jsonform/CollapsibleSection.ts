@@ -16,9 +16,17 @@ export class CollapsibleSection extends HTMLElement {
   private content?: JsonElement<JsonValue>;
   private menu?: () => Promise<AbstractMenuItemElement[]>;
 
+  static TEXT_EXPANDED = '-';
+  static TEXT_COLLAPSED = '+';
+
   constructor() {
     super();
-    this.expandCollapseButton = button({}, [text('[-]')]);
+    this.expandCollapseButton = button({}, [
+      text(CollapsibleSection.TEXT_EXPANDED),
+    ]);
+    this.expandCollapseButton.addEventListener('click', () =>
+      this.toggleExpandCollapse(),
+    );
     this.menuButton = button({}, [text('...')]);
     this.menuButton.addEventListener('click', () => {
       if (this.menu) {
@@ -43,6 +51,19 @@ export class CollapsibleSection extends HTMLElement {
         this.contentContainer,
       ]),
     );
+  }
+
+  toggleExpandCollapse(): void {
+    if (this.content) {
+      const collapsed = this.content.style.display === 'none';
+      if (collapsed) {
+        this.content.style.display = 'block';
+        this.expandCollapseButton.innerText = CollapsibleSection.TEXT_EXPANDED;
+      } else {
+        this.content.style.display = 'none';
+        this.expandCollapseButton.innerText = CollapsibleSection.TEXT_COLLAPSED;
+      }
+    }
   }
 
   setContent(element: JsonElement<JsonValue>) {
