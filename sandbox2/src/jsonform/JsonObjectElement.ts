@@ -15,6 +15,8 @@ import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
 import { createMenu } from './createMenu';
+import { just, Maybe, maybeOf, nothing } from 'tea-cup-fp';
+import { JsonArrayElement } from './JsonArrayElement';
 
 export class JsonObjectElement extends JsonElement<JvObject> {
   static TAG_NAME = 'json-object';
@@ -59,6 +61,16 @@ export class JsonObjectElement extends JsonElement<JvObject> {
     );
   }
 
+  private findPropElement(propertyName: string): Maybe<JsonElement<JsonValue>> {
+    for (const s of this.findSections()) {
+      const sectionPropName = s.getAttribute(JsonObjectElement.ATTR_PROP_NAME);
+      if (sectionPropName === propertyName) {
+        return maybeOf(s.getContent());
+      }
+    }
+    return nothing;
+  }
+
   private mkRow(property: JsonProperty): Element {
     const collapsibleSection = new CollapsibleSection();
     collapsibleSection.setTitle(property.name);
@@ -82,6 +94,42 @@ export class JsonObjectElement extends JsonElement<JvObject> {
             form.toValue(),
             path.append(property.name),
             false,
+            {
+              add: () => {
+                switch (property.value.tag) {
+                  case 'jv-object': {
+                    this.findPropElement(property.name)
+                      .andThen((e) => {
+                        if (e instanceof JsonObjectElement) {
+                          return just(e);
+                        }
+                        return nothing;
+                      })
+                      .forEach((objElem) => {
+                        // TODO
+                        console.log(objElem);
+                        debugger;
+                      });
+                    break;
+                  }
+                  case 'jv-array': {
+                    this.findPropElement(property.name)
+                      .andThen((e) => {
+                        if (e instanceof JsonArrayElement) {
+                          return just(e);
+                        }
+                        return nothing;
+                      })
+                      .forEach((arrayElem) => {
+                        arrayElem.appendItem();
+                      });
+                  }
+                  default: {
+                    break;
+                  }
+                }
+              },
+            },
           ),
         )
         .withDefaultSupply(() => Promise.resolve([]));

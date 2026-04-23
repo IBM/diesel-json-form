@@ -19,6 +19,7 @@ import {
   subMenu,
 } from '../contextmenu/ContextMenu';
 import { div, text } from './HtmlBuilder';
+import { MenuActions } from '../contextmenu/MenuActions';
 
 function label(s: string): Element {
   return div({}, [text(s)]);
@@ -30,6 +31,7 @@ export function createMenu(
   root: JsonValue,
   path: JsPath,
   strictMode: boolean,
+  menuActions: MenuActions,
 ): Promise<AbstractMenuItemElement[]> {
   return getValueAt(root, path)
     .map((valueAtPath) =>
@@ -38,7 +40,11 @@ export function createMenu(
           const isArray = valueAtPath.tag === 'jv-array';
           const isObject = !strictMode && valueAtPath.tag === 'jv-object';
           if (isArray || isObject) {
-            return [item(label('add'))];
+            return [
+              item(label('add'), () => {
+                menuActions.add?.();
+              }),
+            ];
           }
           return [];
         };
@@ -76,7 +82,11 @@ export function createMenu(
           ? [subMenu(label('move'), () => Promise.resolve(moveMenuItems()))]
           : [];
 
-        const deleteItems = [item(label('delete'))];
+        const deleteItems = [
+          item(label('delete'), () => {
+            menuActions.delete?.();
+          }),
+        ];
 
         const changeTypes = createTypesMenu(
           path,

@@ -1,9 +1,12 @@
 import {
+  clearPropertiesIfObject,
   JsonValue,
   JsPath,
   jvArray,
   JvArray,
+  jvNull,
   Metadata,
+  setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { div, empty } from './HtmlBuilder';
@@ -11,6 +14,7 @@ import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
 import { createMenu } from './createMenu';
+import { maybeOf } from 'tea-cup-fp';
 
 export class JsonArrayElement extends JsonElement<JvArray> {
   static TAG_NAME = 'json-array';
@@ -45,6 +49,12 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     return jvArray(values);
   }
 
+  private refreshItemNumbers() {
+    this.findSections().forEach((s, i) => {
+      s.setTitle('#' + i);
+    });
+  }
+
   private mkRow(elem: JsonValue, index: number): Element {
     const collapsibleSection = new CollapsibleSection();
     collapsibleSection.setTitle('#' + index);
@@ -64,11 +74,60 @@ export class JsonArrayElement extends JsonElement<JvArray> {
             form.toValue(),
             path.append(index),
             false,
+            {
+              delete: () => {
+                const section = this.findSections()[index];
+                if (section) {
+                  section.remove();
+                  this.refreshItemNumbers();
+                  form.onChange();
+                }
+              },
+            },
           ),
         )
         .withDefaultSupply(() => Promise.resolve([]));
     });
     return collapsibleSection;
+  }
+
+  appendItem(): void {
+    const form = findEnclosingForm(this);
+    const schema = form.getSchema();
+    if (schema) {
+      const root = form.toValue();
+      const elems = this.findElems();
+      const newElemIndex = elems.length;
+      // we create a transient JsonValue with the array updated
+      // so that we have a value at new index path
+      // otherwise the proposals would be empty because
+      // no path matches the requested index
+      const newArrayElems = [...this.toValue().elems, jvNull];
+      const tmpArray = jvArray(newArrayElems);
+      const path = form.getPath(this);
+      path.forEach((p) => {
+        const tmpRoot = setValueAt(root, p, tmpArray);
+        form
+          .getSchemaService()
+          .propose(schema, tmpRoot, p.append(newElemIndex))
+          .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
+          .then(clearPropertiesIfObject)
+          .then((proposal) => this.appendValue(proposal))
+          .catch(() => {
+            console.warn('broken json', tmpRoot);
+            this.appendValue(jvNull);
+          });
+      });
+    } else {
+      this.appendValue(jvNull);
+    }
+  }
+
+  appendValue(value: JsonValue): void {
+    const nbSections = this.findSections().length;
+    const newRow = this.mkRow(value, nbSections);
+    this.elemsContainer.appendChild(newRow);
+    findEnclosingForm(this).onChange();
   }
 
   fromValue(value: JvArray): void {
@@ -78,59 +137,7 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     value.elems.forEach((elem, index) =>
       this.elemsContainer.appendChild(this.mkRow(elem, index)),
     );
-
-    // const newTable = table({ border: '1px solid gray' }, [
-    //   tbody(
-    //     {},
-    //     value.elems.map((elem, index) => this.mkRow(elem, index)),
-    //   ),
-    // ]);
-    // this.table = newTable;
-    // this.appendChild(newTable);
-    // const addBtn = button({}, [text('Add item')]);
-    // this.appendChild(addBtn);
-    // addBtn.addEventListener('click', () => {
-    //   const form = findEnclosingForm(this);
-    //   const schema = form.getSchema();
-    //   if (schema) {
-    //     const root = form.toValue();
-    //     const elems = this.findElems();
-    //     const newElemIndex = elems.length;
-    //     // we create a transient JsonValue with the array updated
-    //     // so that we have a value at new index path
-    //     // otherwise the proposals would be empty because
-    //     // no path matches the requested index
-    //     const newArrayElems = [...this.toValue().elems, jvNull];
-    //     const tmpArray = jvArray(newArrayElems);
-    //     const path = form.getPath(this);
-    //     path.forEach((p) => {
-    //       const tmpRoot = setValueAt(root, p, tmpArray);
-    //       form
-    //         .getSchemaService()
-    //         .propose(schema, tmpRoot, p.append(newElemIndex))
-    //         .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
-    //         .then(clearPropertiesIfObject)
-    //         .then((proposal) => this.appendElemToArray(proposal))
-    //         .catch(() => {
-    //           console.warn('broken json', tmpRoot);
-    //           this.appendElemToArray(jvString(''));
-    //         });
-    //     });
-    //   } else {
-    //     this.appendElemToArray(jvString(''));
-    //   }
-    // });
   }
-
-  //   private appendElemToArray(elem: JsonValue): void {
-  // if (this.table) {
-  //   const tbody = this.table.querySelector(':scope > tbody');
-  //   if (tbody) {
-  //     const row = this.mkRow(elem);
-  //     tbody.appendChild(row);
-  //   }
-  // }
-  //   }
 
   protected doSetMetadata(metadata: Metadata, path: JsPath): void {
     this.findElems().forEach((elem, index) =>
