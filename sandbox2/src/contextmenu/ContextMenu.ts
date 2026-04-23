@@ -34,6 +34,7 @@ export class MenuElement extends HTMLElement {
   static TAG_NAME = 'ctmn-menu';
 
   private static menuStack: MenuElement[] = [];
+  private static glassPane?: HTMLElement;
 
   constructor() {
     super();
@@ -53,14 +54,13 @@ export class MenuElement extends HTMLElement {
     document.body.appendChild(fn);
     this.focusNode = fn;
     fn.addEventListener('keydown', (e) => {
-      console.log('rvkb', e.key);
       switch (e.key) {
-        case 'ESC': {
-          console.log('EXC');
+        case 'Escape': {
+          MenuElement.closeAll();
           break;
         }
         default: {
-          console.log('lmmlk');
+          console.log('menu key', e.key);
           break;
         }
       }
@@ -68,11 +68,22 @@ export class MenuElement extends HTMLElement {
     return fn;
   }
 
+  private static addGlassPaneIfNeeded() {
+    if (!MenuElement.glassPane) {
+      MenuElement.glassPane = div({ className: 'ctmn-glasspane' });
+      MenuElement.glassPane.addEventListener('click', MenuElement.closeAll);
+      document.body.appendChild(MenuElement.glassPane);
+    }
+  }
+
   static closeAll(): void {
-    for (const m of this.menuStack) {
+    for (const m of MenuElement.menuStack) {
       m.remove();
     }
-    MenuElement.menuStack = [];
+    if (MenuElement.glassPane) {
+      MenuElement.glassPane.remove();
+      delete MenuElement.glassPane;
+    }
   }
 
   static closeAfter(menu: MenuElement): void {
@@ -91,6 +102,10 @@ export class MenuElement extends HTMLElement {
   }
 
   static open(items: readonly AbstractMenuItemElement[], anchor: Element) {
+    if (items.length === 0) {
+      return;
+    }
+    this.addGlassPaneIfNeeded();
     const menu = new MenuElement();
     for (const item of items) {
       menu.appendChild(item);
@@ -129,6 +144,7 @@ export class MenuElement extends HTMLElement {
   }
 
   highlight(item: AbstractMenuItemElement): void {
+    MenuElement.closeAfter(this);
     for (const i of this.getMenuItems()) {
       if (i instanceof HighlightableItem) {
         i.setHighlighted(item === i);
@@ -224,7 +240,6 @@ export class MenuItemSub extends HighlightableItem {
   }
 
   setHighlighted(highlighted: boolean): void {
-    console.log('rvkb', this, highlighted);
     const wasHighlighted = this.isHighlighted();
     if (wasHighlighted !== highlighted) {
       this.doHighlight(highlighted);

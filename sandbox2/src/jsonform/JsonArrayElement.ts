@@ -1,36 +1,16 @@
 import {
-  clearPropertiesIfObject,
   JsonValue,
   JsPath,
   jvArray,
   JvArray,
-  jvNull,
-  jvString,
   Metadata,
-  setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import {
-  button,
-  div,
-  empty,
-  node,
-  table,
-  tbody,
-  td,
-  text,
-  tr,
-} from './HtmlBuilder';
+import { div, empty } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
-import { maybeOf } from 'tea-cup-fp';
-import {
-  item,
-  MenuElement,
-  separator,
-  subMenu,
-} from '../contextmenu/ContextMenu';
 import { CollapsibleSection } from './CollapsibleSection';
+import { createMenu } from './createMenu';
 
 export class JsonArrayElement extends JsonElement<JvArray> {
   static TAG_NAME = 'json-array';
@@ -69,12 +49,25 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     const collapsibleSection = new CollapsibleSection();
     collapsibleSection.setTitle('#' + index);
     collapsibleSection.setContent(createDom(elem));
-    collapsibleSection.setMenu(() => [
-      item(div({}, [text('delete')]), () => {
-        collapsibleSection.remove();
-        findEnclosingForm(this).onChange();
-      }),
-    ]);
+    collapsibleSection.setMenuItems(() => {
+      const form = findEnclosingForm(this);
+      const schema = form.getSchema();
+      if (!schema) {
+        return Promise.resolve([]);
+      }
+      return form
+        .getPath(this)
+        .map((path) =>
+          createMenu(
+            form.getSchemaService(),
+            schema,
+            form.toValue(),
+            path.append(index),
+            false,
+          ),
+        )
+        .withDefaultSupply(() => Promise.resolve([]));
+    });
     return collapsibleSection;
 
     // const btn = button({}, [text('...')]);
@@ -161,15 +154,15 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     // });
   }
 
-  private appendElemToArray(elem: JsonValue): void {
-    // if (this.table) {
-    //   const tbody = this.table.querySelector(':scope > tbody');
-    //   if (tbody) {
-    //     const row = this.mkRow(elem);
-    //     tbody.appendChild(row);
-    //   }
-    // }
-  }
+  //   private appendElemToArray(elem: JsonValue): void {
+  // if (this.table) {
+  //   const tbody = this.table.querySelector(':scope > tbody');
+  //   if (tbody) {
+  //     const row = this.mkRow(elem);
+  //     tbody.appendChild(row);
+  //   }
+  // }
+  //   }
 
   protected doSetMetadata(metadata: Metadata, path: JsPath): void {
     this.findElems().forEach((elem, index) =>

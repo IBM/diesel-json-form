@@ -44,7 +44,7 @@ samples
 const initialSchema = `{"type":"array"}`;
 const schema = parseJsonValue(initialSchema).toMaybe().withDefault(jvObject());
 
-const initialValue = `[]`;
+const initialValue = `[1,2]`;
 const value = parseJsonValue(initialValue).toMaybe().withDefault(jvObject());
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;

@@ -144,6 +144,15 @@ json-string.json-error input {
   flex-direction: row;
 }
 
+.ctmn-glasspane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+}
+
 .ctmn-sub-menu-item-content {
   flex-grow: 1;
 }
