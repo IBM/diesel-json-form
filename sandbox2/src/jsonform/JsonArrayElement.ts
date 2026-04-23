@@ -8,39 +8,19 @@ import {
   Metadata,
   setValueAt,
 } from '@diesel-parser/json-form';
-import { JsonElement } from './JsonElement';
-import { div, empty, moveElementDown, moveElementUp } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
 import { createMenu } from './createMenu';
 import { maybeOf } from 'tea-cup-fp';
+import { SectionBasedElement } from '../SectionBasedElement';
+import { JsonElement } from './JsonElement';
 
-export class JsonArrayElement extends JsonElement<JvArray> {
+export class JsonArrayElement extends SectionBasedElement<JvArray> {
   static TAG_NAME = 'json-array';
-
-  private elemsContainer: HTMLElement = div({ className: 'json-array-items' });
 
   constructor() {
     super();
-    this.appendChild(this.elemsContainer);
-  }
-
-  private findSections(): CollapsibleSection[] {
-    const rows = [];
-    for (const s of this.elemsContainer.children) {
-      if (s instanceof CollapsibleSection) {
-        rows.push(s);
-      }
-    }
-    return rows;
-  }
-
-  private findElems(): readonly JsonElement<JsonValue>[] {
-    return this.findSections().flatMap((s) => {
-      const content = s.getContent();
-      return content === undefined ? [] : [content];
-    });
   }
 
   toValue(): JvArray {
@@ -55,7 +35,7 @@ export class JsonArrayElement extends JsonElement<JvArray> {
     });
   }
 
-  private mkRow(elem: JsonValue): Element {
+  private mkRow(elem: JsonValue): CollapsibleSection {
     const collapsibleSection = new CollapsibleSection();
     collapsibleSection.setContent(createDom(elem));
     collapsibleSection.setMenuItems(() => {
@@ -78,12 +58,18 @@ export class JsonArrayElement extends JsonElement<JvArray> {
               {
                 delete: () => {
                   this.delete(collapsibleSection);
+                  this.refreshItemNumbers();
                 },
                 moveUp: () => {
                   this.moveUp(collapsibleSection);
+                  this.refreshItemNumbers();
                 },
                 moveDown: () => {
                   this.moveDown(collapsibleSection);
+                  this.refreshItemNumbers();
+                },
+                changeType: (value: JsonValue) => {
+                  this.changeType(collapsibleSection, value);
                 },
               },
             ),
@@ -94,26 +80,6 @@ export class JsonArrayElement extends JsonElement<JvArray> {
       }
     });
     return collapsibleSection;
-  }
-
-  private delete(section: CollapsibleSection) {
-    section.remove();
-    this.refreshItemNumbers();
-    findEnclosingForm(this).onChange();
-  }
-
-  private moveUp(section: CollapsibleSection) {
-    if (moveElementUp(section)) {
-      this.refreshItemNumbers();
-      findEnclosingForm(this).onChange();
-    }
-  }
-
-  private moveDown(section: CollapsibleSection) {
-    if (moveElementDown(section)) {
-      this.refreshItemNumbers();
-      findEnclosingForm(this).onChange();
-    }
   }
 
   appendItem(): void {
@@ -150,18 +116,14 @@ export class JsonArrayElement extends JsonElement<JvArray> {
 
   appendValue(value: JsonValue): void {
     const newRow = this.mkRow(value);
-    this.elemsContainer.appendChild(newRow);
+    this.appendSection(newRow);
     this.refreshItemNumbers();
     findEnclosingForm(this).onChange();
   }
 
   fromValue(value: JvArray): void {
-    if (this.elemsContainer) {
-      empty(this.elemsContainer);
-    }
-    value.elems.forEach((elem) =>
-      this.elemsContainer.appendChild(this.mkRow(elem)),
-    );
+    this.emptySections();
+    value.elems.forEach((elem) => this.appendSection(this.mkRow(elem)));
     this.refreshItemNumbers();
   }
 

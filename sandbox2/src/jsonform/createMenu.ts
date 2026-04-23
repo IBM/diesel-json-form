@@ -21,6 +21,7 @@ import {
 import { div, text } from './HtmlBuilder';
 import {
   AddMenuAction,
+  ChangeTypeMenuAction,
   DeleteMenuAction,
   MenuActions,
   MoveDownMenuAction,
@@ -96,7 +97,7 @@ export function createMenu(
           : [];
 
         const changeTypes = createTypesMenu(
-          path,
+          menuActions,
           valueAtPath,
           proposals,
           strictMode,
@@ -116,80 +117,86 @@ export function createMenu(
 }
 
 export function createTypesMenu(
-  path: JsPath,
+  menuActions: MenuActions,
   valueAtPath: JsonValue,
   proposals: ReadonlyArray<JsonValue>,
   strictMode: boolean,
 ): ReadonlyArray<AbstractMenuItemElement> {
-  const buildChangeTypeItem = (value: JsonValue): MenuItem =>
-    item(label(value.tag));
+  if (menuActions.changeType) {
+    const buildChangeTypeItem = (value: JsonValue): MenuItem[] =>
+      menuActions.changeType
+        ? [new ChangeTypeMenuAction(value, menuActions.changeType).createItem()]
+        : [];
 
-  const uniqueProposalTypes = proposals
-    .map((p) => p.tag)
-    .filter(
-      (value: string, index: number, array: ReadonlyArray<string>) =>
-        array.indexOf(value) === index,
-    );
+    const uniqueProposalTypes = proposals
+      .map((p) => p.tag)
+      .filter(
+        (value: string, index: number, array: ReadonlyArray<string>) =>
+          array.indexOf(value) === index,
+      );
 
-  const buildChangeTypeMenuItems = (): AbstractMenuItemElement[] => {
-    const jsonValues = strictMode
-      ? proposals
-      : [
-          jvNull,
-          jvString(''),
-          jvNumber('0'),
-          jvBool(true),
-          jvObject(),
-          jvArray(),
-        ];
+    const buildChangeTypeMenuItems = (): AbstractMenuItemElement[] => {
+      const jsonValues = strictMode
+        ? proposals
+        : [
+            jvNull,
+            jvString(''),
+            jvNumber('0'),
+            jvBool(true),
+            jvObject(),
+            jvArray(),
+          ];
 
-    return (
-      jsonValues
-        // keep only JsonValue type
-        .map((p) => p.tag)
-        // Get unique values
-        .filter(
-          (value: string, index: number, array: ReadonlyArray<string>) =>
-            array.indexOf(value) === index,
-        )
-        // Exclude actual type
-        .filter((value) => value !== valueAtPath.tag)
-        // Build MenuItem from unique JsonValue
-        .map((t) => {
-          switch (t) {
-            case 'jv-array':
-              return buildChangeTypeItem(jvArray());
-            case 'jv-boolean':
-              return buildChangeTypeItem(jvBool(true));
-            case 'jv-null':
-              return buildChangeTypeItem(jvNull);
-            case 'jv-number':
-              return buildChangeTypeItem(jvNumber('0'));
-            case 'jv-object':
-              return buildChangeTypeItem(jvObject());
-            case 'jv-string':
-              return buildChangeTypeItem(jvString(''));
-          }
-        })
-    );
-  };
+      return (
+        jsonValues
+          // keep only JsonValue type
+          .map((p) => p.tag)
+          // Get unique values
+          .filter(
+            (value: string, index: number, array: ReadonlyArray<string>) =>
+              array.indexOf(value) === index,
+          )
+          // Exclude actual type
+          .filter((value) => value !== valueAtPath.tag)
+          // Build MenuItem from unique JsonValue
+          .flatMap((t) => {
+            switch (t) {
+              case 'jv-array':
+                return buildChangeTypeItem(jvArray());
+              case 'jv-boolean':
+                return buildChangeTypeItem(jvBool(true));
+              case 'jv-null':
+                return buildChangeTypeItem(jvNull);
+              case 'jv-number':
+                return buildChangeTypeItem(jvNumber('0'));
+              case 'jv-object':
+                return buildChangeTypeItem(jvObject());
+              case 'jv-string':
+                return buildChangeTypeItem(jvString(''));
+            }
+          })
+      );
+    };
 
-  if (
-    strictMode &&
-    uniqueProposalTypes.length === 1 &&
-    valueAtPath.tag === proposals[0].tag
-  ) {
-    // Only one type accepted and the value has already the right one -> no menu at all
+    if (
+      strictMode &&
+      uniqueProposalTypes.length === 1 &&
+      valueAtPath.tag === proposals[0].tag
+    ) {
+      // Only one type accepted and the value has already the right one -> no menu at all
+      return [];
+    }
+
+    return buildChangeTypeMenuItems().length > 0
+      ? [
+          subMenu(label('change type'), () =>
+            Promise.resolve(buildChangeTypeMenuItems()),
+          ),
+        ]
+      : [];
+  } else {
     return [];
   }
-
-  return buildChangeTypeMenuItems().length > 0
-    ? [
-        subMenu(label('change type'), () =>
-          Promise.resolve(buildChangeTypeMenuItems()),
-        ),
-      ]
-    : [];
 }
 
 export function createProposeMenu(

@@ -10,43 +10,25 @@ import {
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import {
-  button,
-  div,
-  empty,
-  moveElementDown,
-  moveElementUp,
-  text,
-} from './HtmlBuilder';
+import { button, div, empty, text } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
 import { createMenu } from './createMenu';
 import { just, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 import { JsonArrayElement } from './JsonArrayElement';
+import { SectionBasedElement } from '../SectionBasedElement';
 
-export class JsonObjectElement extends JsonElement<JvObject> {
+export class JsonObjectElement extends SectionBasedElement<JvObject> {
   static TAG_NAME = 'json-object';
 
-  private elemsContainer: HTMLElement = div({ className: 'json-object-props' });
   private propertiesNode: HTMLElement = div({});
 
   private static ATTR_PROP_NAME = 'json-property-name';
 
   constructor() {
     super();
-    this.appendChild(this.elemsContainer);
     this.appendChild(this.propertiesNode);
-  }
-
-  private findSections(): CollapsibleSection[] {
-    const rows = [];
-    for (const s of this.elemsContainer.children) {
-      if (s instanceof CollapsibleSection) {
-        rows.push(s);
-      }
-    }
-    return rows;
   }
 
   private findProps(): readonly [string, JsonElement<JsonValue>][] {
@@ -84,7 +66,7 @@ export class JsonObjectElement extends JsonElement<JvObject> {
     );
   }
 
-  private mkRow(property: JsonProperty): Element {
+  private mkRow(property: JsonProperty): CollapsibleSection {
     const collapsibleSection = new CollapsibleSection();
     collapsibleSection.setTitle(property.name);
     collapsibleSection.setContent(createDom(property.value));
@@ -120,29 +102,15 @@ export class JsonObjectElement extends JsonElement<JvObject> {
               moveDown: () => {
                 this.moveDown(collapsibleSection);
               },
+              changeType: (value: JsonValue) => {
+                this.changeType(collapsibleSection, value);
+              },
             },
           ),
         )
         .withDefaultSupply(() => Promise.resolve([]));
     });
     return collapsibleSection;
-  }
-
-  private delete(s: CollapsibleSection): void {
-    s.remove();
-    findEnclosingForm(this).onChange();
-  }
-
-  private moveUp(s: CollapsibleSection): void {
-    if (moveElementUp(s)) {
-      findEnclosingForm(this).onChange();
-    }
-  }
-
-  private moveDown(s: CollapsibleSection): void {
-    if (moveElementDown(s)) {
-      findEnclosingForm(this).onChange();
-    }
   }
 
   private add(property: JsonProperty): void {
@@ -181,12 +149,8 @@ export class JsonObjectElement extends JsonElement<JvObject> {
   }
 
   fromValue(value: JvObject): void {
-    if (this.elemsContainer) {
-      empty(this.elemsContainer);
-    }
-    value.properties.forEach((prop) =>
-      this.elemsContainer.appendChild(this.mkRow(prop)),
-    );
+    this.emptySections();
+    value.properties.forEach((prop) => this.appendSection(this.mkRow(prop)));
   }
 
   protected doSetMetadata(metadata: Metadata, path: JsPath) {
@@ -232,7 +196,7 @@ export class JsonObjectElement extends JsonElement<JvObject> {
               value: proposal,
             };
             const row = this.mkRow(p);
-            this.elemsContainer.appendChild(row);
+            this.appendSection(row);
             form.onChange();
           }
         })

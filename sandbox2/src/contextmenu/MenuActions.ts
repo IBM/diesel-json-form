@@ -1,3 +1,4 @@
+import { JsonValue } from '@diesel-parser/json-form';
 import { div, text } from '../jsonform/HtmlBuilder';
 import { item, MenuItem } from './ContextMenu';
 
@@ -7,6 +8,7 @@ export type MenuActions = {
   moveUp?: () => void;
   moveDown?: () => void;
   proposal?: () => void;
+  changeType?: (value: JsonValue) => void;
 };
 
 export class MenuAction {
@@ -41,5 +43,11 @@ export class MoveUpMenuAction extends MenuAction {
 export class MoveDownMenuAction extends MenuAction {
   constructor(action: () => void) {
     super('Move down', action);
+  }
+}
+
+export class ChangeTypeMenuAction extends MenuAction {
+  constructor(value: JsonValue, action: (value: JsonValue) => void) {
+    super(value.tag, () => action(value));
   }
 }
