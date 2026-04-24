@@ -113,17 +113,16 @@ class TypedJsonValidationResult implements ValidationResult {
         ?.filter((a) => a.keywordLocation.endsWith('/format'))
         .filter((a) => a.instanceLocation.slice(1) == path.format())
         .map((a) => (a as any).annotation as string) ?? [];
-    console.log('FW formats', formats, this.r);
     return formats;
   }
 
   getDiscriminator(path: JsPath): string | undefined {
-    const formats =
+    const discriminator =
       validLeafOutputUnits(this.r)
-        ?.filter((a) => a.keywordLocation.endsWith('/descriminator'))
+        ?.filter((a) => a.keywordLocation.endsWith('/discriminator'))
         .filter((a) => a.instanceLocation.slice(1) == path.format())
         .map((a) => (a as any).annotation as string) ?? [];
-    return formats[0];
+    return discriminator[0];
   }
 }
 
