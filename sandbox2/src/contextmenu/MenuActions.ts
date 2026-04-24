@@ -1,4 +1,4 @@
-import { JsonValue } from '@diesel-parser/json-form';
+import { JsonValue, JsPath, stringify } from '@diesel-parser/json-form';
 import { div, text } from '../jsonform/HtmlBuilder';
 import { item, MenuItem } from './ContextMenu';
 
@@ -7,7 +7,7 @@ export type MenuActions = {
   delete?: () => void;
   moveUp?: () => void;
   moveDown?: () => void;
-  proposal?: () => void;
+  proposal?: (path: JsPath, proposal: JsonValue, proposalIndex: number) => void;
   changeType?: (value: JsonValue) => void;
 };
 
@@ -49,5 +49,19 @@ export class MoveDownMenuAction extends MenuAction {
 export class ChangeTypeMenuAction extends MenuAction {
   constructor(value: JsonValue, action: (value: JsonValue) => void) {
     super(value.tag, () => action(value));
+  }
+}
+
+export class ApplyProposalMenuAction extends MenuAction {
+  constructor(
+    path: JsPath,
+    proposal: JsonValue,
+    proposalIndex: number,
+    action: (path: JsPath, proposal: JsonValue, proposalIndex: number) => void,
+  ) {
+    super(
+      stringify(proposal).withDefaultSupply(() => 'broken json !'),
+      () => action(path, proposal, proposalIndex),
+    );
   }
 }

@@ -27,3 +27,4 @@ export * from './worker/SchemaServiceWorker';
 export * from './worker/WorkerClient';
 export * from './Metadata';
 export * from './ComputeAllTask';
+export * from './proposeNested';

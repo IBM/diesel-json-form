@@ -58,7 +58,7 @@ export abstract class SectionBasedElement<
     return false;
   }
 
-  protected changeType(section: CollapsibleSection, value: JsonValue) {
+  protected setSectionContent(section: CollapsibleSection, value: JsonValue) {
     section.setContent(createDom(value));
     findEnclosingForm(this).onChange();
   }

@@ -18,6 +18,7 @@ import { createMenu } from './createMenu';
 import { just, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 import { JsonArrayElement } from './JsonArrayElement';
 import { SectionBasedElement } from '../SectionBasedElement';
+import { augmentProposal } from './augmentProposal';
 
 export class JsonObjectElement extends SectionBasedElement<JvObject> {
   static TAG_NAME = 'json-object';
@@ -103,7 +104,19 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
                 this.moveDown(collapsibleSection);
               },
               changeType: (value: JsonValue) => {
-                this.changeType(collapsibleSection, value);
+                this.setSectionContent(collapsibleSection, value);
+              },
+              proposal: (path, proposal, proposalIndex) => {
+                augmentProposal(
+                  form.getSchemaService(),
+                  schema,
+                  form.toValue(),
+                  path,
+                  proposal,
+                  proposalIndex,
+                ).then((proposal) => {
+                  this.setSectionContent(collapsibleSection, proposal);
+                });
               },
             },
           ),

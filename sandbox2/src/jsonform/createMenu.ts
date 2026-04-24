@@ -10,17 +10,16 @@ import {
   jvObject,
   jvString,
   SchemaService,
-  stringify,
 } from '@diesel-parser/json-form';
 import {
   AbstractMenuItemElement,
-  item,
   MenuItem,
   subMenu,
 } from '../contextmenu/ContextMenu';
 import { div, text } from './HtmlBuilder';
 import {
   AddMenuAction,
+  ApplyProposalMenuAction,
   ChangeTypeMenuAction,
   DeleteMenuAction,
   MenuActions,
@@ -102,7 +101,12 @@ export function createMenu(
           proposals,
           strictMode,
         );
-        const proposeItems = createProposeMenu(path, proposals, strictMode);
+        const proposeItems = createProposeMenu(
+          menuActions,
+          path,
+          proposals,
+          strictMode,
+        );
 
         const res: AbstractMenuItemElement[] = [];
         return res
@@ -200,17 +204,19 @@ export function createTypesMenu(
 }
 
 export function createProposeMenu(
+  menuActions: MenuActions,
   path: JsPath,
   proposals: ReadonlyArray<JsonValue>,
   strictMode: boolean,
 ): ReadonlyArray<AbstractMenuItemElement> {
-  if (strictMode || proposals.length === 0) {
+  if (strictMode || proposals.length === 0 || !menuActions.proposal) {
     // Strict mode or no proposal => no menu
     return [];
   }
 
-  const proposeMenuItems = proposals.map((value) =>
-    item(label(stringify(value).withDefault('broken json !'))),
+  const p = menuActions.proposal;
+  const proposeMenuItems = proposals.map((value, index) =>
+    new ApplyProposalMenuAction(path, value, index, p).createItem(),
   );
   return [subMenu(label('propose'), () => Promise.resolve(proposeMenuItems))];
 }

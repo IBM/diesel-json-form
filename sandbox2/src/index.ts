@@ -44,7 +44,7 @@ const initialSchema = `{"type":"object"}`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
 const initialValue = `{
-    "foo": "bar", 
+    "foo": "bar",
     "baz": {
         "x": [
             1,
@@ -52,6 +52,7 @@ const initialValue = `{
         ]
     }
 }`;
+// const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
