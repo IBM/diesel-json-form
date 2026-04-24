@@ -358,7 +358,6 @@ const Example_OneOfConst = `{
 }`;
 
 const Example_OneOfConstDiscriminator = `{
-    "$schema": "https://json-schema.org/draft/2019-09/schema",
     "$id": "http://schema/animal/AnimalExtAn.json",
     "oneOf": [
         {
@@ -380,7 +379,8 @@ const Example_OneOfConstDiscriminator = `{
                 "lion": {
                     "type": "string"
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "schema.animal.ElephantExtAn": {
             "type": "object",
@@ -392,7 +392,8 @@ const Example_OneOfConstDiscriminator = `{
                 "elephant": {
                     "type": "boolean"
                 }
-            }
+            },
+            "additionalProperties": false
         }
     }
 }`;
