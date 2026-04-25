@@ -30,7 +30,6 @@ defineCustomElements();
 import '@carbon/web-components/es/components/dropdown/dropdown-item';
 import CDSDropdown from '@carbon/web-components/es/components/dropdown/dropdown';
 import '@carbon/web-components/es/components/button/button';
-import '@carbon/web-components/es/components/textarea/textarea';
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',

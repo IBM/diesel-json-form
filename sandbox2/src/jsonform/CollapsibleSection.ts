@@ -5,31 +5,37 @@ import {
   AbstractMenuItemElement,
   MenuElement,
 } from '../contextmenu/ContextMenu';
+import { CDSButton } from '@carbon/web-components';
+import { IconElement } from './IconElement';
 
 export class CollapsibleSection extends HTMLElement {
   static TAG_NAME = 'collapsible-section';
 
-  private expandCollapseButton: HTMLButtonElement;
+  private expandCollapseButton: CDSButton;
   private contentContainer: HTMLElement;
   private labelElement: HTMLElement;
-  private menuButton: HTMLButtonElement;
+  private menuButton: CDSButton;
   private content?: JsonElement<JsonValue>;
   private menu?: () => Promise<AbstractMenuItemElement[]>;
-
-  static TEXT_EXPANDED = '-';
-  static TEXT_COLLAPSED = '+';
 
   private static TRIGGER_COUNT = 0;
 
   constructor() {
     super();
-    this.expandCollapseButton = button({}, [
-      text(CollapsibleSection.TEXT_EXPANDED),
-    ]);
+    this.expandCollapseButton = document.createElement(
+      'cds-button',
+    ) as CDSButton;
+    this.expandCollapseButton.setAttribute('size', 'xs');
+    this.expandCollapseButton.setAttribute('kind', 'ghost');
     this.expandCollapseButton.addEventListener('click', () =>
       this.toggleExpandCollapse(),
     );
-    this.menuButton = button({}, [text('...')]);
+    IconElement.addToButton(this.expandCollapseButton, 'chevron-up');
+
+    this.menuButton = document.createElement('cds-button') as CDSButton;
+    this.menuButton.setAttribute('size', 'xs');
+    this.menuButton.setAttribute('kind', 'ghost');
+    IconElement.addToButton(this.menuButton, 'overflow-menu-vertical');
     this.menuButton.addEventListener('click', () => {
       if (this.menu) {
         CollapsibleSection.TRIGGER_COUNT++;
@@ -69,10 +75,10 @@ export class CollapsibleSection extends HTMLElement {
       const collapsed = this.content.style.display === 'none';
       if (collapsed) {
         this.content.style.display = 'block';
-        this.expandCollapseButton.innerText = CollapsibleSection.TEXT_EXPANDED;
+        IconElement.addToButton(this.expandCollapseButton, 'chevron-up');
       } else {
         this.content.style.display = 'none';
-        this.expandCollapseButton.innerText = CollapsibleSection.TEXT_COLLAPSED;
+        IconElement.addToButton(this.expandCollapseButton, 'chevron-down');
       }
     }
   }

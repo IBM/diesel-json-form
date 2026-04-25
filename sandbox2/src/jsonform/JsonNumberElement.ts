@@ -9,17 +9,16 @@ import {
 import { input } from './HtmlBuilder';
 import { JsonElement } from './JsonElement';
 import { findEnclosingForm } from './findEnclosingForm';
+import { CDSTextInput } from '@carbon/web-components';
 
 export class JsonNumberElement extends JsonElement<JvNumber> {
   static TAG_NAME = 'json-number';
 
-  private input: HTMLInputElement;
+  private input: CDSTextInput;
 
   constructor() {
     super();
-    this.input = input({
-      type: 'text',
-    });
+    this.input = document.createElement('cds-text-input') as CDSTextInput;
   }
 
   toValue(): JvNumber {

@@ -1,18 +1,17 @@
 import { JvString, jvString } from '@diesel-parser/json-form';
-import { input } from './HtmlBuilder';
 import { JsonElement } from './JsonElement';
 import { findEnclosingForm } from './findEnclosingForm';
+import { CDSTextInput } from '@carbon/web-components';
+import '@carbon/web-components/es/components/text-input/index';
 
 export class JsonStringElement extends JsonElement<JvString> {
   static TAG_NAME = 'json-string';
 
-  private input: HTMLInputElement;
+  private input: CDSTextInput;
 
   constructor() {
     super();
-    this.input = input({
-      type: 'text',
-    });
+    this.input = document.createElement('cds-text-input') as CDSTextInput;
   }
 
   fromValue(value: JvString) {

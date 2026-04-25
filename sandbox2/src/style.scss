@@ -1,3 +1,22 @@
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/themes';
+
+:root {
+  @include theme(themes.$g10);
+
+  @media (prefers-color-scheme: dark) {
+    @include theme(themes.$g100);
+  }
+}
+
+.g10 {
+  @include theme(themes.$g10);
+}
+
+.g100 {
+  @include theme(themes.$g100);
+}
+
 #sandbox {
   position: absolute;
   top: 0;
