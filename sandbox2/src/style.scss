@@ -186,6 +186,10 @@ collapsible-section {
   flex-direction: row;
 }
 
+collapsible-section > .right-pane > .collapsible-content {
+  margin-bottom: 0.5rem;
+}
+
 collapsible-section > .right-pane {
   flex-grow: 1;
 }
@@ -193,6 +197,8 @@ collapsible-section > .right-pane {
 collapsible-section > .right-pane > .label-row {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  //   margin-bottom: 0.5rem;
 }
 
 collapsible-section > .right-pane > .label-row > .label-container {
