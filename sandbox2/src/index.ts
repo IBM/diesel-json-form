@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import './style.css';
+import './style.scss';
 import { samples } from './initdata';
 import {
   defaultSchemaService,
@@ -27,14 +27,20 @@ import { defineCustomElements } from './jsonform/defineCustomElements';
 
 defineCustomElements();
 
+import '@carbon/web-components/es/components/dropdown/dropdown-item';
+import CDSDropdown from '@carbon/web-components/es/components/dropdown/dropdown';
+import '@carbon/web-components/es/components/button/button';
+import '@carbon/web-components/es/components/textarea/textarea';
+import AddIcon from '@carbon/icons/es/add/16';
+
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
-) as HTMLSelectElement;
+) as CDSDropdown;
 
 samples
   .map((s) => {
-    const e = document.createElement('option');
-    e.value = s[1];
+    const e = document.createElement('cds-dropdown-item');
+    e.setAttribute('value', s[1]);
     e.innerHTML = s[0];
     return e;
   })
@@ -97,7 +103,7 @@ jsonForm.addChangeListener((value) => {
     .withDefault(false);
 });
 
-sampleSchemaSelect.addEventListener('change', () => {
+sampleSchemaSelect.addEventListener('cds-dropdown-selected', () => {
   taSchema.value = sampleSchemaSelect.value;
   const value = jsonForm.toValue();
   parseJsonValue(taSchema.value).match(

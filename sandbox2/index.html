@@ -18,8 +18,11 @@
           <div class="sub-head">
             <h3>Schema</h3>
             <div class="schema-select">
-              <label for="sampleSchemaSelect"> Sample Schema </label>
-              <select id="sampleSchemaSelect"></select>
+              <cds-dropdown
+                id="sampleSchemaSelect"
+                trigger-content="Select an item"
+              >
+              </cds-dropdown>
             </div>
           </div>
           <div class="editor-wrapper">
@@ -29,10 +32,9 @@
         <div class="sub texteditor">
           <div class="sub-head">
             <h3>JSON</h3>
-            <div class="json-btns">
-              <button id="btn-from-form">&lt;</button>
-              <button id="btn-to-form">&gt;</button>
-            </div>
+            <cds-button size="xs" id="btn-to-form" has-main-content="false"
+              >&gt;</cds-button
+            >
           </div>
           <div class="editor-wrapper">
             <textarea id="ta-json"></textarea>
@@ -41,6 +43,7 @@
         <div class="sub form">
           <div class="sub-head">
             <h3>FORM</h3>
+            <cds-button size="xs" id="btn-from-form">&lt;</cds-button>
           </div>
           <json-form id="my-form"></json-form>
         </div>

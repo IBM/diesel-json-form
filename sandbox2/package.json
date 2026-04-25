@@ -12,9 +12,11 @@
     "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
   },
   "dependencies": {
+    "@carbon/icons": "^11.79.0",
+    "@carbon/web-components": "^2.53.0",
+    "@diesel-parser/json-form": "^7.0.0",
     "tea-cup-fp": "^1.1.1",
-    "tea-pop-core": "6.0.1",
-    "@diesel-parser/json-form": "^7.0.0"
+    "tea-pop-core": "6.0.1"
   },
   "devDependencies": {
     "@diesel-parser/ts-facade": "~0.32.2",
@@ -24,7 +26,8 @@
     "file-loader": "^6.2.0",
     "gh-pages": "^6.0.0",
     "html-webpack-plugin": "^5.3.1",
-    "sass": "^1.81.0",
+    "sass": "^1.99.0",
+    "sass-loader": "^16.0.7",
     "shx": "~0.4.0",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.2.2",
