@@ -32,9 +32,9 @@
         <div class="sub texteditor">
           <div class="sub-head">
             <h3>JSON</h3>
-            <cds-button size="xs" id="btn-to-form" has-main-content="false"
-              >&gt;</cds-button
-            >
+            <cds-button id="btn-to-form" size="xs">
+              <icon-elem slot="icon" icon="arrow-right"></icon-elem>
+            </cds-button>
           </div>
           <div class="editor-wrapper">
             <textarea id="ta-json"></textarea>
@@ -43,7 +43,9 @@
         <div class="sub form">
           <div class="sub-head">
             <h3>FORM</h3>
-            <cds-button size="xs" id="btn-from-form">&lt;</cds-button>
+            <cds-button size="xs" id="btn-from-form">
+              <icon-elem slot="icon" icon="arrow-left"></icon-elem>
+            </cds-button>
           </div>
           <json-form id="my-form"></json-form>
         </div>
