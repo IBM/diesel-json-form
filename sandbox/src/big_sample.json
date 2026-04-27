@@ -5,16 +5,16 @@
     "additionalProperties": false,
     "properties": {
         "input": {
-            "$ref": "#/definitions/_082283706.performance.test1.data.Large"
+            "$ref": "#/$defs/_082283706.performance.test1.data.Large"
         },
         "input2": {
-            "$ref": "#/definitions/_082283706.performance.test1.data.Large2"
+            "$ref": "#/$defs/_082283706.performance.test1.data.Large2"
         },
         "input3": {
-            "$ref": "#/definitions/_082283706.performance.test1.data.Large3"
+            "$ref": "#/$defs/_082283706.performance.test1.data.Large3"
         }
     },
-    "definitions": {
+    "$defs": {
         "_082283706.performance.test1.data.Large": {
             "type": "object",
             "$comment": "Generated from Java class _082283706.performance.test1.data.Large",

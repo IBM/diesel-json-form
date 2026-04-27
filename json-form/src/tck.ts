@@ -125,7 +125,7 @@ const EXAMPLES = {
         }
       },
       "then": {
-        "$ref": "#/definitions/schema.animal.Lion"
+        "$ref": "#/$defs/schema.animal.Lion"
       }
     },
     {
@@ -138,11 +138,11 @@ const EXAMPLES = {
         }
       },
       "then": {
-        "$ref": "#/definitions/schema.animal.Elephant"
+        "$ref": "#/$defs/schema.animal.Elephant"
       }
     }
   ],
-  "definitions": {
+  "$defs": {
     "schema.animal.Animal": {
       "properties": {
         "name": {
@@ -171,7 +171,7 @@ const EXAMPLES = {
     "schema.animal.Lion": {
       "allOf": [
         {
-          "$ref": "#/definitions/schema.animal.Animal"
+          "$ref": "#/$defs/schema.animal.Animal"
         }
       ],
       "properties": {
@@ -183,7 +183,7 @@ const EXAMPLES = {
     "schema.animal.Elephant": {
       "allOf": [
         {
-          "$ref": "#/definitions/schema.animal.Animal"
+          "$ref": "#/$defs/schema.animal.Animal"
         }
       ],
       "properties": {

@@ -45,10 +45,10 @@ const Sample_BeanContainingOtherBean = `{
   "type": "object",
   "properties": {
     "customer": {
-      "$ref": "#/definitions/schema.Customer"
+      "$ref": "#/$defs/schema.Customer"
     }
   },
-  "definitions": {
+  "$defs": {
     "schema.Customer": {
       "type": "object",
       "properties": {
@@ -82,7 +82,7 @@ const Sample_Inheritance = `{
   "type": "object",
   "allOf": [
     {
-      "$ref": "#/definitions/schema.shape.Shape"
+      "$ref": "#/$defs/schema.shape.Shape"
     }
   ],
   "properties": {
@@ -95,7 +95,7 @@ const Sample_Inheritance = `{
       "format": "int32"
     }
   },
-  "definitions": {
+  "$defs": {
     "schema.shape.Shape": {
       "type": "object",
       "properties": {
@@ -124,7 +124,7 @@ const Example_Polymorphism = `{
         }
       },
       "then": {
-        "$ref": "#/definitions/schema.animal.Lion"
+        "$ref": "#/$defs/schema.animal.Lion"
       }
     },
     {
@@ -137,11 +137,11 @@ const Example_Polymorphism = `{
         }
       },
       "then": {
-        "$ref": "#/definitions/schema.animal.Elephant"
+        "$ref": "#/$defs/schema.animal.Elephant"
       }
     }
   ],
-  "definitions": {
+  "$defs": {
     "schema.animal.Animal": {
       "properties": {
         "name": {
@@ -170,7 +170,7 @@ const Example_Polymorphism = `{
     "schema.animal.Lion": {
       "allOf": [
         {
-          "$ref": "#/definitions/schema.animal.Animal"
+          "$ref": "#/$defs/schema.animal.Animal"
         }
       ],
       "properties": {
@@ -182,7 +182,7 @@ const Example_Polymorphism = `{
     "schema.animal.Elephant": {
       "allOf": [
         {
-          "$ref": "#/definitions/schema.animal.Animal"
+          "$ref": "#/$defs/schema.animal.Animal"
         }
       ],
       "properties": {

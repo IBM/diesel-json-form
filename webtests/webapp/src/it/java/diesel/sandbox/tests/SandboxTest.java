@@ -437,7 +437,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "        }\n" +
                 "      },\n" +
                 "      \"then\": {\n" +
-                "        \"$ref\": \"#/definitions/schema.animal.Lion\"\n" +
+                "        \"$ref\": \"#/$defs/schema.animal.Lion\"\n" +
                 "      }\n" +
                 "    },\n" +
                 "    {\n" +
@@ -450,7 +450,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "        }\n" +
                 "      },\n" +
                 "      \"then\": {\n" +
-                "        \"$ref\": \"#/definitions/schema.animal.Elephant\"\n" +
+                "        \"$ref\": \"#/$defs/schema.animal.Elephant\"\n" +
                 "      }\n" +
                 "    }\n" +
                 "  ],\n" +
@@ -483,7 +483,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "    \"schema.animal.Lion\": {\n" +
                 "      \"allOf\": [\n" +
                 "        {\n" +
-                "          \"$ref\": \"#/definitions/schema.animal.Animal\"\n" +
+                "          \"$ref\": \"#/$defs/schema.animal.Animal\"\n" +
                 "        }\n" +
                 "      ],\n" +
                 "      \"properties\": {\n" +
@@ -495,7 +495,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "    \"schema.animal.Elephant\": {\n" +
                 "      \"allOf\": [\n" +
                 "        {\n" +
-                "          \"$ref\": \"#/definitions/schema.animal.Animal\"\n" +
+                "          \"$ref\": \"#/$defs/schema.animal.Animal\"\n" +
                 "        }\n" +
                 "      ],\n" +
                 "      \"properties\": {\n" +
