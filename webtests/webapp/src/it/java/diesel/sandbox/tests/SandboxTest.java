@@ -424,7 +424,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         FJsonForm f = sandbox.jsonForm;
         sandbox.selectSample("Polymorphism");
         sandbox.schemaEditor.assertText("{\n" +
-                "  \"$schema\": \"https://json-schema.org/draft/2019-09/schema\",\n" +
                 "  \"$id\": \"http://schema.animal.Animal\",\n" +
                 "  \"type\": \"object\",\n" +
                 "  \"allOf\": [\n" +

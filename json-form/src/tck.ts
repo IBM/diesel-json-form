@@ -97,7 +97,6 @@ const EXAMPLES = {
     }
 }`,
   CYCLE: `{
-    "$schema": "https://json-schema.org/draft/2019-09/schema",
     "$id": "http://schema.TestCyclic$Loop",
     "type": "object",
     "properties": {
@@ -113,7 +112,6 @@ const EXAMPLES = {
     }
 }`,
   POLYMORPHISM: `{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "http://schema.animal.Animal",
   "type": "object",
   "allOf": [
@@ -213,7 +211,6 @@ const EXAMPLES = {
 };
 
 const SCHEMA_ONEOF_CONST = `{
-    "$schema": "https://json-schema.org/draft/2019-09/schema",
     "$id": "http://schema/animal/AnimalExtAn.json",
     "oneOf": [
         {

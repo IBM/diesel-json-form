@@ -41,7 +41,6 @@ const Sample_ObjectArray = `{
 }`;
 
 const Sample_BeanContainingOtherBean = `{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "http://schema.BeanWithBean",
   "type": "object",
   "properties": {
@@ -79,7 +78,6 @@ const Sample_BeanContainingOtherBean = `{
 }`;
 
 const Sample_Inheritance = `{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "http://schema.shape.Rectangle",
   "type": "object",
   "allOf": [
@@ -113,7 +111,6 @@ const Sample_Inheritance = `{
 }`;
 
 const Example_Polymorphism = `{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "http://schema.animal.Animal",
   "type": "object",
   "allOf": [
@@ -202,7 +199,6 @@ const Example_Polymorphism = `{
 }`;
 
 const Example_Cycle = `{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "http://schema.TestCyclic$Loop",
   "type": "object",
   "properties": {
@@ -219,7 +215,6 @@ const Example_Cycle = `{
 }`;
 
 const Example_Unwrapping = `{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "http://schema.TestUnwrapping$UnwrappingRoot",
   "type": "object",
   "properties": {
@@ -319,7 +314,6 @@ const Example_DateTimeWithExample = `{
 }`;
 
 const Example_OneOfConst = `{
-    "$schema": "https://json-schema.org/draft/2019-09/schema",
     "$id": "http://schema/animal/AnimalExtAn.json",
     "oneOf": [
         {
