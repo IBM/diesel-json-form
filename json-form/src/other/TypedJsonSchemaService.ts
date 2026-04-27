@@ -83,45 +83,52 @@ class TypedJsonValidationResult implements ValidationResult {
   getRenderers(): ReadonlyMap<string, SchemaRenderer> {
     const kvs: [string, SchemaRenderer][] =
       validLeafOutputUnits(this.r)
-        ?.filter((a) => a.keywordLocation.endsWith('/renderer'))
-        .map((a) => [
-          a.instanceLocation.slice(1),
-          typeof (a as any).annotation === 'string'
+        ?.filter((o) => o.keywordLocation.endsWith('/renderer'))
+        .map((o) => [
+          o.instanceLocation.slice(1),
+          typeof o.annotation === 'string'
             ? {
-                key: (a as any).annotation,
+                key: o.annotation,
                 schemaValue: parseJsonValue(
-                  JSON.stringify((a as any).annotation),
+                  JSON.stringify(o.annotation),
                 ).withDefault(jvNull),
               }
-            : typeof ((a as any).annotation as any)['key'] === 'string'
+            : typeof (o.annotation as any)['key'] === 'string'
               ? {
-                  key: ((a as any).annotation as any)['key'] as string,
+                  key: (o.annotation as any)['key'] as string,
                   schemaValue: parseJsonValue(
-                    JSON.stringify((a as any).annotation),
+                    JSON.stringify({ renderer: o.annotation }),
                   ).withDefault(jvNull),
                 }
-              : parseJsonValue(JSON.stringify((a as any).annotation))
+              : parseJsonValue(JSON.stringify(o.annotation))
                   .map((v) => v as unknown as SchemaRenderer)
                   .withDefault({ key: '?', schemaValue: jvNull }),
         ]) ?? [];
+    console.log(
+      'FW renderers',
+      kvs,
+      validLeafOutputUnits(this.r)?.filter((o) =>
+        o.keywordLocation.endsWith('/renderer'),
+      ),
+    );
     return new Map([...kvs]);
   }
 
   getFormats(path: JsPath): readonly string[] {
     const formats =
       validLeafOutputUnits(this.r)
-        ?.filter((a) => a.keywordLocation.endsWith('/format'))
-        .filter((a) => a.instanceLocation.slice(1) == path.format())
-        .map((a) => (a as any).annotation as string) ?? [];
+        ?.filter((o) => o.keywordLocation.endsWith('/format'))
+        .filter((o) => o.instanceLocation.slice(1) == path.format())
+        .map((o) => o.annotation as string) ?? [];
     return formats;
   }
 
   getDiscriminator(path: JsPath): string | undefined {
     const discriminator =
       validLeafOutputUnits(this.r)
-        ?.filter((a) => a.keywordLocation.endsWith('/discriminator'))
-        .filter((a) => a.instanceLocation.slice(1) == path.format())
-        .map((a) => (a as any).annotation as string) ?? [];
+        ?.filter((o) => o.keywordLocation.endsWith('/discriminator'))
+        .filter((o) => o.instanceLocation.slice(1) == path.format())
+        .map((o) => o.annotation as string) ?? [];
     return discriminator[0];
   }
 }
