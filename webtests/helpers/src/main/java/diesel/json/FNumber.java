@@ -7,8 +7,8 @@ import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FNumber extends FJsonValue {
 
-    FNumber(JsPath path, Findr findr) {
-        super(path, findr);
+    FNumber(JsPath path, Findr findr, boolean ignoreErrorTexts) {
+        super(path, findr, ignoreErrorTexts);
     }
 
     public Findr findInput() {

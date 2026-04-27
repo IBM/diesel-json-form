@@ -1,17 +1,13 @@
 package diesel.json;
 
-import com.pojosontheweb.selenium.Findr;
-import org.openqa.selenium.WebElement;
-
-import java.util.function.Predicate;
-
 import static com.pojosontheweb.selenium.Findrs.attrEquals;
-import static com.pojosontheweb.selenium.Findrs.not;
+
+import com.pojosontheweb.selenium.Findr;
 
 public class FBoolean extends FJsonValue {
 
-    FBoolean(JsPath path, Findr findr) {
-        super(path, findr);
+    FBoolean(JsPath path, Findr findr, boolean ignoreErrorTexts) {
+        super(path, findr, ignoreErrorTexts);
     }
 
     private Findr findCheckbox() {
@@ -20,11 +16,8 @@ public class FBoolean extends FJsonValue {
                 .expectOne();
     }
 
-
     public FBoolean assertChecked(boolean checked) {
-        findCheckbox().where(e ->
-            e.isSelected() == checked
-        ).eval();
+        findCheckbox().where(e -> e.isSelected() == checked).eval();
         return this;
     }
 

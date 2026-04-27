@@ -11,8 +11,8 @@ public class FArray extends FJsonValue {
 
     private final Findr fRoot;
 
-    FArray(Findr fRoot, JsPath path, Findr findr) {
-        super(path, findr.elem(By.xpath("./div[contains(@class,'jv-array')]")));
+    FArray(Findr fRoot, JsPath path, Findr findr, boolean ignoreErrorTexts) {
+        super(path, findr.elem(By.xpath("./div[contains(@class,'jv-array')]")), ignoreErrorTexts);
         this.fRoot = fRoot;
     }
 
@@ -24,7 +24,7 @@ public class FArray extends FJsonValue {
     public FString getStringCell(int index) {
         String indexAsString = "" + index;
         Findr cell = $$(".value").where(Findrs.attrEquals("data-path", indexAsString)).at(0);
-        return new FString(path.append(index), cell);
+        return new FString(path.append(index), cell, ignoreErrorTexts);
 
     }
 

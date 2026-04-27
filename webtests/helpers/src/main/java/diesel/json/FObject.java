@@ -1,22 +1,21 @@
 package diesel.json;
 
-import com.pojosontheweb.selenium.Findr;
-import com.pojosontheweb.selenium.Findrs;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.pojosontheweb.selenium.Findrs.textEquals;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
+import com.pojosontheweb.selenium.Findr;
+import com.pojosontheweb.selenium.Findrs;
 
 public class FObject extends FJsonValue {
 
     private final Findr fRoot;
 
-    FObject(Findr fRoot, JsPath path, Findr findr) {
-        super(path, findr.elem(By.xpath("./div[contains(@class,'jv-object')]")));
+    FObject(Findr fRoot, JsPath path, Findr findr, boolean ignoreErrorTexts) {
+        super(path, findr.elem(By.xpath("./div[contains(@class,'jv-object')]")), ignoreErrorTexts);
         this.fRoot = fRoot;
     }
 

@@ -6,8 +6,8 @@ import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FSelect extends FJsonValue {
 
-    FSelect(JsPath path, Findr findr) {
-        super(path, findr);
+    FSelect(JsPath path, Findr findr, boolean ignoreErrorTexts) {
+        super(path, findr, ignoreErrorTexts);
     }
 
     private Findr findInput() {

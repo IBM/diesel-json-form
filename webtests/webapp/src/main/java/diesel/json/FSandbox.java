@@ -19,5 +19,5 @@ public class FSandbox extends AbstractPageObject {
 
     public final FEditor jsonEditor = new FEditor(getFindr(), "editor2");
 
-    public final FJsonForm jsonForm = new FJsonForm(getFindr(), "#json-form");
+    public final FJsonForm jsonForm = new FJsonForm(getFindr(), "#json-form").ignoreErrorTexts();
 }

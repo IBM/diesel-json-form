@@ -8,8 +8,8 @@ import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FString extends FJsonValue {
 
-    FString(JsPath path, Findr findr) {
-        super(path, findr);
+    FString(JsPath path, Findr findr, boolean ignoreErrorTexts) {
+        super(path, findr, ignoreErrorTexts);
     }
 
     private Findr findInput() {
@@ -51,7 +51,5 @@ public class FString extends FJsonValue {
         }
 
     }
-
-
 
 }
