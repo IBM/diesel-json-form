@@ -3,6 +3,7 @@ import { TypedJsonSchemaService } from './TypedJsonSchemaService';
 import { readFileSync } from 'fs';
 import { parseJsonValue, stringify } from '../JsonValue';
 import { JsPath } from '../JsPath';
+import { TCK_TESTS } from '../tck';
 
 describe('TypedJsonSchemaService', async () => {
   const service = await TypedJsonSchemaService.load(
@@ -44,6 +45,15 @@ describe('TypedJsonSchemaService', async () => {
         ),
       );
     expect(values).toEqual(['0']);
+  });
+
+  describe('tck test', () => {
+    for (const tckTest of TCK_TESTS) {
+      test(tckTest.title, async () => {
+        const proposals = await tckTest.getProposals(service);
+        expect(proposals).toEqual(tckTest.expected);
+      });
+    }
   });
 });
 

@@ -55,7 +55,7 @@ export class TypedJsonSchemaService implements SchemaService {
           instanceValue,
           path.isEmpty() ? '' : '/' + path.format(),
         );
-        console.log('propose', path.format(), suggestOutputs);
+        // console.log('propose', path.format(), suggestOutputs);
         const vs = toValueWithMeta(suggestOutputs)
           .map((v) => v.value)
           .map((v) => JSON.stringify(v));
