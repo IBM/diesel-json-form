@@ -1,7 +1,5 @@
 package diesel.json;
 
-import static com.pojosontheweb.selenium.Findrs.textEquals;
-
 import org.openqa.selenium.By;
 
 import com.pojosontheweb.selenium.Findr;
