@@ -1,9 +1,9 @@
 import { map2 } from 'tea-cup-fp';
 import {
+  BasicOutput,
   OutputUnit,
   toValueWithMeta,
   TypedJson,
-  VerboseOutput,
 } from 'typed-json-ts';
 import { JsonValue, jvNull, parseJsonValue, stringify } from '../JsonValue';
 import { JsPath } from '../JsPath';
@@ -30,7 +30,7 @@ export class TypedJsonSchemaService implements SchemaService {
       stringify(schema),
       stringify(instance),
       (schemaValue: string, instanceValue) =>
-        this.typedJson.validateVerbose(schemaValue, instanceValue),
+        this.typedJson.validateBasic(schemaValue, instanceValue),
     )
       .map((r) =>
         r.then((r) => {
@@ -71,76 +71,80 @@ export class TypedJsonSchemaService implements SchemaService {
 }
 
 class TypedJsonValidationResult implements ValidationResult {
-  constructor(private readonly r: VerboseOutput) {}
+  constructor(private readonly r: BasicOutput) {}
 
   getErrors(): readonly ValidationError[] {
-    return invalidLeafOutputUnits(this.r).map((o) => ({
-      message: (o as any).error,
-      path: o.instanceLocation.slice(1),
-    }));
+    return (
+      this.r.errors
+        ?.map((o) => ({
+          message: (o as any).error,
+          path: o.instanceLocation.slice(1),
+        }))
+        .filter((e) => e.message.indexOf('sub schema') == -1) ?? []
+    );
   }
 
   getRenderers(): ReadonlyMap<string, SchemaRenderer> {
     const kvs: [string, SchemaRenderer][] =
-      validLeafOutputUnits(this.r)
+      this.r.annotations
         ?.filter((o) => o.keywordLocation.endsWith('/renderer'))
         .map((o) => [
           o.instanceLocation.slice(1),
-          typeof o.annotation === 'string'
+          typeof o.value === 'string'
             ? {
-                key: o.annotation,
+                key: o.value,
                 schemaValue: parseJsonValue(
-                  JSON.stringify(o.annotation),
+                  JSON.stringify(o.value),
                 ).withDefault(jvNull),
               }
-            : typeof (o.annotation as any)['key'] === 'string'
+            : typeof (o.value as any)['key'] === 'string'
               ? {
-                  key: (o.annotation as any)['key'] as string,
+                  key: (o.value as any)['key'] as string,
                   schemaValue: parseJsonValue(
-                    JSON.stringify({ renderer: o.annotation }),
+                    JSON.stringify({ renderer: o.value }),
                   ).withDefault(jvNull),
                 }
-              : parseJsonValue(JSON.stringify(o.annotation))
+              : parseJsonValue(JSON.stringify(o.value))
                   .map((v) => v as unknown as SchemaRenderer)
                   .withDefault({ key: '?', schemaValue: jvNull }),
         ]) ?? [];
-    console.log(
-      'FW renderers',
-      kvs,
-      validLeafOutputUnits(this.r)?.filter((o) =>
-        o.keywordLocation.endsWith('/renderer'),
-      ),
-    );
+    // console.log(
+    //   'FW renderers',
+    //   kvs,
+    //   this.r.annotations?.filter((o) =>
+    //     o.keywordLocation.endsWith('/renderer'),
+    //   ),
+    // );
     return new Map([...kvs]);
   }
 
   getFormats(path: JsPath): readonly string[] {
     const formats =
-      validLeafOutputUnits(this.r)
+      this.r.annotations
         ?.filter((o) => o.keywordLocation.endsWith('/format'))
         .filter((o) => o.instanceLocation.slice(1) == path.format())
-        .map((o) => o.annotation as string) ?? [];
+        .map((o) => o.value as string) ?? [];
     return formats;
   }
 
   getDiscriminator(path: JsPath): string | undefined {
     const discriminator =
-      validLeafOutputUnits(this.r)
+      this.r.annotations
         ?.filter((o) => o.keywordLocation.endsWith('/discriminator'))
         .filter((o) => o.instanceLocation.slice(1) == path.format())
-        .map((o) => o.annotation as string) ?? [];
+        .map((o) => o.value as string) ?? [];
     return discriminator[0];
   }
 }
 
-function invalidLeafOutputUnits(o: OutputUnit): readonly OutputUnit[] {
-  const units = o.valid ? [] : (o.errors ?? []);
-  const deep = units.flatMap(invalidLeafOutputUnits).filter((o) => !o.valid);
-  return units.length > 0 ? deep : o.valid ? [] : [o];
-}
+// function invalidLeafOutputUnits(o: OutputUnit): readonly OutputUnit[] {
+//   const units = o.valid ? [] : (o.errors ?? []);
+//   const deep = units.flatMap(invalidLeafOutputUnits).filter((o) => !o.valid);
+//   return units.length > 0 ? deep : o.valid ? [] : [o];
+// }
 
-function validLeafOutputUnits(o: OutputUnit): readonly OutputUnit[] {
-  const units = [...(o.errors ?? []), ...(o.annotations ?? [])];
-  const deep = units.flatMap(validLeafOutputUnits).filter((o) => o.valid);
-  return units.length > 0 ? deep : o.valid ? [o] : [];
-}
+// function validLeafOutputUnits(o: OutputUnit): readonly OutputUnit[] {
+//   const units = [...(o.errors ?? []), ...(o.annotations ?? [])];
+//   const deep = units.flatMap(validLeafOutputUnits).filter((o) => o.valid);
+//   return units.length > 0 ? deep : o.valid ? [o] : [];
+// }
