@@ -1,4 +1,8 @@
-import { JsonStringElement } from './JsonStringElement';
+import {
+  JsonStringElement,
+  StringElemBasic,
+  StringTimeElem,
+} from './JsonStringElement';
 import { JsonNullElement } from './JsonNullElement';
 import { JsonBooleanElement } from './JsonBooleanElement';
 import { JsonNumberElement } from './JsonNumberElement';
@@ -28,4 +32,6 @@ export function defineCustomElements() {
   customElements.define(MenuItemSub.TAG_NAME, MenuItemSub);
   customElements.define(CollapsibleSection.TAG_NAME, CollapsibleSection);
   customElements.define(IconElement.TAG_NAME, IconElement);
+  customElements.define(StringElemBasic.TAG_NAME, StringElemBasic);
+  customElements.define(StringTimeElem.TAG_NAME, StringTimeElem);
 }
