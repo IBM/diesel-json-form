@@ -21,7 +21,6 @@ export class JsonForm extends HTMLElement {
   private root?: JsonElement<JsonValue>;
   private schemaService: SchemaService = defaultSchemaService;
   private schema?: JsonValue;
-  private metadata: Metadata = emptyMetadata;
 
   private changeListeners: ChangeListener[] = [];
 
@@ -60,13 +59,20 @@ export class JsonForm extends HTMLElement {
   init(schemaService: SchemaService, schema: JsonValue, value: JsonValue) {
     this.schemaService = schemaService;
     this.schema = schema;
-    if (this.root) {
-      this.removeChild(this.root);
-    }
-    const newRoot = createDom(value);
-    this.root = newRoot;
-    this.appendChild(newRoot);
-    this.validate();
+    JsonForm.doValidate(schemaService, schema, value)
+      .then((metadata) => {
+        const newRoot = createDom(value);
+        if (metadata) {
+          newRoot.setMetadata(metadata, JsPath.empty);
+        }
+        if (this.root) {
+          this.removeChild(this.root);
+          delete this.root;
+        }
+        this.appendChild(newRoot);
+        this.root = newRoot;
+      })
+      .catch((err) => console.error('could not validate at init : ' + err));
   }
 
   getSchema(): JsonValue | undefined {
@@ -102,20 +108,23 @@ export class JsonForm extends HTMLElement {
     return nothing;
   }
 
-  private validate() {
-    const value = this.toValue();
-    this.fireChanged(value);
-    if (this.schemaService && this.schema) {
-      const validJson = map2(
-        stringify(this.schema),
-        stringify(value),
-        () => true,
-      ).withDefault(false);
-      if (validJson) {
-        JsonForm.VALIDATION_COUNTER++;
-        const validationCounter = JsonForm.VALIDATION_COUNTER;
-        console.log('validate', validationCounter);
-        validateAndComputeMetadata(this.schemaService, this.schema, value)
+  private static doValidate(
+    schemaService: SchemaService,
+    schema: JsonValue,
+    value: JsonValue,
+  ): Promise<Metadata | undefined> {
+    const validJson = map2(
+      stringify(schema),
+      stringify(value),
+      () => true,
+    ).withDefault(false);
+    if (validJson) {
+      JsonForm.VALIDATION_COUNTER++;
+      const validationCounter = JsonForm.VALIDATION_COUNTER;
+      console.log('validate', validationCounter, value);
+      const res = new Promise<Metadata | undefined>((resolve, reject) => {
+        // setTimeout(() => {
+        validateAndComputeMetadata(schemaService, schema, value)
           .then((metadata) => {
             if (validationCounter === JsonForm.VALIDATION_COUNTER) {
               console.log(
@@ -123,17 +132,35 @@ export class JsonForm extends HTMLElement {
                 validationCounter,
                 JsonForm.VALIDATION_COUNTER,
               );
-              console.log('got metadata', value, metadata);
-              this.metadata = metadata;
-              this.root?.setMetadata(metadata, JsPath.empty);
+              resolve(metadata);
+            } else {
+              resolve(undefined);
             }
           })
           .catch((err) => {
-            console.error('validate error', err);
+            reject(err);
           });
-      } else {
-        this.root?.setMetadata(this.metadata, JsPath.empty);
-      }
+        // }, 5000);
+      });
+      return res;
+    } else {
+      return Promise.reject('broken json');
+    }
+  }
+
+  private validate() {
+    const value = this.toValue();
+    this.fireChanged(value);
+    if (this.schemaService && this.schema) {
+      JsonForm.doValidate(this.schemaService, this.schema, value)
+        .then((metadata) => {
+          if (metadata) {
+            this.root?.setMetadata(metadata, JsPath.empty);
+          }
+        })
+        .catch((err) => console.error('validate error', err));
+    } else {
+      this.root?.setMetadata(emptyMetadata, JsPath.empty);
     }
   }
 }

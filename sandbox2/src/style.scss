@@ -33,6 +33,10 @@
   background-color: black;
 }
 
+.schema-select {
+  flex-grow: 1;
+}
+
 .main {
   display: grid;
   grid-template-columns: auto auto auto;
