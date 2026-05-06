@@ -153,7 +153,7 @@ export class StringElemDate extends AbstractStringElem {
   constructor() {
     super();
     this.picker = document.createElement('cds-date-picker') as CDSDatePicker;
-    this.picker.setAttribute('dateFormat', 'Y-m-d');
+    this.picker.setAttribute('date-format', 'Y-m-d');
     this.picker.addEventListener('cds-date-picker-changed', (e) => {
       console.log('rvkb picker change', e);
       // @ts-ignore
