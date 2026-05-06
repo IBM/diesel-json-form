@@ -392,6 +392,72 @@ const Example_OneOfConstDiscriminator = `{
     }
 }`;
 
+const Example_propertyDependenciesV1 = JSON.stringify(
+  {
+    $schema: 'https://json-schema.org/v1',
+    $id: 'http://schema.animal.Animal',
+    type: 'object',
+    propertyDependencies: {
+      what: {
+        'schema.animal.Lion': {
+          $ref: '#/$defs/schema.animal.Lion',
+        },
+        'schema.animal.Elephant': {
+          $ref: '#/$defs/schema.animal.Elephant',
+        },
+      },
+    },
+    $defs: {
+      'schema.animal.Animal': {
+        properties: {
+          name: {
+            type: ['string', 'null'],
+          },
+          sound: {
+            type: ['string', 'null'],
+          },
+          type: {
+            type: ['string', 'null'],
+          },
+          endangered: {
+            type: 'boolean',
+          },
+        },
+      },
+      'schema.animal.Lion': {
+        allOf: [
+          {
+            $ref: '#/$defs/schema.animal.Animal',
+          },
+        ],
+        properties: {
+          mane: {
+            type: 'boolean',
+          },
+        },
+      },
+      'schema.animal.Elephant': {
+        allOf: [
+          {
+            $ref: '#/$defs/schema.animal.Animal',
+          },
+        ],
+        properties: {
+          trunkLength: {
+            type: 'number',
+            format: 'double',
+          },
+          tusk: {
+            type: 'boolean',
+          },
+        },
+      },
+    },
+  },
+  null,
+  2,
+);
+
 export const samples = [
   ['All', '{}'],
   ['Long', Sample_Long],
@@ -414,6 +480,7 @@ export const samples = [
   ['RendererObject', Example_Renderer4],
   ['OneOfConst', Example_OneOfConst],
   ['OneOfConstDiscriminator', Example_OneOfConstDiscriminator],
+  ['propertyDependenciesV1', Example_propertyDependenciesV1],
 ];
 
 export const initialSchema = {};
