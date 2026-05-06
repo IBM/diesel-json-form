@@ -17,7 +17,7 @@ describe('TypedJsonSchemaService', async () => {
 
   test('version', async () => {
     const version = service.typedJson.version();
-    expect(version).toEqual('0.11.4');
+    expect(version).toEqual('0.12.1');
   });
 
   test('validate', async () => {
