@@ -209,3 +209,12 @@ collapsible-section > .right-pane > .label-row {
 collapsible-section > .right-pane > .label-row > .label-container {
   flex-grow: 1;
 }
+
+.json-validation-error > .json-sections {
+  border: 2px solid $text-error;
+}
+
+.json-errors {
+  color: $text-error;
+  font-size: var(--cds-helper-text-01-font-size, 0.75rem);
+}

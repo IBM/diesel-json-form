@@ -1,4 +1,10 @@
-import { JsPath, JvString, jvString, Metadata } from '@diesel-parser/json-form';
+import {
+  JsPath,
+  JvString,
+  jvString,
+  Metadata,
+  ValidationError,
+} from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { findEnclosingForm } from './findEnclosingForm';
 import {
@@ -17,6 +23,7 @@ import '@carbon/web-components/es/components/date-picker/index';
 import '@carbon/web-components/es/components/combo-box/index';
 
 import { div } from './HtmlBuilder';
+import { setErrors } from './setErrorsOnInput';
 
 export type StringFormat = 'date' | 'date-time' | 'time';
 
@@ -108,6 +115,8 @@ export class JsonStringElement extends JsonElement<JvString> {
         }
       }
     }
+    const errors = metadata.errors.get(pathStr);
+    this.elem?.setErrors(errors);
   }
 }
 
@@ -143,6 +152,8 @@ abstract class AbstractStringElem extends HTMLElement {
   abstract setValue(v: JvString): void;
 
   abstract toValue(): JvString;
+
+  abstract setErrors(errors?: readonly ValidationError[]): void;
 }
 
 export class StringElemBasic extends AbstractStringElem {
@@ -166,6 +177,10 @@ export class StringElemBasic extends AbstractStringElem {
   setValue(v: JvString): void {
     this.input.value = v.value;
   }
+
+  setErrors(errors: readonly ValidationError[]): void {
+    setErrors(errors, true, this.input);
+  }
 }
 
 export class StringElemTime extends AbstractStringElem {
@@ -188,6 +203,10 @@ export class StringElemTime extends AbstractStringElem {
 
   setValue(v: JvString): void {
     this.picker.setValue(v.value);
+  }
+
+  setErrors(errors?: readonly ValidationError[]): void {
+    this.picker.showErrors(true, errors);
   }
 }
 
@@ -214,6 +233,10 @@ export class StringElemDate extends AbstractStringElem {
   setValue(v: JvString): void {
     this.myPicker.setValue(v.value);
     this.stringValue = v.value;
+  }
+
+  setErrors(errors?: readonly ValidationError[]): void {
+    this.myPicker.showErrors(true, errors);
   }
 }
 
@@ -254,6 +277,10 @@ export class StringElemCombos extends AbstractStringElem {
   toValue(): JvString {
     return jvString(this.combo.value);
   }
+
+  setErrors(errors?: readonly ValidationError[]): void {
+    setErrors(errors, true, this.combo);
+  }
 }
 
 export class MyDatePicker extends HTMLElement {
@@ -268,8 +295,7 @@ export class MyDatePicker extends HTMLElement {
     super();
     this.picker = document.createElement('cds-date-picker') as CDSDatePicker;
     this.picker.setAttribute('date-format', 'Y-m-d');
-    this.picker.addEventListener('cds-;date-picker-changed', (e) => {
-      console.log('rvkb picker change', e);
+    this.picker.addEventListener('cds-date-picker-changed', (e) => {
       // @ts-ignore
       const dates = e.detail.selectedDates;
       if (dates.length === 1) {
@@ -304,6 +330,13 @@ export class MyDatePicker extends HTMLElement {
 
   getValue(): string {
     return this.input.value;
+  }
+
+  showErrors(
+    includeMessage: boolean,
+    errors?: readonly ValidationError[],
+  ): void {
+    setErrors(errors, includeMessage, this.input);
   }
 }
 
@@ -372,6 +405,13 @@ export class MyTimePicker extends HTMLElement {
   getValue(): string {
     return this.value;
   }
+
+  showErrors(
+    includeMessage: boolean,
+    errors?: readonly ValidationError[],
+  ): void {
+    setErrors(errors, includeMessage, this.timePicker);
+  }
 }
 
 export class StringElemDateTime extends AbstractStringElem {
@@ -407,6 +447,11 @@ export class StringElemDateTime extends AbstractStringElem {
     return jvString(
       this.datePicker.getValue() + 'T' + this.timePicker.getValue(),
     );
+  }
+
+  setErrors(errors?: readonly ValidationError[]): void {
+    this.datePicker.showErrors(false, errors);
+    this.timePicker.showErrors(true, errors);
   }
 }
 

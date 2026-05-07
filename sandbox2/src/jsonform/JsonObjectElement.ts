@@ -25,12 +25,14 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
   static TAG_NAME = 'json-object';
 
   private propertiesNode: HTMLElement = div({});
+  private errorNode: HTMLElement = div({ className: 'json-errors' });
 
   private static ATTR_PROP_NAME = 'json-property-name';
 
   constructor() {
     super();
     this.appendChild(this.propertiesNode);
+    this.appendChild(this.errorNode);
   }
 
   private findProps(): readonly [string, JsonElement<JsonValue>][] {
@@ -172,7 +174,8 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
       elem.setMetadata(metadata, path.append(name)),
     );
     empty(this.propertiesNode);
-    const props = metadata.propertiesToAdd.get(path.format()) ?? [];
+    const pathStr = path.format();
+    const props = metadata.propertiesToAdd.get(pathStr) ?? [];
     for (const prop of props) {
       const btn = document.createElement('cds-button') as CDSButton;
       btn.innerText = '+ ' + prop;
@@ -181,6 +184,17 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
         this.addProperty(prop);
       });
       this.propertiesNode.appendChild(btn);
+    }
+    const errors = metadata.errors.get(pathStr);
+    if (errors && errors.length > 0) {
+      this.classList.add('json-validation-error');
+      const allErrors = errors.map((e) => e.message).join(', ');
+      this.errorNode.innerText = allErrors;
+      this.errorNode.style.display = 'block';
+    } else {
+      this.classList.remove('json-validation-error');
+      this.errorNode.innerText = '';
+      this.errorNode.style.display = 'none';
     }
   }
 

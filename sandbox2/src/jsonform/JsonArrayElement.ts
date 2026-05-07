@@ -16,12 +16,16 @@ import { maybeOf } from 'tea-cup-fp';
 import { SectionBasedElement } from '../SectionBasedElement';
 import { JsonElement } from './JsonElement';
 import { augmentProposal } from './augmentProposal';
+import { div } from './HtmlBuilder';
 
 export class JsonArrayElement extends SectionBasedElement<JvArray> {
   static TAG_NAME = 'json-array';
 
+  private errorNode: HTMLElement = div({ className: 'json-errors' });
+
   constructor() {
     super();
+    this.appendChild(this.errorNode);
   }
 
   toValue(): JvArray {
@@ -144,6 +148,18 @@ export class JsonArrayElement extends SectionBasedElement<JvArray> {
     this.findElems().forEach((elem, index) =>
       elem.setMetadata(metadata, path.append(index)),
     );
+    const pathStr = path.format();
+    const errors = metadata.errors.get(pathStr);
+    if (errors && errors.length > 0) {
+      this.classList.add('json-validation-error');
+      const allErrors = errors.map((e) => e.message).join(', ');
+      this.errorNode.innerText = allErrors;
+      this.errorNode.style.display = 'block';
+    } else {
+      this.classList.remove('json-validation-error');
+      this.errorNode.innerText = '';
+      this.errorNode.style.display = 'none';
+    }
   }
 
   getChildren(): readonly [JsPath, JsonElement<JsonValue>][] {

@@ -1,18 +1,18 @@
-import { JvBoolean, jvBool } from '@diesel-parser/json-form';
-import { input } from './HtmlBuilder';
+import { JsPath, JvBoolean, Metadata, jvBool } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { findEnclosingForm } from './findEnclosingForm';
+import { CDSCheckbox } from '@carbon/web-components';
+import '@carbon/web-components/es/components/checkbox/checkbox';
+import { setErrors } from './setErrorsOnInput';
 
 export class JsonBooleanElement extends JsonElement<JvBoolean> {
   static TAG_NAME = 'json-boolean';
 
-  private input: HTMLInputElement;
+  private input: CDSCheckbox;
 
   constructor() {
     super();
-    this.input = input({
-      type: 'checkbox',
-    });
+    this.input = document.createElement('cds-checkbox') as CDSCheckbox;
   }
 
   toValue(): JvBoolean {
@@ -28,5 +28,11 @@ export class JsonBooleanElement extends JsonElement<JvBoolean> {
 
   connectedCallback() {
     this.appendChild(this.input);
+  }
+
+  protected doSetMetadata(metadata: Metadata, path: JsPath): void {
+    const p = path.format();
+    const errors = metadata.errors.get(p);
+    setErrors(errors, true, this.input);
   }
 }

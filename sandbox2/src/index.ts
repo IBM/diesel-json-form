@@ -45,15 +45,12 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 const initialSchema = `{
-  "type": [
-    "integer",
-    "null"
-  ],
-  "format": "int64"
+  "type": "string",
+  "format": "date"
 }`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = '123';
+const initialValue = '[1,2,3]';
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 

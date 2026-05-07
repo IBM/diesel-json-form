@@ -1,11 +1,15 @@
 import {
   isValidNumberLiteral,
+  JsPath,
   JvNumber,
   jvNumber,
+  Metadata,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CDSTextInput } from '@carbon/web-components';
+import { setErrors } from './setErrorsOnInput';
+import '@carbon/web-components/es/components/text-input/index';
 
 export class JsonNumberElement extends JsonElement<JvNumber> {
   static TAG_NAME = 'json-number';
@@ -15,6 +19,7 @@ export class JsonNumberElement extends JsonElement<JvNumber> {
   constructor() {
     super();
     this.input = document.createElement('cds-text-input') as CDSTextInput;
+    this.appendChild(this.input);
   }
 
   toValue(): JvNumber {
@@ -27,16 +32,20 @@ export class JsonNumberElement extends JsonElement<JvNumber> {
       if (!isValidNumberLiteral(this.input.value)) {
         const path = findEnclosingForm(this).getPath(this);
         path.forEach((path) => {
-          this.updateErrorNode([
-            { path: path.format(), message: 'Invalid number' },
-          ]);
+          setErrors(
+            [{ path: path.format(), message: 'Invalid number' }],
+            true,
+            this.input,
+          );
         });
       }
       findEnclosingForm(this).onChange();
     });
   }
 
-  connectedCallback() {
-    this.appendChild(this.input);
+  protected doSetMetadata(metadata: Metadata, path: JsPath): void {
+    const p = path.format();
+    const errors = metadata.errors.get(p);
+    setErrors(errors, true, this.input);
   }
 }

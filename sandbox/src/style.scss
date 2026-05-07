@@ -1,14 +1,14 @@
-@use "@carbon/react" with (
-$font-path: "@ibm/plex"
+@use '@carbon/react' with (
+  $font-path: '@ibm/plex'
 );
-@use "@carbon/themes";
-@use "@carbon/themes/scss/themes" as *;
+@use '@carbon/themes';
+@use '@carbon/themes/scss/themes' as *;
 
 :root {
   @include themes.theme(react.$white);
 }
 
-[data-carbon-theme="g10"] {
+[data-carbon-theme='g10'] {
   @include themes.theme(react.$white);
 }
 
