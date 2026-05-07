@@ -4,6 +4,7 @@ import {
   MyTimePicker,
   StringElemBasic,
   StringElemDate,
+  StringElemDateTime,
   StringElemTime,
 } from './JsonStringElement';
 import { JsonNullElement } from './JsonNullElement';
@@ -38,6 +39,7 @@ export function defineCustomElements() {
   customElements.define(StringElemBasic.TAG_NAME, StringElemBasic);
   customElements.define(StringElemTime.TAG_NAME, StringElemTime);
   customElements.define(StringElemDate.TAG_NAME, StringElemDate);
+  customElements.define(StringElemDateTime.TAG_NAME, StringElemDateTime);
   customElements.define(MyDatePicker.TAG_NAME, MyDatePicker);
   customElements.define(MyTimePicker.TAG_NAME, MyTimePicker);
 }

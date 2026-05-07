@@ -44,10 +44,10 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{"type":"string", "format": "time"}`;
+const initialSchema = `{"type":"string", "format": "date-time"}`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = '"12:20Z"';
+const initialValue = '"2026-05-11T12:20Z"';
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 

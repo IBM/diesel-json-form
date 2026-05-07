@@ -50,7 +50,7 @@ export class JsonStringElement extends JsonElement<JvString> {
       }
       case 'date-time': {
         this.format = format;
-        elem = new StringElemBasic();
+        elem = new StringElemDateTime();
         break;
       }
       case 'time':
@@ -217,6 +217,10 @@ export class MyDatePicker extends HTMLElement {
   setValue(value: string) {
     this.input.value = value;
   }
+
+  getValue(): string {
+    return this.input.value;
+  }
 }
 
 export class MyTimePicker extends HTMLElement {
@@ -286,24 +290,41 @@ export class MyTimePicker extends HTMLElement {
   }
 }
 
-// export class StringElemDateTime extends AbstractStringElem {
-//   setValue(v: JvString): void {
-//     throw new Error('Method not implemented.');
-//   }
-//   toValue(): JvString {
-//     throw new Error('Method not implemented.');
-//   }
-//   static TAG_NAME = 'string-elem-date-time';
+export class StringElemDateTime extends AbstractStringElem {
+  static TAG_NAME = 'string-elem-date-time';
 
-//   constructor() {
-//     super();
-//     // const myDatePicker = new MyDatePicker();
-//     // const dom = div({ className: 'date-time-picker' }, [
-//     //   div({ className: 'date-time-picker__date' }, []),
-//     //   div({ className: 'date-time-picker__time' }, []),
-//     // ]);
-//   }
-// }
+  private datePicker: MyDatePicker;
+  private timePicker: MyTimePicker;
+
+  constructor() {
+    super();
+    this.datePicker = new MyDatePicker();
+    this.datePicker.setOnChange(() => {
+      this.onChange?.();
+    });
+    this.timePicker = new MyTimePicker();
+    this.timePicker.setOnChange(() => {
+      this.onChange?.();
+    });
+    const dom = div({ className: 'date-time-picker' }, [
+      div({ className: 'date-time-picker__date' }, [this.datePicker]),
+      div({ className: 'date-time-picker__time' }, [this.timePicker]),
+    ]);
+    this.appendChild(dom);
+  }
+
+  setValue(v: JvString): void {
+    const dt = new MyDateTime(v.value);
+    this.datePicker.setValue(dt.date);
+    this.timePicker.setValue(dt.time.fullTime);
+  }
+
+  toValue(): JvString {
+    return jvString(
+      this.datePicker.getValue() + 'T' + this.timePicker.getValue(),
+    );
+  }
+}
 
 const allOffsets = [
   'Z',
