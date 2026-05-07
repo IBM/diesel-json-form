@@ -41,7 +41,7 @@ export abstract class JsonElement<T extends JsonValue> extends HTMLElement {
     this.updateErrorNode(errors);
   }
 
-  private updateErrorNode(errors: readonly ValidationError[]) {
+  protected updateErrorNode(errors: readonly ValidationError[]) {
     if (this.errorsNode) {
       this.errorsNode.remove();
       delete this.errorsNode;

@@ -225,6 +225,7 @@ export class StringElemCombos extends AbstractStringElem {
   constructor() {
     super();
     this.combo = document.createElement('cds-combo-box') as CDSComboBox;
+    // this.combo.shouldFilterItem = true;
     this.combo.allowCustomValue = true;
     this.combo.inputProps = {
       autocomplete: 'off',

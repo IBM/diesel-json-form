@@ -28,12 +28,12 @@ import { defineCustomElements } from './jsonform/defineCustomElements';
 defineCustomElements();
 
 import '@carbon/web-components/es/components/dropdown/dropdown-item';
-import CDSDropdown from '@carbon/web-components/es/components/dropdown/dropdown';
 import '@carbon/web-components/es/components/button/button';
+import { CDSComboBox } from '@carbon/web-components';
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
-) as CDSDropdown;
+) as CDSComboBox;
 
 samples
   .map((s) => {
@@ -46,18 +46,14 @@ samples
 
 const initialSchema = `{
   "type": [
-    "array", "null"
+    "integer",
+    "null"
   ],
-  "items": {
-    "type": [ "string", "null" ],
-    "enum": [
-      "FOO", "BAR"
-    ]
-  }
+  "format": "int64"
 }`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = '["FOO"]';
+const initialValue = '123';
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 

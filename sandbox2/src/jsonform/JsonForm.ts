@@ -10,7 +10,6 @@ import {
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { createDom } from './createDom';
-import { emptyMetadata } from '@diesel-parser/json-form/dist/Metadata';
 import { just, map2, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 
 export type ChangeListener = (value: JsonValue) => void;
@@ -151,7 +150,8 @@ export class JsonForm extends HTMLElement {
   private validate() {
     const value = this.toValue();
     this.fireChanged(value);
-    if (this.schemaService && this.schema) {
+
+    if (this.schemaService && this.schema && stringify(value).isJust()) {
       JsonForm.doValidate(this.schemaService, this.schema, value)
         .then((metadata) => {
           if (metadata) {
@@ -159,8 +159,6 @@ export class JsonForm extends HTMLElement {
           }
         })
         .catch((err) => console.error('validate error', err));
-    } else {
-      this.root?.setMetadata(emptyMetadata, JsPath.empty);
     }
   }
 }

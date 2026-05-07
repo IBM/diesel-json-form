@@ -10,7 +10,7 @@ import {
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import { button, div, empty, text } from './HtmlBuilder';
+import { div, empty } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -19,6 +19,7 @@ import { just, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 import { JsonArrayElement } from './JsonArrayElement';
 import { SectionBasedElement } from '../SectionBasedElement';
 import { augmentProposal } from './augmentProposal';
+import { CDSButton } from '@carbon/web-components';
 
 export class JsonObjectElement extends SectionBasedElement<JvObject> {
   static TAG_NAME = 'json-object';
@@ -173,7 +174,8 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
     empty(this.propertiesNode);
     const props = metadata.propertiesToAdd.get(path.format()) ?? [];
     for (const prop of props) {
-      const btn = button({}, [text('+ ' + prop)]);
+      const btn = document.createElement('cds-button') as CDSButton;
+      btn.innerText = '+ ' + prop;
       btn.addEventListener('click', () => {
         btn.disabled = true;
         this.addProperty(prop);
