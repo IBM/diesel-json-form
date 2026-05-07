@@ -2,6 +2,8 @@ import { JsPath, JvString, jvString, Metadata } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { findEnclosingForm } from './findEnclosingForm';
 import {
+  CDSComboBox,
+  CDSComboBoxItem,
   CDSDatePicker,
   CDSDatePickerInput,
   CDSSelectItem,
@@ -12,6 +14,8 @@ import {
 import '@carbon/web-components/es/components/text-input/index';
 import '@carbon/web-components/es/components/time-picker/index';
 import '@carbon/web-components/es/components/date-picker/index';
+import '@carbon/web-components/es/components/combo-box/index';
+
 import { div } from './HtmlBuilder';
 
 export type StringFormat = 'date' | 'date-time' | 'time';
@@ -21,6 +25,7 @@ export class JsonStringElement extends JsonElement<JvString> {
 
   private elem?: AbstractStringElem;
   private format?: StringFormat;
+  private combos: readonly string[] = [];
 
   constructor() {
     super();
@@ -71,6 +76,21 @@ export class JsonStringElement extends JsonElement<JvString> {
     this.appendChild(elem);
   }
 
+  private createDomCombos(value: JvString, combos: readonly string[]): void {
+    if (this.elem) {
+      this.elem.remove();
+    }
+    const elem = new StringElemCombos();
+    elem.setValue(value);
+    elem.setCombos(combos);
+    elem.setOnChange(() => {
+      findEnclosingForm(this).onChange();
+    });
+    this.elem = elem;
+    this.appendChild(elem);
+    this.combos = combos;
+  }
+
   protected doSetMetadata(metadata: Metadata, path: JsPath): void {
     const pathStr = path.format();
     const formats = metadata.formats.get(pathStr);
@@ -80,8 +100,33 @@ export class JsonStringElement extends JsonElement<JvString> {
       if (format !== this.format) {
         this.createDom(this.toValue(), format);
       }
+    } else {
+      const combos = metadata.comboBoxes.get(pathStr);
+      if (combos && combos.length > 0) {
+        if (!stringArrayEquals(combos, this.combos)) {
+          this.createDomCombos(this.toValue(), combos);
+        }
+      }
     }
   }
+}
+
+function stringArrayEquals(
+  a1: readonly string[],
+  a2: readonly string[],
+): boolean {
+  if (a1 === a2) {
+    return true;
+  }
+  if (a1.length !== a2.length) {
+    return false;
+  }
+  for (let i = 0; i < a1.length; i++) {
+    if (a1[i] !== a2[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 abstract class AbstractStringElem extends HTMLElement {
@@ -169,6 +214,44 @@ export class StringElemDate extends AbstractStringElem {
   setValue(v: JvString): void {
     this.myPicker.setValue(v.value);
     this.stringValue = v.value;
+  }
+}
+
+export class StringElemCombos extends AbstractStringElem {
+  static TAG_NAME = 'string-elem-combos';
+
+  private combo: CDSComboBox;
+
+  constructor() {
+    super();
+    this.combo = document.createElement('cds-combo-box') as CDSComboBox;
+    this.combo.allowCustomValue = true;
+    this.combo.inputProps = {
+      autocomplete: 'off',
+    };
+    this.combo.addEventListener('cds-combo-box-selected', () => {
+      this.onChange?.();
+    });
+    this.appendChild(this.combo);
+  }
+
+  setCombos(combos: readonly string[]): void {
+    for (const combo of combos) {
+      const item = document.createElement(
+        'cds-combo-box-item',
+      ) as CDSComboBoxItem;
+      item.setAttribute('value', combo);
+      item.innerText = combo;
+      this.combo.appendChild(item);
+    }
+  }
+
+  setValue(v: JvString): void {
+    this.combo.value = v.value;
+  }
+
+  toValue(): JvString {
+    return jvString(this.combo.value);
   }
 }
 

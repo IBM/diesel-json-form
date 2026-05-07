@@ -3,6 +3,7 @@ import {
   MyDatePicker,
   MyTimePicker,
   StringElemBasic,
+  StringElemCombos,
   StringElemDate,
   StringElemDateTime,
   StringElemTime,
@@ -40,6 +41,7 @@ export function defineCustomElements() {
   customElements.define(StringElemTime.TAG_NAME, StringElemTime);
   customElements.define(StringElemDate.TAG_NAME, StringElemDate);
   customElements.define(StringElemDateTime.TAG_NAME, StringElemDateTime);
+  customElements.define(StringElemCombos.TAG_NAME, StringElemCombos);
   customElements.define(MyDatePicker.TAG_NAME, MyDatePicker);
   customElements.define(MyTimePicker.TAG_NAME, MyTimePicker);
 }
