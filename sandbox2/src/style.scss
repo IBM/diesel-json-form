@@ -145,17 +145,14 @@ footer.sandbox .gas-station {
   height: 100%;
 }
 
-json-string.json-error input {
-  border-color: red;
-}
-
-.json-error-list {
-  color: red;
-}
-
 ctmn-menu {
-  border: 1px solid gray;
-  padding: 2px;
+  position: absolute;
+  display: block;
+  background-color: $layer;
+
+  ctmn-menu-item > div {
+    background-color: $layer;
+  }
 }
 
 .ctmn-highlighted > div {
@@ -165,6 +162,7 @@ ctmn-menu {
 .ctmn-sub-menu-item {
   display: flex;
   flex-direction: row;
+  background-color: $layer;
 }
 
 .ctmn-glasspane {
@@ -196,7 +194,6 @@ collapsible-section > .right-pane > .collapsible-content {
 
 collapsible-section > .right-pane {
   flex-grow: 1;
-  margin-right: 0.5rem;
 }
 
 collapsible-section > .right-pane > .label-row {
