@@ -1,11 +1,6 @@
 import { JsonValue } from '@diesel-parser/json-form';
 import { JsonElement } from './jsonform/JsonElement';
-import {
-  div,
-  empty,
-  moveElementDown,
-  moveElementUp,
-} from './jsonform/HtmlBuilder';
+import { div, moveElementDown, moveElementUp } from './jsonform/HtmlBuilder';
 import { CollapsibleSection } from './jsonform/CollapsibleSection';
 import { findEnclosingForm } from './jsonform/findEnclosingForm';
 import { createDom } from './jsonform/createDom';
@@ -15,9 +10,21 @@ export abstract class SectionBasedElement<
 > extends JsonElement<T> {
   private elemsContainer: HTMLElement = div({ className: 'json-sections' });
 
+  private emptyNodeContainer: HTMLElement = div({
+    className: 'json-section-empty',
+  });
+
   constructor() {
     super();
     this.appendChild(this.elemsContainer);
+    this.emptyNodeContainer.style.display = 'none';
+    this.elemsContainer.appendChild(this.emptyNodeContainer);
+  }
+
+  private updateEmptyNode() {
+    this.emptyNodeContainer.innerText = this.emptyMessage();
+    this.emptyNodeContainer.style.display =
+      this.findSections().length === 0 ? 'block' : 'none';
   }
 
   protected findSections(): CollapsibleSection[] {
@@ -39,6 +46,7 @@ export abstract class SectionBasedElement<
 
   protected delete(section: CollapsibleSection) {
     section.remove();
+    this.updateEmptyNode();
     findEnclosingForm(this).onChange();
   }
 
@@ -64,10 +72,14 @@ export abstract class SectionBasedElement<
   }
 
   emptySections() {
-    empty(this.elemsContainer);
+    this.findSections().forEach((s) => s.remove());
+    this.updateEmptyNode();
   }
 
   appendSection(s: CollapsibleSection) {
     this.elemsContainer.appendChild(s);
+    this.updateEmptyNode();
   }
+
+  protected abstract emptyMessage(): string;
 }

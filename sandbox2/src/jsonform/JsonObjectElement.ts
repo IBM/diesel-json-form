@@ -35,6 +35,10 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
     this.appendChild(this.errorNode);
   }
 
+  protected emptyMessage(): string {
+    return 'empty object';
+  }
+
   private findProps(): readonly [string, JsonElement<JsonValue>][] {
     return this.findSections().flatMap((s) => {
       const propName = s.getAttribute(JsonObjectElement.ATTR_PROP_NAME);

@@ -28,6 +28,10 @@ export class JsonArrayElement extends SectionBasedElement<JvArray> {
     this.appendChild(this.errorNode);
   }
 
+  protected emptyMessage(): string {
+    return 'empty array';
+  }
+
   toValue(): JvArray {
     const elems = this.findElems();
     const values = elems.map((e) => e.toValue());
