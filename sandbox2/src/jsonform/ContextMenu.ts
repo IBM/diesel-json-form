@@ -2,6 +2,7 @@ import {
   getValueAt,
   indexOfPathInParent,
   JsonValue,
+  JsonValueType,
   JsPath,
   jvArray,
   jvBool,
@@ -11,6 +12,7 @@ import {
   jvString,
   SchemaService,
   stringify,
+  valueType,
 } from '@diesel-parser/json-form';
 
 import '@carbon/web-components/es/components/menu/index';
@@ -60,6 +62,23 @@ function subMenuItem(
     items,
     options,
   };
+}
+
+function typeIcon(t: JsonValueType) {
+  switch (t) {
+    case 'array':
+      return 'table';
+    case 'boolean':
+      return 'checkbox--checked';
+    case 'null':
+      return 'not-available';
+    case 'number':
+      return 'string-integer';
+    case 'object':
+      return 'decision-tree';
+    case 'string':
+      return 'string-text';
+  }
 }
 
 export function createMenu(
@@ -113,12 +132,12 @@ export function createMenu(
           const canMoveDown = index >= 0 && index < nbItems - 1;
           const moveUpItems =
             menuActions.moveUp && canMoveUp
-              ? [menuItem('Move up', menuActions.moveUp, { icon: 'arrow-up' })]
+              ? [menuItem('up', menuActions.moveUp, { icon: 'arrow-up' })]
               : [];
           const moveDownItems =
             menuActions.moveDown && canMoveDown
               ? [
-                  menuItem('Move down', menuActions.moveDown, {
+                  menuItem('down', menuActions.moveDown, {
                     icon: 'arrow-down',
                   }),
                 ]
@@ -174,7 +193,11 @@ export function createTypesMenu(
   if (menuActions.changeType) {
     const buildChangeTypeItem = (value: JsonValue): MenuItem[] =>
       menuActions.changeType
-        ? [menuItem(value.tag, () => menuActions.changeType?.(value))]
+        ? [
+            menuItem(valueType(value), () => menuActions.changeType?.(value), {
+              icon: typeIcon(valueType(value)),
+            }),
+          ]
         : [];
 
     const uniqueProposalTypes = proposals
@@ -248,6 +271,17 @@ export function createTypesMenu(
   }
 }
 
+function stringifyProposal(value: JsonValue): string {
+  switch (value.tag) {
+    case 'jv-object': {
+      return value.properties.map((p) => p.name).join(', ');
+    }
+    default: {
+      return stringify(value).withDefault('broken json !');
+    }
+  }
+}
+
 export function createProposeMenu(
   menuActions: MenuActions,
   path: JsPath,
@@ -261,10 +295,9 @@ export function createProposeMenu(
 
   const p = menuActions.proposal;
   const proposeMenuItems = proposals.map((value, index) =>
-    menuItem(
-      stringify(value).withDefaultSupply(() => 'broken json !'),
-      () => p(path, value, index),
-    ),
+    menuItem(stringifyProposal(value), () => p(path, value, index), {
+      icon: typeIcon(valueType(value)),
+    }),
   );
   return [subMenuItem('propose', proposeMenuItems, { icon: 'magic-wand' })];
 }
@@ -312,7 +345,19 @@ function createCdsItem(item: MenuItem): CDSmenuItem {
 let menu: CDSMenu | undefined = undefined;
 let prevFocus: HTMLElement | null = null;
 
-export function openMenu(items: readonly MenuItem[], refElement: HTMLElement) {
+const nextFrame = () =>
+  new Promise((resolve) => requestAnimationFrame(resolve));
+// minimal workaround to ensure icon layout is enabled on root + submenu menus
+function forceIcons(menuEl: Element) {
+  menuEl.shadowRoot
+    ?.querySelector('.cds--menu')
+    ?.classList.add('cds--menu--with-icons');
+}
+
+export async function openMenu(
+  items: readonly MenuItem[],
+  refElement: HTMLElement,
+) {
   prevFocus = refElement;
   console.log('prevFocus', prevFocus);
   closeMenu();
@@ -325,6 +370,18 @@ export function openMenu(items: readonly MenuItem[], refElement: HTMLElement) {
   for (const item of items) {
     menu.appendChild(createCdsItem(item));
   }
+
+  // Let menu-item/icon layout settle before opening (helps positioning with icons)
+  //   await menu.updateComplete;
+  await nextFrame();
+
+  // apply icon layout class for root and nested submenu menus
+  forceIcons(menu);
+  menu.querySelectorAll('cds-menu-item').forEach((item) => {
+    const nestedMenu = item.shadowRoot?.querySelector('cds-menu');
+    if (nestedMenu) forceIcons(nestedMenu);
+  });
+
   menu.x = [rect.left, rect.right];
   menu.y = [rect.bottom, rect.bottom];
   menu.open = true;

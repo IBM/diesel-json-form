@@ -22,6 +22,18 @@ import TrashCan from '@carbon/icons/es/trash-can/16.js';
 import MagicWand from '@carbon/icons/es/magic-wand/16.js';
 // @ts-ignore
 import Add from '@carbon/icons/es/add/16.js';
+// @ts-ignore
+import Table from '@carbon/icons/es/table/16.js';
+// @ts-ignore
+import CheckboxChecked from '@carbon/icons/es/checkbox--checked/16.js';
+// @ts-ignore
+import NotAvailable from '@carbon/icons/es/not-available/16.js';
+// @ts-ignore
+import StringInteger from '@carbon/icons/es/string-integer/16.js';
+// @ts-ignore
+import DecisionTree from '@carbon/icons/es/decision-tree/16.js';
+// @ts-ignore
+import StringText from '@carbon/icons/es/string-text/16.js';
 
 import { getAttributes, toSVG } from '@carbon/icon-helpers';
 import { CDSButton } from '@carbon/web-components';
@@ -42,6 +54,12 @@ export class IconElement extends HTMLElement {
     'trash-can': TrashCan,
     'magic-wand': MagicWand,
     add: Add,
+    table: Table,
+    'checkbox--checked': CheckboxChecked,
+    'not-available': NotAvailable,
+    'string-integer': StringInteger,
+    'decision-tree': DecisionTree,
+    'string-text': StringText,
   };
 
   static newInstance(iconName: string): IconElement {
