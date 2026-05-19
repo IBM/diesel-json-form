@@ -10,25 +10,36 @@ import {
   jvObject,
   jvString,
   SchemaService,
+  stringify,
 } from '@diesel-parser/json-form';
-import {
-  AbstractMenuItemElement,
-  MenuItem,
-  subMenu,
-} from '../contextmenu/ContextMenu';
-import { div, text } from './HtmlBuilder';
-import {
-  AddMenuAction,
-  ApplyProposalMenuAction,
-  ChangeTypeMenuAction,
-  DeleteMenuAction,
-  MenuActions,
-  MoveDownMenuAction,
-  MoveUpMenuAction,
-} from '../contextmenu/MenuActions';
 
-function label(s: string): Element {
-  return div({}, [text(s)]);
+import '@carbon/web-components/es/components/menu/index';
+import CDSMenu from '@carbon/web-components/es/components/menu/menu';
+import CDSmenuItem from '@carbon/web-components/es/components/menu/menu-item';
+
+export type MenuActions = {
+  add?: () => void;
+  delete?: () => void;
+  moveUp?: () => void;
+  moveDown?: () => void;
+  proposal?: (path: JsPath, proposal: JsonValue, proposalIndex: number) => void;
+  changeType?: (value: JsonValue) => void;
+};
+
+export type MenuItem =
+  | { tag: 'item'; label: string; onClick: () => void }
+  | { tag: 'sub-menu'; label: string; items: readonly MenuItem[] };
+
+function menuItem(label: string, onClick: () => void): MenuItem {
+  return { tag: 'item', label, onClick };
+}
+
+function subMenuItem(label: string, items: readonly MenuItem[]): MenuItem {
+  return {
+    tag: 'sub-menu',
+    label,
+    items,
+  };
 }
 
 export function createMenu(
@@ -38,7 +49,7 @@ export function createMenu(
   path: JsPath,
   strictMode: boolean,
   menuActions: MenuActions,
-): Promise<AbstractMenuItemElement[]> {
+): Promise<MenuItem[]> {
   console.log('createMenu', path.format());
   return getValueAt(root, path)
     .map((valueAtPath) =>
@@ -47,7 +58,12 @@ export function createMenu(
         const addItems: () => MenuItem[] = () => {
           const isObject = !strictMode && valueAtPath.tag === 'jv-object';
           if (menuActions.add && (isArray || isObject)) {
-            return [new AddMenuAction(isArray, menuActions.add).createItem()];
+            return [
+              menuItem(
+                isArray ? 'Add element' : 'Add property',
+                menuActions.add,
+              ),
+            ];
           }
           return [];
         };
@@ -77,22 +93,22 @@ export function createMenu(
           const canMoveDown = index >= 0 && index < nbItems - 1;
           const moveUpItems =
             menuActions.moveUp && canMoveUp
-              ? [new MoveUpMenuAction(menuActions.moveUp).createItem()]
+              ? [menuItem('Move up', menuActions.moveUp)]
               : [];
           const moveDownItems =
             menuActions.moveDown && canMoveDown
-              ? [new MoveDownMenuAction(menuActions.moveDown).createItem()]
+              ? [menuItem('Move down', menuActions.moveDown)]
               : [];
 
           return moveUpItems.concat(moveDownItems);
         };
 
         const moveItems = hasMoveMenu
-          ? [subMenu(label('move'), () => Promise.resolve(moveMenuItems()))]
+          ? [subMenuItem('move', moveMenuItems())]
           : [];
 
         const deleteItems = menuActions.delete
-          ? [new DeleteMenuAction(menuActions.delete).createItem()]
+          ? [menuItem('delete', menuActions.delete)]
           : [];
 
         const changeTypes = createTypesMenu(
@@ -108,7 +124,7 @@ export function createMenu(
           strictMode,
         );
 
-        const res: AbstractMenuItemElement[] = [];
+        const res: MenuItem[] = [];
         return res
           .concat(moveItems)
           .concat(addItems())
@@ -125,11 +141,11 @@ export function createTypesMenu(
   valueAtPath: JsonValue,
   proposals: ReadonlyArray<JsonValue>,
   strictMode: boolean,
-): ReadonlyArray<AbstractMenuItemElement> {
+): ReadonlyArray<MenuItem> {
   if (menuActions.changeType) {
     const buildChangeTypeItem = (value: JsonValue): MenuItem[] =>
       menuActions.changeType
-        ? [new ChangeTypeMenuAction(value, menuActions.changeType).createItem()]
+        ? [menuItem(value.tag, () => menuActions.changeType?.(value))]
         : [];
 
     const uniqueProposalTypes = proposals
@@ -139,7 +155,7 @@ export function createTypesMenu(
           array.indexOf(value) === index,
       );
 
-    const buildChangeTypeMenuItems = (): AbstractMenuItemElement[] => {
+    const buildChangeTypeMenuItems = (): MenuItem[] => {
       const jsonValues = strictMode
         ? proposals
         : [
@@ -192,11 +208,7 @@ export function createTypesMenu(
     }
 
     return buildChangeTypeMenuItems().length > 0
-      ? [
-          subMenu(label('change type'), () =>
-            Promise.resolve(buildChangeTypeMenuItems()),
-          ),
-        ]
+      ? [subMenuItem('change type', buildChangeTypeMenuItems())]
       : [];
   } else {
     return [];
@@ -208,7 +220,7 @@ export function createProposeMenu(
   path: JsPath,
   proposals: ReadonlyArray<JsonValue>,
   strictMode: boolean,
-): ReadonlyArray<AbstractMenuItemElement> {
+): ReadonlyArray<MenuItem> {
   if (strictMode || proposals.length === 0 || !menuActions.proposal) {
     // Strict mode or no proposal => no menu
     return [];
@@ -216,7 +228,68 @@ export function createProposeMenu(
 
   const p = menuActions.proposal;
   const proposeMenuItems = proposals.map((value, index) =>
-    new ApplyProposalMenuAction(path, value, index, p).createItem(),
+    menuItem(
+      stringify(value).withDefaultSupply(() => 'broken json !'),
+      () => p(path, value, index),
+    ),
   );
-  return [subMenu(label('propose'), () => Promise.resolve(proposeMenuItems))];
+  return [subMenuItem('propose', proposeMenuItems)];
+}
+
+function createCdsItem(item: MenuItem): CDSmenuItem {
+  switch (item.tag) {
+    case 'item': {
+      const cdsItem = document.createElement('cds-menu-item') as CDSmenuItem;
+      cdsItem.setAttribute('label', item.label);
+      cdsItem.addEventListener('click', item.onClick);
+      return cdsItem;
+    }
+    case 'sub-menu': {
+      const cdsItem = document.createElement('cds-menu-item') as CDSmenuItem;
+      //   cdsItem.setAttribute('slot', 'submenu');
+      cdsItem.setAttribute('label', item.label);
+
+      const group = document.createElement('cds-menu-item-radio-group');
+      group.setAttribute('slot', 'submenu');
+      cdsItem.appendChild(group);
+
+      for (const i of item.items) {
+        group.appendChild(createCdsItem(i));
+      }
+      return cdsItem;
+    }
+  }
+}
+
+let menu: CDSMenu | undefined = undefined;
+let prevFocus: HTMLElement | null = null;
+
+export function openMenu(items: readonly MenuItem[], refElement: HTMLElement) {
+  prevFocus = refElement;
+  console.log('prevFocus', prevFocus);
+  closeMenu();
+  const rect = refElement.getBoundingClientRect();
+  menu = document.createElement('cds-menu') as CDSMenu;
+  menu.addEventListener('cds-menu-closed', closeMenu);
+  menu.open = false;
+  document.body.appendChild(menu);
+  for (const item of items) {
+    menu.appendChild(createCdsItem(item));
+  }
+  menu.x = [rect.left, rect.right];
+  menu.y = [rect.bottom, rect.bottom];
+  menu.open = true;
+}
+
+function closeMenu() {
+  if (menu) {
+    menu.open = false;
+    menu.remove();
+    menu = undefined;
+    if (prevFocus) {
+      console.log('focusing : ', prevFocus);
+      prevFocus.focus();
+      prevFocus = null;
+    }
+  }
 }

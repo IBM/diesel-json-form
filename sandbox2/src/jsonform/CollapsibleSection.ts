@@ -1,10 +1,7 @@
 import { JsonValue } from '@diesel-parser/json-form';
-import { button, div, empty, span, text } from './HtmlBuilder';
+import { div, empty, span } from './HtmlBuilder';
 import { JsonElement } from './JsonElement';
-import {
-  AbstractMenuItemElement,
-  MenuElement,
-} from '../contextmenu/ContextMenu';
+import { MenuItem, openMenu } from './ContextMenu';
 import { CDSButton } from '@carbon/web-components';
 import { IconElement } from './IconElement';
 
@@ -16,7 +13,7 @@ export class CollapsibleSection extends HTMLElement {
   private labelElement: HTMLElement;
   private menuButton: CDSButton;
   private content?: JsonElement<JsonValue>;
-  private menu?: () => Promise<AbstractMenuItemElement[]>;
+  private menu?: () => Promise<MenuItem[]>;
 
   private static TRIGGER_COUNT = 0;
 
@@ -45,8 +42,8 @@ export class CollapsibleSection extends HTMLElement {
         this.menu()
           .then((i) => {
             if (CollapsibleSection.TRIGGER_COUNT === triggerCount) {
-              console.log('open menu', triggerCount);
-              MenuElement.open(i, this.menuButton);
+              console.log('open menu', triggerCount, i);
+              openMenu(i, this.menuButton);
             }
           })
           .finally(() => {
@@ -97,7 +94,7 @@ export class CollapsibleSection extends HTMLElement {
     this.labelElement.innerText = title;
   }
 
-  setMenuItems(f: () => Promise<AbstractMenuItemElement[]>): void {
+  setMenuItems(f: () => Promise<MenuItem[]>): void {
     this.menu = f;
   }
 }

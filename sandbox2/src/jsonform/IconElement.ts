@@ -38,6 +38,8 @@ export class IconElement extends HTMLElement {
     btn.appendChild(IconElement.newInstance(icon));
   }
 
+  private iconNode?: SVGElement;
+
   constructor() {
     super();
   }
@@ -47,15 +49,19 @@ export class IconElement extends HTMLElement {
     if (iconName) {
       const icon = IconElement.ICONS[iconName];
       if (icon) {
-        const iconNode = toSVG({
+        this.iconNode = toSVG({
           ...icon,
           attrs: getAttributes(icon.attrs),
         });
-        iconNode.setAttribute('slot', 'icon');
+        this.iconNode.setAttribute('slot', 'icon');
         // btn.appendChild(iconNode);
-        this.appendChild(iconNode);
+        this.appendChild(this.iconNode);
       }
       //   this.appendChild(btn);
     }
+  }
+
+  disconnectedCallback() {
+    this.iconNode?.remove();
   }
 }

@@ -14,7 +14,7 @@ import { div, empty } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
-import { createMenu } from './createMenu';
+import { createMenu } from './ContextMenu';
 import { just, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 import { JsonArrayElement } from './JsonArrayElement';
 import { SectionBasedElement } from '../SectionBasedElement';
