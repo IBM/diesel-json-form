@@ -16,6 +16,7 @@ import {
 import '@carbon/web-components/es/components/menu/index';
 import CDSMenu from '@carbon/web-components/es/components/menu/menu';
 import CDSmenuItem from '@carbon/web-components/es/components/menu/menu-item';
+import { IconElement } from './IconElement';
 
 export type MenuActions = {
   add?: () => void;
@@ -26,19 +27,38 @@ export type MenuActions = {
   changeType?: (value: JsonValue) => void;
 };
 
-export type MenuItem =
-  | { tag: 'item'; label: string; onClick: () => void }
-  | { tag: 'sub-menu'; label: string; items: readonly MenuItem[] };
-
-function menuItem(label: string, onClick: () => void): MenuItem {
-  return { tag: 'item', label, onClick };
+interface ItemOptions {
+  icon?: string;
+  danger?: boolean;
 }
 
-function subMenuItem(label: string, items: readonly MenuItem[]): MenuItem {
+export type MenuItem =
+  | { tag: 'item'; label: string; onClick: () => void; options?: ItemOptions }
+  | {
+      tag: 'sub-menu';
+      label: string;
+      items: readonly MenuItem[];
+      options?: ItemOptions;
+    };
+
+function menuItem(
+  label: string,
+  onClick: () => void,
+  options?: ItemOptions,
+): MenuItem {
+  return { tag: 'item', label, onClick, options };
+}
+
+function subMenuItem(
+  label: string,
+  items: readonly MenuItem[],
+  options?: ItemOptions,
+): MenuItem {
   return {
     tag: 'sub-menu',
     label,
     items,
+    options,
   };
 }
 
@@ -93,22 +113,26 @@ export function createMenu(
           const canMoveDown = index >= 0 && index < nbItems - 1;
           const moveUpItems =
             menuActions.moveUp && canMoveUp
-              ? [menuItem('Move up', menuActions.moveUp)]
+              ? [menuItem('Move up', menuActions.moveUp, { icon: 'arrow-up' })]
               : [];
           const moveDownItems =
             menuActions.moveDown && canMoveDown
-              ? [menuItem('Move down', menuActions.moveDown)]
+              ? [
+                  menuItem('Move down', menuActions.moveDown, {
+                    icon: 'arrow-down',
+                  }),
+                ]
               : [];
 
           return moveUpItems.concat(moveDownItems);
         };
 
         const moveItems = hasMoveMenu
-          ? [subMenuItem('move', moveMenuItems())]
+          ? [subMenuItem('move', moveMenuItems(), { icon: 'move' })]
           : [];
 
         const deleteItems = menuActions.delete
-          ? [menuItem('delete', menuActions.delete)]
+          ? [menuItem('delete', menuActions.delete, { danger: true })]
           : [];
 
         const changeTypes = createTypesMenu(
@@ -242,17 +266,31 @@ function createCdsItem(item: MenuItem): CDSmenuItem {
       const cdsItem = document.createElement('cds-menu-item') as CDSmenuItem;
       cdsItem.setAttribute('label', item.label);
       cdsItem.addEventListener('click', item.onClick);
+      if (item.options?.icon) {
+        const iconElem = IconElement.getSVG(item.options.icon);
+        iconElem.setAttribute('slot', 'render-icon');
+        cdsItem.appendChild(iconElem);
+      }
+      if (item.options?.danger) {
+        cdsItem.setAttribute('kind', 'danger');
+      }
       return cdsItem;
     }
     case 'sub-menu': {
       const cdsItem = document.createElement('cds-menu-item') as CDSmenuItem;
       //   cdsItem.setAttribute('slot', 'submenu');
       cdsItem.setAttribute('label', item.label);
-
+      if (item.options?.icon) {
+        const iconElem = IconElement.getSVG(item.options.icon);
+        iconElem.setAttribute('slot', 'render-icon');
+        cdsItem.appendChild(iconElem);
+      }
+      if (item.options?.danger) {
+        cdsItem.setAttribute('kind', 'danger');
+      }
       const group = document.createElement('cds-menu-item-radio-group');
       group.setAttribute('slot', 'submenu');
       cdsItem.appendChild(group);
-
       for (const i of item.items) {
         group.appendChild(createCdsItem(i));
       }
@@ -276,7 +314,7 @@ export function openMenu(items: readonly MenuItem[], refElement: HTMLElement) {
   for (const item of items) {
     menu.appendChild(createCdsItem(item));
   }
-  menu.x = [rect.left, rect.right];
+  menu.x = [rect.left, rect.left];
   menu.y = [rect.bottom, rect.bottom];
   menu.open = true;
 }
