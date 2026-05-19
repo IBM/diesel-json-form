@@ -14,6 +14,14 @@ import ChevronDown from '@carbon/icons/es/chevron--down/16.js';
 import OverflowMenuVertical from '@carbon/icons/es/overflow-menu--vertical/16.js';
 // @ts-ignore
 import Move from '@carbon/icons/es/move/16.js';
+// @ts-ignore
+import Types from '@carbon/icons/es/types/16.js';
+// @ts-ignore
+import TrashCan from '@carbon/icons/es/trash-can/16.js';
+// @ts-ignore
+import MagicWand from '@carbon/icons/es/magic-wand/16.js';
+// @ts-ignore
+import Add from '@carbon/icons/es/add/16.js';
 
 import { getAttributes, toSVG } from '@carbon/icon-helpers';
 import { CDSButton } from '@carbon/web-components';
@@ -30,6 +38,10 @@ export class IconElement extends HTMLElement {
     'chevron-down': ChevronDown,
     'overflow-menu-vertical': OverflowMenuVertical,
     move: Move,
+    types: Types,
+    'trash-can': TrashCan,
+    'magic-wand': MagicWand,
+    add: Add,
   };
 
   static newInstance(iconName: string): IconElement {

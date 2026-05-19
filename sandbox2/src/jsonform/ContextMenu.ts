@@ -70,7 +70,6 @@ export function createMenu(
   strictMode: boolean,
   menuActions: MenuActions,
 ): Promise<MenuItem[]> {
-  console.log('createMenu', path.format());
   return getValueAt(root, path)
     .map((valueAtPath) =>
       schemaService.propose(schema, root, path).then((proposals) => {
@@ -80,8 +79,9 @@ export function createMenu(
           if (menuActions.add && (isArray || isObject)) {
             return [
               menuItem(
-                isArray ? 'Add element' : 'Add property',
+                isArray ? 'add element' : 'add property',
                 menuActions.add,
+                { icon: 'add' },
               ),
             ];
           }
@@ -132,7 +132,12 @@ export function createMenu(
           : [];
 
         const deleteItems = menuActions.delete
-          ? [menuItem('delete', menuActions.delete, { danger: true })]
+          ? [
+              menuItem('delete', menuActions.delete, {
+                danger: true,
+                icon: 'trash-can',
+              }),
+            ]
           : [];
 
         const changeTypes = createTypesMenu(
@@ -232,7 +237,11 @@ export function createTypesMenu(
     }
 
     return buildChangeTypeMenuItems().length > 0
-      ? [subMenuItem('change type', buildChangeTypeMenuItems())]
+      ? [
+          subMenuItem('change type', buildChangeTypeMenuItems(), {
+            icon: 'types',
+          }),
+        ]
       : [];
   } else {
     return [];
@@ -257,7 +266,7 @@ export function createProposeMenu(
       () => p(path, value, index),
     ),
   );
-  return [subMenuItem('propose', proposeMenuItems)];
+  return [subMenuItem('propose', proposeMenuItems, { icon: 'magic-wand' })];
 }
 
 function createCdsItem(item: MenuItem): CDSmenuItem {
@@ -280,6 +289,7 @@ function createCdsItem(item: MenuItem): CDSmenuItem {
       const cdsItem = document.createElement('cds-menu-item') as CDSmenuItem;
       //   cdsItem.setAttribute('slot', 'submenu');
       cdsItem.setAttribute('label', item.label);
+      // see https://stackblitz.com/edit/github-1k4hn4fe-6uart3mk?file=src%2Findex.js
       if (item.options?.icon) {
         const iconElem = IconElement.getSVG(item.options.icon);
         iconElem.setAttribute('slot', 'render-icon');
@@ -288,7 +298,7 @@ function createCdsItem(item: MenuItem): CDSmenuItem {
       if (item.options?.danger) {
         cdsItem.setAttribute('kind', 'danger');
       }
-      const group = document.createElement('cds-menu-item-radio-group');
+      const group = document.createElement('cds-menu-item-group');
       group.setAttribute('slot', 'submenu');
       cdsItem.appendChild(group);
       for (const i of item.items) {
@@ -309,12 +319,13 @@ export function openMenu(items: readonly MenuItem[], refElement: HTMLElement) {
   const rect = refElement.getBoundingClientRect();
   menu = document.createElement('cds-menu') as CDSMenu;
   menu.addEventListener('cds-menu-closed', closeMenu);
+  menu.setAttribute('size', 'sm');
   menu.open = false;
   document.body.appendChild(menu);
   for (const item of items) {
     menu.appendChild(createCdsItem(item));
   }
-  menu.x = [rect.left, rect.left];
+  menu.x = [rect.left, rect.right];
   menu.y = [rect.bottom, rect.bottom];
   menu.open = true;
 }
