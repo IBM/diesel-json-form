@@ -14,7 +14,6 @@ import { just, map2, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 import { JsonRootElement } from './JsonRootElement';
 import { JsonObjectElement } from './JsonObjectElement';
 import { JsonArrayElement } from './JsonArrayElement';
-import { Debouncer } from './Debouncer';
 
 export type ChangeListener = (value: JsonValue) => void;
 
@@ -29,8 +28,6 @@ export class JsonForm extends HTMLElement {
   private changeListeners: ChangeListener[] = [];
 
   private static VALIDATION_COUNTER = 0;
-
-  static DEBOUNCER = new Debouncer();
 
   addChangeListener(l: ChangeListener) {
     this.changeListeners.push(l);
