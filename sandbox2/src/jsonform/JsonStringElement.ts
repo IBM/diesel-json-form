@@ -4,6 +4,7 @@ import {
   jvString,
   Metadata,
   ValidationError,
+  getUtcOffsets,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { findEnclosingForm } from './findEnclosingForm';
@@ -467,45 +468,7 @@ export class StringElemDateTime extends AbstractStringElem {
   }
 }
 
-const allOffsets = [
-  'Z',
-  '+01:00',
-  '+02:00',
-  '+03:00',
-  '+04:00',
-  '+04:30',
-  '+05:00',
-  '+05:30',
-  '+05:45',
-  '+06:00',
-  '+06:30',
-  '+07:00',
-  '+08:00',
-  '+08:45',
-  '+09:00',
-  '+09:30',
-  '+10:00',
-  '+10:30',
-  '+11:00',
-  '+12:00',
-  '+12:45',
-  '+13:00',
-  '+14:00',
-  '-01:00',
-  '-02:00',
-  '-02:30',
-  '-03:00',
-  '-04:00',
-  '-05:00',
-  '-06:00',
-  '-07:00',
-  '-08:00',
-  '-09:00',
-  '-09:30',
-  '-10:00',
-  '-11:00',
-  '-12:00',
-];
+const allOffsets = getUtcOffsets();
 
 export class MyDateTime {
   readonly date: string;
