@@ -24,6 +24,7 @@ import '@carbon/web-components/es/components/combo-box/index';
 
 import { div } from './HtmlBuilder';
 import { setErrors } from './setErrorsOnInput';
+import { Debouncer } from './Debouncer';
 
 export type StringFormat = 'date' | 'date-time' | 'time';
 
@@ -160,13 +161,16 @@ export class StringElemBasic extends AbstractStringElem {
   static TAG_NAME = 'string-elem-basic';
 
   private input: CDSTextInput;
+  private readonly debouncer = new Debouncer();
 
   constructor() {
     super();
     this.input = document.createElement('cds-text-input') as CDSTextInput;
     this.appendChild(this.input);
     this.input.addEventListener('input', () => {
-      this.onChange?.();
+      this.debouncer.debounce(() => {
+        this.onChange?.();
+      });
     });
   }
 
@@ -288,6 +292,7 @@ export class MyDatePicker extends HTMLElement {
 
   private picker: CDSDatePicker;
   private input: CDSDatePickerInput;
+  private readonly debouncer = new Debouncer();
 
   private onChange?: (value: string) => void;
 
@@ -314,7 +319,10 @@ export class MyDatePicker extends HTMLElement {
     ) as CDSDatePickerInput;
     this.input.setAttribute('kind', 'single');
     this.input.addEventListener('input', () => {
-      this.onChange?.(this.input.value);
+      const value = this.input.value;
+      this.debouncer.debounce(() => {
+        this.onChange?.(value);
+      });
     });
     this.picker.appendChild(this.input);
     this.appendChild(this.picker);
@@ -347,6 +355,7 @@ export class MyTimePicker extends HTMLElement {
   private timePickerSelect: CDSTimePickerSelect;
   private onChange?: (value: string) => void;
   private value: string = '';
+  private readonly debouncer = new Debouncer();
 
   constructor() {
     super();
@@ -361,8 +370,11 @@ export class MyTimePicker extends HTMLElement {
     this.appendChild(this.timePicker);
     this.timePicker.addEventListener('change', () => {
       const t = new MyTime(this.value);
-      this.value = t.setTime(this.timePicker.value).fullTime;
-      this.onChange?.(this.value);
+      const value = t.setTime(this.timePicker.value).fullTime;
+      this.value = value;
+      this.debouncer.debounce(() => {
+        this.onChange?.(value);
+      });
     });
 
     this.timePickerSelect = document.createElement(

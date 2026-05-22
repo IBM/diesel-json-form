@@ -10,11 +10,13 @@ import { findEnclosingForm } from './findEnclosingForm';
 import { CDSTextInput } from '@carbon/web-components';
 import { setErrors } from './setErrorsOnInput';
 import '@carbon/web-components/es/components/text-input/index';
+import { Debouncer } from './Debouncer';
 
 export class JsonNumberElement extends JsonElement<JvNumber> {
   static TAG_NAME = 'json-number';
 
   private input: CDSTextInput;
+  private readonly debouncer = new Debouncer();
 
   constructor() {
     super();
@@ -39,7 +41,9 @@ export class JsonNumberElement extends JsonElement<JvNumber> {
           );
         });
       }
-      findEnclosingForm(this).onChange();
+      this.debouncer.debounce(() => {
+        findEnclosingForm(this).onChange();
+      });
     });
   }
 
