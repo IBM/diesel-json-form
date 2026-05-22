@@ -97,20 +97,6 @@
   resize: none;
 }
 
-// .schema-select {
-//   margin-left: 12px;
-//   align-items: center;
-//   display: flex;
-//   flex-direction: row;
-// }
-
-// .schema-value-at-select {
-//   margin-left: 12px;
-//   align-items: center;
-//   display: flex;
-//   flex-direction: row;
-// }
-
 footer.sandbox {
   padding-right: 16px;
   padding-top: 8px;
@@ -144,39 +130,6 @@ footer.sandbox .gas-station {
 #editor1,
 #editor2 {
   height: 100%;
-}
-
-ctmn-menu {
-  position: absolute;
-  display: block;
-  background-color: $layer;
-
-  ctmn-menu-item > div {
-    background-color: $layer;
-  }
-}
-
-.ctmn-highlighted > div {
-  background-color: gray;
-}
-
-.ctmn-sub-menu-item {
-  display: flex;
-  flex-direction: row;
-  background-color: $layer;
-}
-
-.ctmn-glasspane {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: transparent;
-}
-
-.ctmn-sub-menu-item-content {
-  flex-grow: 1;
 }
 
 .json-array-items {
