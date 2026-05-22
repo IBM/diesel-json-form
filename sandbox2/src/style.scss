@@ -216,3 +216,12 @@ collapsible-section > .right-pane > .label-row > .label-container {
   color: $text-error;
   font-size: var(--cds-helper-text-01-font-size, 0.75rem);
 }
+
+json-document-root {
+  display: flex;
+  flex-direction: row;
+
+  .json-form-root-label {
+    flex-grow: 1;
+  }
+}

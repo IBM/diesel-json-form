@@ -1,8 +1,11 @@
 import { JsonValue } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
 import { JsonForm } from './JsonForm';
+import { JsonRootElement } from './JsonRootElement';
 
-export function findEnclosingForm(element: JsonElement<JsonValue>): JsonForm {
+export function findEnclosingForm(
+  element: JsonElement<JsonValue> | JsonRootElement,
+): JsonForm {
   let parent = element.parentElement;
   while (parent) {
     if (parent instanceof JsonForm) {

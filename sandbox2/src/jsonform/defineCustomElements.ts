@@ -16,6 +16,7 @@ import { JsonArrayElement } from './JsonArrayElement';
 import { JsonForm } from './JsonForm';
 import { CollapsibleSection } from './CollapsibleSection';
 import { IconElement } from './IconElement';
+import { JsonRootElement } from './JsonRootElement';
 
 export function defineCustomElements() {
   customElements.define(JsonForm.TAG_NAME, JsonForm);
@@ -34,4 +35,5 @@ export function defineCustomElements() {
   customElements.define(StringElemCombos.TAG_NAME, StringElemCombos);
   customElements.define(MyDatePicker.TAG_NAME, MyDatePicker);
   customElements.define(MyTimePicker.TAG_NAME, MyTimePicker);
+  customElements.define(JsonRootElement.TAG_NAME, JsonRootElement);
 }

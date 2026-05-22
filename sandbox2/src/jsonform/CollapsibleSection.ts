@@ -17,6 +17,14 @@ export class CollapsibleSection extends HTMLElement {
 
   private static TRIGGER_COUNT = 0;
 
+  static createMenuButton(): CDSButton {
+    const menuButton = document.createElement('cds-button') as CDSButton;
+    menuButton.setAttribute('size', 'xs');
+    menuButton.setAttribute('kind', 'ghost');
+    IconElement.addToButton(menuButton, 'overflow-menu-vertical');
+    return menuButton;
+  }
+
   constructor() {
     super();
     this.expandCollapseButton = document.createElement(
@@ -29,10 +37,7 @@ export class CollapsibleSection extends HTMLElement {
     );
     IconElement.addToButton(this.expandCollapseButton, 'chevron-up');
 
-    this.menuButton = document.createElement('cds-button') as CDSButton;
-    this.menuButton.setAttribute('size', 'xs');
-    this.menuButton.setAttribute('kind', 'ghost');
-    IconElement.addToButton(this.menuButton, 'overflow-menu-vertical');
+    this.menuButton = CollapsibleSection.createMenuButton();
     this.menuButton.addEventListener('click', () => {
       if (this.menu) {
         CollapsibleSection.TRIGGER_COUNT++;

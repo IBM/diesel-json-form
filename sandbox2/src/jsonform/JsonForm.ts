@@ -11,12 +11,16 @@ import {
 import { JsonElement } from './JsonElement';
 import { createDom } from './createDom';
 import { just, map2, Maybe, maybeOf, nothing } from 'tea-cup-fp';
+import { JsonRootElement } from './JsonRootElement';
+import { JsonObjectElement } from './JsonObjectElement';
+import { JsonArrayElement } from './JsonArrayElement';
 
 export type ChangeListener = (value: JsonValue) => void;
 
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
 
+  private documentRoot: JsonRootElement;
   private root?: JsonElement<JsonValue>;
   private schemaService: SchemaService = defaultSchemaService;
   private schema?: JsonValue;
@@ -46,6 +50,10 @@ export class JsonForm extends HTMLElement {
 
   constructor() {
     super();
+    this.documentRoot = document.createElement(
+      JsonRootElement.TAG_NAME,
+    ) as JsonRootElement;
+    this.appendChild(this.documentRoot);
   }
 
   toValue(): JsonValue {
@@ -72,6 +80,24 @@ export class JsonForm extends HTMLElement {
         this.root = newRoot;
       })
       .catch((err) => console.error('could not validate at init : ' + err));
+  }
+
+  setRoot(value: JsonValue) {
+    const newRoot = createDom(value);
+    if (this.root) {
+      this.root.remove();
+    }
+    this.root = newRoot;
+    this.appendChild(newRoot);
+    this.validate();
+  }
+
+  addPropertyOrElement() {
+    if (this.root instanceof JsonObjectElement) {
+      // TODO
+    } else if (this.root instanceof JsonArrayElement) {
+      this.root.appendItem();
+    }
   }
 
   getSchema(): JsonValue | undefined {
