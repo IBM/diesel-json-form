@@ -26,6 +26,7 @@ import '@carbon/web-components/es/components/combo-box/index';
 import { div } from './HtmlBuilder';
 import { setErrors } from './setErrorsOnInput';
 import { Debouncer } from './Debouncer';
+import { T_FUNCTION } from './JsonFormMessages';
 
 export type StringFormat = 'date' | 'date-time' | 'time';
 
@@ -167,6 +168,10 @@ export class StringElemBasic extends AbstractStringElem {
   constructor() {
     super();
     this.input = document.createElement('cds-text-input') as CDSTextInput;
+    this.input.setAttribute(
+      'placeholder',
+      T_FUNCTION('stringValuePlaceholder'),
+    );
     this.appendChild(this.input);
     this.input.addEventListener('input', () => {
       this.debouncer.debounce(() => {

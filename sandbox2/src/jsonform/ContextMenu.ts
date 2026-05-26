@@ -19,6 +19,7 @@ import '@carbon/web-components/es/components/menu/index';
 import CDSMenu from '@carbon/web-components/es/components/menu/menu';
 import CDSmenuItem from '@carbon/web-components/es/components/menu/menu-item';
 import { IconElement } from './IconElement';
+import { T_FUNCTION } from './JsonFormMessages';
 
 export type MenuActions = {
   add?: () => void;
@@ -98,7 +99,11 @@ export function createMenu(
           if (menuActions.add && (isArray || isObject)) {
             return [
               menuItem(
-                isArray ? 'add element' : 'add property',
+                T_FUNCTION(
+                  isArray
+                    ? 'contextMenu.addElement'
+                    : 'contextMenu.addProperty',
+                ),
                 menuActions.add,
                 { icon: 'add' },
               ),
@@ -132,14 +137,24 @@ export function createMenu(
           const canMoveDown = index >= 0 && index < nbItems - 1;
           const moveUpItems =
             menuActions.moveUp && canMoveUp
-              ? [menuItem('up', menuActions.moveUp, { icon: 'arrow-up' })]
+              ? [
+                  menuItem(
+                    T_FUNCTION('contextMenu.moveUp'),
+                    menuActions.moveUp,
+                    { icon: 'arrow-up' },
+                  ),
+                ]
               : [];
           const moveDownItems =
             menuActions.moveDown && canMoveDown
               ? [
-                  menuItem('down', menuActions.moveDown, {
-                    icon: 'arrow-down',
-                  }),
+                  menuItem(
+                    T_FUNCTION('contextMenu.moveDown'),
+                    menuActions.moveDown,
+                    {
+                      icon: 'arrow-down',
+                    },
+                  ),
                 ]
               : [];
 
@@ -147,12 +162,16 @@ export function createMenu(
         };
 
         const moveItems = hasMoveMenu
-          ? [subMenuItem('move', moveMenuItems(), { icon: 'move' })]
+          ? [
+              subMenuItem(T_FUNCTION('contextMenu.move'), moveMenuItems(), {
+                icon: 'move',
+              }),
+            ]
           : [];
 
         const deleteItems = menuActions.delete
           ? [
-              menuItem('delete', menuActions.delete, {
+              menuItem(T_FUNCTION('contextMenu.delete'), menuActions.delete, {
                 danger: true,
                 icon: 'trash-can',
               }),
@@ -261,9 +280,13 @@ export function createTypesMenu(
 
     return buildChangeTypeMenuItems().length > 0
       ? [
-          subMenuItem('change type', buildChangeTypeMenuItems(), {
-            icon: 'types',
-          }),
+          subMenuItem(
+            T_FUNCTION('contextMenu.changeType'),
+            buildChangeTypeMenuItems(),
+            {
+              icon: 'types',
+            },
+          ),
         ]
       : [];
   } else {
@@ -299,7 +322,11 @@ export function createProposeMenu(
       icon: typeIcon(valueType(value)),
     }),
   );
-  return [subMenuItem('propose', proposeMenuItems, { icon: 'magic-wand' })];
+  return [
+    subMenuItem(T_FUNCTION('contextMenu.propose'), proposeMenuItems, {
+      icon: 'magic-wand',
+    }),
+  ];
 }
 
 function createCdsItem(item: MenuItem): CDSmenuItem {
@@ -393,7 +420,6 @@ function closeMenu() {
     menu.remove();
     menu = undefined;
     if (prevFocus) {
-      console.log('focusing : ', prevFocus);
       prevFocus.focus();
       prevFocus = null;
     }

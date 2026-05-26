@@ -29,3 +29,4 @@ export * from './Metadata';
 export * from './ComputeAllTask';
 export * from './proposeNested';
 export * from './UtcOffsets';
+export * from './i18n/MyI18n';

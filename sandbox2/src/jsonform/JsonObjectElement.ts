@@ -20,6 +20,7 @@ import { JsonArrayElement } from './JsonArrayElement';
 import { SectionBasedElement } from '../SectionBasedElement';
 import { augmentProposal } from './augmentProposal';
 import { CDSButton } from '@carbon/web-components';
+import { T_FUNCTION } from './JsonFormMessages';
 
 export class JsonObjectElement extends SectionBasedElement<JvObject> {
   static TAG_NAME = 'json-object';
@@ -36,7 +37,7 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
   }
 
   protected emptyMessage(): string {
-    return 'empty object';
+    return T_FUNCTION('emptyObject');
   }
 
   private findProps(): readonly [string, JsonElement<JsonValue>][] {

@@ -11,6 +11,7 @@ import { CDSTextInput } from '@carbon/web-components';
 import { setErrors } from './setErrorsOnInput';
 import '@carbon/web-components/es/components/text-input/index';
 import { Debouncer } from './Debouncer';
+import { T_FUNCTION } from './JsonFormMessages';
 
 export class JsonNumberElement extends JsonElement<JvNumber> {
   static TAG_NAME = 'json-number';
@@ -35,7 +36,7 @@ export class JsonNumberElement extends JsonElement<JvNumber> {
         const path = findEnclosingForm(this).getPath(this);
         path.forEach((path) => {
           setErrors(
-            [{ path: path.format(), message: 'Invalid number' }],
+            [{ path: path.format(), message: T_FUNCTION('invalid.number') }],
             true,
             this.input,
           );

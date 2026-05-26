@@ -17,6 +17,7 @@ import { SectionBasedElement } from '../SectionBasedElement';
 import { JsonElement } from './JsonElement';
 import { augmentProposal } from './augmentProposal';
 import { div } from './HtmlBuilder';
+import { T_FUNCTION } from './JsonFormMessages';
 
 export class JsonArrayElement extends SectionBasedElement<JvArray> {
   static TAG_NAME = 'json-array';
@@ -29,7 +30,7 @@ export class JsonArrayElement extends SectionBasedElement<JvArray> {
   }
 
   protected emptyMessage(): string {
-    return 'empty array';
+    return T_FUNCTION('emptyArray');
   }
 
   toValue(): JvArray {

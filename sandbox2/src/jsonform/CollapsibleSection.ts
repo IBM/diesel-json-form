@@ -4,6 +4,7 @@ import { JsonElement } from './JsonElement';
 import { MenuItem, openMenu } from './ContextMenu';
 import { CDSButton } from '@carbon/web-components';
 import { IconElement } from './IconElement';
+import { T_FUNCTION } from './JsonFormMessages';
 
 export class CollapsibleSection extends HTMLElement {
   static TAG_NAME = 'collapsible-section';
@@ -21,6 +22,7 @@ export class CollapsibleSection extends HTMLElement {
     const menuButton = document.createElement('cds-button') as CDSButton;
     menuButton.setAttribute('size', 'xs');
     menuButton.setAttribute('kind', 'ghost');
+    menuButton.setAttribute('title', T_FUNCTION('icon.openMenu'));
     IconElement.addToButton(menuButton, 'overflow-menu-vertical');
     return menuButton;
   }
@@ -32,6 +34,10 @@ export class CollapsibleSection extends HTMLElement {
     ) as CDSButton;
     this.expandCollapseButton.setAttribute('size', 'xs');
     this.expandCollapseButton.setAttribute('kind', 'ghost');
+    this.expandCollapseButton.setAttribute(
+      'title',
+      T_FUNCTION('icon.collapse'),
+    );
     this.expandCollapseButton.addEventListener('click', () =>
       this.toggleExpandCollapse(),
     );
@@ -78,9 +84,17 @@ export class CollapsibleSection extends HTMLElement {
       if (collapsed) {
         this.content.style.display = 'block';
         IconElement.addToButton(this.expandCollapseButton, 'chevron-up');
+        this.expandCollapseButton.setAttribute(
+          'title',
+          T_FUNCTION('icon.collapse'),
+        );
       } else {
         this.content.style.display = 'none';
         IconElement.addToButton(this.expandCollapseButton, 'chevron-down');
+        this.expandCollapseButton.setAttribute(
+          'title',
+          T_FUNCTION('icon.expand'),
+        );
       }
     }
   }
