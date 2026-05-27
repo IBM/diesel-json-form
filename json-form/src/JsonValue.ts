@@ -123,6 +123,15 @@ export function valueType(value: JsonValue): JsonValueType {
   }
 }
 
+export const DEFAULT_TYPES: readonly JsonValue[] = [
+  jvString(''),
+  jvNumber('0'),
+  jvBool(true),
+  jvObject(),
+  jvArray(),
+  jvNull,
+];
+
 export function setValueAt(
   root: JsonValue,
   path: JsPath,

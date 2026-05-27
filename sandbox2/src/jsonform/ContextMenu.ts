@@ -1,4 +1,5 @@
 import {
+  DEFAULT_TYPES,
   getValueAt,
   indexOfPathInParent,
   JsonValue,
@@ -227,16 +228,7 @@ export function createTypesMenu(
       );
 
     const buildChangeTypeMenuItems = (): MenuItem[] => {
-      const jsonValues = strictMode
-        ? proposals
-        : [
-            jvNull,
-            jvString(''),
-            jvNumber('0'),
-            jvBool(true),
-            jvObject(),
-            jvArray(),
-          ];
+      const jsonValues = strictMode ? proposals : DEFAULT_TYPES;
 
       return (
         jsonValues

@@ -1,4 +1,17 @@
-import { CDSButton } from '@carbon/web-components';
+import {
+  CDSButton,
+  CDSModal,
+  CDSModalBody,
+  CDSModalBodyContent,
+  CDSModalCloseButton,
+  CDSModalFooter,
+  CDSModalFooterButton,
+  CDSModalHeader,
+  CDSModalHeading,
+  CDSRadioButton,
+  CDSRadioButtonGroup,
+  CDSTextInput,
+} from '@carbon/web-components';
 
 type EventListener = (e: Event) => void;
 
@@ -10,6 +23,17 @@ declare global {
       div: Partial<HTMLDivElement>;
       span: Partial<HTMLSpanElement>;
       'cds-button': Partial<CDSButton>;
+      'cds-modal': Partial<CDSModal>;
+      'cds-modal-header': Partial<CDSModalHeader>;
+      'cds-modal-close-button': Partial<CDSModalCloseButton>;
+      'cds-modal-heading': Partial<CDSModalHeading>;
+      'cds-modal-body': Partial<CDSModalBody>;
+      'cds-modal-body-content': Partial<CDSModalBodyContent>;
+      'cds-modal-footer': Partial<CDSModalFooter>;
+      'cds-modal-footer-button': Partial<CDSModalFooterButton>;
+      'cds-text-input': Partial<CDSTextInput>;
+      'cds-radio-button-group': Partial<CDSRadioButtonGroup>;
+      'cds-radio-button': Partial<CDSRadioButton>;
     }
   }
 }
@@ -46,8 +70,12 @@ export function createDomElement(
       } else {
         // <input disable />      { disable: true }
         // <input type="text" />  { type: "text"}
-        if (typeof attributeValue === 'boolean' && attributeValue) {
-          element.setAttribute(key, '');
+        if (typeof attributeValue === 'boolean') {
+          if (attributeValue) {
+            element.setAttribute(key, '');
+          } else {
+            element.removeAttribute(key);
+          }
         } else if (typeof attributeValue === 'string') {
           element.setAttribute(key, attributeValue);
         } else {

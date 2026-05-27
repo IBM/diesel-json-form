@@ -22,6 +22,7 @@ import { augmentProposal } from './augmentProposal';
 import { CDSButton } from '@carbon/web-components';
 import { T_FUNCTION } from './JsonFormMessages';
 import { createDomElement } from './MyJSXFactory';
+import { createAddPropertyModal } from './AddPropertyModal';
 
 export class JsonObjectElement extends SectionBasedElement<JvObject> {
   static TAG_NAME = 'json-object';
@@ -146,8 +147,15 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
           })
           .forEach((objElem) => {
             // TODO
+            const modal = createAddPropertyModal(
+              objElem.findProps().map((x) => x[0]),
+              (newPropertyName) => {
+                debugger;
+              },
+            );
+            document.body.appendChild(modal);
+            modal.open = true;
             console.log(objElem);
-            debugger;
           });
         break;
       }
