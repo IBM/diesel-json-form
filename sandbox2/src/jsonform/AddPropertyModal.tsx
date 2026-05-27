@@ -42,8 +42,12 @@ export function createAddPropertyModal(
     const s = inputName.value;
     if (s === '' || existingNames.has(s)) {
       btnAdd.setAttribute('disabled', 'true');
+      inputName.setAttribute('invalid', 'true');
+      inputName.setAttribute('invalid-text', 'invalid prop name (TODO i18n)');
     } else {
       btnAdd.removeAttribute('disabled');
+      inputName.removeAttribute('invalid');
+      inputName.removeAttribute('invalid-text');
     }
   });
 
