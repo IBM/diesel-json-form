@@ -5,6 +5,8 @@ import { MenuItem, openMenu } from './ContextMenu';
 import { CDSButton } from '@carbon/web-components';
 import { IconElement } from './IconElement';
 import { T_FUNCTION } from './JsonFormMessages';
+import { createDomElement, createDomFragment } from './MyJSXFactory';
+import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs';
 
 export class CollapsibleSection extends HTMLElement {
   static TAG_NAME = 'collapsible-section';
@@ -19,28 +21,28 @@ export class CollapsibleSection extends HTMLElement {
   private static TRIGGER_COUNT = 0;
 
   static createMenuButton(): CDSButton {
-    const menuButton = document.createElement('cds-button') as CDSButton;
-    menuButton.setAttribute('size', 'xs');
-    menuButton.setAttribute('kind', 'ghost');
-    menuButton.setAttribute('title', T_FUNCTION('icon.openMenu'));
+    const menuButton = (
+      <cds-button
+        size="xs"
+        kind={BUTTON_KIND.GHOST}
+        title={T_FUNCTION('icon.openMenu')}
+      />
+    );
     IconElement.addToButton(menuButton, 'overflow-menu-vertical');
     return menuButton;
   }
 
   constructor() {
     super();
-    this.expandCollapseButton = document.createElement(
-      'cds-button',
-    ) as CDSButton;
-    this.expandCollapseButton.setAttribute('size', 'xs');
-    this.expandCollapseButton.setAttribute('kind', 'ghost');
-    this.expandCollapseButton.setAttribute(
-      'title',
-      T_FUNCTION('icon.collapse'),
+    this.expandCollapseButton = (
+      <cds-button
+        size="xs"
+        kind={BUTTON_KIND.GHOST}
+        title={T_FUNCTION('icon.collapse')}
+        onclick={() => this.toggleExpandCollapse()}
+      />
     );
-    this.expandCollapseButton.addEventListener('click', () =>
-      this.toggleExpandCollapse(),
-    );
+
     IconElement.addToButton(this.expandCollapseButton, 'chevron-up');
 
     this.menuButton = CollapsibleSection.createMenuButton();
@@ -62,20 +64,29 @@ export class CollapsibleSection extends HTMLElement {
           });
       }
     });
-    this.contentContainer = div({ className: 'collapsible-content' }, []);
-    this.labelElement = span({});
+    this.contentContainer = <div className="collapsible-content" />;
+    this.labelElement = <span />;
     this.appendChild(
-      div({ className: 'btn-container' }, [this.expandCollapseButton]),
+      <>
+        <div className="btn-container">{this.expandCollapseButton}</div>
+        <div className="right-pane">
+          <div className="label-row">
+            <div className="label-container">{this.labelElement}</div>
+            {this.menuButton}
+          </div>
+          {this.contentContainer}
+        </div>
+      </>,
     );
-    this.appendChild(
-      div({ className: 'right-pane' }, [
-        div({ className: 'label-row' }, [
-          div({ className: 'label-container' }, [this.labelElement]),
-          this.menuButton,
-        ]),
-        this.contentContainer,
-      ]),
-    );
+
+    //   div({ className: 'right-pane' }, [
+    //     div({ className: 'label-row' }, [
+    //       div({ className: 'label-container' }, [this.labelElement]),
+    //       this.menuButton,
+    //     ]),
+    //     this.contentContainer,
+    //   ]),
+    // );
   }
 
   toggleExpandCollapse(): void {

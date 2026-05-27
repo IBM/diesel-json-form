@@ -16,13 +16,13 @@ import { maybeOf } from 'tea-cup-fp';
 import { SectionBasedElement } from '../SectionBasedElement';
 import { JsonElement } from './JsonElement';
 import { augmentProposal } from './augmentProposal';
-import { div } from './HtmlBuilder';
 import { T_FUNCTION } from './JsonFormMessages';
+import { createDomElement } from './MyJSXFactory';
 
 export class JsonArrayElement extends SectionBasedElement<JvArray> {
   static TAG_NAME = 'json-array';
 
-  private errorNode: HTMLElement = div({ className: 'json-errors' });
+  private errorNode: HTMLElement = (<div className="json-errors"></div>);
 
   constructor() {
     super();

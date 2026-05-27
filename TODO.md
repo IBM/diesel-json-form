@@ -1,6 +1,9 @@
 Web Components :
 
 - strict mode config
-- i18n
+- add properties not in schema
+
 - custom rendering
 - layout options ?
+
+- slash in prop name
