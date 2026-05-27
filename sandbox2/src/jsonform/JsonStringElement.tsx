@@ -23,10 +23,10 @@ import '@carbon/web-components/es/components/time-picker/index';
 import '@carbon/web-components/es/components/date-picker/index';
 import '@carbon/web-components/es/components/combo-box/index';
 
-import { div } from './HtmlBuilder';
 import { setErrors } from './setErrorsOnInput';
 import { Debouncer } from './Debouncer';
 import { T_FUNCTION } from './JsonFormMessages';
+import { createDomElement } from './MyJSXFactory';
 
 export type StringFormat = 'date' | 'date-time' | 'time';
 
@@ -386,9 +386,9 @@ export class MyTimePicker extends HTMLElement {
     this.timePickerSelect = document.createElement(
       'cds-time-picker-select',
     ) as CDSTimePickerSelect;
-    const offsetWrapper = div({ className: 'time-picker-offset-wrapper' }, [
-      this.timePickerSelect,
-    ]);
+    const offsetWrapper = (
+      <div className="time-picker-offset-wrapper">{this.timePickerSelect}</div>
+    );
 
     const createSelectItem = (offset: string) => {
       const selectItem = document.createElement(
@@ -448,11 +448,12 @@ export class StringElemDateTime extends AbstractStringElem {
     this.timePicker.setOnChange(() => {
       this.onChange?.();
     });
-    const dom = div({ className: 'date-time-picker' }, [
-      div({ className: 'date-time-picker__date' }, [this.datePicker]),
-      div({ className: 'date-time-picker__time' }, [this.timePicker]),
-    ]);
-    this.appendChild(dom);
+    this.appendChild(
+      <div className="date-time-picker">
+        <div className="date-time-picker__date">${this.datePicker}</div>
+        <div className="date-time-picker__time">${this.timePicker}</div>
+      </div>,
+    );
   }
 
   setValue(v: JvString): void {

@@ -1,18 +1,19 @@
 import { JsonValue } from '@diesel-parser/json-form';
 import { JsonElement } from './jsonform/JsonElement';
-import { div, moveElementDown, moveElementUp } from './jsonform/HtmlBuilder';
+import { moveElementDown, moveElementUp } from './jsonform/HtmlBuilder';
 import { CollapsibleSection } from './jsonform/CollapsibleSection';
 import { findEnclosingForm } from './jsonform/findEnclosingForm';
 import { createDom } from './jsonform/createDom';
+import { createDomElement } from './jsonform/MyJSXFactory';
 
 export abstract class SectionBasedElement<
   T extends JsonValue,
 > extends JsonElement<T> {
-  private elemsContainer: HTMLElement = div({ className: 'json-sections' });
+  private elemsContainer: HTMLElement = (<div className="json-sections" />);
 
-  private emptyNodeContainer: HTMLElement = div({
-    className: 'json-section-empty',
-  });
+  private emptyNodeContainer: HTMLElement = (
+    <div className="json-section-empty"></div>
+  );
 
   constructor() {
     super();

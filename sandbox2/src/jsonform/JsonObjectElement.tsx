@@ -10,7 +10,7 @@ import {
   setValueAt,
 } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import { div, empty } from './HtmlBuilder';
+import { empty } from './HtmlBuilder';
 import { createDom } from './createDom';
 import { findEnclosingForm } from './findEnclosingForm';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -21,13 +21,13 @@ import { SectionBasedElement } from '../SectionBasedElement';
 import { augmentProposal } from './augmentProposal';
 import { CDSButton } from '@carbon/web-components';
 import { T_FUNCTION } from './JsonFormMessages';
+import { createDomElement } from './MyJSXFactory';
 
 export class JsonObjectElement extends SectionBasedElement<JvObject> {
   static TAG_NAME = 'json-object';
 
-  private propertiesNode: HTMLElement = div({});
-  private errorNode: HTMLElement = div({ className: 'json-errors' });
-
+  private propertiesNode: HTMLElement = (<div />);
+  private errorNode: HTMLElement = (<div className="json-errors" />);
   private static ATTR_PROP_NAME = 'json-property-name';
 
   constructor() {

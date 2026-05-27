@@ -2,10 +2,10 @@ import { JsPath } from '@diesel-parser/json-form';
 import { CollapsibleSection } from './CollapsibleSection';
 import { createMenu, openMenu } from './ContextMenu';
 import { findEnclosingForm } from './findEnclosingForm';
-import { div, text } from './HtmlBuilder';
 import { CDSButton } from '@carbon/web-components';
 import { augmentProposal } from './augmentProposal';
 import { T_FUNCTION } from './JsonFormMessages';
+import { createDomElement } from './MyJSXFactory';
 
 export class JsonRootElement extends HTMLElement {
   static TAG_NAME = 'json-document-root';
@@ -15,9 +15,9 @@ export class JsonRootElement extends HTMLElement {
 
   constructor() {
     super();
-    const label = div({ className: 'json-form-root-label' }, [
-      text(T_FUNCTION('documentRoot')),
-    ]);
+    const label = (
+      <div className="json-form-root-label">{T_FUNCTION('documentRoot')}</div>
+    );
     this.menuButton = CollapsibleSection.createMenuButton();
     this.appendChild(label);
     this.appendChild(this.menuButton);
