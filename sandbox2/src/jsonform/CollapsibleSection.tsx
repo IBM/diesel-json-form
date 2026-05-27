@@ -1,11 +1,11 @@
 import { JsonValue } from '@diesel-parser/json-form';
-import { div, empty, span } from './HtmlBuilder';
+import { empty } from './HtmlBuilder';
 import { JsonElement } from './JsonElement';
 import { MenuItem, openMenu } from './ContextMenu';
 import { CDSButton } from '@carbon/web-components';
 import { IconElement } from './IconElement';
 import { T_FUNCTION } from './JsonFormMessages';
-import { createDomElement, createDomFragment } from './MyJSXFactory';
+import { createDomElement } from './MyJSXFactory';
 import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs';
 
 export class CollapsibleSection extends HTMLElement {

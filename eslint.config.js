@@ -41,6 +41,12 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-object-literal-type-assertion': 'off',
       '@typescript-eslint/ban-ts-comment': 'off', // TODO @sgregoire: due to images
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: 'createDomElement',
+        },
+      ],
     },
   },
 ];
