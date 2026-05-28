@@ -147,16 +147,6 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
           })
           .forEach((objElem) => {
             objElem.appendProperty();
-            // const modal = createAddPropertyModal(
-            //   objElem.findProps().map((x) => x[0]),
-            //   (newProperty) => {
-            //     const newSection = this.mkRow(newProperty, property.name);
-            //     objElem.appendSection(newSection);
-            //     findEnclosingForm(this).onChange();
-            //   },
-            // );
-            // document.body.appendChild(modal);
-            // modal.open = true;
           });
         break;
       }
