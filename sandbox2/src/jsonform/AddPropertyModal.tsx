@@ -6,11 +6,15 @@ import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs';
 import { T_FUNCTION } from './JsonFormMessages';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/defs';
 import '@carbon/web-components/es/components/radio-button/index';
-import { DEFAULT_TYPES, valueType } from '@diesel-parser/json-form';
+import {
+  DEFAULT_TYPES,
+  JsonProperty,
+  valueType,
+} from '@diesel-parser/json-form';
 
 export function createAddPropertyModal(
   existing: readonly string[],
-  onSubmit: (propertyName: string) => void,
+  onSubmit: (property: JsonProperty) => void,
 ): CDSModal {
   const inputName: CDSTextInput = (
     <cds-text-input
@@ -51,6 +55,20 @@ export function createAddPropertyModal(
     }
   });
 
+  const radioGroup = (
+    <cds-radio-button-group
+      legend-text="Select type (TODO i18n)"
+      name="radio-group"
+      orientation={RADIO_BUTTON_ORIENTATION.VERTICAL}
+      value="string"
+    >
+      {DEFAULT_TYPES.map((t) => {
+        const s = valueType(t);
+        return <cds-radio-button label-text={s} value={s}></cds-radio-button>;
+      })}
+    </cds-radio-button-group>
+  );
+
   const m = (
     <cds-modal
       aria-label=""
@@ -69,24 +87,7 @@ export function createAddPropertyModal(
       <cds-modal-body>
         <cds-modal-body-content>
           <div className="json-modal-field">{inputName}</div>
-          <div className="json-modal-field">
-            <cds-radio-button-group
-              legend-text="Select type (TODO i18n)"
-              name="radio-group"
-              orientation={RADIO_BUTTON_ORIENTATION.VERTICAL}
-            >
-              {DEFAULT_TYPES.map((t, i) => {
-                const s = valueType(t);
-                return (
-                  <cds-radio-button
-                    label-text={s}
-                    value={s}
-                    checked={i === 0}
-                  ></cds-radio-button>
-                );
-              })}
-            </cds-radio-button-group>
-          </div>
+          <div className="json-modal-field">{radioGroup}</div>
         </cds-modal-body-content>
       </cds-modal-body>
 
@@ -102,7 +103,12 @@ export function createAddPropertyModal(
 
   btnAdd.addEventListener('click', () => {
     const propName = inputName.value;
-    onSubmit(propName);
+    const propVal = DEFAULT_TYPES.find(
+      (t) => valueType(t) === radioGroup.value,
+    );
+    if (propVal) {
+      onSubmit({ name: propName, value: propVal });
+    }
     m.open = false;
     m.remove();
   });

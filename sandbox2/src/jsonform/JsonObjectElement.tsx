@@ -85,6 +85,7 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
       property.name,
     );
     collapsibleSection.setMenuItems(() => {
+      debugger;
       const form = findEnclosingForm(this);
       const schema = form.getSchema();
       if (!schema) {
@@ -146,16 +147,16 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
             return nothing;
           })
           .forEach((objElem) => {
-            // TODO
             const modal = createAddPropertyModal(
               objElem.findProps().map((x) => x[0]),
-              (newPropertyName) => {
-                debugger;
+              (newProperty) => {
+                const newSection = this.mkRow(newProperty);
+                objElem.appendSection(newSection);
+                findEnclosingForm(this).onChange();
               },
             );
             document.body.appendChild(modal);
             modal.open = true;
-            console.log(objElem);
           });
         break;
       }
