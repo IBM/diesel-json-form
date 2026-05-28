@@ -21,7 +21,7 @@ import { SectionBasedElement } from '../SectionBasedElement';
 import { augmentProposal } from './augmentProposal';
 import { CDSButton } from '@carbon/web-components';
 import { T_FUNCTION } from './JsonFormMessages';
-import { createDomElement } from './MyJSXFactory';
+import { h } from './MyJSXFactory';
 import { createAddPropertyModal } from './AddPropertyModal';
 
 export class JsonObjectElement extends SectionBasedElement<JvObject> {

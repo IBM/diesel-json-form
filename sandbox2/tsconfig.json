@@ -17,8 +17,8 @@
         "moduleResolution": "Node",
         "resolveJsonModule": true,
         "jsx": "react",
-        "jsxFactory": "createDomElement",
-        "jsxFragmentFactory": "createDomElement"
+        "jsxFactory": "h",
+        "jsxFragmentFactory": "Fragment"
     },
     "include": [
         "src"

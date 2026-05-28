@@ -5,7 +5,7 @@ import { MenuItem, openMenu } from './ContextMenu';
 import { CDSButton } from '@carbon/web-components';
 import { IconElement } from './IconElement';
 import { T_FUNCTION } from './JsonFormMessages';
-import { createDomElement } from './MyJSXFactory';
+import { h, Fragment } from './MyJSXFactory';
 import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs';
 
 export class CollapsibleSection extends HTMLElement {
@@ -78,15 +78,6 @@ export class CollapsibleSection extends HTMLElement {
         </div>
       </>,
     );
-
-    //   div({ className: 'right-pane' }, [
-    //     div({ className: 'label-row' }, [
-    //       div({ className: 'label-container' }, [this.labelElement]),
-    //       this.menuButton,
-    //     ]),
-    //     this.contentContainer,
-    //   ]),
-    // );
   }
 
   toggleExpandCollapse(): void {

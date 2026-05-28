@@ -1,6 +1,6 @@
 import { CDSModal, CDSTextInput } from '@carbon/web-components';
 import '@carbon/web-components/es/components/modal/index';
-import { createDomElement } from './MyJSXFactory';
+import { h } from './MyJSXFactory';
 import { MODAL_SIZE } from '@carbon/web-components/es/components/modal/modal';
 import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs';
 import { T_FUNCTION } from './JsonFormMessages';

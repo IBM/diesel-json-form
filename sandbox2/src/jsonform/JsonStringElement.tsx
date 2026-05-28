@@ -26,7 +26,7 @@ import '@carbon/web-components/es/components/combo-box/index';
 import { setErrors } from './setErrorsOnInput';
 import { Debouncer } from './Debouncer';
 import { T_FUNCTION } from './JsonFormMessages';
-import { createDomElement } from './MyJSXFactory';
+import { h } from './MyJSXFactory';
 
 export type StringFormat = 'date' | 'date-time' | 'time';
 

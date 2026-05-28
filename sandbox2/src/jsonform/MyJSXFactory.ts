@@ -38,16 +38,16 @@ declare global {
   }
 }
 
-export function createDomFragment(props: { children: Element[] }): any {
-  throw 'NOT USED';
-}
+export const Fragment = () => {
+  throw 'NOT CALLED';
+};
 
-export function createDomElement(
-  tagName: any,
+export function h(
+  tagName: string | typeof Fragment,
   attributes: Record<string, string | EventListener> | null,
   ...children: Node[]
 ): Element | DocumentFragment {
-  if (typeof tagName === 'function') {
+  if (tagName === Fragment) {
     const f = document.createDocumentFragment();
     for (const c of children) {
       f.append(c);
@@ -55,7 +55,7 @@ export function createDomElement(
     return f;
   }
   if (typeof tagName !== 'string') {
-    throw 'unknown tagName ' + tagName;
+    throw 'tag is not a stting ' + tagName;
   }
   const element = document.createElement(tagName);
   if (attributes) {

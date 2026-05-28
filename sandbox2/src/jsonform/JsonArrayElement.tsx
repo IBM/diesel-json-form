@@ -17,7 +17,7 @@ import { SectionBasedElement } from '../SectionBasedElement';
 import { JsonElement } from './JsonElement';
 import { augmentProposal } from './augmentProposal';
 import { T_FUNCTION } from './JsonFormMessages';
-import { createDomElement } from './MyJSXFactory';
+import { h } from './MyJSXFactory';
 
 export class JsonArrayElement extends SectionBasedElement<JvArray> {
   static TAG_NAME = 'json-array';

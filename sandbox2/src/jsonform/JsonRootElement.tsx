@@ -5,7 +5,7 @@ import { findEnclosingForm } from './findEnclosingForm';
 import { CDSButton } from '@carbon/web-components';
 import { augmentProposal } from './augmentProposal';
 import { T_FUNCTION } from './JsonFormMessages';
-import { createDomElement } from './MyJSXFactory';
+import { h } from './MyJSXFactory';
 
 export class JsonRootElement extends HTMLElement {
   static TAG_NAME = 'json-document-root';

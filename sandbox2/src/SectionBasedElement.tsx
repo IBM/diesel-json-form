@@ -4,7 +4,7 @@ import { moveElementDown, moveElementUp } from './jsonform/HtmlBuilder';
 import { CollapsibleSection } from './jsonform/CollapsibleSection';
 import { findEnclosingForm } from './jsonform/findEnclosingForm';
 import { createDom } from './jsonform/createDom';
-import { createDomElement } from './jsonform/MyJSXFactory';
+import { h } from './jsonform/MyJSXFactory';
 
 export abstract class SectionBasedElement<
   T extends JsonValue,
