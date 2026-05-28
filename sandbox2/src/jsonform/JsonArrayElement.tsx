@@ -64,7 +64,7 @@ export class JsonArrayElement extends SectionBasedElement<JvArray> {
               schema,
               form.toValue(),
               path.append(rowIndex),
-              false,
+              form.strictMode,
               {
                 delete: () => {
                   this.delete(collapsibleSection);

@@ -38,7 +38,7 @@ export class JsonRootElement extends HTMLElement {
           schema,
           value,
           JsPath.empty,
-          false, // TODO
+          form.strictMode,
           {
             add() {
               form.addPropertyOrElement();
@@ -57,6 +57,9 @@ export class JsonRootElement extends HTMLElement {
               ).then((proposal) => {
                 form.setRoot(proposal);
               });
+            },
+            delete() {
+              form.deleteRoot();
             },
           },
         )

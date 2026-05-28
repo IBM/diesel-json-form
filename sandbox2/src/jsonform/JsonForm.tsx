@@ -117,6 +117,18 @@ export class JsonForm extends HTMLElement {
     );
   }
 
+  get strictMode(): boolean {
+    return this.hasAttribute('strict-mode');
+  }
+
+  set strictMode(strict: boolean) {
+    if (strict) {
+      this.setAttribute('strict-mode', '');
+    } else {
+      this.removeAttribute('strict-mode');
+    }
+  }
+
   private doGetPath(
     current: JsonElement<JsonValue>,
     target: JsonElement<JsonValue>,
@@ -189,5 +201,10 @@ export class JsonForm extends HTMLElement {
         })
         .catch((err) => console.error('validate error', err));
     }
+  }
+
+  deleteRoot() {
+    this.root?.remove();
+    delete this.root;
   }
 }

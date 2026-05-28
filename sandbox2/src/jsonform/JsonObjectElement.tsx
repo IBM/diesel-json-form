@@ -98,7 +98,7 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
             schema,
             form.toValue(),
             path.append(property.name),
-            false,
+            form.strictMode,
             {
               delete: () => {
                 this.delete(collapsibleSection);
