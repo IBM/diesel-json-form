@@ -85,7 +85,6 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
       property.name,
     );
     collapsibleSection.setMenuItems(() => {
-      debugger;
       const form = findEnclosingForm(this);
       const schema = form.getSchema();
       if (!schema) {
@@ -105,7 +104,7 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
                 this.delete(collapsibleSection);
               },
               add: () => {
-                this.add(property);
+                this.addItemOrElementAt(property);
               },
               moveUp: () => {
                 this.moveUp(collapsibleSection);
@@ -136,7 +135,7 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
     return collapsibleSection;
   }
 
-  private add(property: JsonProperty): void {
+  private addItemOrElementAt(property: JsonProperty): void {
     switch (property.value.tag) {
       case 'jv-object': {
         this.findPropElement(property.name)
@@ -147,16 +146,17 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
             return nothing;
           })
           .forEach((objElem) => {
-            const modal = createAddPropertyModal(
-              objElem.findProps().map((x) => x[0]),
-              (newProperty) => {
-                const newSection = this.mkRow(newProperty);
-                objElem.appendSection(newSection);
-                findEnclosingForm(this).onChange();
-              },
-            );
-            document.body.appendChild(modal);
-            modal.open = true;
+            objElem.appendProperty();
+            // const modal = createAddPropertyModal(
+            //   objElem.findProps().map((x) => x[0]),
+            //   (newProperty) => {
+            //     const newSection = this.mkRow(newProperty, property.name);
+            //     objElem.appendSection(newSection);
+            //     findEnclosingForm(this).onChange();
+            //   },
+            // );
+            // document.body.appendChild(modal);
+            // modal.open = true;
           });
         break;
       }
@@ -176,6 +176,19 @@ export class JsonObjectElement extends SectionBasedElement<JvObject> {
         break;
       }
     }
+  }
+
+  appendProperty(): void {
+    const modal = createAddPropertyModal(
+      this.findProps().map((x) => x[0]),
+      (newProperty) => {
+        const newSection = this.mkRow(newProperty);
+        this.appendSection(newSection);
+        findEnclosingForm(this).onChange();
+      },
+    );
+    document.body.appendChild(modal);
+    modal.open = true;
   }
 
   fromValue(value: JvObject): void {

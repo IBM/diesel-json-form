@@ -94,7 +94,7 @@ export class JsonForm extends HTMLElement {
 
   addPropertyOrElement() {
     if (this.root instanceof JsonObjectElement) {
-      // TODO
+      this.root.appendProperty();
     } else if (this.root instanceof JsonArrayElement) {
       this.root.appendItem();
     }
