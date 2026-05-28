@@ -14,6 +14,7 @@ import { just, map2, Maybe, maybeOf, nothing } from 'tea-cup-fp';
 import { JsonRootElement } from './JsonRootElement';
 import { JsonObjectElement } from './JsonObjectElement';
 import { JsonArrayElement } from './JsonArrayElement';
+import { h } from './MyJSXFactory';
 
 export type ChangeListener = (value: JsonValue) => void;
 
@@ -24,6 +25,7 @@ export class JsonForm extends HTMLElement {
   private root?: JsonElement<JsonValue>;
   private schemaService: SchemaService = defaultSchemaService;
   private schema?: JsonValue;
+  private scrollPane = (<div className="json-form-scrollpane" />);
 
   private changeListeners: ChangeListener[] = [];
 
@@ -50,10 +52,11 @@ export class JsonForm extends HTMLElement {
 
   constructor() {
     super();
+    this.appendChild(this.scrollPane);
     this.documentRoot = document.createElement(
       JsonRootElement.TAG_NAME,
     ) as JsonRootElement;
-    this.appendChild(this.documentRoot);
+    this.scrollPane.appendChild(this.documentRoot);
   }
 
   toValue(): JsonValue {
@@ -73,10 +76,10 @@ export class JsonForm extends HTMLElement {
           newRoot.setMetadata(metadata, JsPath.empty);
         }
         if (this.root) {
-          this.removeChild(this.root);
+          this.root.remove();
           delete this.root;
         }
-        this.appendChild(newRoot);
+        this.scrollPane.appendChild(newRoot);
         this.root = newRoot;
       })
       .catch((err) => console.error('could not validate at init : ' + err));
@@ -88,7 +91,7 @@ export class JsonForm extends HTMLElement {
       this.root.remove();
     }
     this.root = newRoot;
-    this.appendChild(newRoot);
+    this.scrollPane.appendChild(newRoot);
     this.validate();
   }
 

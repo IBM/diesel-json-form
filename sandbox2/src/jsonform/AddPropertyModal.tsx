@@ -42,7 +42,7 @@ export function createAddPropertyModal(
 
   const existingNames = new Set(existing);
 
-  inputName.addEventListener('input', (e) => {
+  inputName.addEventListener('input', () => {
     const s = inputName.value;
     if (s === '' || existingNames.has(s)) {
       btnAdd.setAttribute('disabled', 'true');

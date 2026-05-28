@@ -123,7 +123,7 @@ footer.sandbox .gas-station {
   color: inherit;
 }
 
-#json-form {
+#my-form {
   flex-grow: 1;
 }
 
@@ -135,6 +135,20 @@ footer.sandbox .gas-station {
 .json-array-items {
   display: flex;
   flex-direction: column;
+}
+
+json-form {
+  position: relative;
+  overflow: hidden;
+
+  .json-form-scrollpane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+  }
 }
 
 collapsible-section {
