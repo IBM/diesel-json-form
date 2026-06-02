@@ -14,7 +14,18 @@ export class CarbonNullElement extends NullElement {
     this.input = document.createElement('cds-text-input') as CDSTextInput;
     this.input.value = 'null';
     this.input.disabled = true;
+  }
+
+  connectedCallback() {
     this.appendChild(this.input);
+  }
+
+  disconnectedCallback() {
+    this.input.remove();
+  }
+
+  initialize(metadata: Metadata, path: JsPath): void {
+    this.setMetadata(metadata, path);
   }
 
   setMetadata(metadata: Metadata, path: JsPath): void {

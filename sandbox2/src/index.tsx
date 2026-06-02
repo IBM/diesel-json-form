@@ -18,15 +18,20 @@ import './style.scss';
 import { samples } from './initdata';
 import {
   defaultSchemaService,
+  JsPath,
+  Metadata,
   parseJsonValue,
   parseJsonValueUnsafe,
   stringify,
 } from '@diesel-parser/json-form';
 import '@carbon/web-components/es/components/dropdown/dropdown-item';
 import '@carbon/web-components/es/components/button/button';
+import '@carbon/web-components/es/components/radio-button/index';
 import { CDSComboBox } from '@carbon/web-components';
 import { JsonForm } from './form2/JsonForm';
 import { Renderer } from './form2/Renderer';
+import { h } from './jsonform/MyJSXFactory';
+import { NumberElement } from './form2/NumberElement';
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
@@ -42,45 +47,19 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 const initialSchema = `{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "http://schema.BeanWithBean",
-  "type": "object",
   "properties": {
-    "customer": {
-      "$ref": "#/definitions/schema.Customer"
-    }
-  },
-  "definitions": {
-    "schema.Customer": {
-      "type": "object",
-      "properties": {
-        "firstName": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "lastName": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "amount": {
-          "type": "number",
-          "format": "double"
-        },
-        "age": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
+    "name": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "renderer": "RatingRenderer"
     }
   }
 }`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `{"customer":{"firstName":"toto"}}`;
+const initialValue = `{"name":"toto", "rating": 3}`;
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 
@@ -118,7 +97,58 @@ btnToForm.addEventListener('click', () => {
   jsonForm.initialize(renderer, defaultSchemaService, schema, value);
 });
 
+class RatingRenderer extends NumberElement {
+  static TAG_NAME = 'my-rating-renderer';
+
+  private radio = (<cds-radio-button-group></cds-radio-button-group>);
+
+  constructor() {
+    super();
+    for (let i = 0; i < 5; i++) {
+      this.radio.appendChild(
+        <cds-radio-button
+          value={i + ''}
+          label-text={i + ''}
+        ></cds-radio-button>,
+      );
+    }
+  }
+
+  connectedCallback() {
+    this.appendChild(this.radio);
+  }
+
+  disconnectedCallback() {
+    this.radio.remove();
+  }
+
+  initialize(
+    value: string,
+    metadata: Metadata,
+    path: JsPath,
+    onChange: () => void,
+  ): void {
+    this.radio.value = value;
+    this.radio.addEventListener('cds-radio-button-changed', () => {
+      onChange();
+    });
+    this.setMetadata(metadata, path);
+  }
+  getNumValue(): string {
+    return this.radio.value;
+  }
+  setMetadata(metadata: Metadata, path: JsPath): void {
+    console.log('TODO errors rating renderer');
+  }
+}
+
+customElements.define(RatingRenderer.TAG_NAME, RatingRenderer);
+
 const renderer: Renderer = new Renderer();
+
+renderer.addCustomRenderer('RatingRenderer', () => {
+  return new RatingRenderer();
+});
 
 const jsonForm = document.getElementById('my-form') as JsonForm;
 jsonForm.initialize(renderer, defaultSchemaService, schema, value);

@@ -14,6 +14,16 @@ import { CarbonBooleanElement } from './carbon/CarbonBooleanElem';
 import { CarbonNumberElement } from './carbon/CarbonNumberElem';
 import { CarbonArrayElement } from './carbon/CarbonArrayElem';
 import { CarbonObjectElement } from './carbon/CarbonObjectElem';
+import { ArrayElement } from './ArrayElement';
+import { BooleanElement } from './BooleanElement';
+import { NullElement } from './NullElement';
+import { NumberElement } from './NumberElement';
+import { ObjectElement } from './ObjectElement';
+import { StringElement } from './StringElement';
+import { CarbonStringElemDate } from './carbon/CarbonStringElemDate';
+import { CarbonStringElemTime } from './carbon/CarbonStringElemTime';
+import { CarbonStringElemDateTime } from './carbon/CarbonStringElemDateTime';
+import { CarbonStringElemCombo } from './carbon/CarbonStringElemCombo';
 
 export interface RenderArgs {
   readonly key: RendererKey;
@@ -23,17 +33,88 @@ export interface RenderArgs {
   readonly onChange: () => void;
 }
 
+type CustomRendererCtor = (s: SchemaRenderer) => RenderedElement;
+
+type FormatCtor = () => StringElement;
+
 export class Renderer {
-  private renderCustom(key: CustomRendererKey): RenderedElement {
-    throw 'TODO2';
+  private readonly customRenderers: Map<string, CustomRendererCtor> = new Map();
+  private readonly formatRenderers: Map<string, FormatCtor> = new Map<
+    string,
+    FormatCtor
+  >([
+    ['date', () => new CarbonStringElemDate()],
+    ['time', () => new CarbonStringElemTime()],
+    ['date-time', () => new CarbonStringElemDateTime()],
+  ]);
+
+  addCustomRenderer(
+    customKey: string,
+    f: (s: SchemaRenderer) => RenderedElement,
+  ) {
+    this.customRenderers.set(customKey, f);
+  }
+
+  private renderCustom(
+    key: CustomRendererKey,
+    args: RenderArgs,
+    f: CustomRendererCtor,
+  ): RenderedElement {
+    const e = f(key.customKey);
+    if (e instanceof ArrayElement && args.value.tag === 'jv-array') {
+      e.initialize(
+        this,
+        args.value.elems,
+        args.metadata,
+        args.path,
+        args.onChange,
+      );
+    } else if (e instanceof BooleanElement && args.value.tag === 'jv-boolean') {
+      e.initialize(args.value.value, args.metadata, args.path, args.onChange);
+    } else if (e instanceof NullElement && args.value.tag === 'jv-null') {
+      e.initialize(args.metadata, args.path);
+    } else if (e instanceof NumberElement && args.value.tag === 'jv-number') {
+      e.initialize(args.value.value, args.metadata, args.path, args.onChange);
+    } else if (e instanceof ObjectElement && args.value.tag === 'jv-object') {
+      e.initialize(
+        this,
+        args.value.properties,
+        args.metadata,
+        args.path,
+        args.onChange,
+      );
+    } else if (e instanceof StringElement && args.value.tag === 'jv-string') {
+      e.initialize(args.value.value, args.metadata, args.path, args.onChange);
+    }
+    return e;
   }
 
   private renderString(value: string, args: RenderArgs): RenderedElement {
-    // TODO formats
+    const { path, metadata, onChange } = args;
+    const pathStr = path.format();
+
+    const combos = metadata.comboBoxes.get(pathStr);
+    if (combos && combos.length > 0) {
+      const e = new CarbonStringElemCombo();
+      e.initialize(value, metadata, path, onChange);
+      return e;
+    }
+
+    const formats = metadata.formats.get(pathStr);
+    if (formats && formats.length > 0) {
+      const fmt = formats[0];
+      const ctor = this.formatRenderers.get(fmt);
+      if (ctor) {
+        const e = ctor();
+        e.initialize(value, metadata, path, onChange);
+        return e;
+      }
+    }
+
     const e = document.createElement(
       CarbonStringElemBasic.TAG_NAME,
     ) as CarbonStringElemBasic;
-    e.initialize(value, args.metadata, args.path, args.onChange);
+    e.initialize(value, metadata, path, onChange);
     return e;
   }
 
@@ -93,7 +174,13 @@ export class Renderer {
 
   render(args: RenderArgs): RenderedElement {
     if (args.key instanceof CustomRendererKey) {
-      return this.renderCustom(args.key);
+      const f = this.customRenderers.get(args.key.customKey.key);
+      if (f) {
+        return this.renderCustom(args.key, args, f);
+      } else {
+        console.warn('custom renderer not found : ' + args.key.customKey.key);
+        return this.renderDefault(args);
+      }
     } else if (args.key instanceof StringRendererKey) {
       if (args.value.tag === 'jv-string') {
         return this.renderString(args.value.value, args);
@@ -140,7 +227,7 @@ class StringRendererKey extends RendererKey {
 }
 
 class CustomRendererKey extends RendererKey {
-  constructor(private readonly customKey: SchemaRenderer) {
+  constructor(readonly customKey: SchemaRenderer) {
     super();
   }
 
