@@ -15,6 +15,7 @@ export class CarbonNumberElement extends NumberElement {
 
   private input: CDSTextInput;
   private readonly debouncer = new Debouncer();
+  private path?: JsPath;
 
   constructor() {
     super();
@@ -38,12 +39,18 @@ export class CarbonNumberElement extends NumberElement {
     this.input.value = value;
     this.input.addEventListener('input', () => {
       if (!isValidNumberLiteral(this.input.value)) {
-        // const path = this.getPath();
-        setErrors(
-          [{ path: path.format(), message: T_FUNCTION('invalid.number') }],
-          true,
-          this.input,
-        );
+        if (this.path) {
+          setErrors(
+            [
+              {
+                path: this.path.format(),
+                message: T_FUNCTION('invalid.number'),
+              },
+            ],
+            true,
+            this.input,
+          );
+        }
       }
       this.debouncer.debounce(() => {
         onChange();
@@ -55,6 +62,7 @@ export class CarbonNumberElement extends NumberElement {
   setMetadata(metadata: Metadata, path: JsPath): void {
     const p = path.format();
     const errors = metadata.errors.get(p);
+    this.path = path;
     setErrors(errors, true, this.input);
   }
 
