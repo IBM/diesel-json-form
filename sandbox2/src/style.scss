@@ -184,11 +184,11 @@ collapsible-section > .right-pane > .label-row > .label-container {
   font-size: var(--cds-helper-text-01-font-size, 0.75rem);
 }
 
-json-document-root {
+json-form-header {
   display: flex;
   flex-direction: row;
 
-  .json-form-root-label {
+  .json-form-header-label {
     flex-grow: 1;
   }
 }

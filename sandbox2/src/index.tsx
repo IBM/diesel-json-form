@@ -132,12 +132,12 @@ class RatingRenderer extends NumberElement {
     this.radio.addEventListener('cds-radio-button-changed', () => {
       onChange();
     });
-    this.setMetadata(metadata, path);
+    // this.setMetadata();
   }
   getNumValue(): string {
     return this.radio.value;
   }
-  setMetadata(metadata: Metadata, path: JsPath): void {
+  setMetadata(): void {
     console.log('TODO errors rating renderer');
   }
 }
