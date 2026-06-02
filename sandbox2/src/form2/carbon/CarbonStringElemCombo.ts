@@ -29,16 +29,11 @@ export class CarbonStringElemCombo extends StringElement {
     this.combo.remove();
   }
 
-  initialize(
-    value: string,
-    metadata: Metadata,
-    path: JsPath,
-    onChange: () => void,
-  ) {
+  initialize(value: string, metadata: Metadata, path: JsPath) {
     this.combo.value = value;
     this.setMetadata(metadata, path);
     this.combo.addEventListener('cds-combo-box-selected', () => {
-      onChange();
+      this.onChange();
     });
   }
 

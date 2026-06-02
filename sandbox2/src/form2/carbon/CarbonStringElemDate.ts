@@ -21,16 +21,11 @@ export class CarbonStringElemDate extends StringElement {
     this.myPicker.remove();
   }
 
-  initialize(
-    value: string,
-    metadata: Metadata,
-    path: JsPath,
-    onChange: () => void,
-  ): void {
+  initialize(value: string, metadata: Metadata, path: JsPath): void {
     this.myPicker.setValue(value);
     this.myPicker.setOnChange((value) => {
       this.stringValue = value;
-      onChange();
+      this.onChange();
     });
     this.setMetadata(metadata, path);
   }

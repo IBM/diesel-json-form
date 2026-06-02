@@ -4,6 +4,7 @@ import { Renderer } from '../Renderer';
 import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { ObjectElement } from '../ObjectElement';
+import { findEnclosingForm } from '../findEnclosingForm';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';
@@ -26,16 +27,12 @@ export class CarbonObjectElement extends ObjectElement {
     this.sectionElem.remove();
   }
 
-  private onChange?: () => void;
-
   initialize(
     renderer: Renderer,
     properties: readonly JsonProperty[],
     metadata: Metadata,
     path: JsPath,
-    onChange: () => void,
   ): void {
-    this.onChange = onChange;
     properties.forEach((prop) => {
       const e = JsonElement.newInstance(
         renderer,
@@ -80,7 +77,7 @@ export class ObjectSectionElement extends CarbonSectionBasedElement {
   }
 
   protected onChange(): void {
-    // throw new Error('Method not implemented.');
+    findEnclosingForm(this).onChange();
   }
   protected emptyMessage(): string {
     return 'TODO message';

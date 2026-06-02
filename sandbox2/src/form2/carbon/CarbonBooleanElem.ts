@@ -28,15 +28,12 @@ export class CarbonBooleanElement extends BooleanElement {
     setErrors(errors, true, this.input);
   }
 
-  initialize(
-    value: boolean,
-    metadata: Metadata,
-    path: JsPath,
-    onChange: () => void,
-  ): void {
+  initialize(value: boolean, metadata: Metadata, path: JsPath): void {
     this.input.checked = value;
     this.setMetadata(metadata, path);
-    this.input.addEventListener('input', onChange);
+    this.input.addEventListener('input', () => {
+      this.onChange();
+    });
   }
 
   getBooleanValue(): boolean {

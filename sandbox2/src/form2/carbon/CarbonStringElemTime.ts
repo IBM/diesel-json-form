@@ -20,15 +20,10 @@ export class CarbonStringElemTime extends StringElement {
     this.myPicker.remove();
   }
 
-  initialize(
-    value: string,
-    metadata: Metadata,
-    path: JsPath,
-    onChange: () => void,
-  ): void {
+  initialize(value: string, metadata: Metadata, path: JsPath): void {
     this.myPicker.setValue(value);
     this.myPicker.setOnChange(() => {
-      onChange();
+      this.onChange();
     });
     this.setMetadata(metadata, path);
   }

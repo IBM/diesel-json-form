@@ -18,8 +18,6 @@ import './style.scss';
 import { samples } from './initdata';
 import {
   defaultSchemaService,
-  JsPath,
-  Metadata,
   parseJsonValue,
   parseJsonValueUnsafe,
   stringify,
@@ -122,15 +120,10 @@ class RatingRenderer extends NumberElement {
     this.radio.remove();
   }
 
-  initialize(
-    value: string,
-    metadata: Metadata,
-    path: JsPath,
-    onChange: () => void,
-  ): void {
+  initialize(value: string): void {
     this.radio.value = value;
     this.radio.addEventListener('cds-radio-button-changed', () => {
-      onChange();
+      this.onChange();
     });
     // this.setMetadata();
   }

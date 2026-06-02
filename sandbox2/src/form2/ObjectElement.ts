@@ -9,7 +9,10 @@ export abstract class ObjectElement extends RenderedElement {
     properties: readonly JsonProperty[],
     metadata: Metadata,
     path: JsPath,
-    onChange: () => void,
   ): void;
   abstract getProperties(): [string, JsonElement][];
+
+  appendProperty() {
+    throw new Error('Method not implemented.');
+  }
 }

@@ -30,16 +30,11 @@ export class CarbonStringElemBasic extends StringElement {
     this.input.remove();
   }
 
-  initialize(
-    value: string,
-    metadata: Metadata,
-    path: JsPath,
-    onChange: () => void,
-  ) {
+  initialize(value: string, metadata: Metadata, path: JsPath) {
     this.input.value = value;
     this.setMetadata(metadata, path);
     this.input.addEventListener('input', () => {
-      this.debouncer.debounce(onChange);
+      this.debouncer.debounce(() => this.onChange());
     });
   }
 

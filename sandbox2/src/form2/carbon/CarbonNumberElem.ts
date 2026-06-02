@@ -30,12 +30,7 @@ export class CarbonNumberElement extends NumberElement {
     this.input.remove();
   }
 
-  initialize(
-    value: string,
-    metadata: Metadata,
-    path: JsPath,
-    onChange: () => void,
-  ): void {
+  initialize(value: string, metadata: Metadata, path: JsPath): void {
     this.input.value = value;
     this.input.addEventListener('input', () => {
       if (!isValidNumberLiteral(this.input.value)) {
@@ -53,7 +48,7 @@ export class CarbonNumberElement extends NumberElement {
         }
       }
       this.debouncer.debounce(() => {
-        onChange();
+        this.onChange();
       });
     });
     this.setMetadata(metadata, path);

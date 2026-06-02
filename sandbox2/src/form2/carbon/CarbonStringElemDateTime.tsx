@@ -32,20 +32,15 @@ export class CarbonStringElemDateTime extends StringElement {
     this.wrapper.remove();
   }
 
-  initialize(
-    value: string,
-    metadata: Metadata,
-    path: JsPath,
-    onChange: () => void,
-  ): void {
+  initialize(value: string, metadata: Metadata, path: JsPath): void {
     const dt = new MyDateTime(value);
     this.datePicker.setValue(dt.date);
     this.timePicker.setValue(dt.time.fullTime);
     this.datePicker.setOnChange(() => {
-      onChange();
+      this.onChange();
     });
     this.timePicker.setOnChange(() => {
-      onChange();
+      this.onChange();
     });
     this.setMetadata(metadata, path);
   }

@@ -30,7 +30,6 @@ export interface RenderArgs {
   readonly value: JsonValue;
   readonly metadata: Metadata;
   readonly path: JsPath;
-  readonly onChange: () => void;
 }
 
 type CustomRendererCtor = (s: SchemaRenderer) => RenderedElement;
@@ -62,41 +61,29 @@ export class Renderer {
   ): RenderedElement {
     const e = f(key.customKey);
     if (e instanceof ArrayElement && args.value.tag === 'jv-array') {
-      e.initialize(
-        this,
-        args.value.elems,
-        args.metadata,
-        args.path,
-        args.onChange,
-      );
+      e.initialize(this, args.value.elems, args.metadata, args.path);
     } else if (e instanceof BooleanElement && args.value.tag === 'jv-boolean') {
-      e.initialize(args.value.value, args.metadata, args.path, args.onChange);
+      e.initialize(args.value.value, args.metadata, args.path);
     } else if (e instanceof NullElement && args.value.tag === 'jv-null') {
       e.initialize(args.metadata, args.path);
     } else if (e instanceof NumberElement && args.value.tag === 'jv-number') {
-      e.initialize(args.value.value, args.metadata, args.path, args.onChange);
+      e.initialize(args.value.value, args.metadata, args.path);
     } else if (e instanceof ObjectElement && args.value.tag === 'jv-object') {
-      e.initialize(
-        this,
-        args.value.properties,
-        args.metadata,
-        args.path,
-        args.onChange,
-      );
+      e.initialize(this, args.value.properties, args.metadata, args.path);
     } else if (e instanceof StringElement && args.value.tag === 'jv-string') {
-      e.initialize(args.value.value, args.metadata, args.path, args.onChange);
+      e.initialize(args.value.value, args.metadata, args.path);
     }
     return e;
   }
 
   private renderString(value: string, args: RenderArgs): RenderedElement {
-    const { path, metadata, onChange } = args;
+    const { path, metadata } = args;
     const pathStr = path.format();
 
     const combos = metadata.comboBoxes.get(pathStr);
     if (combos && combos.length > 0) {
       const e = new CarbonStringElemCombo();
-      e.initialize(value, metadata, path, onChange);
+      e.initialize(value, metadata, path);
       return e;
     }
 
@@ -106,7 +93,7 @@ export class Renderer {
       const ctor = this.formatRenderers.get(fmt);
       if (ctor) {
         const e = ctor();
-        e.initialize(value, metadata, path, onChange);
+        e.initialize(value, metadata, path);
         return e;
       }
     }
@@ -114,7 +101,7 @@ export class Renderer {
     const e = document.createElement(
       CarbonStringElemBasic.TAG_NAME,
     ) as CarbonStringElemBasic;
-    e.initialize(value, metadata, path, onChange);
+    e.initialize(value, metadata, path);
     return e;
   }
 
@@ -133,40 +120,28 @@ export class Renderer {
         const e = document.createElement(
           CarbonBooleanElement.TAG_NAME,
         ) as CarbonBooleanElement;
-        e.initialize(args.value.value, args.metadata, args.path, args.onChange);
+        e.initialize(args.value.value, args.metadata, args.path);
         return e;
       }
       case 'jv-number': {
         const e = document.createElement(
           CarbonNumberElement.TAG_NAME,
         ) as CarbonNumberElement;
-        e.initialize(args.value.value, args.metadata, args.path, args.onChange);
+        e.initialize(args.value.value, args.metadata, args.path);
         return e;
       }
       case 'jv-array': {
         const e = document.createElement(
           CarbonArrayElement.TAG_NAME,
         ) as CarbonArrayElement;
-        e.initialize(
-          this,
-          args.value.elems,
-          args.metadata,
-          args.path,
-          args.onChange,
-        );
+        e.initialize(this, args.value.elems, args.metadata, args.path);
         return e;
       }
       case 'jv-object': {
         const e = document.createElement(
           CarbonObjectElement.TAG_NAME,
         ) as CarbonObjectElement;
-        e.initialize(
-          this,
-          args.value.properties,
-          args.metadata,
-          args.path,
-          args.onChange,
-        );
+        e.initialize(this, args.value.properties, args.metadata, args.path);
         return e;
       }
     }

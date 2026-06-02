@@ -4,6 +4,7 @@ import { JsonElement } from '../JsonElement';
 import { Renderer } from '../Renderer';
 import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
+import { findEnclosingForm } from '../findEnclosingForm';
 
 export class CarbonArrayElement extends ArrayElement {
   static TAG_NAME = 'json-array';
@@ -24,28 +25,34 @@ export class CarbonArrayElement extends ArrayElement {
     this.sectionElem.remove();
   }
 
-  private onChange?: () => void;
-
   initialize(
     renderer: Renderer,
     items: readonly JsonValue[],
     metadata: Metadata,
     path: JsPath,
-    onChange: () => void,
   ): void {
-    this.onChange = onChange;
     items.forEach((item, index) => {
-      const e = JsonElement.newInstance(
-        renderer,
-        item,
-        metadata,
-        path.append(index),
-      );
-      const section = CarbonCollapsibleSection.newInstance();
-      section.setTitle('#' + index);
-      section.setContent(e);
-      this.sectionElem.appendSection(section);
+      this.doAppendValue(renderer, metadata, path, item, index);
     });
+  }
+
+  private doAppendValue(
+    renderer: Renderer,
+    metadata: Metadata,
+    path: JsPath,
+    item: JsonValue,
+    index: number,
+  ) {
+    const e = JsonElement.newInstance(
+      renderer,
+      item,
+      metadata,
+      path.append(index),
+    );
+    const section = CarbonCollapsibleSection.newInstance();
+    section.setTitle('#' + index);
+    section.setContent(e);
+    this.sectionElem.appendSection(section);
   }
 
   getElements(): readonly JsonElement[] {
@@ -56,6 +63,14 @@ export class CarbonArrayElement extends ArrayElement {
     this.sectionElem.findElems().forEach((elem, index) => {
       elem.setMetadata(metadata, path.append(index), renderer);
     });
+  }
+
+  appendValue(elem: JsonElement): void {
+    const section = CarbonCollapsibleSection.newInstance();
+    const nbSections = this.sectionElem.findSections().length;
+    section.setTitle('#' + nbSections);
+    section.setContent(elem);
+    this.sectionElem.appendSection(section);
   }
 }
 
@@ -69,7 +84,7 @@ export class ArraySectionElement extends CarbonSectionBasedElement {
   }
 
   protected onChange(): void {
-    // throw new Error('Method not implemented.');
+    findEnclosingForm(this).onChange();
   }
   protected emptyMessage(): string {
     return 'TODO message';

@@ -134,8 +134,15 @@ export class JsonForm extends HTMLElement {
     return this.hasAttribute('strict-mode');
   }
 
+  getRenderer(): Renderer {
+    if (!this.renderer) {
+      throw new Error('no renderer available');
+    }
+    return this.renderer;
+  }
+
   addPropertyOrElement() {
-    throw new Error('Method not implemented.');
+    this.element?.addPropertyOrElement();
   }
 
   setValue(value: JsonValue): void {
@@ -147,7 +154,8 @@ export class JsonForm extends HTMLElement {
   }
 
   deleteValue(): void {
-    throw new Error('TODO');
+    this.element?.remove();
+    delete this.element;
   }
 }
 
