@@ -1,7 +1,6 @@
 import { Metadata, JsPath, JsonValue } from '@diesel-parser/json-form';
 import { ArrayElement } from '../ArrayElement';
 import { JsonElement } from '../JsonElement';
-import { h, Fragment } from '../../jsonform/MyJSXFactory';
 import { Renderer } from '../Renderer';
 import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
@@ -12,8 +11,6 @@ export class CarbonArrayElement extends ArrayElement {
   private sectionElem: ArraySectionElement = document.createElement(
     ArraySectionElement.TAG_NAME,
   ) as ArraySectionElement;
-
-  private renderer?: Renderer;
 
   constructor() {
     super();
@@ -36,7 +33,6 @@ export class CarbonArrayElement extends ArrayElement {
     path: JsPath,
     onChange: () => void,
   ): void {
-    this.renderer = renderer;
     this.onChange = onChange;
     items.forEach((item, index) => {
       const e = JsonElement.newInstance(
@@ -56,13 +52,10 @@ export class CarbonArrayElement extends ArrayElement {
     return this.sectionElem.findElems();
   }
 
-  setMetadata(metadata: Metadata, path: JsPath): void {
-    if (this.renderer) {
-      const r = this.renderer;
-      this.sectionElem.findElems().forEach((elem, index) => {
-        elem.setMetadata(r, metadata, path.append(index));
-      });
-    }
+  setMetadata(metadata: Metadata, path: JsPath, renderer: Renderer): void {
+    this.sectionElem.findElems().forEach((elem, index) => {
+      elem.setMetadata(metadata, path.append(index), renderer);
+    });
   }
 }
 

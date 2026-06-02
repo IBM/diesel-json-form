@@ -20,7 +20,7 @@ export class JsonForm extends HTMLElement {
   private VALIDATION_COUNTER = 0;
   private schemaService: SchemaService = defaultSchemaService;
   private schema: JsonValue = jvObject();
-  renderer?: Renderer;
+  private renderer?: Renderer;
 
   constructor() {
     super();
@@ -94,7 +94,7 @@ export class JsonForm extends HTMLElement {
       this.doValidate(this.toValue())
         .then((metadata) => {
           if (metadata && this.element && this.renderer) {
-            this.element.setMetadata(this.renderer, metadata, JsPath.empty);
+            this.element.setMetadata(metadata, JsPath.empty, this.renderer);
           }
         })
         .catch((err) => {
@@ -105,7 +105,7 @@ export class JsonForm extends HTMLElement {
 
   toValue(): JsonValue {
     if (!this.element) {
-      throw 'not initialized';
+      throw new Error('not initialized');
     }
     return this.element.toValue();
   }

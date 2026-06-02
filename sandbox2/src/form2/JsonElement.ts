@@ -73,7 +73,7 @@ export class JsonElement extends HTMLElement {
     throw 'no enclosing json-form';
   }
 
-  setMetadata(renderer: Renderer, metadata: Metadata, path: JsPath) {
+  setMetadata(metadata: Metadata, path: JsPath, renderer: Renderer) {
     if (this.type) {
       const newKey = getRendererKey(this.type, metadata, path);
       if (this.rendererKey !== undefined && !newKey.equals(this.rendererKey)) {
@@ -89,7 +89,7 @@ export class JsonElement extends HTMLElement {
         this.rendererKey = newKey;
         this.appendChild(this.renderedElement);
       } else {
-        this.renderedElement?.setMetadata(metadata, path);
+        this.renderedElement?.setMetadata(metadata, path, renderer);
       }
     }
   }
