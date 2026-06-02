@@ -41,10 +41,46 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = '{}';
+const initialSchema = `{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "http://schema.BeanWithBean",
+  "type": "object",
+  "properties": {
+    "customer": {
+      "$ref": "#/definitions/schema.Customer"
+    }
+  },
+  "definitions": {
+    "schema.Customer": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lastName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `[1]`;
+const initialValue = `{"customer":{"firstName":"toto"}}`;
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 

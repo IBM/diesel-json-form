@@ -13,6 +13,7 @@ import { CarbonNullElement } from './carbon/CarbonNullElem';
 import { CarbonBooleanElement } from './carbon/CarbonBooleanElem';
 import { CarbonNumberElement } from './carbon/CarbonNumberElem';
 import { CarbonArrayElement } from './carbon/CarbonArrayElem';
+import { CarbonObjectElement } from './carbon/CarbonObjectElem';
 
 export interface RenderArgs {
   readonly key: RendererKey;
@@ -75,7 +76,17 @@ export class Renderer {
         return e;
       }
       case 'jv-object': {
-        throw new Error('TODO3');
+        const e = document.createElement(
+          CarbonObjectElement.TAG_NAME,
+        ) as CarbonObjectElement;
+        e.initialize(
+          this,
+          args.value.properties,
+          args.metadata,
+          args.path,
+          args.onChange,
+        );
+        return e;
       }
     }
   }

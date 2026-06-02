@@ -33,7 +33,7 @@ export abstract class CarbonSectionBasedElement extends HTMLElement {
       this.findSections().length === 0 ? 'block' : 'none';
   }
 
-  protected findSections(): CarbonCollapsibleSection[] {
+  findSections(): CarbonCollapsibleSection[] {
     const rows = [];
     for (const s of this.elemsContainer.children) {
       if (s instanceof CarbonCollapsibleSection) {
