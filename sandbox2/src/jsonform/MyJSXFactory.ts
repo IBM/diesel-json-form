@@ -22,6 +22,8 @@ declare global {
       image: any;
       div: Partial<HTMLDivElement>;
       span: Partial<HTMLSpanElement>;
+      ul: Partial<HTMLUListElement>;
+      li: Partial<HTMLLIElement>;
       'cds-button': Partial<CDSButton>;
       'cds-modal': Partial<CDSModal>;
       'cds-modal-header': Partial<CDSModalHeader>;

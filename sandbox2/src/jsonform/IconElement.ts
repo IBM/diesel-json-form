@@ -109,3 +109,5 @@ export class IconElement extends HTMLElement {
     this.iconNode?.remove();
   }
 }
+
+customElements.define(IconElement.TAG_NAME, IconElement);

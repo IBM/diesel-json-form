@@ -22,11 +22,14 @@ import {
   parseJsonValueUnsafe,
   stringify,
 } from '@diesel-parser/json-form';
+import { JsonForm } from './jsonform/JsonForm';
+import { defineCustomElements } from './jsonform/defineCustomElements';
+
+defineCustomElements();
+
 import '@carbon/web-components/es/components/dropdown/dropdown-item';
 import '@carbon/web-components/es/components/button/button';
 import { CDSComboBox } from '@carbon/web-components';
-import { JsonForm } from './form2/JsonForm';
-import { Renderer } from './form2/Renderer';
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
@@ -41,10 +44,53 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = '{}';
+const initialSchema = `{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "http://schema.BeanWithBean",
+  "type": "object",
+  "properties": {
+    "customer": {
+      "$ref": "#/definitions/schema.Customer"
+    }
+  },
+  "definitions": {
+    "schema.Customer": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lastName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `[1,2,[3,4,true]]`;
+const initialValue = `{
+  "customer": {
+    "amount": 0,
+    "firstName": "",
+    "age": 0,
+    "lastName": ""
+  }
+}`;
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 
@@ -79,25 +125,22 @@ const btnToForm = document.getElementById('btn-to-form') as HTMLButtonElement;
 btnToForm.addEventListener('click', () => {
   const value = parseJsonValueUnsafe(taJson.value);
   const schema = parseJsonValueUnsafe(taSchema.value);
-  jsonForm.initialize(renderer, defaultSchemaService, schema, value);
+  jsonForm.init(defaultSchemaService, schema, value);
 });
 
-const renderer: Renderer = new Renderer();
-
 const jsonForm = document.getElementById('my-form') as JsonForm;
-jsonForm.initialize(renderer, defaultSchemaService, schema, value);
-// jsonForm.addChangeListener((value) => {
-//   btnFromForm.disabled = !stringify(value)
-//     .map(() => true)
-//     .withDefault(false);
-// });
+jsonForm.init(defaultSchemaService, schema, value);
+jsonForm.addChangeListener((value) => {
+  btnFromForm.disabled = !stringify(value)
+    .map(() => true)
+    .withDefault(false);
+});
 
 sampleSchemaSelect.addEventListener('cds-dropdown-selected', () => {
   taSchema.value = sampleSchemaSelect.value;
   const value = jsonForm.toValue();
   parseJsonValue(taSchema.value).match(
-    (schema) =>
-      jsonForm.initialize(renderer, defaultSchemaService, schema, value),
+    (schema) => jsonForm.init(defaultSchemaService, schema, value),
     (err) => console.error(err),
   );
 });
