@@ -68,7 +68,7 @@ export class JsonElement extends HTMLElement {
       if (p instanceof JsonForm) {
         return p;
       }
-      p = this.parentElement;
+      p = p.parentElement;
     }
     throw 'no enclosing json-form';
   }
@@ -76,7 +76,7 @@ export class JsonElement extends HTMLElement {
   setMetadata(renderer: Renderer, metadata: Metadata, path: JsPath) {
     if (this.type) {
       const newKey = getRendererKey(this.type, metadata, path);
-      if (this.rendererKey !== undefined && newKey.equals(this.rendererKey)) {
+      if (this.rendererKey !== undefined && !newKey.equals(this.rendererKey)) {
         const value = this.toValue();
         this.renderedElement?.remove();
         this.renderedElement = renderer.render({

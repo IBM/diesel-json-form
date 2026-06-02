@@ -11,5 +11,5 @@ export abstract class ArrayElement extends RenderedElement {
     path: JsPath,
     onChange: () => void,
   ): void;
-  abstract getElements(): JsonElement[];
+  abstract getElements(): readonly JsonElement[];
 }

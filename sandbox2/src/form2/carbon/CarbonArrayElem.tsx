@@ -13,6 +13,8 @@ export class CarbonArrayElement extends ArrayElement {
     ArraySectionElement.TAG_NAME,
   ) as ArraySectionElement;
 
+  private renderer?: Renderer;
+
   constructor() {
     super();
   }
@@ -34,6 +36,7 @@ export class CarbonArrayElement extends ArrayElement {
     path: JsPath,
     onChange: () => void,
   ): void {
+    this.renderer = renderer;
     this.onChange = onChange;
     items.forEach((item, index) => {
       const e = JsonElement.newInstance(
@@ -49,16 +52,17 @@ export class CarbonArrayElement extends ArrayElement {
     });
   }
 
-  getElements(): JsonElement[] {
-    const elems = this.querySelectorAll(
-      '.array-elems > ' + JsonElement.TAG_NAME,
-    );
-    return Array.from(elems).map((x) => x as JsonElement);
+  getElements(): readonly JsonElement[] {
+    return this.sectionElem.findElems();
   }
 
   setMetadata(metadata: Metadata, path: JsPath): void {
-    const errors = metadata.errors.get(path.format());
-    console.log('TODO array errors', errors);
+    if (this.renderer) {
+      const r = this.renderer;
+      this.sectionElem.findElems().forEach((elem, index) => {
+        elem.setMetadata(r, metadata, path.append(index));
+      });
+    }
   }
 }
 

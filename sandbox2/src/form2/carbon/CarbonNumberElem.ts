@@ -38,7 +38,7 @@ export class CarbonNumberElement extends NumberElement {
     this.input.value = value;
     this.input.addEventListener('input', () => {
       if (!isValidNumberLiteral(this.input.value)) {
-        const path = this.getPath();
+        // const path = this.getPath();
         setErrors(
           [{ path: path.format(), message: T_FUNCTION('invalid.number') }],
           true,
@@ -49,6 +49,7 @@ export class CarbonNumberElement extends NumberElement {
         onChange();
       });
     });
+    this.setMetadata(metadata, path);
   }
 
   setMetadata(metadata: Metadata, path: JsPath): void {

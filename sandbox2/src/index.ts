@@ -44,7 +44,7 @@ samples
 const initialSchema = '{}';
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `[1,2,[3,4,true]]`;
+const initialValue = `[1]`;
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 

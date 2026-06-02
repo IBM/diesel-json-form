@@ -20,7 +20,14 @@ export class CarbonStringElemBasic extends StringElement {
       'placeholder',
       T_FUNCTION('stringValuePlaceholder'),
     );
+  }
+
+  connectedCallback() {
     this.appendChild(this.input);
+  }
+
+  disconnectedCallback() {
+    this.input.remove();
   }
 
   initialize(

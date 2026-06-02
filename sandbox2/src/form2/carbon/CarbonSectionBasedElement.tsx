@@ -43,7 +43,7 @@ export abstract class CarbonSectionBasedElement extends HTMLElement {
     return rows;
   }
 
-  protected findElems(): readonly JsonElement[] {
+  findElems(): readonly JsonElement[] {
     return this.findSections().flatMap((s) => {
       const content = s.getContent();
       return content === undefined ? [] : [content];
