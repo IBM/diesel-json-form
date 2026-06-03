@@ -43,6 +43,7 @@ export class CarbonObjectElement extends ObjectElement {
       );
       this.createAndAppendNewSection(prop.name, e);
     });
+    this.setMetadata(metadata, path, renderer);
   }
 
   private createAndAppendNewSection(name: string, elem: JsonElement) {
@@ -69,6 +70,10 @@ export class CarbonObjectElement extends ObjectElement {
     this.getProperties().forEach(([name, elem]) => {
       elem.setMetadata(metadata, path.append(name), renderer);
     });
+    debugger;
+    const pathStr = path.format();
+    const errors = metadata.errors.get(pathStr);
+    this.sectionElem.showErrors(errors);
   }
 
   protected openDialog(): Promise<JsonProperty> {
