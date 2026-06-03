@@ -65,7 +65,7 @@ export class CarbonArrayElement extends ArrayElement {
     });
   }
 
-  appendValue(elem: JsonElement): void {
+  protected appendElement(elem: JsonElement): void {
     const section = CarbonCollapsibleSection.newInstance();
     const nbSections = this.sectionElem.findSections().length;
     section.setTitle('#' + nbSections);

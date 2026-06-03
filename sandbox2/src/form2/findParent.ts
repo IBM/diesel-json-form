@@ -13,7 +13,7 @@ export function findEnclosingForm(e: Element): JsonForm {
 
 export function findParent<T>(elem: Element, p: (e: Element) => Maybe<T>): T {
   let parent = elem.parentElement;
-  while (parent) {
+  while (parent !== null) {
     const m = p(parent);
     if (m.type === 'Just') {
       return m.value;

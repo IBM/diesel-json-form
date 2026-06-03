@@ -17,6 +17,8 @@ import { ArrayElement } from './ArrayElement';
 import { getRendererKey, Renderer, RendererKey } from './Renderer';
 import { NullElement } from './NullElement';
 import { RenderedElement } from './RenderedElement';
+import { JsonForm } from './JsonForm';
+import { findEnclosingForm } from './findParent';
 
 export class JsonElement extends HTMLElement {
   static TAG_NAME = 'json-element';
@@ -134,6 +136,10 @@ export class JsonElement extends HTMLElement {
       throw new Error('path attribute not found');
     }
     return JsPath.parse(pathStr);
+  }
+
+  get parentForm(): JsonForm {
+    return findEnclosingForm(this);
   }
 }
 
