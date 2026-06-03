@@ -9,6 +9,7 @@ import { NumberElement } from '../NumberElement';
 import { Debouncer } from '../../jsonform/Debouncer';
 import { setErrors } from '../../jsonform/setErrorsOnInput';
 import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
+import { JsonForm } from '../JsonForm';
 
 export class CarbonNumberElement extends NumberElement {
   static TAG_NAME = 'json-number';
@@ -48,7 +49,7 @@ export class CarbonNumberElement extends NumberElement {
         }
       }
       this.debouncer.debounce(() => {
-        this.onChange();
+        JsonForm.getEnclosingForm(this).onChange();
       });
     });
     this.setMetadata(metadata, path);

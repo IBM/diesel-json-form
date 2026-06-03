@@ -15,8 +15,8 @@ import { BooleanElement } from './BooleanElement';
 import { ObjectElement } from './ObjectElement';
 import { ArrayElement } from './ArrayElement';
 import { getRendererKey, Renderer, RendererKey } from './Renderer';
-import { RenderedElement } from './RenderedElement';
 import { NullElement } from './NullElement';
+import { RenderedElement } from './RenderedElement';
 
 export class JsonElement extends HTMLElement {
   static TAG_NAME = 'json-element';
@@ -37,17 +37,6 @@ export class JsonElement extends HTMLElement {
     const e = document.createElement(JsonElement.TAG_NAME) as JsonElement;
     e.initialize(renderer, value, metadata, path);
     return e;
-  }
-
-  static findParentJsonElement(e: Element): JsonElement {
-    let p = e.parentElement;
-    while (p) {
-      if (p instanceof JsonElement) {
-        return p;
-      }
-      p = p.parentElement;
-    }
-    throw new Error('no parent Json Element found');
   }
 
   private initialize(

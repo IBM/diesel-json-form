@@ -4,17 +4,17 @@ import { JsonElement } from '../JsonElement';
 import { Renderer } from '../Renderer';
 import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
-import { findEnclosingForm } from '../findEnclosingForm';
+import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
 
 export class CarbonArrayElement extends ArrayElement {
   static TAG_NAME = 'json-array';
 
-  private sectionElem: ArraySectionElement = document.createElement(
-    ArraySectionElement.TAG_NAME,
-  ) as ArraySectionElement;
+  private sectionElem: CarbonSectionBasedElement;
 
   constructor() {
     super();
+    this.sectionElem = CarbonSectionBasedElement.newInstance();
+    this.sectionElem.emptyMessage = T_FUNCTION('emptyArray');
   }
 
   connectedCallback() {
@@ -75,21 +75,3 @@ export class CarbonArrayElement extends ArrayElement {
 }
 
 customElements.define(CarbonArrayElement.TAG_NAME, CarbonArrayElement);
-
-export class ArraySectionElement extends CarbonSectionBasedElement {
-  static TAG_NAME = 'array-section-elem';
-
-  constructor() {
-    super();
-  }
-
-  protected onChange(): void {
-    findEnclosingForm(this).onChange();
-  }
-  protected emptyMessage(): string {
-    return 'TODO message';
-    // throw new Error('Method not implemented.');
-  }
-}
-
-customElements.define(ArraySectionElement.TAG_NAME, ArraySectionElement);

@@ -1,7 +1,7 @@
 import { JsonValue, Metadata, JsPath } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import { RenderedElement } from './RenderedElement';
 import { Renderer } from './Renderer';
+import { RenderedElement } from './RenderedElement';
 
 export abstract class ArrayElement extends RenderedElement {
   abstract initialize(
@@ -15,7 +15,6 @@ export abstract class ArrayElement extends RenderedElement {
   abstract appendValue(elem: JsonElement): void;
 
   appendItem() {
-    throw new Error('TODO');
     // const parentElement = this.findEnclosingJsonElement();
     // const form = parentElement.findEnclosingForm();
     // const schema = form.getSchema();
@@ -27,7 +26,6 @@ export abstract class ArrayElement extends RenderedElement {
     //   // so that we have a value at new index path
     //   // otherwise the proposals would be empty because
     //   // no path matches the requested index
-
     //   const newArrayElems = elems.map((e) => e.toValue()).concat([jvNull]);
     //   const tmpArray = jvArray(newArrayElems);
     //   const p = parentElement.path;

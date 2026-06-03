@@ -4,6 +4,7 @@ import { MyDatePicker } from './MyDatePicker';
 import { MyTimePicker } from './MyTimePicker';
 import { h } from '../../jsonform/MyJSXFactory';
 import { MyDateTime } from './MyDateTime';
+import { JsonForm } from '../JsonForm';
 
 export class CarbonStringElemDateTime extends StringElement {
   static TAG_NAME = 'string-elem-date-time';
@@ -37,10 +38,10 @@ export class CarbonStringElemDateTime extends StringElement {
     this.datePicker.setValue(dt.date);
     this.timePicker.setValue(dt.time.fullTime);
     this.datePicker.setOnChange(() => {
-      this.onChange();
+      JsonForm.getEnclosingForm(this).onChange();
     });
     this.timePicker.setOnChange(() => {
-      this.onChange();
+      JsonForm.getEnclosingForm(this).onChange();
     });
     this.setMetadata(metadata, path);
   }

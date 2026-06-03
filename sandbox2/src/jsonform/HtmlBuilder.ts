@@ -1,3 +1,5 @@
+import { Maybe } from 'tea-cup-fp';
+
 export function empty(e: Node) {
   while (e.firstChild) {
     e.removeChild(e.firstChild);
@@ -22,4 +24,16 @@ export function moveElementDown(element: Element): boolean {
     return true;
   }
   return false;
+}
+
+export function findParent<T>(elem: Element, p: (e: Element) => Maybe<T>): T {
+  let parent = elem.parentElement;
+  while (parent) {
+    const m = p(parent);
+    if (m.type === 'Just') {
+      return m.value;
+    }
+    parent = parent.parentElement;
+  }
+  throw 'Element not found';
 }

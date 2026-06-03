@@ -3,6 +3,7 @@ import { CDSCheckbox } from '@carbon/web-components';
 import '@carbon/web-components/es/components/checkbox/checkbox';
 import { BooleanElement } from '../BooleanElement';
 import { setErrors } from '../../jsonform/setErrorsOnInput';
+import { JsonForm } from '../JsonForm';
 
 export class CarbonBooleanElement extends BooleanElement {
   static TAG_NAME = 'json-boolean';
@@ -32,7 +33,7 @@ export class CarbonBooleanElement extends BooleanElement {
     this.input.checked = value;
     this.setMetadata(metadata, path);
     this.input.addEventListener('input', () => {
-      this.onChange();
+      JsonForm.getEnclosingForm(this).onChange();
     });
   }
 

@@ -45,19 +45,19 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 const initialSchema = `{
-  "properties": {
-    "name": {
-      "type": "string"
-    },
-    "rating": {
-      "type": "number",
-      "renderer": "RatingRenderer"
-    }
+  "type": [
+    "array", "null"
+  ],
+  "items": {
+    "type": [ "string", "null" ],
+    "enum": [
+      "FOO", "BAR"
+    ]
   }
 }`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `{"name":"toto", "rating": 3}`;
+const initialValue = `["FOO"]`;
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 
@@ -123,7 +123,7 @@ class RatingRenderer extends NumberElement {
   initialize(value: string): void {
     this.radio.value = value;
     this.radio.addEventListener('cds-radio-button-changed', () => {
-      this.onChange();
+      JsonForm.getEnclosingForm(this).onChange();
     });
     // this.setMetadata();
   }

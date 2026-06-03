@@ -9,10 +9,11 @@ import {
   jvObject,
   defaultSchemaService,
 } from '@diesel-parser/json-form';
-import { map2 } from 'tea-cup-fp';
+import { just, map2, nothing } from 'tea-cup-fp';
 import { JsonElement } from './JsonElement';
 import { Renderer } from './Renderer';
 import { FormHeaderElement } from './carbon/FormHeaderElement';
+import { findParent } from './findParent';
 
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
@@ -156,6 +157,15 @@ export class JsonForm extends HTMLElement {
   deleteValue(): void {
     this.element?.remove();
     delete this.element;
+  }
+
+  static getEnclosingForm(e: Element): JsonForm {
+    return findParent(e, (e) => {
+      if (e instanceof JsonForm) {
+        return just(e);
+      }
+      return nothing;
+    });
   }
 }
 

@@ -1,7 +1,7 @@
 import { JsonProperty, JsPath, Metadata } from '@diesel-parser/json-form';
 import { JsonElement } from './JsonElement';
-import { RenderedElement } from './RenderedElement';
 import { Renderer } from './Renderer';
+import { RenderedElement } from './RenderedElement';
 
 export abstract class ObjectElement extends RenderedElement {
   abstract initialize(

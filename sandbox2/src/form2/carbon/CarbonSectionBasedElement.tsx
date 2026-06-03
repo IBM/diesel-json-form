@@ -3,17 +3,35 @@ import { JsonElement } from '../JsonElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { moveElementDown, moveElementUp } from '../../jsonform/HtmlBuilder';
 
-export abstract class CarbonSectionBasedElement extends HTMLElement {
+export class CarbonSectionBasedElement extends HTMLElement {
+  static TAG_NAME = 'section-based-elem';
+
   private elemsContainer: HTMLElement = (<div className="json-sections" />);
 
   private emptyNodeContainer: HTMLElement = (
     <div className="json-section-empty"></div>
   );
 
-  protected abstract onChange(): void;
+  private _onChange: () => void = () => {};
+  private _emptyMessage: string = '';
 
   constructor() {
     super();
+  }
+
+  static newInstance(): CarbonSectionBasedElement {
+    const e = document.createElement(
+      CarbonSectionBasedElement.TAG_NAME,
+    ) as CarbonSectionBasedElement;
+    return e;
+  }
+
+  set onChange(f: () => void) {
+    this._onChange = f;
+  }
+
+  set emptyMessage(msg: string) {
+    this._emptyMessage = msg;
   }
 
   connectedCallback() {
@@ -28,7 +46,7 @@ export abstract class CarbonSectionBasedElement extends HTMLElement {
   }
 
   private updateEmptyNode() {
-    this.emptyNodeContainer.innerText = this.emptyMessage();
+    this.emptyNodeContainer.innerText = this._emptyMessage;
     this.emptyNodeContainer.style.display =
       this.findSections().length === 0 ? 'block' : 'none';
   }
@@ -53,12 +71,12 @@ export abstract class CarbonSectionBasedElement extends HTMLElement {
   protected delete(section: CarbonCollapsibleSection) {
     section.remove();
     this.updateEmptyNode();
-    this.onChange();
+    this._onChange();
   }
 
   protected moveUp(section: CarbonCollapsibleSection): boolean {
     if (moveElementUp(section)) {
-      this.onChange();
+      this._onChange();
       return true;
     }
     return false;
@@ -66,7 +84,7 @@ export abstract class CarbonSectionBasedElement extends HTMLElement {
 
   protected moveDown(section: CarbonCollapsibleSection): boolean {
     if (moveElementDown(section)) {
-      this.onChange();
+      this._onChange();
       return true;
     }
     return false;
@@ -86,6 +104,9 @@ export abstract class CarbonSectionBasedElement extends HTMLElement {
     this.elemsContainer.appendChild(s);
     this.updateEmptyNode();
   }
-
-  protected abstract emptyMessage(): string;
 }
+
+customElements.define(
+  CarbonSectionBasedElement.TAG_NAME,
+  CarbonSectionBasedElement,
+);

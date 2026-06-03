@@ -6,6 +6,7 @@ import { setErrors } from '../../jsonform/setErrorsOnInput';
 import { StringElement } from '../StringElement';
 
 import '@carbon/web-components/es/components/text-input/index';
+import { JsonForm } from '../JsonForm';
 
 export class CarbonStringElemBasic extends StringElement {
   static TAG_NAME = 'string-elem-basic';
@@ -34,7 +35,7 @@ export class CarbonStringElemBasic extends StringElement {
     this.input.value = value;
     this.setMetadata(metadata, path);
     this.input.addEventListener('input', () => {
-      this.debouncer.debounce(() => this.onChange());
+      this.debouncer.debounce(() => JsonForm.getEnclosingForm(this).onChange());
     });
   }
 

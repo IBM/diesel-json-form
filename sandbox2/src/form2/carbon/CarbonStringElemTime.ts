@@ -1,6 +1,7 @@
 import { JsPath, Metadata } from '@diesel-parser/json-form';
 import { StringElement } from '../StringElement';
 import { MyTimePicker } from './MyTimePicker';
+import { JsonForm } from '../JsonForm';
 
 export class CarbonStringElemTime extends StringElement {
   static TAG_NAME = 'string-elem-time';
@@ -23,7 +24,7 @@ export class CarbonStringElemTime extends StringElement {
   initialize(value: string, metadata: Metadata, path: JsPath): void {
     this.myPicker.setValue(value);
     this.myPicker.setOnChange(() => {
-      this.onChange();
+      JsonForm.getEnclosingForm(this).onChange();
     });
     this.setMetadata(metadata, path);
   }

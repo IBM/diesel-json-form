@@ -7,7 +7,6 @@ import {
 } from '@diesel-parser/json-form';
 import { stringArrayEquals } from './stringArrayEquals';
 import { map2 } from 'tea-cup-fp';
-import { RenderedElement } from './RenderedElement';
 import { CarbonStringElemBasic } from './carbon/CarbonStringElemBasic';
 import { CarbonNullElement } from './carbon/CarbonNullElem';
 import { CarbonBooleanElement } from './carbon/CarbonBooleanElem';
@@ -24,6 +23,7 @@ import { CarbonStringElemDate } from './carbon/CarbonStringElemDate';
 import { CarbonStringElemTime } from './carbon/CarbonStringElemTime';
 import { CarbonStringElemDateTime } from './carbon/CarbonStringElemDateTime';
 import { CarbonStringElemCombo } from './carbon/CarbonStringElemCombo';
+import { RenderedElement } from './RenderedElement';
 
 export interface RenderArgs {
   readonly key: RendererKey;

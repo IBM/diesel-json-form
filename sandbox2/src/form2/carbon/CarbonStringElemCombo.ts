@@ -5,6 +5,7 @@ import { StringElement } from '../StringElement';
 
 import '@carbon/web-components/es/components/combo-box/index';
 import { empty } from '../../jsonform/HtmlBuilder';
+import { JsonForm } from '../JsonForm';
 
 export class CarbonStringElemCombo extends StringElement {
   static TAG_NAME = 'string-elem-combo';
@@ -33,7 +34,7 @@ export class CarbonStringElemCombo extends StringElement {
     this.combo.value = value;
     this.setMetadata(metadata, path);
     this.combo.addEventListener('cds-combo-box-selected', () => {
-      this.onChange();
+      JsonForm.getEnclosingForm(this).onChange();
     });
   }
 
