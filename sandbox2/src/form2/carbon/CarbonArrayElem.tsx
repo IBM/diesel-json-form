@@ -13,6 +13,7 @@ import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
 import { createMenu, MenuItem } from '../../jsonform/ContextMenu';
 import { augmentProposal } from '../../jsonform/augmentProposal';
+import { h } from '../../jsonform/MyJSXFactory';
 
 export class CarbonArrayElement extends ArrayElement {
   static TAG_NAME = 'json-array';
@@ -42,6 +43,7 @@ export class CarbonArrayElement extends ArrayElement {
     items.forEach((item, index) => {
       this.doAppendValue(renderer, metadata, path, item, index);
     });
+    this.setMetadata(metadata, path, renderer);
   }
 
   private doAppendValue(
@@ -77,6 +79,9 @@ export class CarbonArrayElement extends ArrayElement {
     this.sectionElem.findElems().forEach((elem, index) => {
       elem.setMetadata(metadata, path.append(index), renderer);
     });
+    const pathStr = path.format();
+    const errors = metadata.errors.get(pathStr);
+    this.sectionElem.showErrors(errors);
   }
 
   protected appendElement(elem: JsonElement): void {

@@ -175,7 +175,7 @@ collapsible-section > .right-pane > .label-row > .label-container {
   flex-grow: 1;
 }
 
-.json-validation-error > .json-sections {
+section-based-elem.json-validation-error > .json-sections {
   border: 2px solid $text-error;
 }
 

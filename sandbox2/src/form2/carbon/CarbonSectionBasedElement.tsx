@@ -2,16 +2,16 @@ import { h } from '../../jsonform/MyJSXFactory';
 import { JsonElement } from '../JsonElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { moveElementDown, moveElementUp } from '../../jsonform/HtmlBuilder';
+import { ValidationError } from '@diesel-parser/json-form';
 
 export class CarbonSectionBasedElement extends HTMLElement {
   static TAG_NAME = 'section-based-elem';
 
   private elemsContainer: HTMLElement = (<div className="json-sections" />);
-
+  private errorNode: HTMLElement = (<div className="json-errors"></div>);
   private emptyNodeContainer: HTMLElement = (
     <div className="json-section-empty"></div>
   );
-
   private _emptyMessage: string = '';
 
   constructor() {
@@ -31,13 +31,28 @@ export class CarbonSectionBasedElement extends HTMLElement {
 
   connectedCallback() {
     this.appendChild(this.elemsContainer);
-    this.emptyNodeContainer.style.display = 'none';
     this.elemsContainer.appendChild(this.emptyNodeContainer);
+    this.updateEmptyNode();
+    this.appendChild(this.errorNode);
   }
 
   disconnectedCallback() {
     this.emptyNodeContainer.remove();
     this.elemsContainer.remove();
+    this.errorNode.remove();
+  }
+
+  showErrors(errors?: readonly ValidationError[]) {
+    if (errors && errors.length > 0) {
+      this.classList.add('json-validation-error');
+      const allErrors = errors.map((e) => e.message).join(', ');
+      this.errorNode.innerText = allErrors;
+      this.errorNode.style.display = 'block';
+    } else {
+      this.classList.remove('json-validation-error');
+      this.errorNode.innerText = '';
+      this.errorNode.style.display = 'none';
+    }
   }
 
   updateEmptyNode() {

@@ -45,19 +45,45 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 const initialSchema = `{
-  "type": [
-    "array", "null"
-  ],
-  "items": {
-    "type": [ "string", "null" ],
-    "enum": [
-      "FOO", "BAR"
-    ]
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "http://schema.BeanWithBean",
+  "type": "object",
+  "properties": {
+    "customer": {
+      "$ref": "#/definitions/schema.Customer"
+    }
+  },
+  "definitions": {
+    "schema.Customer": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lastName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "age": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
   }
 }`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `["FOO", "BAR", "BAZ"]`;
+const initialValue = `{}`;
 const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
