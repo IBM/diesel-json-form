@@ -145,9 +145,6 @@ export class CarbonArrayElement extends ArrayElement {
     const parent = this.parentJsonElement;
     const form = parent.parentForm;
     const schema = form.getSchema();
-    if (!schema) {
-      return Promise.resolve([]);
-    }
     if (rowIndex !== -1) {
       const path = this.parentJsonElement.path;
       return createMenu(
