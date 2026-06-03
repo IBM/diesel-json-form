@@ -5,6 +5,7 @@ import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { ObjectElement } from '../ObjectElement';
 import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
+import { createAddPropertyModal } from './AddPropertyModal';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';
@@ -40,12 +41,16 @@ export class CarbonObjectElement extends ObjectElement {
         metadata,
         path.append(prop.name),
       );
-      const section = CarbonCollapsibleSection.newInstance();
-      section.setTitle(prop.name);
-      section.setAttribute(CarbonObjectElement.ATTR_PROP_NAME, prop.name);
-      section.setContent(e);
-      this.sectionElem.appendSection(section);
+      this.createAndAppendNewSection(prop.name, e);
     });
+  }
+
+  private createAndAppendNewSection(name: string, elem: JsonElement) {
+    const section = CarbonCollapsibleSection.newInstance();
+    section.setTitle(name);
+    section.setAttribute(CarbonObjectElement.ATTR_PROP_NAME, name);
+    section.setContent(elem);
+    this.sectionElem.appendSection(section);
   }
 
   getProperties(): [string, JsonElement][] {
@@ -65,6 +70,24 @@ export class CarbonObjectElement extends ObjectElement {
       elem.setMetadata(metadata, path.append(name), renderer);
     });
   }
+
+  protected openDialog(): Promise<JsonProperty> {
+    return new Promise((resolve) => {
+      const modal = createAddPropertyModal(
+        this.getProperties().map((x) => x[0]),
+        resolve,
+      );
+      document.body.appendChild(modal);
+      modal.open = true;
+    });
+  }
+
+  protected appendProperty(name: string, elem: JsonElement): void {
+    this.createAndAppendNewSection(name, elem);
+  }
+
+  //   appendPropertyClicked(): void {
+  //   }
 }
 
 customElements.define(CarbonObjectElement.TAG_NAME, CarbonObjectElement);

@@ -111,7 +111,7 @@ export class JsonElement extends HTMLElement {
           .getProperties()
           .map(([name, elem]) => ({ name, value: elem.toValue() })),
       );
-    } else if (this.renderedElement instanceof ObjectElement) {
+    } else if (this.renderedElement instanceof NullElement) {
       return jvNull;
     } else {
       throw new Error('unhandled element ' + this.renderedElement);
@@ -122,7 +122,7 @@ export class JsonElement extends HTMLElement {
     if (this.renderedElement instanceof ArrayElement) {
       this.renderedElement.appendItem();
     } else if (this.renderedElement instanceof ObjectElement) {
-      this.renderedElement.appendProperty();
+      this.renderedElement.appendPropertyWithDialog();
     }
   }
 

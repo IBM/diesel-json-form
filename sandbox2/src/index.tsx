@@ -44,20 +44,10 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{
-  "type": [
-    "array", "null"
-  ],
-  "items": {
-    "type": [ "string", "null" ],
-    "enum": [
-      "FOO", "BAR"
-    ]
-  }
-}`;
+const initialSchema = `{}`;
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `["FOO"]`;
+const initialValue = `{}`;
 // const initialValue = `[1]`;
 const value = parseJsonValueUnsafe(initialValue);
 

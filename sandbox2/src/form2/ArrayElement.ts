@@ -52,31 +52,25 @@ export abstract class ArrayElement extends RenderedElement {
     const elems = this.getElements();
     const newElemIndex = elems.length;
     const existingValues = elems.map((e) => e.toValue());
-    if (schema) {
-      // we create a transient JsonValue with the array updated
-      // so that we have a value at new index path
-      // otherwise the proposals would be empty because
-      // no path matches the requested index
-      const newArrayElems = existingValues.concat([jvNull]);
-      const tmpArray = jvArray(newArrayElems);
-      const tmpRoot = setValueAt(root, p, tmpArray);
-      form
-        .getSchemaService()
-        .propose(schema, tmpRoot, p.append(newElemIndex))
-        .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
-        .then(clearPropertiesIfObject)
-        .then((proposal) => {
-          const finalArray = existingValues.concat([proposal]);
-          const finalRoot = setValueAt(root, p, jvArray(finalArray));
-          this.appendValue(form, finalRoot, proposal, p.append(newElemIndex));
-        })
-        .catch((err) => {
-          console.error('error while validating : ' + err);
-        });
-    } else {
-      const finalArray = existingValues.concat([jvNull]);
-      const finalRoot = setValueAt(root, p, jvArray(finalArray));
-      this.appendValue(form, finalRoot, jvNull, p.append(newElemIndex));
-    }
+    // we create a transient JsonValue with the array updated
+    // so that we have a value at new index path
+    // otherwise the proposals would be empty because
+    // no path matches the requested index
+    const newArrayElems = existingValues.concat([jvNull]);
+    const tmpArray = jvArray(newArrayElems);
+    const tmpRoot = setValueAt(root, p, tmpArray);
+    form
+      .getSchemaService()
+      .propose(schema, tmpRoot, p.append(newElemIndex))
+      .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
+      .then(clearPropertiesIfObject)
+      .then((proposal) => {
+        const finalArray = existingValues.concat([proposal]);
+        const finalRoot = setValueAt(root, p, jvArray(finalArray));
+        this.appendValue(form, finalRoot, proposal, p.append(newElemIndex));
+      })
+      .catch((err) => {
+        console.error('error while adding element', err);
+      });
   }
 }
