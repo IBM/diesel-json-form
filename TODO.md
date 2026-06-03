@@ -6,3 +6,4 @@ Web Components :
 - slash in prop name
 
 BUG: added props/items cannot be moved up
+BUG: index.tsx#154

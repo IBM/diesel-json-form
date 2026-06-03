@@ -31,6 +31,8 @@ import { Renderer } from './form2/Renderer';
 import { h } from './jsonform/MyJSXFactory';
 import { NumberElement } from './form2/NumberElement';
 
+const jsonForm = document.getElementById('my-form') as JsonForm;
+
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
 ) as CDSComboBox;
@@ -148,6 +150,8 @@ class RatingRenderer extends NumberElement {
   initialize(value: string): void {
     this.radio.value = value;
     this.radio.addEventListener('cds-radio-button-changed', () => {
+      // this.parentJsonElement.parentForm.onChange();
+      // TODO commenting this wrecks the app !
       JsonForm.getEnclosingForm(this).onChange();
     });
     // this.setMetadata();
@@ -168,7 +172,6 @@ renderer.addCustomRenderer('RatingRenderer', () => {
   return new RatingRenderer();
 });
 
-const jsonForm = document.getElementById('my-form') as JsonForm;
 jsonForm.initialize(renderer, defaultSchemaService, schema, value);
 // jsonForm.addChangeListener((value) => {
 //   btnFromForm.disabled = !stringify(value)
