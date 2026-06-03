@@ -2,7 +2,6 @@ import {
   clearPropertiesIfObject,
   JsonProperty,
   JsPath,
-  jvNull,
   jvObject,
   Metadata,
   setValueAt,
