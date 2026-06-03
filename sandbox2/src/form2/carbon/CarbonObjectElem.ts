@@ -1,4 +1,11 @@
-import { Metadata, JsPath, JsonProperty } from '@diesel-parser/json-form';
+import {
+  Metadata,
+  JsPath,
+  JsonProperty,
+  JsonValue,
+  setValueAt,
+  validateAndComputeMetadata,
+} from '@diesel-parser/json-form';
 import { JsonElement } from '../JsonElement';
 import { Renderer } from '../Renderer';
 import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
@@ -6,6 +13,8 @@ import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { ObjectElement } from '../ObjectElement';
 import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
 import { createAddPropertyModal } from './AddPropertyModal';
+import { createMenu, MenuItem } from '../../jsonform/ContextMenu';
+import { augmentProposal } from '../../jsonform/augmentProposal';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';
@@ -51,6 +60,7 @@ export class CarbonObjectElement extends ObjectElement {
     section.setTitle(name);
     section.setAttribute(CarbonObjectElement.ATTR_PROP_NAME, name);
     section.setContent(elem);
+    section.setMenuItems(() => this.createMenuItems(section));
     this.sectionElem.appendSection(section);
   }
 
@@ -90,8 +100,106 @@ export class CarbonObjectElement extends ObjectElement {
     this.createAndAppendNewSection(name, elem);
   }
 
-  //   appendPropertyClicked(): void {
-  //   }
+  private setSectionContent(
+    section: CarbonCollapsibleSection,
+    value: JsonValue,
+  ): void {
+    const { parentJsonElement } = this;
+    const form = parentJsonElement.parentForm;
+    const thisPath = parentJsonElement.path;
+    const itemPath = thisPath.append(
+      CarbonObjectElement.getPropertyName(section),
+    );
+    const newRoot = setValueAt(form.toValue(), itemPath, value);
+    validateAndComputeMetadata(
+      form.getSchemaService(),
+      form.getSchema(),
+      newRoot,
+    )
+      .then((metadata) => {
+        if (metadata) {
+          const e = JsonElement.newInstance(
+            form.getRenderer(),
+            value,
+            metadata,
+            itemPath,
+          );
+          section.setContent(e);
+          form.onChange();
+        } else {
+          console.warn('no metadata returned');
+        }
+      })
+      .catch((err) =>
+        console.error('error while setting section content', err),
+      );
+  }
+
+  private static getPropertyName(section: CarbonCollapsibleSection): string {
+    const propertyName = section.getAttribute(
+      CarbonObjectElement.ATTR_PROP_NAME,
+    );
+    if (!propertyName) {
+      throw new Error('property name not found on section');
+    }
+    return propertyName;
+  }
+
+  private addItemOrElementAt(section: CarbonCollapsibleSection): void {
+    section.getContent()?.addPropertyOrElement();
+  }
+
+  private createMenuItems(
+    section: CarbonCollapsibleSection,
+  ): Promise<MenuItem[]> {
+    const parent = this.parentJsonElement;
+    const form = parent.parentForm;
+    const schema = form.getSchema();
+    const path = this.parentJsonElement.path;
+    return createMenu(
+      form.getSchemaService(),
+      schema,
+      form.toValue(),
+      path.append(CarbonObjectElement.getPropertyName(section)),
+      form.strictMode,
+      {
+        delete: () => {
+          this.sectionElem.delete(section);
+          this.parentJsonElement.parentForm.onChange();
+        },
+        add: () => {
+          this.addItemOrElementAt(section);
+        },
+        moveUp: () => {
+          if (this.sectionElem.moveUp(section)) {
+            this.parentJsonElement.parentForm.onChange();
+          }
+        },
+        moveDown: () => {
+          if (this.sectionElem.moveDown(section)) {
+            this.parentJsonElement.parentForm.onChange();
+          }
+        },
+        changeType: (value: JsonValue) => {
+          this.setSectionContent(section, value);
+          this.parentJsonElement.parentForm.onChange();
+        },
+        proposal: (path, proposal, proposalIndex) => {
+          augmentProposal(
+            form.getSchemaService(),
+            schema,
+            form.toValue(),
+            path,
+            proposal,
+            proposalIndex,
+          ).then((proposal) => {
+            this.setSectionContent(section, proposal);
+            this.parentJsonElement.parentForm.onChange();
+          });
+        },
+      },
+    );
+  }
 }
 
 customElements.define(CarbonObjectElement.TAG_NAME, CarbonObjectElement);
