@@ -12,7 +12,6 @@ export class CarbonSectionBasedElement extends HTMLElement {
     <div className="json-section-empty"></div>
   );
 
-  private _onChange: () => void = () => {};
   private _emptyMessage: string = '';
 
   constructor() {
@@ -24,10 +23,6 @@ export class CarbonSectionBasedElement extends HTMLElement {
       CarbonSectionBasedElement.TAG_NAME,
     ) as CarbonSectionBasedElement;
     return e;
-  }
-
-  set onChange(f: () => void) {
-    this._onChange = f;
   }
 
   set emptyMessage(msg: string) {
@@ -45,7 +40,7 @@ export class CarbonSectionBasedElement extends HTMLElement {
     this.elemsContainer.remove();
   }
 
-  private updateEmptyNode() {
+  updateEmptyNode() {
     this.emptyNodeContainer.innerText = this._emptyMessage;
     this.emptyNodeContainer.style.display =
       this.findSections().length === 0 ? 'block' : 'none';
@@ -68,23 +63,20 @@ export class CarbonSectionBasedElement extends HTMLElement {
     });
   }
 
-  protected delete(section: CarbonCollapsibleSection) {
+  delete(section: CarbonCollapsibleSection) {
     section.remove();
     this.updateEmptyNode();
-    this._onChange();
   }
 
-  protected moveUp(section: CarbonCollapsibleSection): boolean {
+  moveUp(section: CarbonCollapsibleSection): boolean {
     if (moveElementUp(section)) {
-      this._onChange();
       return true;
     }
     return false;
   }
 
-  protected moveDown(section: CarbonCollapsibleSection): boolean {
+  moveDown(section: CarbonCollapsibleSection): boolean {
     if (moveElementDown(section)) {
-      this._onChange();
       return true;
     }
     return false;
