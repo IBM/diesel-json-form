@@ -7,13 +7,14 @@ import {
   JvArray,
 } from '@diesel-parser/json-form';
 import { ArrayElement } from '../ArrayElement';
-import { getRendererKey, Renderer } from '../Renderer';
+import { Renderer } from '../Renderer';
 import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
 import { createMenu, MenuItem } from '../../jsonform/ContextMenu';
 import { RenderedElement } from '../RenderedElement';
 import { augmentProposal } from '../../jsonform/augmentProposal';
+import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
 
 export class CarbonArrayElement extends ArrayElement {
   static TAG_NAME = 'json-array';
@@ -54,9 +55,7 @@ export class CarbonArrayElement extends ArrayElement {
     index: number,
   ) {
     const itemPath = path.append(index);
-    const key = getRendererKey(item.tag, metadata, itemPath);
     const e = renderer.render({
-      key,
       metadata,
       value: item,
       path: itemPath,
@@ -81,18 +80,9 @@ export class CarbonArrayElement extends ArrayElement {
     this.sectionElem.findSections().forEach((section, index) => {
       const elem = section.getContent()!;
       const itemPath = path.append(index);
-      const newKey = getRendererKey(elem.getType(), metadata, itemPath);
-      if (!elem.rendererKey!.equals(newKey)) {
-        const value = elem.toValue();
-        const newElem = renderer.render({
-          key: newKey,
-          value,
-          metadata,
-          path: itemPath,
-        });
-        section.setContent(newElem);
-      } else {
-        elem.setMetadata(metadata, itemPath, renderer);
+      const e = renderNewOrSetMetadata(elem, metadata, itemPath, renderer);
+      if (e) {
+        section.setContent(e);
       }
     });
     const pathStr = path.format();
@@ -135,9 +125,7 @@ export class CarbonArrayElement extends ArrayElement {
       )
         .then((metadata) => {
           if (metadata) {
-            const key = getRendererKey(value.tag, metadata, itemPath);
             const e = form.getRenderer().render({
-              key,
               metadata,
               value,
               path: itemPath,

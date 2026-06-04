@@ -72,7 +72,8 @@ const initialSchema = `{
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "const": "John"
         },
         "amount": {
           "type": "number",
@@ -86,9 +87,17 @@ const initialSchema = `{
     }
   }
 }`;
+
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `{}`;
+const initialValue = `{
+  "customer": {
+    "firstName": "",
+    "lastName": "",
+    "amount": 0,
+    "age": 0
+  }
+}`;
 const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;

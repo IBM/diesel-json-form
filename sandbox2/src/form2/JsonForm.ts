@@ -9,12 +9,13 @@ import {
   defaultSchemaService,
 } from '@diesel-parser/json-form';
 import { just, map2, nothing } from 'tea-cup-fp';
-import { getRendererKey, Renderer } from './Renderer';
+import { Renderer } from './Renderer';
 import { FormHeaderElement } from './carbon/FormHeaderElement';
 import { findParent } from './findParent';
 import { RenderedElement } from './RenderedElement';
 import { ArrayElement } from './ArrayElement';
 import { ObjectElement } from './ObjectElement';
+import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata';
 
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
@@ -24,7 +25,7 @@ export class JsonForm extends HTMLElement {
   private VALIDATION_COUNTER = 0;
   private schemaService: SchemaService = defaultSchemaService;
   private schema: JsonValue = jvObject();
-  private renderer?: Renderer;
+  private renderer: Renderer = new Renderer();
 
   constructor() {
     super();
@@ -49,19 +50,19 @@ export class JsonForm extends HTMLElement {
     this.renderer = renderer;
     if (this.element) {
       this.element.remove();
+      delete this.element;
     }
     this.schema = schema;
     this.schemaService = schemaService;
     this.doValidate(value)
       .then((metadata) => {
         if (metadata) {
-          const key = getRendererKey(value.tag, metadata, JsPath.empty);
           const e = renderer.render({
-            key,
             metadata,
             value,
             path: JsPath.empty,
           });
+          this.element = e;
           this.appendChild(e);
         }
       })
@@ -84,6 +85,7 @@ export class JsonForm extends HTMLElement {
         // setTimeout(() => {
         validateAndComputeMetadata(this.schemaService, this.schema, value)
           .then((metadata) => {
+            console.log('validated', metadata);
             if (validationCounter === this.VALIDATION_COUNTER) {
               console.log(
                 'validate',
@@ -112,23 +114,16 @@ export class JsonForm extends HTMLElement {
       this.doValidate(value)
         .then((metadata) => {
           if (metadata && this.element && this.renderer) {
-            const newKey = getRendererKey(
-              this.element.getType(),
+            const e = renderNewOrSetMetadata(
+              this.element,
               metadata,
               JsPath.empty,
+              this.renderer,
             );
-            if (!newKey.equals(this.element.rendererKey!)) {
-              const value = this.toValue();
-              this.element?.remove();
-              this.element = this.renderer.render({
-                key: newKey,
-                value,
-                metadata,
-                path: JsPath.empty,
-              });
+            if (e) {
+              this.element.remove();
+              this.element = e;
               this.appendChild(this.element);
-            } else {
-              this.element?.setMetadata(metadata, JsPath.empty, this.renderer);
             }
           }
         })

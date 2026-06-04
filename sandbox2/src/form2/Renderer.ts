@@ -21,7 +21,6 @@ import { CarbonStringElemCombo } from './carbon/CarbonStringElemCombo';
 import { RenderedElement } from './RenderedElement';
 
 export interface RenderArgs {
-  readonly key: RendererKey;
   readonly value: JsonValue;
   readonly metadata: Metadata;
   readonly path: JsPath;
@@ -118,32 +117,36 @@ export class Renderer {
   }
 
   render(args: RenderArgs): RenderedElement<JsonValue> {
-    const e = this.create(args);
-    e.rendererKey = args.key;
+    const key = getRendererKey(args.value.tag, args.metadata, args.path);
+    const e = this.create(key, args);
     e.path = JsPath.empty;
+    e.rendererKey = key;
     e.initialize(args.value, args.metadata, JsPath.empty, this);
     return e;
   }
 
-  private create(args: RenderArgs): RenderedElement<JsonValue> {
-    if (args.key instanceof CustomRendererKey) {
-      const f = this.customRenderers.get(args.key.customKey.key);
+  private create(
+    key: RendererKey,
+    args: RenderArgs,
+  ): RenderedElement<JsonValue> {
+    if (key instanceof CustomRendererKey) {
+      const f = this.customRenderers.get(key.customKey.key);
       if (f) {
-        return this.createCustom(args.key, args, f);
+        return this.createCustom(key, args, f);
       } else {
-        console.warn('custom renderer not found : ' + args.key.customKey.key);
+        console.warn('custom renderer not found : ' + key.customKey.key);
         return this.createDefault(args);
       }
-    } else if (args.key instanceof StringRendererKey) {
+    } else if (key instanceof StringRendererKey) {
       if (args.value.tag === 'jv-string') {
         return this.createString(args.value.value, args);
       } else {
-        throw "key and type don't match " + args.key + ', ' + args.value.tag;
+        throw "key and type don't match " + key + ', ' + args.value.tag;
       }
-    } else if (args.key instanceof DefaultRendererKey) {
+    } else if (key instanceof DefaultRendererKey) {
       return this.createDefault(args);
     }
-    throw 'Unhandled key ' + args.key;
+    throw 'Unhandled key ' + key;
   }
 }
 

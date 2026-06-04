@@ -7,7 +7,7 @@ import {
   validateAndComputeMetadata,
   JvObject,
 } from '@diesel-parser/json-form';
-import { getRendererKey, Renderer } from '../Renderer';
+import { Renderer } from '../Renderer';
 import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { ObjectElement } from '../ObjectElement';
@@ -17,6 +17,7 @@ import { createMenu, MenuItem } from '../../jsonform/ContextMenu';
 import { augmentProposal } from '../../jsonform/augmentProposal';
 import { RenderedElement } from '../RenderedElement';
 import { ArrayElement } from '../ArrayElement';
+import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';
@@ -46,11 +47,9 @@ export class CarbonObjectElement extends ObjectElement {
     renderer: Renderer,
   ): void {
     value.properties.forEach((prop) => {
-      const rendererKey = getRendererKey(value.tag, metadata, path);
       const propPath = path.append(prop.name);
       const e = renderer.render({
-        key: rendererKey,
-        value,
+        value: prop.value,
         metadata,
         path: propPath,
       });
@@ -84,8 +83,16 @@ export class CarbonObjectElement extends ObjectElement {
   }
 
   setMetadata(metadata: Metadata, path: JsPath, renderer: Renderer): void {
-    this.getProperties().forEach(([name, elem]) => {
-      elem.setMetadata(metadata, path.append(name), renderer);
+    this.sectionElem.findSections().forEach((section) => {
+      const propertyName = section.getAttribute(
+        CarbonObjectElement.ATTR_PROP_NAME,
+      )!;
+      const elem = section.getContent()!;
+      const propPath = path.append(propertyName);
+      const e = renderNewOrSetMetadata(elem, metadata, propPath, renderer);
+      if (e) {
+        section.setContent(e);
+      }
     });
     const pathStr = path.format();
     const errors = metadata.errors.get(pathStr);
@@ -127,9 +134,7 @@ export class CarbonObjectElement extends ObjectElement {
     )
       .then((metadata) => {
         if (metadata) {
-          const key = getRendererKey(value.tag, metadata, itemPath);
           const e = form.getRenderer().render({
-            key,
             metadata,
             value,
             path: itemPath,
