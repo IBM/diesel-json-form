@@ -119,9 +119,9 @@ export class Renderer {
   render(args: RenderArgs): RenderedElement<JsonValue> {
     const key = getRendererKey(args.value.tag, args.metadata, args.path);
     const e = this.create(key, args);
-    e.path = JsPath.empty;
+    e.path = args.path;
     e.rendererKey = key;
-    e.initialize(args.value, args.metadata, JsPath.empty, this);
+    e.initialize(args.value, args.metadata, args.path, this);
     return e;
   }
 
