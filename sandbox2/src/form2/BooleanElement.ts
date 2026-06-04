@@ -1,7 +1,12 @@
-import { JsPath, Metadata } from '@diesel-parser/json-form';
+import { jvBool, JvBoolean } from '@diesel-parser/json-form';
 import { RenderedElement } from './RenderedElement';
 
-export abstract class BooleanElement extends RenderedElement {
-  abstract initialize(value: boolean, metadata: Metadata, path: JsPath): void;
+export abstract class BooleanElement extends RenderedElement<JvBoolean> {
+  getType(): 'jv-boolean' {
+    return 'jv-boolean';
+  }
+  toValue(): JvBoolean {
+    return jvBool(this.getBooleanValue());
+  }
   abstract getBooleanValue(): boolean;
 }

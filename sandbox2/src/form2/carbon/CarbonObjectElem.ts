@@ -5,9 +5,9 @@ import {
   JsonValue,
   setValueAt,
   validateAndComputeMetadata,
+  JvObject,
 } from '@diesel-parser/json-form';
-import { JsonElement } from '../JsonElement';
-import { Renderer } from '../Renderer';
+import { getRendererKey, Renderer } from '../Renderer';
 import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { ObjectElement } from '../ObjectElement';
@@ -15,6 +15,8 @@ import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
 import { createAddPropertyModal } from './AddPropertyModal';
 import { createMenu, MenuItem } from '../../jsonform/ContextMenu';
 import { augmentProposal } from '../../jsonform/augmentProposal';
+import { RenderedElement } from '../RenderedElement';
+import { ArrayElement } from '../ArrayElement';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';
@@ -38,24 +40,29 @@ export class CarbonObjectElement extends ObjectElement {
   }
 
   initialize(
-    renderer: Renderer,
-    properties: readonly JsonProperty[],
+    value: JvObject,
     metadata: Metadata,
     path: JsPath,
+    renderer: Renderer,
   ): void {
-    properties.forEach((prop) => {
-      const e = JsonElement.newInstance(
-        renderer,
-        prop.value,
+    value.properties.forEach((prop) => {
+      const rendererKey = getRendererKey(value.tag, metadata, path);
+      const propPath = path.append(prop.name);
+      const e = renderer.render({
+        key: rendererKey,
+        value,
         metadata,
-        path.append(prop.name),
-      );
+        path: propPath,
+      });
       this.createAndAppendNewSection(prop.name, e);
     });
     this.setMetadata(metadata, path, renderer);
   }
 
-  private createAndAppendNewSection(name: string, elem: JsonElement) {
+  private createAndAppendNewSection(
+    name: string,
+    elem: RenderedElement<JsonValue>,
+  ) {
     const section = CarbonCollapsibleSection.newInstance();
     section.setTitle(name);
     section.setAttribute(CarbonObjectElement.ATTR_PROP_NAME, name);
@@ -64,7 +71,7 @@ export class CarbonObjectElement extends ObjectElement {
     this.sectionElem.appendSection(section);
   }
 
-  getProperties(): [string, JsonElement][] {
+  getProperties(): [string, RenderedElement<JsonValue>][] {
     return this.sectionElem.findSections().flatMap((s) => {
       const name = s.getAttribute(CarbonObjectElement.ATTR_PROP_NAME);
       const content = s.getContent();
@@ -96,7 +103,10 @@ export class CarbonObjectElement extends ObjectElement {
     });
   }
 
-  protected appendProperty(name: string, elem: JsonElement): void {
+  protected appendProperty(
+    name: string,
+    elem: RenderedElement<JsonValue>,
+  ): void {
     this.createAndAppendNewSection(name, elem);
   }
 
@@ -104,9 +114,8 @@ export class CarbonObjectElement extends ObjectElement {
     section: CarbonCollapsibleSection,
     value: JsonValue,
   ): void {
-    const { parentJsonElement } = this;
-    const form = parentJsonElement.parentForm;
-    const thisPath = parentJsonElement.path;
+    const form = this.parentForm;
+    const thisPath = this.path;
     const itemPath = thisPath.append(
       CarbonObjectElement.getPropertyName(section),
     );
@@ -118,12 +127,13 @@ export class CarbonObjectElement extends ObjectElement {
     )
       .then((metadata) => {
         if (metadata) {
-          const e = JsonElement.newInstance(
-            form.getRenderer(),
-            value,
+          const key = getRendererKey(value.tag, metadata, itemPath);
+          const e = form.getRenderer().render({
+            key,
             metadata,
-            itemPath,
-          );
+            value,
+            path: itemPath,
+          });
           section.setContent(e);
           form.onChange();
         } else {
@@ -146,16 +156,20 @@ export class CarbonObjectElement extends ObjectElement {
   }
 
   private addItemOrElementAt(section: CarbonCollapsibleSection): void {
-    section.getContent()?.addPropertyOrElement();
+    const e = section.getContent();
+    if (e instanceof ArrayElement) {
+      e.appendItem();
+    } else if (e instanceof ObjectElement) {
+      e.appendPropertyWithDialog();
+    }
   }
 
   private createMenuItems(
     section: CarbonCollapsibleSection,
   ): Promise<MenuItem[]> {
-    const parent = this.parentJsonElement;
-    const form = parent.parentForm;
+    const form = this.parentForm;
     const schema = form.getSchema();
-    const path = this.parentJsonElement.path;
+    const path = this.path;
     return createMenu(
       form.getSchemaService(),
       schema,
@@ -165,24 +179,24 @@ export class CarbonObjectElement extends ObjectElement {
       {
         delete: () => {
           this.sectionElem.delete(section);
-          this.parentJsonElement.parentForm.onChange();
+          form.onChange();
         },
         add: () => {
           this.addItemOrElementAt(section);
         },
         moveUp: () => {
           if (this.sectionElem.moveUp(section)) {
-            this.parentJsonElement.parentForm.onChange();
+            form.onChange();
           }
         },
         moveDown: () => {
           if (this.sectionElem.moveDown(section)) {
-            this.parentJsonElement.parentForm.onChange();
+            form.onChange();
           }
         },
         changeType: (value: JsonValue) => {
           this.setSectionContent(section, value);
-          this.parentJsonElement.parentForm.onChange();
+          form.onChange();
         },
         proposal: (path, proposal, proposalIndex) => {
           augmentProposal(
@@ -194,7 +208,7 @@ export class CarbonObjectElement extends ObjectElement {
             proposalIndex,
           ).then((proposal) => {
             this.setSectionContent(section, proposal);
-            this.parentJsonElement.parentForm.onChange();
+            form.onChange();
           });
         },
       },

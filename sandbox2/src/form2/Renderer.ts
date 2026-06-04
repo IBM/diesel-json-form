@@ -13,11 +13,6 @@ import { CarbonBooleanElement } from './carbon/CarbonBooleanElem';
 import { CarbonNumberElement } from './carbon/CarbonNumberElem';
 import { CarbonArrayElement } from './carbon/CarbonArrayElem';
 import { CarbonObjectElement } from './carbon/CarbonObjectElem';
-import { ArrayElement } from './ArrayElement';
-import { BooleanElement } from './BooleanElement';
-import { NullElement } from './NullElement';
-import { NumberElement } from './NumberElement';
-import { ObjectElement } from './ObjectElement';
 import { StringElement } from './StringElement';
 import { CarbonStringElemDate } from './carbon/CarbonStringElemDate';
 import { CarbonStringElemTime } from './carbon/CarbonStringElemTime';
@@ -32,7 +27,7 @@ export interface RenderArgs {
   readonly path: JsPath;
 }
 
-type CustomRendererCtor = (s: SchemaRenderer) => RenderedElement;
+type CustomRendererCtor = (s: SchemaRenderer) => RenderedElement<JsonValue>;
 
 type FormatCtor = () => StringElement;
 
@@ -49,42 +44,30 @@ export class Renderer {
 
   addCustomRenderer(
     customKey: string,
-    f: (s: SchemaRenderer) => RenderedElement,
+    f: (s: SchemaRenderer) => RenderedElement<JsonValue>,
   ) {
     this.customRenderers.set(customKey, f);
   }
 
-  private renderCustom(
+  private createCustom(
     key: CustomRendererKey,
     args: RenderArgs,
     f: CustomRendererCtor,
-  ): RenderedElement {
+  ): RenderedElement<JsonValue> {
     const e = f(key.customKey);
-    if (e instanceof ArrayElement && args.value.tag === 'jv-array') {
-      e.initialize(this, args.value.elems, args.metadata, args.path);
-    } else if (e instanceof BooleanElement && args.value.tag === 'jv-boolean') {
-      e.initialize(args.value.value, args.metadata, args.path);
-    } else if (e instanceof NullElement && args.value.tag === 'jv-null') {
-      e.initialize(args.metadata, args.path);
-    } else if (e instanceof NumberElement && args.value.tag === 'jv-number') {
-      e.initialize(args.value.value, args.metadata, args.path);
-    } else if (e instanceof ObjectElement && args.value.tag === 'jv-object') {
-      e.initialize(this, args.value.properties, args.metadata, args.path);
-    } else if (e instanceof StringElement && args.value.tag === 'jv-string') {
-      e.initialize(args.value.value, args.metadata, args.path);
-    }
     return e;
   }
 
-  private renderString(value: string, args: RenderArgs): RenderedElement {
+  private createString(
+    value: string,
+    args: RenderArgs,
+  ): RenderedElement<JsonValue> {
     const { path, metadata } = args;
     const pathStr = path.format();
 
     const combos = metadata.comboBoxes.get(pathStr);
     if (combos && combos.length > 0) {
-      const e = new CarbonStringElemCombo();
-      e.initialize(value, metadata, path);
-      return e;
+      return new CarbonStringElemCombo();
     }
 
     const formats = metadata.formats.get(pathStr);
@@ -92,78 +75,73 @@ export class Renderer {
       const fmt = formats[0];
       const ctor = this.formatRenderers.get(fmt);
       if (ctor) {
-        const e = ctor();
-        e.initialize(value, metadata, path);
-        return e;
+        return ctor();
       }
     }
 
-    const e = document.createElement(
+    return document.createElement(
       CarbonStringElemBasic.TAG_NAME,
     ) as CarbonStringElemBasic;
-    e.initialize(value, metadata, path);
+  }
+
+  private createDefault(args: RenderArgs): RenderedElement<JsonValue> {
+    switch (args.value.tag) {
+      case 'jv-null': {
+        return document.createElement(
+          CarbonNullElement.TAG_NAME,
+        ) as CarbonNullElement;
+      }
+      case 'jv-string': {
+        return this.createString(args.value.value, args);
+      }
+      case 'jv-boolean': {
+        return document.createElement(
+          CarbonBooleanElement.TAG_NAME,
+        ) as CarbonBooleanElement;
+      }
+      case 'jv-number': {
+        return document.createElement(
+          CarbonNumberElement.TAG_NAME,
+        ) as CarbonNumberElement;
+      }
+      case 'jv-array': {
+        return document.createElement(
+          CarbonArrayElement.TAG_NAME,
+        ) as CarbonArrayElement;
+      }
+      case 'jv-object': {
+        return document.createElement(
+          CarbonObjectElement.TAG_NAME,
+        ) as CarbonObjectElement;
+      }
+    }
+  }
+
+  render(args: RenderArgs): RenderedElement<JsonValue> {
+    const e = this.create(args);
+    e.rendererKey = args.key;
+    e.path = JsPath.empty;
+    e.initialize(args.value, args.metadata, JsPath.empty, this);
     return e;
   }
 
-  private renderDefault(args: RenderArgs): RenderedElement {
-    switch (args.value.tag) {
-      case 'jv-null': {
-        const e = document.createElement(
-          CarbonNullElement.TAG_NAME,
-        ) as CarbonNullElement;
-        return e;
-      }
-      case 'jv-string': {
-        return this.renderString(args.value.value, args);
-      }
-      case 'jv-boolean': {
-        const e = document.createElement(
-          CarbonBooleanElement.TAG_NAME,
-        ) as CarbonBooleanElement;
-        e.initialize(args.value.value, args.metadata, args.path);
-        return e;
-      }
-      case 'jv-number': {
-        const e = document.createElement(
-          CarbonNumberElement.TAG_NAME,
-        ) as CarbonNumberElement;
-        e.initialize(args.value.value, args.metadata, args.path);
-        return e;
-      }
-      case 'jv-array': {
-        const e = document.createElement(
-          CarbonArrayElement.TAG_NAME,
-        ) as CarbonArrayElement;
-        e.initialize(this, args.value.elems, args.metadata, args.path);
-        return e;
-      }
-      case 'jv-object': {
-        const e = document.createElement(
-          CarbonObjectElement.TAG_NAME,
-        ) as CarbonObjectElement;
-        e.initialize(this, args.value.properties, args.metadata, args.path);
-        return e;
-      }
-    }
-  }
-
-  render(args: RenderArgs): RenderedElement {
+  private create(args: RenderArgs): RenderedElement<JsonValue> {
     if (args.key instanceof CustomRendererKey) {
       const f = this.customRenderers.get(args.key.customKey.key);
       if (f) {
-        return this.renderCustom(args.key, args, f);
+        return this.createCustom(args.key, args, f);
       } else {
         console.warn('custom renderer not found : ' + args.key.customKey.key);
-        return this.renderDefault(args);
+        return this.createDefault(args);
       }
     } else if (args.key instanceof StringRendererKey) {
       if (args.value.tag === 'jv-string') {
-        return this.renderString(args.value.value, args);
+        return this.createString(args.value.value, args);
       } else {
         throw "key and type don't match " + args.key + ', ' + args.value.tag;
       }
     } else if (args.key instanceof DefaultRendererKey) {
-      return this.renderDefault(args);
+      return this.createDefault(args);
     }
     throw 'Unhandled key ' + args.key;
   }

@@ -1,4 +1,4 @@
-import { JsPath, Metadata } from '@diesel-parser/json-form';
+import { JsPath, JvString, Metadata } from '@diesel-parser/json-form';
 import { StringElement } from '../StringElement';
 import { MyDatePicker } from './MyDatePicker';
 import { MyTimePicker } from './MyTimePicker';
@@ -33,8 +33,8 @@ export class CarbonStringElemDateTime extends StringElement {
     this.wrapper.remove();
   }
 
-  initialize(value: string, metadata: Metadata, path: JsPath): void {
-    const dt = new MyDateTime(value);
+  initialize(value: JvString, metadata: Metadata, path: JsPath): void {
+    const dt = new MyDateTime(value.value);
     this.datePicker.setValue(dt.date);
     this.timePicker.setValue(dt.time.fullTime);
     this.datePicker.setOnChange(() => {

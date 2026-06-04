@@ -1,4 +1,4 @@
-import { JsPath, Metadata } from '@diesel-parser/json-form';
+import { JsPath, JvBoolean, Metadata } from '@diesel-parser/json-form';
 import { CDSCheckbox } from '@carbon/web-components';
 import '@carbon/web-components/es/components/checkbox/checkbox';
 import { BooleanElement } from '../BooleanElement';
@@ -29,8 +29,8 @@ export class CarbonBooleanElement extends BooleanElement {
     setErrors(errors, true, this.input);
   }
 
-  initialize(value: boolean, metadata: Metadata, path: JsPath): void {
-    this.input.checked = value;
+  initialize(value: JvBoolean, metadata: Metadata, path: JsPath): void {
+    this.input.checked = value.value;
     this.setMetadata(metadata, path);
     this.input.addEventListener('input', () => {
       JsonForm.getEnclosingForm(this).onChange();

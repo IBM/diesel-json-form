@@ -1,6 +1,7 @@
 import {
   isValidNumberLiteral,
   JsPath,
+  JvNumber,
   Metadata,
 } from '@diesel-parser/json-form';
 import { CDSTextInput } from '@carbon/web-components';
@@ -16,7 +17,6 @@ export class CarbonNumberElement extends NumberElement {
 
   private input: CDSTextInput;
   private readonly debouncer = new Debouncer();
-  private path?: JsPath;
 
   constructor() {
     super();
@@ -31,8 +31,8 @@ export class CarbonNumberElement extends NumberElement {
     this.input.remove();
   }
 
-  initialize(value: string, metadata: Metadata, path: JsPath): void {
-    this.input.value = value;
+  initialize(value: JvNumber, metadata: Metadata, path: JsPath): void {
+    this.input.value = value.value;
     this.input.addEventListener('input', () => {
       if (!isValidNumberLiteral(this.input.value)) {
         if (this.path) {
@@ -58,7 +58,6 @@ export class CarbonNumberElement extends NumberElement {
   setMetadata(metadata: Metadata, path: JsPath): void {
     const p = path.format();
     const errors = metadata.errors.get(p);
-    this.path = path;
     setErrors(errors, true, this.input);
   }
 

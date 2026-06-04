@@ -1,8 +1,8 @@
 import { h } from '../../jsonform/MyJSXFactory';
-import { JsonElement } from '../JsonElement';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { moveElementDown, moveElementUp } from '../../jsonform/HtmlBuilder';
-import { ValidationError } from '@diesel-parser/json-form';
+import { JsonValue, ValidationError } from '@diesel-parser/json-form';
+import { RenderedElement } from '../RenderedElement';
 
 export class CarbonSectionBasedElement extends HTMLElement {
   static TAG_NAME = 'section-based-elem';
@@ -71,7 +71,7 @@ export class CarbonSectionBasedElement extends HTMLElement {
     return rows;
   }
 
-  findElems(): readonly JsonElement[] {
+  findElems(): readonly RenderedElement<JsonValue>[] {
     return this.findSections().flatMap((s) => {
       const content = s.getContent();
       return content === undefined ? [] : [content];

@@ -5,7 +5,8 @@ import { MenuItem, openMenu } from '../../jsonform/ContextMenu';
 import { empty } from '../../jsonform/HtmlBuilder';
 import { IconElement } from '../../jsonform/IconElement';
 import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
-import { JsonElement } from '../JsonElement';
+import { JsonValue } from '@diesel-parser/json-form';
+import { RenderedElement } from '../RenderedElement';
 
 export class CarbonCollapsibleSection extends HTMLElement {
   static TAG_NAME = 'collapsible-section';
@@ -14,7 +15,7 @@ export class CarbonCollapsibleSection extends HTMLElement {
   private contentContainer: HTMLElement;
   private labelElement: HTMLElement;
   private menuButton: CDSButton;
-  private content?: JsonElement;
+  private content?: RenderedElement<JsonValue>;
   private menu?: () => Promise<MenuItem[]>;
 
   private static TRIGGER_COUNT = 0;
@@ -107,13 +108,13 @@ export class CarbonCollapsibleSection extends HTMLElement {
     }
   }
 
-  setContent(element: JsonElement) {
+  setContent(element: RenderedElement<JsonValue>) {
     empty(this.contentContainer);
     this.contentContainer.appendChild(element);
     this.content = element;
   }
 
-  getContent(): JsonElement | undefined {
+  getContent(): RenderedElement<JsonValue> | undefined {
     return this.content;
   }
 

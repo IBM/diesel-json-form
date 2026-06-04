@@ -1,7 +1,13 @@
-import { JsPath, Metadata } from '@diesel-parser/json-form';
+import { jvNumber, JvNumber } from '@diesel-parser/json-form';
 import { RenderedElement } from './RenderedElement';
 
-export abstract class NumberElement extends RenderedElement {
-  abstract initialize(value: string, metadata: Metadata, path: JsPath): void;
+export abstract class NumberElement extends RenderedElement<JvNumber> {
+  getType(): 'jv-number' {
+    return 'jv-number';
+  }
+  toValue(): JvNumber {
+    return jvNumber(this.getNumValue());
+  }
+
   abstract getNumValue(): string;
 }

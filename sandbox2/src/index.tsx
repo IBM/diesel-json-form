@@ -18,6 +18,7 @@ import './style.scss';
 import { samples } from './initdata';
 import {
   defaultSchemaService,
+  JvNumber,
   parseJsonValue,
   parseJsonValueUnsafe,
   stringify,
@@ -32,6 +33,8 @@ import { h } from './jsonform/MyJSXFactory';
 import { NumberElement } from './form2/NumberElement';
 
 const jsonForm = document.getElementById('my-form') as JsonForm;
+
+console.log(JsonForm.TAG_NAME);
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
@@ -147,18 +150,17 @@ class RatingRenderer extends NumberElement {
     this.radio.remove();
   }
 
-  initialize(value: string): void {
-    this.radio.value = value;
-    this.radio.addEventListener('cds-radio-button-changed', () => {
-      // this.parentJsonElement.parentForm.onChange();
-      // TODO commenting this wrecks the app !
-      JsonForm.getEnclosingForm(this).onChange();
-    });
-    // this.setMetadata();
-  }
   getNumValue(): string {
     return this.radio.value;
   }
+
+  initialize(value: JvNumber): void {
+    this.radio.value = value;
+    this.radio.addEventListener('cds-radio-button-changed', () => {
+      this.parentForm.onChange();
+    });
+  }
+
   setMetadata(): void {
     console.log('TODO errors rating renderer');
   }

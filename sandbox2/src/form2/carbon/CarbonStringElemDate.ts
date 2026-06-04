@@ -1,4 +1,4 @@
-import { JsPath, Metadata } from '@diesel-parser/json-form';
+import { JsPath, JvString, Metadata } from '@diesel-parser/json-form';
 import { StringElement } from '../StringElement';
 import { MyDatePicker } from './MyDatePicker';
 import { JsonForm } from '../JsonForm';
@@ -22,8 +22,8 @@ export class CarbonStringElemDate extends StringElement {
     this.myPicker.remove();
   }
 
-  initialize(value: string, metadata: Metadata, path: JsPath): void {
-    this.myPicker.setValue(value);
+  initialize(value: JvString, metadata: Metadata, path: JsPath): void {
+    this.myPicker.setValue(value.value);
     this.myPicker.setOnChange((value) => {
       this.stringValue = value;
       JsonForm.getEnclosingForm(this).onChange();

@@ -1,4 +1,4 @@
-import { JsPath, Metadata } from '@diesel-parser/json-form';
+import { JsPath, JvNull, Metadata } from '@diesel-parser/json-form';
 import '@carbon/web-components/es/components/text-input/index';
 import { CDSTextInput } from '@carbon/web-components';
 import { setErrors } from '../../jsonform/setErrorsOnInput';
@@ -24,9 +24,11 @@ export class CarbonNullElement extends NullElement {
     this.input.remove();
   }
 
-  initialize(metadata: Metadata, path: JsPath): void {
+  initialize(value: JvNull, metadata: Metadata, path: JsPath): void {
     this.setMetadata(metadata, path);
   }
+  //   initialize(metadata: Metadata, path: JsPath): void {
+  //   }
 
   setMetadata(metadata: Metadata, path: JsPath): void {
     const p = path.format();

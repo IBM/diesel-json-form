@@ -5,21 +5,22 @@ import {
   stringify,
   validateAndComputeMetadata,
   JsPath,
-  emptyMetadata,
   jvObject,
   defaultSchemaService,
 } from '@diesel-parser/json-form';
 import { just, map2, nothing } from 'tea-cup-fp';
-import { JsonElement } from './JsonElement';
-import { Renderer } from './Renderer';
+import { getRendererKey, Renderer } from './Renderer';
 import { FormHeaderElement } from './carbon/FormHeaderElement';
 import { findParent } from './findParent';
+import { RenderedElement } from './RenderedElement';
+import { ArrayElement } from './ArrayElement';
+import { ObjectElement } from './ObjectElement';
 
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
 
   private documentRoot: FormHeaderElement;
-  private element?: JsonElement;
+  private element?: RenderedElement<JsonValue>;
   private VALIDATION_COUNTER = 0;
   private schemaService: SchemaService = defaultSchemaService;
   private schema: JsonValue = jvObject();
@@ -53,13 +54,16 @@ export class JsonForm extends HTMLElement {
     this.schemaService = schemaService;
     this.doValidate(value)
       .then((metadata) => {
-        this.element = JsonElement.newInstance(
-          renderer,
-          value,
-          metadata ?? emptyMetadata,
-          JsPath.empty,
-        );
-        this.appendChild(this.element);
+        if (metadata) {
+          const key = getRendererKey(value.tag, metadata, JsPath.empty);
+          const e = renderer.render({
+            key,
+            metadata,
+            value,
+            path: JsPath.empty,
+          });
+          this.appendChild(e);
+        }
       })
       .catch((err) => {
         console.error('form init error ', err);
@@ -104,10 +108,28 @@ export class JsonForm extends HTMLElement {
 
   onChange(): void {
     if (this.element) {
-      this.doValidate(this.toValue())
+      const value = this.toValue();
+      this.doValidate(value)
         .then((metadata) => {
           if (metadata && this.element && this.renderer) {
-            this.element.setMetadata(metadata, JsPath.empty, this.renderer);
+            const newKey = getRendererKey(
+              this.element.getType(),
+              metadata,
+              JsPath.empty,
+            );
+            if (!newKey.equals(this.element.rendererKey!)) {
+              const value = this.toValue();
+              this.element?.remove();
+              this.element = this.renderer.render({
+                key: newKey,
+                value,
+                metadata,
+                path: JsPath.empty,
+              });
+              this.appendChild(this.element);
+            } else {
+              this.element?.setMetadata(metadata, JsPath.empty, this.renderer);
+            }
           }
         })
         .catch((err) => {
@@ -143,7 +165,11 @@ export class JsonForm extends HTMLElement {
   }
 
   addPropertyOrElement() {
-    this.element?.addPropertyOrElement();
+    if (this.element instanceof ArrayElement) {
+      this.element.appendItem();
+    } else if (this.element instanceof ObjectElement) {
+      this.element.appendPropertyWithDialog();
+    }
   }
 
   setValue(value: JsonValue): void {

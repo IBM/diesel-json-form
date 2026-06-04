@@ -1,19 +1,41 @@
-import { Metadata, JsPath } from '@diesel-parser/json-form';
-import { Renderer } from './Renderer';
-import { JsonElement } from './JsonElement';
-import { findParent } from './findParent';
-import { just, nothing } from 'tea-cup-fp';
+import { Metadata, JsPath, JsonValue } from '@diesel-parser/json-form';
+import { Renderer, RendererKey } from './Renderer';
+import { findEnclosingForm } from './findParent';
+import { JsonForm } from './JsonForm';
 
-export abstract class RenderedElement extends HTMLElement {
+export abstract class RenderedElement<T extends JsonValue> extends HTMLElement {
+  rendererKey?: RendererKey;
+
+  abstract initialize(
+    value: T,
+    metadata: Metadata,
+    path: JsPath,
+    renderer: Renderer,
+  ): void;
+
   abstract setMetadata(
     metadata: Metadata,
     path: JsPath,
     renderer: Renderer,
   ): void;
 
-  get parentJsonElement(): JsonElement {
-    return findParent(this, (e) =>
-      e instanceof JsonElement ? just(e) : nothing,
-    );
+  abstract getType(): T['tag'];
+
+  abstract toValue(): T;
+
+  get parentForm(): JsonForm {
+    return findEnclosingForm(this);
+  }
+
+  set path(p: JsPath) {
+    this.setAttribute('path', p.format());
+  }
+
+  get path(): JsPath {
+    const pathStr = this.getAttribute('path');
+    if (pathStr === null) {
+      throw new Error('path attribute not found');
+    }
+    return JsPath.parse(pathStr);
   }
 }
