@@ -63,13 +63,8 @@ export class CarbonArrayElement extends ArrayElement {
     const section = CarbonCollapsibleSection.newInstance();
     section.setTitle('#' + index);
     section.setContent(e);
+    section.setMenuItems(() => this.createMenuItems(section));
     this.sectionElem.appendSection(section);
-    section.setMenuItems(() =>
-      this.createMenuItems(
-        section,
-        this.sectionElem.findSections().indexOf(section),
-      ),
-    );
   }
 
   getElements(): readonly RenderedElement<JsonValue>[] {
@@ -95,9 +90,7 @@ export class CarbonArrayElement extends ArrayElement {
     const nbSections = this.sectionElem.findSections().length;
     section.setTitle('#' + nbSections);
     section.setContent(elem);
-    section.setMenuItems(() =>
-      this.createMenuItems(section, this.sectionElem.findSections().length),
-    );
+    section.setMenuItems(() => this.createMenuItems(section));
     this.sectionElem.appendSection(section);
     this.parentForm.onChange();
   }
@@ -144,58 +137,61 @@ export class CarbonArrayElement extends ArrayElement {
 
   private createMenuItems(
     section: CarbonCollapsibleSection,
-    rowIndex: number,
   ): Promise<MenuItem[]> {
     const form = this.parentForm;
     const schema = form.getSchema();
-    if (rowIndex !== -1) {
-      const path = this.path;
-      return createMenu(
-        form.getSchemaService(),
-        schema,
-        form.toValue(),
-        path.append(rowIndex),
-        form.strictMode,
-        {
-          delete: () => {
-            this.sectionElem.delete(section);
+    const path = this.path;
+    const rowIndex = this.sectionElem.findSections().indexOf(section);
+    return createMenu(
+      form.getSchemaService(),
+      schema,
+      form.toValue(),
+      path.append(rowIndex),
+      form.strictMode,
+      {
+        add: () => {
+          const elem = section.getContent();
+          if (elem instanceof ArrayElement) {
+            elem.appendItem();
+            form.onChange();
+          }
+        },
+        delete: () => {
+          this.sectionElem.delete(section);
+          this.refreshItemNumbers();
+          form.onChange();
+        },
+        moveUp: () => {
+          if (this.sectionElem.moveUp(section)) {
             this.refreshItemNumbers();
             form.onChange();
-          },
-          moveUp: () => {
-            if (this.sectionElem.moveUp(section)) {
-              this.refreshItemNumbers();
-              form.onChange();
-            }
-          },
-          moveDown: () => {
-            if (this.sectionElem.moveDown(section)) {
-              this.refreshItemNumbers();
-              form.onChange();
-            }
-          },
-          changeType: (value: JsonValue) => {
-            this.setSectionContent(section, value);
-            form.onChange();
-          },
-          proposal: (path, proposal, proposalIndex) => {
-            augmentProposal(
-              form.getSchemaService(),
-              schema,
-              form.toValue(),
-              path,
-              proposal,
-              proposalIndex,
-            ).then((proposal) => {
-              this.setSectionContent(section, proposal);
-              form.onChange();
-            });
-          },
+          }
         },
-      );
-    } else {
-      return Promise.resolve([]);
-    }
+        moveDown: () => {
+          if (this.sectionElem.moveDown(section)) {
+            this.refreshItemNumbers();
+            form.onChange();
+          }
+        },
+        changeType: (value: JsonValue) => {
+          this.setSectionContent(section, value);
+          form.onChange();
+        },
+        proposal: (path, proposal, proposalIndex) => {
+          augmentProposal(
+            form.getSchemaService(),
+            schema,
+            form.toValue(),
+            path,
+            proposal,
+            proposalIndex,
+          ).then((proposal) => {
+            this.setSectionContent(section, proposal);
+            form.onChange();
+          });
+        },
+      },
+    );
   }
 }
 

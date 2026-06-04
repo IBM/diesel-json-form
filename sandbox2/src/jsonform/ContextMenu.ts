@@ -194,8 +194,8 @@ export function createMenu(
 
         const res: MenuItem[] = [];
         return res
-          .concat(moveItems)
           .concat(addItems())
+          .concat(moveItems)
           .concat(changeTypes)
           .concat(proposeItems)
           .concat(deleteItems);

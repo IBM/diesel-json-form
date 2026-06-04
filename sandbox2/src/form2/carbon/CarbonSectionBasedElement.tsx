@@ -31,7 +31,7 @@ export class CarbonSectionBasedElement extends HTMLElement {
 
   connectedCallback() {
     this.appendChild(this.elemsContainer);
-    this.elemsContainer.appendChild(this.emptyNodeContainer);
+    this.appendChild(this.emptyNodeContainer);
     this.updateEmptyNode();
     this.appendChild(this.errorNode);
   }
