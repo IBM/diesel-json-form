@@ -18,9 +18,14 @@ import './style.scss';
 import { samples } from './initdata';
 import {
   defaultSchemaService,
+  getValueAt,
+  JsPath,
   JvNumber,
+  JvString,
+  Metadata,
   parseJsonValue,
   parseJsonValueUnsafe,
+  SchemaRenderer,
   stringify,
 } from '@diesel-parser/json-form';
 import '@carbon/web-components/es/components/dropdown/dropdown-item';
@@ -34,6 +39,8 @@ import { Renderer } from './form2/Renderer';
 import { h } from './jsonform/MyJSXFactory';
 import { NumberElement } from './form2/NumberElement';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
+import { StringElement } from './form2/StringElement';
+import { empty } from './jsonform/HtmlBuilder';
 
 const jsonForm = document.getElementById('my-form') as JsonForm;
 
@@ -53,20 +60,16 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 const initialSchema = `{
-  "properties": {
-    "name": {
-      "type": "string"
-    },
-    "rating": {
-      "type": "number",
-      "renderer": "RatingRenderer"
+    "type": "string",
+    "renderer": {
+        "key": "MyStringRenderer",
+        "myConfigProp": 123
     }
-  }
 }`;
 
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `{"name": "John", "rating": 2 }`;
+const initialValue = `"yalla"`;
 const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
@@ -163,11 +166,81 @@ class RatingRenderer extends NumberElement {
 
 customElements.define(RatingRenderer.TAG_NAME, RatingRenderer);
 
+class MyStringRenderer extends StringElement {
+  static TAG_NAME = 'my-string-renderer';
+
+  private value: string = '';
+  private label: HTMLDivElement = (<div className="my-value"></div>);
+  private myConfigProp?: string;
+
+  constructor() {
+    super();
+  }
+
+  static newInstance(schemaRenderer: SchemaRenderer): MyStringRenderer {
+    const r = document.createElement(
+      MyStringRenderer.TAG_NAME,
+    ) as MyStringRenderer;
+    const p = getValueAt(
+      schemaRenderer.schemaValue,
+      JsPath.parse('renderer/myConfigProp'),
+    );
+    p.forEach((v) => {
+      if (v.tag === 'jv-number') {
+        r.myConfigProp = v.value;
+      }
+    });
+    return r;
+  }
+
+  getStrValue(): string {
+    return this.value;
+  }
+
+  private buttonClicked() {
+    this.value = this.value + 'X';
+    this.label.innerText = this.value;
+    this.parentForm.onChange();
+  }
+
+  connectedCallback() {
+    this.appendChild(
+      <div className={'my-string'}>
+        {this.label}
+        <button onclick={this.buttonClicked.bind(this)}>Concat !</button>
+        <p>
+          Config prop{' '}
+          {this.myConfigProp !== undefined
+            ? 'set to ' + this.myConfigProp
+            : 'is undefined'}
+        </p>
+      </div>,
+    );
+  }
+
+  disconnectedCallback() {
+    empty(this);
+  }
+
+  initialize(value: JvString): void {
+    this.value = value.value;
+    this.label.innerText = value.value;
+  }
+
+  setMetadata(): void {
+    console.log('meta not needed for this');
+  }
+}
+
+customElements.define(MyStringRenderer.TAG_NAME, MyStringRenderer);
+
 const renderer: Renderer = new Renderer();
 
 renderer.addCustomRenderer('RatingRenderer', () => {
   return new RatingRenderer();
 });
+
+renderer.addCustomRenderer('MyStringRenderer', MyStringRenderer.newInstance);
 
 jsonForm.initialize(renderer, defaultSchemaService, schema, value);
 // jsonForm.addChangeListener((value) => {

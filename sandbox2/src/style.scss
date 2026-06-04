@@ -200,3 +200,9 @@ json-form-header {
 my-rating-renderer cds-radio-button-group {
   margin-top: 1rem;
 }
+
+my-string-renderer > div {
+  &:hover {
+    background-color: lightsalmon;
+  }
+}

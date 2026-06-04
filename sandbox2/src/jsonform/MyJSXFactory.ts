@@ -24,6 +24,8 @@ declare global {
       span: Partial<HTMLSpanElement>;
       ul: Partial<HTMLUListElement>;
       li: Partial<HTMLLIElement>;
+      button: Partial<HTMLButtonElement>;
+      p: Partial<HTMLParagraphElement>;
       'cds-button': Partial<CDSButton>;
       'cds-modal': Partial<CDSModal>;
       'cds-modal-header': Partial<CDSModalHeader>;
