@@ -25,12 +25,15 @@ import {
 } from '@diesel-parser/json-form';
 import '@carbon/web-components/es/components/dropdown/dropdown-item';
 import '@carbon/web-components/es/components/button/button';
-import '@carbon/web-components/es/components/radio-button/index';
-import { CDSComboBox } from '@carbon/web-components';
+import '@carbon/web-components/es/components/radio-button/radio-button';
+import '@carbon/web-components/es/components/radio-button/radio-button-group';
+
+import { CDSComboBox, CDSRadioButton } from '@carbon/web-components';
 import { JsonForm } from './form2/JsonForm';
 import { Renderer } from './form2/Renderer';
 import { h } from './jsonform/MyJSXFactory';
 import { NumberElement } from './form2/NumberElement';
+import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
 
 const jsonForm = document.getElementById('my-form') as JsonForm;
 
@@ -49,11 +52,21 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{}`;
+const initialSchema = `{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "renderer": "RatingRenderer"
+    }
+  }
+}`;
 
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `[1,2]`;
+const initialValue = `{"name": "John", "rating": 2 }`;
 const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
@@ -93,18 +106,30 @@ btnToForm.addEventListener('click', () => {
 class RatingRenderer extends NumberElement {
   static TAG_NAME = 'my-rating-renderer';
 
-  private radio = (<cds-radio-button-group></cds-radio-button-group>);
+  private static COUNTER = 0;
+
+  private radio: CDSRadioButton = RatingRenderer.createRadio();
+  private value?: string;
+
+  private static createRadio(): CDSRadioButton {
+    RatingRenderer.COUNTER++;
+    const name = 'json-rating-radio-' + RatingRenderer.COUNTER;
+    return (
+      <cds-radio-button-group
+        orientation={RADIO_BUTTON_ORIENTATION.HORIZONTAL}
+        name={name}
+      >
+        <cds-radio-button value={'0'} label-text={'1'}></cds-radio-button>
+        <cds-radio-button value={'1'} label-text={'2'}></cds-radio-button>
+        <cds-radio-button value={'2'} label-text={'3'}></cds-radio-button>
+        <cds-radio-button value={'3'} label-text={'4'}></cds-radio-button>
+        <cds-radio-button value={'4'} label-text={'5'}></cds-radio-button>
+      </cds-radio-button-group>
+    );
+  }
 
   constructor() {
     super();
-    for (let i = 0; i < 5; i++) {
-      this.radio.appendChild(
-        <cds-radio-button
-          value={i + ''}
-          label-text={i + ''}
-        ></cds-radio-button>,
-      );
-    }
   }
 
   connectedCallback() {
@@ -116,13 +141,18 @@ class RatingRenderer extends NumberElement {
   }
 
   getNumValue(): string {
-    return this.radio.value;
+    return this.value ?? this.radio.value;
   }
 
   initialize(value: JvNumber): void {
-    this.radio.value = value;
+    this.value = value.value;
+    this.radio.value = value.value;
     this.radio.addEventListener('cds-radio-button-changed', () => {
-      this.parentForm.onChange();
+      const newValue = this.radio.value;
+      if (newValue !== this.value) {
+        this.value = newValue;
+        this.parentForm.onChange();
+      }
     });
   }
 
