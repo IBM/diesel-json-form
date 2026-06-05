@@ -11,6 +11,7 @@ import { h } from '../../jsonform/MyJSXFactory';
 import { setErrors } from '../../jsonform/setErrorsOnInput';
 
 import '@carbon/web-components/es/components/time-picker/index';
+import { nextElementId } from './nextElementId';
 
 const allOffsets = getUtcOffsets();
 
@@ -28,6 +29,7 @@ export class MyTimePicker extends HTMLElement {
     this.timePicker = document.createElement(
       'cds-time-picker',
     ) as CDSTimePicker;
+    this.timePicker.id = nextElementId();
     this.timePicker.classList.add('time-picker');
     this.timePicker.setAttribute(
       'pattern',
@@ -46,6 +48,7 @@ export class MyTimePicker extends HTMLElement {
     this.timePickerSelect = document.createElement(
       'cds-time-picker-select',
     ) as CDSTimePickerSelect;
+    this.timePickerSelect.id = nextElementId();
     const offsetWrapper = (
       <div className="time-picker-offset-wrapper">{this.timePickerSelect}</div>
     );

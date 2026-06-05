@@ -11,44 +11,41 @@ import java.util.stream.Stream;
 
 import static com.pojosontheweb.selenium.Findrs.textEquals;
 
-public class FObject extends FJsonValue {
+public class FObject extends FRenderedElement {
 
     private final Findr fRoot;
+    private FSectionBasedElem sections;
 
-    FObject(Findr fRoot, JsPath path, Findr findr) {
-        super(path, findr.elem(By.xpath("./div[contains(@class,'jv-object')]")));
+    FObject(Findr fRoot, JsPath path, Findr form) {
+        super(path, form);
         this.fRoot = fRoot;
+        this.sections = new FSectionBasedElem($("section-based-elem"));
     }
 
     public FObject assertEmpty() {
-        getFindr()
-                .elem(By.xpath("./*[contains(@class,'empty-obj')]"))
-                .eval();
+        sections.assertEmpty("Empty object");
         return this;
     }
 
     public FObject assertError(String expectedError) {
-        getFindr()
-                .elem(By.xpath("./*[contains(@class,'form-errors')]"))
-                .where(textEquals(expectedError))
-                .eval();
+        sections.assertError(expectedError);
         return this;
     }
 
     private Findr.ListFindr findPropButtons() {
-        return getFindr()
-                .elemList(
-                        By.xpath("./div/div[contains(@class,'add-prop-row')]/button"));
+        return $$(".json-prop-buttons  cds-button");
     }
 
     public FObject assertAddPropButtons(String prop, String... rest) {
         List<String> props = Stream.concat(
                 Stream.of(prop),
-                Stream.of(rest)).collect(Collectors.toList());
+                Stream.of(rest))
+                .map(x -> "+ " + x)
+                .toList();
 
         findPropButtons()
                 .eval(elems -> {
-                    List<String> actual = elems.stream().map(WebElement::getText).collect(Collectors.toList());
+                    List<String> actual = elems.stream().map(WebElement::getText).toList();
                     return actual.equals(props);
                 });
 
@@ -56,7 +53,7 @@ public class FObject extends FJsonValue {
     }
 
     public FObject clickAddPropButton(String propName) {
-        findPropButtons().where(textEquals(propName)).expectOne().click();
+        findPropButtons().where(textEquals("+ " + propName)).expectOne().click();
         return this;
     }
 

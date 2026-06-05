@@ -6,6 +6,7 @@ import { StringElement } from '../StringElement';
 import '@carbon/web-components/es/components/combo-box/index';
 import { empty } from '../../jsonform/HtmlBuilder';
 import { JsonForm } from '../JsonForm';
+import { nextElementId } from './nextElementId';
 
 export class CarbonStringElemCombo extends StringElement {
   static TAG_NAME = 'string-elem-combo';
@@ -17,6 +18,7 @@ export class CarbonStringElemCombo extends StringElement {
     this.combo = document.createElement('cds-combo-box') as CDSComboBox;
     // this.combo.shouldFilterItem = true;
     this.combo.allowCustomValue = true;
+    this.combo.id = nextElementId();
     this.combo.inputProps = {
       autocomplete: 'off',
     };

@@ -3,8 +3,6 @@ package diesel.json;
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
 
-import static com.pojosontheweb.selenium.Findrs.attrEquals;
-
 public class FJsonForm extends AbstractPageObject {
 
     private final Findr fRoot;
@@ -14,49 +12,45 @@ public class FJsonForm extends AbstractPageObject {
         this.fRoot = findr;
     }
 
-    private Findr findValueNode(JsPath path) {
-        return $$("div.value")
-                .where(attrEquals("data-path", path.format()))
-                .expectOne();
-    }
-
     public FObject objectAt(JsPath path) {
-        return new FObject(fRoot, path, findValueNode(path));
+        return new FObject(fRoot, path, getFindr());
     }
 
     public FNumber numberAt(JsPath path) {
-        return new FNumber(path, findValueNode(path));
+        return new FNumber(path, getFindr());
     }
 
     public FString stringAt(JsPath path) {
-        return new FString(path, findValueNode(path));
+        return new FString(path, getFindr());
     }
 
     public FArray arrayAt(JsPath path) {
-        return new FArray(fRoot, path, findValueNode(path));
+        return new FArray(fRoot, path, getFindr());
     }
 
     public FBoolean booleanAt(JsPath path) {
-        return new FBoolean(path, findValueNode(path));
+        return new FBoolean(path, getFindr());
     }
 
-    public FDate dateAt(JsPath path){return new FDate(path, findValueNode(path));}
+    public FDate dateAt(JsPath path) {
+        return new FDate(path, getFindr());
+    }
 
-    public FTime timeAt(JsPath path){return new FTime(path, findValueNode(path));}
+    public FTime timeAt(JsPath path) {
+        return new FTime(path, getFindr());
+    }
 
     public FSelect selectAt(JsPath path) {
-        return new FSelect(path, findValueNode(path));
+        return new FSelect(path, getFindr());
     }
 
     public FJsonForm assertMenuClosed() {
-        $$(".tm").count(0).eval();
+        $$("cds-menu").count(0).eval();
         return this;
     }
 
     public FMenu clickRootMenu() {
-        $$(".doc-root .cds--tooltip-trigger__wrapper button")
-            .expectOne()
-            .click();
+        $$("json-form-header cds-button").expectOne().click();
         return new FMenu(fRoot);
     }
 

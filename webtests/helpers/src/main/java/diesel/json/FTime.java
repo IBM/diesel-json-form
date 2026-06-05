@@ -4,7 +4,7 @@ import com.pojosontheweb.selenium.Findr;
 
 import static com.pojosontheweb.selenium.Findrs.*;
 
-public class FTime extends FJsonValue{
+public class FTime extends FRenderedElement {
 
     private Findr findInput() {
         return $("#time-picker-");
@@ -13,16 +13,19 @@ public class FTime extends FJsonValue{
     FTime(JsPath path, Findr findr) {
         super(path, findr);
     }
+
     public FTime assertValue(String expected) {
         findInput().where(attrEquals("value", expected)).eval();
         return this;
     }
+
     public FTime assertNoError() {
         $$(".cds--form-requirement").count(0).eval();
         findInput().where(not(attrEquals("data-invalid", "true"))).eval();
         return this;
     }
-    public FTime assertHasError(String expectedError){
+
+    public FTime assertHasError(String expectedError) {
         $$(".cds--form-requirement")
                 .at(0)
                 .where(textEquals(expectedError)).eval();

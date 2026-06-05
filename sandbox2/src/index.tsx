@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// @ts-ignore
 import './style.scss';
 import { samples } from './initdata';
 import {
@@ -22,7 +23,6 @@ import {
   JsPath,
   JvNumber,
   JvString,
-  Metadata,
   parseJsonValue,
   parseJsonValueUnsafe,
   SchemaRenderer,
@@ -42,7 +42,7 @@ import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/r
 import { StringElement } from './form2/StringElement';
 import { empty } from './jsonform/HtmlBuilder';
 
-const jsonForm = document.getElementById('my-form') as JsonForm;
+const jsonForm = document.getElementById('json-form') as JsonForm;
 
 console.log(JsonForm.TAG_NAME);
 
@@ -59,17 +59,11 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{
-    "type": "string",
-    "renderer": {
-        "key": "MyStringRenderer",
-        "myConfigProp": 123
-    }
-}`;
+const initialSchema = `{}`;
 
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `"yalla"`;
+const initialValue = `{}`;
 const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;

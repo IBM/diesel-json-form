@@ -2,7 +2,6 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
-import com.pojosontheweb.selenium.formz.Select;
 
 public class FSandbox extends AbstractPageObject {
 
@@ -11,13 +10,23 @@ public class FSandbox extends AbstractPageObject {
     }
 
     public FSandbox selectSample(String sample) {
-        new Select($("#sampleSchemaSelect")).selectByVisibleText(sample);
+        new FCarbonComboBox($("#sampleSchemaSelect")).selectValue(sample);
         return this;
     }
 
-    public final FEditor schemaEditor = new FEditor(getFindr(), "editor1");
+    public final FEditor schemaEditor = new FEditor(getFindr(), "ta-schema");
 
-    public final FEditor jsonEditor = new FEditor(getFindr(), "editor2");
+    public final FEditor jsonEditor = new FEditor(getFindr(), "ta-json");
 
     public final FJsonForm jsonForm = new FJsonForm(getFindr(), "#json-form");
+
+    public FSandbox clickApplyLeftToRight() {
+        $("#btn-to-form").click();
+        return this;
+    }
+
+    public FSandbox clickApplyRightToLeft() {
+        $("#btn-from-form").click();
+        return this;
+    }
 }

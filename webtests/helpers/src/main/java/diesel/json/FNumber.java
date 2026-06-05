@@ -5,14 +5,14 @@ import com.pojosontheweb.selenium.Retry;
 
 import static com.pojosontheweb.selenium.Findrs.*;
 
-public class FNumber extends FJsonValue {
+public class FNumber extends FRenderedElement {
 
     FNumber(JsPath path, Findr findr) {
         super(path, findr);
     }
 
     public Findr findInput() {
-        return $("#input-" + this.path.format("_"));
+        return $("cds-text-input");
     }
 
     public FNumber assertValue(String expected) {
@@ -21,24 +21,30 @@ public class FNumber extends FJsonValue {
     }
 
     public FNumber assertHasError(String expected) {
-        $$(".cds--form-requirement").where(textEquals(expected)).count(1).eval();
-        findInput().where((attrEquals("data-invalid", "true"))).eval();
+        findInput().where(attrEquals("invalid", "true")).eval();
+        findInput()
+                .shadowRoot()
+                .$$(".cds--form-requirement")
+                .where(textEquals(expected))
+                .expectOne()
+                .eval();
         return this;
     }
 
     public FNumber assertNoError() {
-        $$(".cds--form-requirement").count(0).eval();
-        findInput().where(not(attrEquals("data-invalid", "true"))).eval();
-
+        findInput().where(not(attrEquals("invalid", "true"))).eval();
         return this;
     }
 
     public FNumber setValue(String value) {
-        Retry.retry()
-                .add(() -> findInput().clear())
-                .add(() -> findInput().sendKeys(value))
-                .add(() -> assertValue(value))
-                .eval();
+        Findr actualInput = findInput()
+                .shadowRoot()
+                .$$("input.cds--text-input")
+                .expectOne();
+        actualInput.click();
+        actualInput.clear();
+        actualInput.sendKeys(value);
+        assertValue(value);
         return this;
     }
 }

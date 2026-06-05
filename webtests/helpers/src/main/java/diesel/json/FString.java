@@ -6,7 +6,7 @@ import org.openqa.selenium.Keys;
 
 import static com.pojosontheweb.selenium.Findrs.*;
 
-public class FString extends FJsonValue {
+public class FString extends FRenderedElement {
 
     FString(JsPath path, Findr findr) {
         super(path, findr);
@@ -51,7 +51,5 @@ public class FString extends FJsonValue {
         }
 
     }
-
-
 
 }

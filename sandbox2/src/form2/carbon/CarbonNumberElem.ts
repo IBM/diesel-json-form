@@ -11,6 +11,7 @@ import { Debouncer } from '../../jsonform/Debouncer';
 import { setErrors } from '../../jsonform/setErrorsOnInput';
 import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
 import { JsonForm } from '../JsonForm';
+import { nextElementId } from './nextElementId';
 
 export class CarbonNumberElement extends NumberElement {
   static TAG_NAME = 'json-number';
@@ -21,6 +22,7 @@ export class CarbonNumberElement extends NumberElement {
   constructor() {
     super();
     this.input = document.createElement('cds-text-input') as CDSTextInput;
+    this.input.id = nextElementId();
   }
 
   connectedCallback() {

@@ -46,7 +46,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         options.setExperimentalOption("prefs", prefs);
         LoggingPreferences loggingPrefs = new LoggingPreferences();
         loggingPrefs.enable(LogType.BROWSER, Level.ALL);
-        options.setCapability(CapabilityType.LOGGING_PREFS, loggingPrefs);
         options.setCapability("goog:loggingPrefs", loggingPrefs);
         WebDriver d = new ChromeDriver(options);
         d.manage().window().setSize(new Dimension(1920, 1200));
@@ -100,10 +99,10 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .clearText()
                 .typeText("true")
-                // .assertHasErrors()
                 .clearText()
                 .typeText("123");
-        // .assertHasNoErrors();
+
+        sandbox.clickApplyLeftToRight();
 
         sandbox.jsonForm
                 .numberAt(JsPath.empty)
@@ -131,11 +130,16 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .clearText()
                 .typeText(text)
                 .assertText(text);
-        // .assertHasNoErrors();
+
+        sandbox.clickApplyLeftToRight();
+
         sandbox.jsonForm
                 .numberAt(JsPath.empty.append("customer").append("age"))
                 .assertValue("0")
                 .setValue("18");
+
+        sandbox.clickApplyRightToLeft();
+
         sandbox.jsonEditor
                 .assertText("{\n" +
                         "  \"customer\": {\n" +
@@ -154,6 +158,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         sandbox.selectSample(BeanContainingOtherBean);
         sandbox.jsonEditor.assertText("{}");
+
         f
                 .objectAt(JsPath.empty)
                 .assertEmpty()
@@ -169,8 +174,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         FJsonForm f = sandbox.jsonForm;
 
         sandbox.selectSample(ObjectArray);
-        sandbox.jsonEditor.focus().clearText();
-        sandbox.jsonEditor.assertText("");
 
         f
                 .clickRootMenu()
@@ -194,6 +197,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .clearText()
                 .typeText("{ \"type\": \"" + type + "\" }");
+        sandbox.clickApplyLeftToRight();
+
         String expectedError = "Invalid type: expected " + type;
         // sandbox.jsonEditor
         // .assertHasErrors()

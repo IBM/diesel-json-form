@@ -4,6 +4,7 @@ import '@carbon/web-components/es/components/checkbox/checkbox';
 import { BooleanElement } from '../BooleanElement';
 import { setErrors } from '../../jsonform/setErrorsOnInput';
 import { JsonForm } from '../JsonForm';
+import { nextElementId } from './nextElementId';
 
 export class CarbonBooleanElement extends BooleanElement {
   static TAG_NAME = 'json-boolean';
@@ -13,6 +14,7 @@ export class CarbonBooleanElement extends BooleanElement {
   constructor() {
     super();
     this.input = document.createElement('cds-checkbox') as CDSCheckbox;
+    this.input.id = nextElementId();
   }
 
   connectedCallback() {

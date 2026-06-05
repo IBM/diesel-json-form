@@ -4,6 +4,7 @@ import { Debouncer } from '../../jsonform/Debouncer';
 import { setErrors } from '../../jsonform/setErrorsOnInput';
 
 import '@carbon/web-components/es/components/date-picker/index';
+import { nextElementId } from './nextElementId';
 
 export class MyDatePicker extends HTMLElement {
   static TAG_NAME = 'my-date-picker';
@@ -17,6 +18,7 @@ export class MyDatePicker extends HTMLElement {
   constructor() {
     super();
     this.picker = document.createElement('cds-date-picker') as CDSDatePicker;
+    this.picker.id = nextElementId();
     this.picker.setAttribute('date-format', 'Y-m-d');
     this.picker.addEventListener('cds-date-picker-changed', (e) => {
       // @ts-ignore

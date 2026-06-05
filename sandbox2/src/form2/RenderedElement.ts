@@ -28,11 +28,11 @@ export abstract class RenderedElement<T extends JsonValue> extends HTMLElement {
   }
 
   set path(p: JsPath) {
-    this.setAttribute('path', p.format());
+    this.setAttribute('json-form-path', p.format());
   }
 
   get path(): JsPath {
-    const pathStr = this.getAttribute('path');
+    const pathStr = this.getAttribute('json-form-path');
     if (pathStr === null) {
       throw new Error('path attribute not found');
     }

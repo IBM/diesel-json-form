@@ -7,6 +7,7 @@ import { StringElement } from '../StringElement';
 
 import '@carbon/web-components/es/components/text-input/index';
 import { JsonForm } from '../JsonForm';
+import { nextElementId } from './nextElementId';
 
 export class CarbonStringElemBasic extends StringElement {
   static TAG_NAME = 'string-elem-basic';
@@ -17,6 +18,7 @@ export class CarbonStringElemBasic extends StringElement {
   constructor() {
     super();
     this.input = document.createElement('cds-text-input') as CDSTextInput;
+    this.input.id = nextElementId();
     this.input.setAttribute(
       'placeholder',
       T_FUNCTION('stringValuePlaceholder'),

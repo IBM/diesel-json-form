@@ -1,35 +1,26 @@
 package diesel.json;
 
 import com.pojosontheweb.selenium.Findr;
-import org.openqa.selenium.WebElement;
-
-import java.util.function.Predicate;
-
 import static com.pojosontheweb.selenium.Findrs.attrEquals;
-import static com.pojosontheweb.selenium.Findrs.not;
 
-public class FBoolean extends FJsonValue {
+public class FBoolean extends FRenderedElement {
 
     FBoolean(JsPath path, Findr findr) {
         super(path, findr);
     }
 
     private Findr findCheckbox() {
-        return $$("input")
-                .where(attrEquals("type", "checkbox"))
-                .expectOne();
+        return $("input")
+                .where(attrEquals("type", "checkbox"));
     }
 
-
     public FBoolean assertChecked(boolean checked) {
-        findCheckbox().where(e ->
-            e.isSelected() == checked
-        ).eval();
+        findCheckbox().where(e -> e.isSelected() == checked).eval();
         return this;
     }
 
     public FBoolean clickCheckbox() {
-        $$(".checkbox-wrapper label").expectOne().click();
+        $("label.cds--checkbox-label").click();
         return this;
     }
 }

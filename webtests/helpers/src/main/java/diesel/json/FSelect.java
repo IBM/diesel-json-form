@@ -4,7 +4,7 @@ import com.pojosontheweb.selenium.Findr;
 
 import static com.pojosontheweb.selenium.Findrs.*;
 
-public class FSelect extends FJsonValue {
+public class FSelect extends FRenderedElement {
 
     FSelect(JsPath path, Findr findr) {
         super(path, findr);

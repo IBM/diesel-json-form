@@ -12,7 +12,6 @@ import {
   jvObject,
   jvString,
   SchemaService,
-  stringify,
   valueType,
 } from '@diesel-parser/json-form';
 
@@ -286,14 +285,19 @@ export function createTypesMenu(
   }
 }
 
-function stringifyProposal(value: JsonValue): string {
-  switch (value.tag) {
-    case 'jv-object': {
-      return value.properties.map((p) => p.name).join(', ');
-    }
-    default: {
-      return stringify(value).withDefault('broken json !');
-    }
+function getItemLabel(proposal: JsonValue): string {
+  switch (proposal.tag) {
+    case 'jv-number':
+      return proposal.value.toString();
+    case 'jv-string':
+      return proposal.value;
+    case 'jv-boolean':
+      return '' + proposal.value;
+    case 'jv-object':
+      const props = proposal.properties.map((p) => p.name).join(', ');
+      return '{ ' + props + ' }';
+    default:
+      return valueType(proposal);
   }
 }
 
@@ -309,11 +313,11 @@ export function createProposeMenu(
   }
 
   const p = menuActions.proposal;
-  const proposeMenuItems = proposals.map((value, index) =>
-    menuItem(stringifyProposal(value), () => p(path, value, index), {
+  const proposeMenuItems = proposals.map((value, index) => {
+    return menuItem(getItemLabel(value), () => p(path, value, index), {
       icon: typeIcon(valueType(value)),
-    }),
-  );
+    });
+  });
   return [
     subMenuItem(T_FUNCTION('contextMenu.propose'), proposeMenuItems, {
       icon: 'magic-wand',

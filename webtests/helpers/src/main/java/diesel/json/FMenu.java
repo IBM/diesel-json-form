@@ -2,9 +2,10 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import static com.pojosontheweb.selenium.Findrs.textEquals;
+import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FMenu extends AbstractPageObject {
 
@@ -12,24 +13,24 @@ public class FMenu extends AbstractPageObject {
         super(findr);
     }
 
-    private Findr findMenu(int index) {
-        return $$(".diesel-json-editor-menu .tm")
-                .at(index);
+    private Findr findMenu() {
+        return $$("cds-menu").expectOne();
     }
 
-    private Findr findMenuItem(int menuIndex, String itemText) {
-        return findMenu(menuIndex)
-                .$$(".menu-item span")
-                .where(textEquals(itemText))
-                .at(0);
+    private Findr findMenuItem(String itemText) {
+        return findMenu()
+                .$$("cds-menu-item")
+                .where(attrEquals("label", itemText))
+                .where(isDisplayed())
+                .expectOne();
     }
 
-    private void clickMenuItem(int menuIndex, String itemText) {
-        findMenuItem(menuIndex, itemText).click();
+    private void clickMenuItem(String itemText) {
+        findMenuItem(itemText).click();
     }
 
-    private void hoverMenuItem(int menuIndex, String itemText) {
-        findMenuItem(menuIndex, itemText).eval(e -> {
+    private void hoverMenuItem(String itemText) {
+        findMenuItem(itemText).eval(e -> {
             new Actions(getDriver())
                     .moveToElement(e)
                     .build()
@@ -39,26 +40,26 @@ public class FMenu extends AbstractPageObject {
     }
 
     public FAddProperty clickAddProperty() {
-        clickMenuItem(0, "Add property...");
+        clickMenuItem("Add property...");
         return new FAddProperty();
     }
 
     public void clickChangeType(String type) {
-        hoverMenuItem(0, "Change type");
-        clickMenuItem(1, type);
+        hoverMenuItem("Change type");
+        clickMenuItem(type);
     }
 
     public void clickAddElement() {
-        clickMenuItem(0, "Add element");
+        clickMenuItem("Add element");
     }
 
     public void clickDeleteElement() {
-        clickMenuItem(0, "Delete");
+        clickMenuItem("Delete");
     }
 
     public void clickPropose(String type) {
-        hoverMenuItem(0, "Propose");
-        clickMenuItem(1, type);
+        hoverMenuItem("Propose");
+        clickMenuItem(type);
     }
 
     public class FAddProperty {

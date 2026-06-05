@@ -18,6 +18,9 @@ import { augmentProposal } from '../../jsonform/augmentProposal';
 import { RenderedElement } from '../RenderedElement';
 import { ArrayElement } from '../ArrayElement';
 import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
+import { h } from '../../jsonform/MyJSXFactory';
+import { empty } from '../../jsonform/HtmlBuilder';
+import { CDSButton } from '@carbon/web-components';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';
@@ -25,6 +28,7 @@ export class CarbonObjectElement extends ObjectElement {
   private static ATTR_PROP_NAME = 'json-property-name';
 
   private sectionElem: CarbonSectionBasedElement;
+  private propertiesNode: HTMLElement = (<div className="json-prop-buttons" />);
 
   constructor() {
     super();
@@ -34,6 +38,7 @@ export class CarbonObjectElement extends ObjectElement {
 
   connectedCallback() {
     this.appendChild(this.sectionElem);
+    this.appendChild(this.propertiesNode);
   }
 
   disconnectedCallback() {
@@ -97,6 +102,17 @@ export class CarbonObjectElement extends ObjectElement {
     const pathStr = path.format();
     const errors = metadata.errors.get(pathStr);
     this.sectionElem.showErrors(errors);
+    empty(this.propertiesNode);
+    const props = metadata.propertiesToAdd.get(pathStr) ?? [];
+    for (const prop of props) {
+      const btn = document.createElement('cds-button') as CDSButton;
+      btn.innerText = '+ ' + prop;
+      btn.addEventListener('click', () => {
+        btn.disabled = true;
+        this.appendPropertyWithName(prop);
+      });
+      this.propertiesNode.appendChild(btn);
+    }
   }
 
   protected openDialog(): Promise<JsonProperty> {
