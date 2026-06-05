@@ -118,6 +118,7 @@ export function ViewJsonValue(
               dispatch={p.dispatch}
               rendererFactory={rendererFactory}
               language={p.language}
+              instanceId={p.instanceId}
             />
           ),
         });
@@ -437,7 +438,7 @@ function ViewNumber(p: ViewValueProps<JvNumber>): React.ReactElement {
     <TextInput
       labelText={t('numberValueLabel', { path: p.path.format('.') }).toString()}
       hideLabel={true}
-      id={'input-' + p.path.format('_')}
+      id={'input-' + p.path.format('_') + p.instanceId}
       value={p.value.value}
       disabled={p.model.adding.isJust()}
       invalidText={errorsToInvalidText(p)}
@@ -484,7 +485,7 @@ function ViewStringDefault(p: ViewValueProps<JvString>): React.ReactElement {
     <TextInput
       labelText={t('stringValueLabel', { path: p.path.format('.') }).toString()}
       hideLabel={true}
-      id={'input-' + p.path.format('_')}
+      id={'input-' + p.path.format('_') + p.instanceId}
       type="text"
       value={p.value.value}
       disabled={p.model.adding.isJust()}
@@ -525,7 +526,7 @@ function ViewStringWithCombo(p: ViewStringWithComboProps): React.ReactElement {
   const { t } = p.model;
   return (
     <ComboBox
-      id={'input-' + p.path.format('_')}
+      id={'input-' + p.path.format('_') + p.instanceId}
       aria-label={t('stringValueComboLabel', {
         path: p.path.format('.'),
       }).toString()}
@@ -559,6 +560,7 @@ interface MyTimePickerProps {
   readonly isInvalid: boolean;
   readonly invalidText: string;
   readonly t: FormTFunction;
+  readonly instanceId: string;
 }
 
 function MyTimePicker(props: MyTimePickerProps) {
@@ -566,7 +568,7 @@ function MyTimePicker(props: MyTimePickerProps) {
   const { onChange, value, isInvalid, invalidText, t } = props;
   return (
     <TimePicker
-      id={'time-picker-' + fmtPath}
+      id={'time-picker-' + fmtPath + props.instanceId}
       className={'time-picker'}
       onChange={(e) => {
         const t = new MyTime(value);
@@ -581,7 +583,7 @@ function MyTimePicker(props: MyTimePickerProps) {
     >
       <div className={'time-picker-offset-wrapper'}>
         <TimePickerSelect
-          id={'time-picker-select' + fmtPath}
+          id={'time-picker-select' + fmtPath + props.instanceId}
           aria-label={t('timeValueLabel', {
             path: props.path.format('.'),
           }).toString()}
@@ -611,6 +613,7 @@ interface MyDatePickerProps {
   readonly invalidText: string;
   readonly t: FormTFunction;
   readonly language: string;
+  readonly instanceId: string;
 }
 
 function languageToPickerLocale(x: string): DatePickerProps['locale'] {
@@ -625,7 +628,7 @@ function MyDatePicker(props: MyDatePickerProps) {
   return (
     <DatePicker
       // @ts-ignore
-      id={'date-picker-' + fmtPath}
+      id={'date-picker-' + fmtPath + props.instanceId}
       datePickerType="single"
       dateFormat={'Y-m-d'}
       onChange={(dates) => {
@@ -687,6 +690,7 @@ function ViewStringWithFormats(
               invalidText={errorsToInvalidText(p)}
               t={p.model.t}
               language={p.language}
+              instanceId={p.instanceId}
             />
           );
         }
@@ -714,6 +718,7 @@ function ViewStringWithFormats(
                   invalidText={errorsToInvalidText(p)}
                   t={p.model.t}
                   language={p.language}
+                  instanceId={p.instanceId}
                 />
               </div>
               <div className={'date-time-picker__time'}>
@@ -734,6 +739,7 @@ function ViewStringWithFormats(
                   isInvalid={invalid}
                   invalidText={errorsToInvalidText(p)}
                   t={p.model.t}
+                  instanceId={p.instanceId}
                 />
               </div>
             </div>
@@ -748,6 +754,7 @@ function ViewStringWithFormats(
               isInvalid={isInvalid(p)}
               invalidText={errorsToInvalidText(p)}
               t={p.model.t}
+              instanceId={p.instanceId}
             />
           );
         }
@@ -771,7 +778,7 @@ function ViewBoolean(p: ViewValueProps<JvBoolean>): React.ReactElement {
             path: p.path.format('.'),
           }).toString()}
           hideLabel={true}
-          id={'input-' + p.path.format('_')}
+          id={'input-' + p.path.format('_') + p.instanceId}
           checked={p.value.value}
           disabled={p.model.adding.isJust()}
           onChange={() => {

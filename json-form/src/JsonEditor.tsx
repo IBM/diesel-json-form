@@ -156,10 +156,12 @@ export interface ViewJsonEditorProps {
   readonly rendererFactory: RendererFactory;
   readonly renderOptions?: RenderOptions;
   readonly schemaService: SchemaService;
+  readonly instanceId?: string;
 }
 
 export function ViewJsonEditor(props: ViewJsonEditorProps) {
-  const { model, dispatch, renderOptions } = props;
+  const { model, dispatch, renderOptions, instanceId } = props;
+  const editorInstanceId = instanceId ?? '';
   return (
     <div className="diesel-json-editor">
       <div className="diesel-json-editor-scrollpane">
@@ -184,6 +186,7 @@ export function ViewJsonEditor(props: ViewJsonEditorProps) {
           rendererFactory={props.rendererFactory}
           language={props.model.lang}
           renderOptions={renderOptions}
+          instanceId={editorInstanceId}
         />
       </div>
       {model.menuModel
@@ -557,6 +560,7 @@ export interface JsonEditorProps {
   readonly renderOptions?: RenderOptions;
   readonly menuFilter?: MenuOptionFilter;
   readonly schemaService?: SchemaService;
+  readonly instanceId?: string;
 }
 
 // const devTools = new DevTools<Model, Msg>().setVerbose(true).asGlobal();
@@ -583,6 +587,7 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
           rendererFactory={props.rendererFactory}
           renderOptions={props.renderOptions}
           schemaService={schemaService}
+          instanceId={props.instanceId}
         />
       )}
       update={(msg, model) => {
