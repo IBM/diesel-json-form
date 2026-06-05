@@ -40,10 +40,6 @@ public class FJsonForm extends AbstractPageObject {
         return new FTime(path, getFindr());
     }
 
-    public FSelect selectAt(JsPath path) {
-        return new FSelect(path, getFindr());
-    }
-
     public FJsonForm assertMenuClosed() {
         $$("cds-menu").count(0).eval();
         return this;

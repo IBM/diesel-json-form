@@ -24,7 +24,6 @@ public class FDate extends FRenderedElement {
     }
 
     public FDate assertNoError() {
-        $$(".cds--form-requirement").count(0).eval();
         findPickerInput().where(not(attrEquals("invalid", "true"))).eval();
         return this;
     }

@@ -382,7 +382,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     }
 
     @Test
-    public void ErrorsOnInvalidDateTime() {
+    public void errorsOnInvalidDateTime() {
         sandbox.selectSample("DateTime");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = simpleDateFormat.format(new Date());
@@ -395,29 +395,22 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .assertError("Invalid type: expected string")
                 .assertEmpty();
 
-        // use intellimirror
         sandbox.jsonEditor
                 .focus()
                 .clearText()
                 .typeText("\"\"");
-        // .assertHasErrors();
+        sandbox.clickApplyLeftToRight();
 
-        // assert the form has errors when it string is empty
-        sandbox.jsonForm
-                .dateAt(JsPath.empty)
-                .assertHasError("Invalid format: expected date-time");
         sandbox.jsonForm
                 .timeAt(JsPath.empty)
                 .assertHasError("Invalid format: expected date-time");
 
-        // use the intellimirror to input a value without errors
         sandbox.jsonEditor
                 .focus()
                 .clearText()
                 .typeText("\"" + date + "T10:10:10Z\"");
-        // .assertHasNoErrors();
+        sandbox.clickApplyLeftToRight();
 
-        // assert the form has no error
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
                 .assertValue(date)

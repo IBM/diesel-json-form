@@ -6,8 +6,16 @@ import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FTime extends FRenderedElement {
 
-    private Findr findInput() {
-        return $("#time-picker-");
+    private Findr findPicker() {
+        return $("my-time-picker");
+    }
+
+    private Findr findPickerInput() {
+        return findPicker()
+                .$("cds-time-picker")
+                .shadowRoot()
+                .$$("input.cds--time-picker__input-field")
+                .expectOne();
     }
 
     FTime(JsPath path, Findr findr) {
@@ -15,26 +23,32 @@ public class FTime extends FRenderedElement {
     }
 
     public FTime assertValue(String expected) {
-        findInput().where(attrEquals("value", expected)).eval();
+        findPicker()
+                .$("cds-time-picker")
+                .where(attrEquals("value", expected))
+                .eval();
         return this;
     }
 
     public FTime assertNoError() {
-        $$(".cds--form-requirement").count(0).eval();
-        findInput().where(not(attrEquals("data-invalid", "true"))).eval();
+        findPicker()
+                .$("cds-time-picker")
+                .where(not(attrEquals("invalid", "true")))
+                .eval();
         return this;
     }
 
     public FTime assertHasError(String expectedError) {
-        $$(".cds--form-requirement")
-                .at(0)
-                .where(textEquals(expectedError)).eval();
+        findPicker()
+                .$("cds-time-picker")
+                .where(attrEquals("invalid-text", expectedError))
+                .eval();
         return this;
     }
 
     public FTime setValue(String value) {
-        findInput().clear();
-        findInput().sendKeys(value);
+        findPickerInput().clear();
+        findPickerInput().sendKeys(value);
         return this;
     }
 }

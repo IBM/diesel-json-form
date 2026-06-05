@@ -35,6 +35,7 @@ export class MyTimePicker extends HTMLElement {
       'pattern',
       '([0-1]\d|2[0-3]):([0-5]\d)(:[0-5]\d(\.(\d{1,3}))?)?',
     );
+    this.timePicker.setAttribute('max-length', '8');
     this.appendChild(this.timePicker);
     this.timePicker.addEventListener('change', () => {
       const t = new MyTime(this.value);
