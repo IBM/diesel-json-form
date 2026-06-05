@@ -10,31 +10,34 @@ public class FDate extends FRenderedElement {
         super(path, findr);
     }
 
-    private Findr findInput() {
-        return $(".cds--date-picker__input");
+    private Findr findPicker() {
+        return $("my-date-picker");
+    }
+
+    private Findr findPickerInput() {
+        return findPicker().$("cds-date-picker-input");
     }
 
     public FDate assertValue(String expected) {
-        findInput().where(attrEquals("value", expected)).eval();
+        findPickerInput().where(attrEquals("value", expected)).eval();
         return this;
     }
 
     public FDate assertNoError() {
         $$(".cds--form-requirement").count(0).eval();
-        findInput().where(not(attrEquals("data-invalid", "true"))).eval();
+        findPickerInput().where(not(attrEquals("invalid", "true"))).eval();
         return this;
     }
 
     public FDate assertHasError(String expectedError) {
-        $$(".cds--form-requirement")
-                .at(0)
-                .where(textEquals(expectedError)).eval();
+        findPickerInput()
+                .where(attrEquals("invalid-text", expectedError)).eval();
         return this;
     }
 
     public FDate setValue(String value) {
-        findInput().clear();
-        findInput().sendKeys(value);
+        findPickerInput().clear();
+        findPickerInput().sendKeys(value);
         return this;
     }
 }

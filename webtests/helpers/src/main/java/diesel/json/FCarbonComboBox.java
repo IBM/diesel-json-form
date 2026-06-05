@@ -2,6 +2,8 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
+import org.openqa.selenium.JavascriptExecutor;
+
 import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FCarbonComboBox extends AbstractPageObject {
@@ -22,7 +24,13 @@ public class FCarbonComboBox extends AbstractPageObject {
         $$("cds-dropdown-item")
                 .where(textEquals(value))
                 .at(0)
-                .click();
+                .eval(e -> {
+                    ((JavascriptExecutor) getDriver()).executeScript(
+                            "arguments[0].scrollIntoView(true);", e
+                    );
+                    e.click();
+                    return true;
+                });
         return this;
     }
 
