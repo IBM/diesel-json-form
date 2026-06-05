@@ -104,11 +104,7 @@ public class FObject extends FRenderedElement {
     }
 
     public FMenu clickPropertyMenu(String propName) {
-        findPropNameRow(propName)
-                .$$(".prop-menu button")
-                .expectOne()
-                .click();
-        return new FMenu(fRoot);
+        return this.sections.clickMenu(propName);
     }
 
     public FObject assertArrayLength(String propName, int expectedCount) {

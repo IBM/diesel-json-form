@@ -26,7 +26,7 @@ public class FArray extends FRenderedElement {
     }
 
     public FMenu clickItemMenu(int index) {
-        sections.clickMenuItem(index);
+        sections.clickMenu(index);
         return new FMenu(fRoot);
     }
 

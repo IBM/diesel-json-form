@@ -233,10 +233,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .setPropertyName("bar")
                 .clickAdd();
 
-        f.objectAt(JsPath.empty)
-                .clickPropertyMenu("foo")
-                .clickChangeType("string");
-
         f.stringAt(JsPath.empty.append("foo"))
                 .setValue("yalla");
 
@@ -246,6 +242,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         f.numberAt(JsPath.empty.append("bar"))
                 .setValue("123");
+
+        sandbox.clickApplyRightToLeft();
 
         sandbox.jsonEditor.assertText("{\n" +
                 "  \"foo\": \"yalla\",\n" +
@@ -603,7 +601,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         String expectedError = "Invalid value: should be one of \"FOO\" | \"BAR\"";
         fArray
                 .getStringCell(1)
-                .assertError(expectedError);
+                .assertHasError(expectedError);
 
     }
 

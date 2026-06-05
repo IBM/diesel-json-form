@@ -2,8 +2,9 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
-import static com.pojosontheweb.selenium.Findrs.textEquals;
-import static com.pojosontheweb.selenium.Findrs.isDisplayed;
+import org.openqa.selenium.By;
+
+import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FSectionBasedElem extends AbstractPageObject {
 
@@ -21,8 +22,26 @@ public class FSectionBasedElem extends AbstractPageObject {
         return this;
     }
 
-    public FMenu clickMenuItem(int sectionIndex) {
+    public FMenu clickMenu(int sectionIndex) {
         throw new RuntimeException("TODO");
+    }
+
+    public FMenu clickMenu(String sectionTitle) {
+        var section = findSections()
+                .where(e -> {
+                    var span = e.findElement(By.cssSelector(".right-pane .label-container span"));
+                    if (span == null) {
+                        return false;
+                    }
+                    return span.getText().equals(sectionTitle);
+                })
+                .expectOne();
+        section
+                .$$("cds-button")
+                .where(attrEquals("title", "Open menu"))
+                .expectOne()
+                .click();
+        return new FMenu(new Findr(getDriver(), getFindr().getTimeout()));
     }
 
     public FSectionBasedElem assertError(String expected) {

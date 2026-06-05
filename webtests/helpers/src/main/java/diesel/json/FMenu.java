@@ -64,22 +64,24 @@ public class FMenu extends AbstractPageObject {
 
     public class FAddProperty {
 
+
+
         public FAddProperty setPropertyName(String foo) {
-            Findr input = $("#property-name-editor");
+            var input = $$("cds-modal cds-text-input")
+                    .where(attrEquals("placeholder", "type property name..."))
+                    .expectOne()
+                    .shadowRoot()
+                    .$$("input")
+                    .where(attrEquals("placeholder", "type property name..."))
+                    .expectOne();
             input.clear();
             input.sendKeys(foo);
             return this;
         }
 
-        private Findr findAddForm() {
-            return $$(".diesel-json-editor .add-prop-form")
-                    .expectOne();
-        }
-
         public void clickAdd() {
-            findAddForm()
-                    .$$(".buttons-row button")
-                    .where(textEquals("Add"))
+            $$("cds-modal cds-modal-footer-button")
+                    .where(attrEquals("kind", "primary"))
                     .expectOne()
                     .click();
         }

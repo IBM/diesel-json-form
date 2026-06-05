@@ -13,7 +13,7 @@ public class FString extends FRenderedElement {
     }
 
     private Findr findInput() {
-        return $("#input-" + this.path.format("_"));
+        return $("cds-text-input");
     }
 
     public FString assertValue(String expected) {
@@ -27,29 +27,27 @@ public class FString extends FRenderedElement {
         return this;
     }
 
-    public FString assertError(String expectedError) {
-        $$(".cds--form-requirement")
-                .where(textContains(expectedError))
-                .count(1)
-                .at(0)
+    public FString assertHasError(String expected) {
+        findInput().where(attrEquals("invalid", "true")).eval();
+        findInput()
+                .shadowRoot()
+                .$$(".cds--form-requirement")
+                .where(textEquals(expected))
+                .expectOne()
                 .eval();
         return this;
     }
 
     public FString setValue(String value) {
-        // findInput().clear(); does not work everytime
-        clear(findInput());
-        findInput().sendKeys(value);
-        findInput().sendKeys(Keys.RETURN);
+        Findr actualInput = findInput()
+                .shadowRoot()
+                .$$("input.cds--text-input")
+                .expectOne();
+        actualInput.click();
+        actualInput.clear();
+        actualInput.sendKeys(value);
+        assertValue(value);
         return this;
-    }
-
-    private void clear(Findr input) {
-        String content = input.eval(Utility.getValue);
-        for (int i = 0; i < content.length(); i++) {
-            input.sendKeys(Keys.BACK_SPACE);
-        }
-
     }
 
 }
