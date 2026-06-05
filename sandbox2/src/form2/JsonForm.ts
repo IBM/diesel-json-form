@@ -20,7 +20,7 @@ import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata';
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
 
-  private documentRoot: FormHeaderElement;
+  private headerElement: FormHeaderElement;
   private element?: RenderedElement<JsonValue>;
   private VALIDATION_COUNTER = 0;
   private schemaService: SchemaService = defaultSchemaService;
@@ -29,15 +29,15 @@ export class JsonForm extends HTMLElement {
 
   constructor() {
     super();
-    this.documentRoot = new FormHeaderElement();
+    this.headerElement = new FormHeaderElement();
   }
 
   connectedCallback() {
-    this.appendChild(this.documentRoot);
+    this.appendChild(this.headerElement);
   }
 
   disconnectedCallback() {
-    this.documentRoot.remove();
+    this.headerElement.remove();
     this.element?.remove();
   }
 
@@ -64,11 +64,25 @@ export class JsonForm extends HTMLElement {
           });
           this.element = e;
           this.appendChild(e);
+          this.updateHeaderCounter();
         }
       })
       .catch((err) => {
         console.error('form init error ', err);
       });
+  }
+
+  private updateHeaderCounter() {
+    const getNbElems = () => {
+      if (this.element instanceof ObjectElement) {
+        return this.element.getProperties().length;
+      } else if (this.element instanceof ArrayElement) {
+        return this.element.getElements().length;
+      }
+      return undefined;
+    };
+    const nbElems = getNbElems();
+    this.headerElement.setCounter(nbElems);
   }
 
   private doValidate(value: JsonValue): Promise<Metadata | undefined> {
@@ -110,6 +124,7 @@ export class JsonForm extends HTMLElement {
 
   onChange(): void {
     if (this.element) {
+      this.updateHeaderCounter();
       const value = this.toValue();
       this.doValidate(value)
         .then((metadata) => {

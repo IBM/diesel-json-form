@@ -10,6 +10,7 @@ import {
   CDSModalHeading,
   CDSRadioButton,
   CDSRadioButtonGroup,
+  CDSTag,
   CDSTextInput,
 } from '@carbon/web-components';
 
@@ -38,6 +39,7 @@ declare global {
       'cds-text-input': Partial<CDSTextInput>;
       'cds-radio-button-group': Partial<CDSRadioButtonGroup>;
       'cds-radio-button': Partial<CDSRadioButton>;
+      'cds-tag': Partial<CDSTag>;
     }
   }
 }

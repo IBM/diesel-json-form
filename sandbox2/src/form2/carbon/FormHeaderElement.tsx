@@ -8,11 +8,20 @@ import { JsonForm } from '../JsonForm';
 import { createMenu, openMenu } from '../../jsonform/ContextMenu';
 import { augmentProposal } from '../../jsonform/augmentProposal';
 
+import '@carbon/web-components/es/components/tag/tag';
+import {
+  TAG_SIZE,
+  TAG_TYPE,
+} from '@carbon/web-components/es/components/tag/defs';
+
 export class FormHeaderElement extends HTMLElement {
   static TAG_NAME = 'json-form-header';
 
   private static MENU_COUNTER = 0;
   private menuButton: CDSButton;
+  private counterWrapper: HTMLDivElement = (
+    <div className="json-counter-wrapper"></div>
+  );
 
   constructor() {
     super();
@@ -27,11 +36,27 @@ export class FormHeaderElement extends HTMLElement {
       <div className="json-form-header-label">{T_FUNCTION('documentRoot')}</div>
     );
     this.appendChild(label);
+    this.setCounter(undefined);
+    this.appendChild(this.counterWrapper);
     this.appendChild(this.menuButton);
   }
 
   disconnectedCallback() {
     empty(this);
+  }
+
+  setCounter(counter: number | undefined) {
+    if (counter === undefined) {
+      this.counterWrapper.style.display = 'none';
+      empty(this.counterWrapper);
+    } else {
+      this.counterWrapper.appendChild(
+        <cds-tag type={TAG_TYPE.GRAY} size={TAG_SIZE.MEDIUM}>
+          {counter}
+        </cds-tag>,
+      );
+      this.counterWrapper.style.display = 'block';
+    }
   }
 
   private findEnclosingForm(): JsonForm {
