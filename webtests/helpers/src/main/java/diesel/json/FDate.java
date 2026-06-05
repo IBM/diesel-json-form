@@ -36,8 +36,12 @@ public class FDate extends FRenderedElement {
     }
 
     public FDate setValue(String value) {
-        findPickerInput().clear();
-        findPickerInput().sendKeys(value);
+        Findr input = findPickerInput()
+            .shadowRoot()
+            .$$("input.cds--date-picker__input")
+            .expectOne();
+        input.clear();
+        input.sendKeys(value);
         return this;
     }
 }

@@ -334,7 +334,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .clearText()
                 .typeText("\"\"");
-        // .assertHasErrors();
 
         sandbox.clickApplyLeftToRight();
 
@@ -358,8 +357,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void typeDateInInputField() {
         sandbox.selectSample("Date");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = simpleDateFormat.format(new Date());
         sandbox.schemaEditor.assertText("{\n" +
                 "  \"type\": \"string\",\n" +
                 "  \"format\": \"date\"\n" +
@@ -369,6 +366,9 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .clearText()
                 .typeText("\"\"");
+
+        sandbox.clickApplyLeftToRight();
+
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
                 .assertValue("")
