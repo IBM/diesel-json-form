@@ -59,24 +59,11 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{
-  "type": [
-    "array", "null"
-  ],
-  "items": {
-    "type": [ "string", "null" ],
-    "enum": [
-      "FOO", "BAR"
-    ]
-  }
-}`;
+const initialSchema = `{}`;
 
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `[
-  "FOO",
-  "FOO"
-]`;
+const initialValue = `{}`;
 const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;

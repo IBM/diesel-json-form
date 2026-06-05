@@ -10,8 +10,11 @@ public class FBoolean extends FRenderedElement {
     }
 
     private Findr findCheckbox() {
-        return $("input")
-                .where(attrEquals("type", "checkbox"));
+        return $("cds-checkbox")
+                .shadowRoot()
+                .$$("input")
+                .where(attrEquals("type", "checkbox"))
+                .expectOne();
     }
 
     public FBoolean assertChecked(boolean checked) {
@@ -20,7 +23,11 @@ public class FBoolean extends FRenderedElement {
     }
 
     public FBoolean clickCheckbox() {
-        $("label.cds--checkbox-label").click();
+        $("cds-checkbox")
+                .shadowRoot()
+                .$$("label.cds--checkbox-label")
+                .expectOne()
+                .click();
         return this;
     }
 }

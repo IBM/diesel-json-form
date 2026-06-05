@@ -13,8 +13,12 @@ public class FSectionBasedElem extends AbstractPageObject {
     }
 
     private Findr.ListFindr findSections() {
-        return getFindr().$$(
-                "div.json-sections > collapsible-section");
+        return getFindr()
+            .elemList(
+                By.xpath(
+        "./div[contains(@class,'json-sections')]/collapsible-section"
+                )
+            );
     }
 
     public FSectionBasedElem assertLength(int expected) {
@@ -23,11 +27,12 @@ public class FSectionBasedElem extends AbstractPageObject {
     }
 
     public FMenu clickMenu(int sectionIndex) {
-        throw new RuntimeException("TODO");
+        clickSectionMenu(findSections().at(sectionIndex));
+        return new FMenu(new Findr(getDriver(), getFindr().getTimeout()));
     }
 
-    public FMenu clickMenu(String sectionTitle) {
-        var section = findSections()
+    private Findr findSectionByTitle(String sectionTitle) {
+        return findSections()
                 .where(e -> {
                     var span = e.findElement(By.cssSelector(".right-pane .label-container span"));
                     if (span == null) {
@@ -36,11 +41,22 @@ public class FSectionBasedElem extends AbstractPageObject {
                     return span.getText().equals(sectionTitle);
                 })
                 .expectOne();
-        section
-                .$$("cds-button")
+    }
+
+    private void clickSectionMenu(Findr fSection) {
+        fSection.elemList(
+                    By.xpath(
+                    "./div[contains(@class,'right-pane')]/div[contains(@class,'label-row')]/cds-button"
+                    )
+                )
                 .where(attrEquals("title", "Open menu"))
+                .where(isDisplayed())
                 .expectOne()
                 .click();
+    }
+
+    public FMenu clickMenu(String sectionTitle) {
+        clickSectionMenu(findSectionByTitle(sectionTitle));
         return new FMenu(new Findr(getDriver(), getFindr().getTimeout()));
     }
 
@@ -60,4 +76,12 @@ public class FSectionBasedElem extends AbstractPageObject {
         return this;
     }
 
+    public FSectionBasedElem assertCounter(String propName, int expectedCount) {
+        findSectionByTitle(propName)
+                .$$(".json-counter-wrapper cds-tag")
+                .expectOne()
+                .where(textEquals(expectedCount + ""))
+                .eval();
+        return this;
+    }
 }

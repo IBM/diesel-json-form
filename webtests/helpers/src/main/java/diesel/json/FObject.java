@@ -83,50 +83,26 @@ public class FObject extends FRenderedElement {
         return this;
     }
 
-    private Findr findPropRow(String propName) {
-        return getFindr().elemList(By.xpath("./div[contains(@class,'object-prop')]"))
-                .where(e -> {
-                    WebElement propNameElem = e.findElement(
-                            By.xpath(
-                                    "./div[contains(@class,'prop-name-row')]/div[contains(@class,'prop-name')]"));
-                    if (propNameElem == null) {
-                        return false;
-                    }
-                    return propNameElem.getText().equals(propName);
-                })
-                .expectOne();
-    }
-
-    private Findr findPropNameRow(String propName) {
-        return findPropRow(propName)
-                .elemList(By.xpath("./div[contains(@class,'prop-name-row')]"))
-                .expectOne();
-    }
-
     public FMenu clickPropertyMenu(String propName) {
         return this.sections.clickMenu(propName);
     }
 
     public FObject assertArrayLength(String propName, int expectedCount) {
-        findPropRow(propName)
-                .$$(".array-counter span")
-                .where(textEquals(Integer.toString(expectedCount)))
-                .expectOne()
-                .eval();
+        this.sections.assertCounter(propName, expectedCount);
         return this;
     }
 
     public FObject selectPropertyValue(String property, String value) {
-        Findr findSelect = findPropRow(property)
-                .$$(".cds--list-box__menu-icon")
-                .expectOne();
+//        Findr findSelect = findPropRow(property)
+//                .$$(".cds--list-box__menu-icon")
+//                .expectOne();
+//
+//        findSelect.click();
+//        $$(".cds--list-box__menu-item__option")
+//                .where(Findrs.textEquals(value))
+//                .expectOne()
+//                .click();
 
-        findSelect.click();
-        $$(".cds--list-box__menu-item__option")
-                .where(Findrs.textEquals(value))
-                .expectOne()
-                .click();
-
-        return this;
+        throw new UnsupportedOperationException("TODO");
     }
 }

@@ -32,8 +32,8 @@ export class CarbonSectionBasedElement extends HTMLElement {
   connectedCallback() {
     this.appendChild(this.elemsContainer);
     this.appendChild(this.emptyNodeContainer);
-    this.updateEmptyNode();
     this.appendChild(this.errorNode);
+    this.updateEmptyNode();
   }
 
   disconnectedCallback() {
@@ -57,8 +57,9 @@ export class CarbonSectionBasedElement extends HTMLElement {
 
   updateEmptyNode() {
     this.emptyNodeContainer.innerText = this._emptyMessage;
-    this.emptyNodeContainer.style.display =
-      this.findSections().length === 0 ? 'block' : 'none';
+    const sections = this.findSections();
+    const nbSections = sections.length;
+    this.emptyNodeContainer.style.display = nbSections === 0 ? 'block' : 'none';
   }
 
   findSections(): CarbonCollapsibleSection[] {
@@ -96,11 +97,6 @@ export class CarbonSectionBasedElement extends HTMLElement {
     }
     return false;
   }
-
-  //   protected setSectionContent(section: CollapsibleSection, value: JsonValue) {
-  //     section.setContent(createDom(value));
-  //     findEnclosingForm(this).onChange();
-  //   }
 
   emptySections() {
     this.findSections().forEach((s) => s.remove());

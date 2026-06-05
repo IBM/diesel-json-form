@@ -305,6 +305,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .clickCheckbox()
                 .assertChecked(false);
 
+        sandbox.clickApplyRightToLeft();
+
         sandbox.jsonEditor.assertText("{\n" +
                 "  \"foo\": [\n" +
                 "    \"yalla\",\n" +

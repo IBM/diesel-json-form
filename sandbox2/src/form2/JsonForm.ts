@@ -73,15 +73,10 @@ export class JsonForm extends HTMLElement {
   }
 
   private updateHeaderCounter() {
-    const getNbElems = () => {
-      if (this.element instanceof ObjectElement) {
-        return this.element.getProperties().length;
-      } else if (this.element instanceof ArrayElement) {
-        return this.element.getElements().length;
-      }
-      return undefined;
-    };
-    const nbElems = getNbElems();
+    const nbElems =
+      this.element instanceof ArrayElement
+        ? this.element.getElements().length
+        : undefined;
     this.headerElement.setCounter(nbElems);
   }
 

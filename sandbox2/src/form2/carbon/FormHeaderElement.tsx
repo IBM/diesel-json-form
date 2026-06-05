@@ -46,9 +46,9 @@ export class FormHeaderElement extends HTMLElement {
   }
 
   setCounter(counter: number | undefined) {
+    empty(this.counterWrapper);
     if (counter === undefined) {
       this.counterWrapper.style.display = 'none';
-      empty(this.counterWrapper);
     } else {
       this.counterWrapper.appendChild(
         <cds-tag type={TAG_TYPE.GRAY} size={TAG_SIZE.MEDIUM}>

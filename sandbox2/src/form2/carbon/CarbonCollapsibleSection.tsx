@@ -7,6 +7,10 @@ import { IconElement } from '../../jsonform/IconElement';
 import { T_FUNCTION } from '../../jsonform/JsonFormMessages';
 import { JsonValue } from '@diesel-parser/json-form';
 import { RenderedElement } from '../RenderedElement';
+import {
+  TAG_SIZE,
+  TAG_TYPE,
+} from '@carbon/web-components/es/components/tag/defs';
 
 export class CarbonCollapsibleSection extends HTMLElement {
   static TAG_NAME = 'collapsible-section';
@@ -17,6 +21,9 @@ export class CarbonCollapsibleSection extends HTMLElement {
   private menuButton: CDSButton;
   private content?: RenderedElement<JsonValue>;
   private menu?: () => Promise<MenuItem[]>;
+  private counterWrapper: HTMLDivElement = (
+    <div className="json-counter-wrapper"></div>
+  );
 
   private static TRIGGER_COUNT = 0;
 
@@ -26,6 +33,7 @@ export class CarbonCollapsibleSection extends HTMLElement {
         size="xs"
         kind={BUTTON_KIND.GHOST}
         title={T_FUNCTION('icon.openMenu')}
+        className="json-menu-trigger"
       />
     );
     IconElement.addToButton(menuButton, 'overflow-menu-vertical');
@@ -33,10 +41,9 @@ export class CarbonCollapsibleSection extends HTMLElement {
   }
 
   static newInstance(): CarbonCollapsibleSection {
-    return new CarbonCollapsibleSection();
-    // return document.createElement(
-    //   CarbonCollapsibleSection.TAG_NAME,
-    // ) as CarbonCollapsibleSection;
+    return document.createElement(
+      CarbonCollapsibleSection.TAG_NAME,
+    ) as CarbonCollapsibleSection;
   }
 
   constructor() {
@@ -73,18 +80,40 @@ export class CarbonCollapsibleSection extends HTMLElement {
     });
     this.contentContainer = <div className="collapsible-content" />;
     this.labelElement = <span />;
+  }
+
+  connectedCallback() {
     this.appendChild(
       <>
         <div className="btn-container">{this.expandCollapseButton}</div>
         <div className="right-pane">
           <div className="label-row">
             <div className="label-container">{this.labelElement}</div>
+            {this.counterWrapper}
             {this.menuButton}
           </div>
           {this.contentContainer}
         </div>
       </>,
     );
+  }
+
+  disconnectedCallback() {
+    empty(this);
+  }
+
+  setCounter(counter: number | undefined) {
+    empty(this.counterWrapper);
+    if (counter === undefined) {
+      this.counterWrapper.style.display = 'none';
+    } else {
+      this.counterWrapper.appendChild(
+        <cds-tag type={TAG_TYPE.GRAY} size={TAG_SIZE.MEDIUM}>
+          {counter}
+        </cds-tag>,
+      );
+      this.counterWrapper.style.display = 'block';
+    }
   }
 
   toggleExpandCollapse(): void {

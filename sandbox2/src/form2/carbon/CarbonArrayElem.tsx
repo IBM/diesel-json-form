@@ -79,6 +79,12 @@ export class CarbonArrayElement extends ArrayElement {
       if (e) {
         section.setContent(e);
       }
+      const newOrExistingElem = e ?? elem;
+      if (newOrExistingElem instanceof ArrayElement) {
+        section.setCounter(newOrExistingElem.getElements().length);
+      } else {
+        section.setCounter(undefined);
+      }
     });
     const pathStr = path.format();
     const errors = metadata.errors.get(pathStr);
