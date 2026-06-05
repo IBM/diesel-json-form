@@ -61,6 +61,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: {},
+          instanceId: '',
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(1);
@@ -75,6 +76,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: {},
+          instanceId: '',
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(1);
@@ -118,6 +120,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: { hideCollapsiblePanel: true },
+          instanceId: '',
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(0);
@@ -132,6 +135,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: { hideCollapsiblePanel: true },
+          instanceId: '',
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(0);

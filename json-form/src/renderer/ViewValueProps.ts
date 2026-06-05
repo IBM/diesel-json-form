@@ -14,4 +14,5 @@ export interface ViewValueProps<T extends JsonValue> {
   readonly dispatch: Dispatcher<Msg>;
   readonly language: string;
   readonly renderOptions?: RenderOptions;
+  readonly instanceId: string;
 }
