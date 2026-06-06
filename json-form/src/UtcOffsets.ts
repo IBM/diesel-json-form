@@ -37,9 +37,6 @@ function convertToInt(offset: string): number {
 function sortOffsets(o1: string, o2: string): number {
   return convertToInt(o1) - convertToInt(o2);
 }
-
-export const allOffsets = getUtcOffsets();
-
 // const timezonesWithoffsets =  Intl.supportedValuesOf('timeZone').map(timeZone => {
 //   const offset=new Intl.DateTimeFormat('en',{timeZone:timeZone, timeZoneName:'longOffset'}).formatToParts().find(part => part.type==='timeZoneName').value
 //   const offset=new Intl.DateTimeFormat('en',{timeZone:timeZone, timeZoneName:'long'}).formatToParts().find(part => part.type==='timeZoneName').value

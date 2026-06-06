@@ -4,16 +4,15 @@ import {
   CDSSelectItem,
 } from '@carbon/web-components';
 import '@carbon/web-components/es/components/time-picker/index';
-import { getUtcOffsets, ValidationError } from '@diesel-parser/json-form';
+import { ValidationError } from '@diesel-parser/json-form';
 import { Debouncer } from '../../jsonform/Debouncer';
-import { MyTime } from '../../jsonform/JsonStringElement';
 import { h } from '../../jsonform/MyJSXFactory';
 import { setErrors } from '../../jsonform/setErrorsOnInput';
 
 import '@carbon/web-components/es/components/time-picker/index';
 import { nextElementId } from './nextElementId';
-
-const allOffsets = getUtcOffsets();
+import { allOffsets } from './allOffsets';
+import { MyTime } from './MyTime';
 
 export class MyTimePicker extends HTMLElement {
   static TAG_NAME = 'my-time-picker';
@@ -79,6 +78,7 @@ export class MyTimePicker extends HTMLElement {
 
   setValue(value: string) {
     this.value = value;
+    debugger;
     const t = new MyTime(value);
     this.timePicker.value = t.time;
     this.timePickerSelect.value = t.offset;

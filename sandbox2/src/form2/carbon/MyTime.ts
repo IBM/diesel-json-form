@@ -1,4 +1,4 @@
-import { allOffsets } from '@diesel-parser/json-form';
+import { allOffsets } from "./allOffsets";
 
 export class MyTime {
   readonly time: string;
