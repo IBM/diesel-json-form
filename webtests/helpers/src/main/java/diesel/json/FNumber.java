@@ -22,12 +22,7 @@ public class FNumber extends FRenderedElement {
 
     public FNumber assertHasError(String expected) {
         findInput().where(attrEquals("invalid", "true")).eval();
-        findInput()
-                .shadowRoot()
-                .$$(".cds--form-requirement")
-                .where(textEquals(expected))
-                .expectOne()
-                .eval();
+        findInput().where(attrEquals("invalid-text", expected)).eval();
         return this;
     }
 
@@ -36,15 +31,26 @@ public class FNumber extends FRenderedElement {
         return this;
     }
 
-    public FNumber setValue(String value) {
-        Findr actualInput = findInput()
+    private Findr findActualInput() {
+        return findInput()
                 .shadowRoot()
                 .$$("input.cds--text-input")
                 .expectOne();
+    }
+
+    public FNumber setValue(String value) {
+        Findr actualInput = findActualInput();
         actualInput.click();
         actualInput.clear();
         actualInput.sendKeys(value);
         assertValue(value);
+        return this;
+    }
+
+    public FNumber sendKeys(CharSequence... keys) {
+        Findr actualInput = findActualInput();
+        actualInput.click();
+        actualInput.sendKeys(keys);
         return this;
     }
 }

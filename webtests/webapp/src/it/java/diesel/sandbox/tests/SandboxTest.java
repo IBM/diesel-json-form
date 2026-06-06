@@ -731,15 +731,15 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     public void testNumberEmptyField() {
         sandbox.schemaEditor.replaceText("{\"type\":\"number\"}");
         sandbox.jsonEditor.replaceText("123");
+        sandbox.clickApplyLeftToRight();
+
         FNumber num = sandbox.jsonForm.numberAt(JsPath.empty);
 
         num
                 .assertValue("123")
                 .assertNoError();
 
-        num
-                .findInput()
-                .sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE);
+        num.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE);
 
         num.assertHasError("Not a valid number");
 
