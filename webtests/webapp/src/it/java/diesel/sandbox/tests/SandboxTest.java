@@ -515,13 +515,17 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "}");
 
         f.clickRootMenu().clickPropose("{ what }");
+
+        sandbox.clickApplyRightToLeft();
+
         sandbox.jsonEditor
                 .assertText("{\n" +
                         "  \"what\": \"schema.animal.Lion\"\n" +
                         "}");
         FObject fObject = f.objectAt(JsPath.empty);
         fObject.assertEmptyProperties("mane", "name", "sound", "type", "endangered");
-        fObject.selectPropertyValue("what", "schema.animal.Elephant");
+        FSelect select = f.selectAt(JsPath.empty.append("what"));
+        select.selectValue("schema.animal.Elephant");
         fObject.assertEmptyProperties("trunkLength", "tusk", "name", "sound", "type", "endangered");
         sandbox.jsonEditor
                 .focus()
@@ -535,14 +539,20 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "  \"trunkLength\": 0,\n" +
                         "  \"tusk\": true\n" +
                         "}");
+        sandbox.clickApplyLeftToRight();
         fObject.assertProperties("what", "endangered", "name", "sound", "type", "trunkLength", "tusk");
-        sandbox.jsonEditor.focus().clearText();
+
+        sandbox.jsonEditor.focus().replaceText("{}");
+        sandbox.clickApplyLeftToRight();
+
         f.clickRootMenu().clickPropose("{ what }");
         fObject.clickAddPropButton("endangered");
         fObject.clickAddPropButton("mane");
         fObject.clickAddPropButton("name");
         fObject.clickAddPropButton("sound");
         fObject.clickAddPropButton("type");
+        sandbox.clickApplyRightToLeft();
+
         sandbox.jsonEditor
                 .assertText("{\n" +
                         "  \"what\": \"schema.animal.Lion\",\n" +

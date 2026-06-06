@@ -2,26 +2,22 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.Findr;
 
-import static com.pojosontheweb.selenium.Findrs.*;
-
 public class FSelect extends FRenderedElement {
+
+    private final FCarbonComboBox comboBox;
 
     FSelect(JsPath path, Findr findr) {
         super(path, findr);
-    }
-
-    private Findr findInput() {
-        return $("#input-" + this.path.format("_"));
+        this.comboBox = new FCarbonComboBox(getFindr().$("cds-combo-box"));
     }
 
     public FSelect selectValue(String value) {
-        findInput().click();
-        $("div").where(textEquals(value)).click();
+        comboBox.selectValue(value);
         return this;
     }
 
     public FSelect assertValue(String expected) {
-        findInput().where(attrEquals("value", expected)).eval();
+        comboBox.assertValue(expected);
         return this;
     }
 }

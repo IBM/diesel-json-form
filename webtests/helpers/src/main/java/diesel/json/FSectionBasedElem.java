@@ -3,6 +3,11 @@ package diesel.json;
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static com.pojosontheweb.selenium.Findrs.*;
 
@@ -31,15 +36,24 @@ public class FSectionBasedElem extends AbstractPageObject {
         return new FMenu(new Findr(getDriver(), getFindr().getTimeout()));
     }
 
+    private static String getSectionTitle(WebElement e) {
+        var span = e.findElement(By.cssSelector(".right-pane .label-container span"));
+        if (span == null) {
+            return null;
+        }
+        return span.getText();
+    }
+
+    private static Predicate<WebElement> sectionTitleEquals(String title) {
+        return e -> {
+            String sectionTitle = getSectionTitle(e);
+            return sectionTitle != null && sectionTitle.equals(title);
+        };
+    }
+
     private Findr findSectionByTitle(String sectionTitle) {
         return findSections()
-                .where(e -> {
-                    var span = e.findElement(By.cssSelector(".right-pane .label-container span"));
-                    if (span == null) {
-                        return false;
-                    }
-                    return span.getText().equals(sectionTitle);
-                })
+                .where(sectionTitleEquals(sectionTitle))
                 .expectOne();
     }
 
@@ -82,6 +96,16 @@ public class FSectionBasedElem extends AbstractPageObject {
                 .expectOne()
                 .where(textEquals(expectedCount + ""))
                 .eval();
+        return this;
+    }
+
+    public FSectionBasedElem assertSectionTitles(List<String> expected) {
+        findSections().eval(sections -> {
+            List<String> actual = sections.stream()
+                    .map(FSectionBasedElem::getSectionTitle)
+                    .toList();
+            return actual.equals(expected);
+        });
         return this;
     }
 }

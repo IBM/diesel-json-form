@@ -10,7 +10,7 @@ public class FSandbox extends AbstractPageObject {
     }
 
     public FSandbox selectSample(String sample) {
-        new FCarbonComboBox($("#sampleSchemaSelect")).selectValue(sample);
+        new FCarbonDropDown($("#sampleSchemaSelect")).selectValue(sample);
         return this;
     }
 

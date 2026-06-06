@@ -4,12 +4,11 @@ import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
 import org.openqa.selenium.JavascriptExecutor;
 
-import static com.pojosontheweb.selenium.Findrs.attrEquals;
-import static com.pojosontheweb.selenium.Findrs.textEquals;
+import static com.pojosontheweb.selenium.Findrs.*;
 
-public class FCarbonComboBox extends AbstractPageObject {
+public class FCarbonDropDown extends AbstractPageObject {
 
-    public FCarbonComboBox(Findr findr) {
+    public FCarbonDropDown(Findr findr) {
         super(findr);
     }
 
@@ -19,11 +18,11 @@ public class FCarbonComboBox extends AbstractPageObject {
             .where(attrEquals("part", "trigger-button"))
             .expectOne();
 
-    public FCarbonComboBox selectValue(String value) {
+    public FCarbonDropDown selectValue(String value) {
         fTriggerButton.click();
 
-        $$("cds-combo-box-item")
-                .where(attrEquals("value", value))
+        $$("cds-dropdown-item")
+                .where(textEquals(value))
                 .at(0)
                 .eval(e -> {
                     ((JavascriptExecutor) getDriver()).executeScript(
@@ -35,7 +34,7 @@ public class FCarbonComboBox extends AbstractPageObject {
         return this;
     }
 
-    public FCarbonComboBox assertValue(String expected) {
+    public FCarbonDropDown assertValue(String expected) {
         fTriggerButton
                 .$$("span.cds--list-box__label")
                 .expectOne()

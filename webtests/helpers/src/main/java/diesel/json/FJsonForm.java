@@ -45,6 +45,10 @@ public class FJsonForm extends AbstractPageObject {
         return this;
     }
 
+    public FSelect selectAt(JsPath path) {
+        return new FSelect(path, getFindr());
+    }
+
     public FMenu clickRootMenu() {
         $$("json-form-header cds-button").expectOne().click();
         return new FMenu(fRoot);

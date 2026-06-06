@@ -22,7 +22,7 @@ public class FMenu extends AbstractPageObject {
                 .$$("cds-menu-item")
                 .where(attrEquals("label", itemText))
                 .where(isDisplayed())
-                .expectOne();
+                .at(0);
     }
 
     private void clickMenuItem(String itemText) {

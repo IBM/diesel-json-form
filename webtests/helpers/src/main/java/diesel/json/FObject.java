@@ -59,27 +59,17 @@ public class FObject extends FRenderedElement {
 
     public FObject assertProperties(String... props) {
         List<String> expected = Stream.of(props).collect(Collectors.toList());
-        getFindr()
-                .elemList(
-                        By.xpath(
-                                "./div[contains(@class,'object-prop')]/div[contains(@class,'prop-name-row')]/div[contains(@class,'prop-name')]"))
-                .eval(elems -> {
-                    List<String> actual = elems.stream().map(WebElement::getText).collect(Collectors.toList());
-                    return actual.equals(expected);
-                });
+        sections.assertSectionTitles(expected);
         return this;
     }
 
     public FObject assertEmptyProperties(String... props) {
-        List<String> expected = Stream.of(props).collect(Collectors.toList());
-        getFindr()
-                .elemList(
-                        By.xpath(
-                                "./div/div[contains(@class,'add-prop-row')]/button"))
-                .eval(elems -> {
-                    List<String> actual = elems.stream().map(WebElement::getText).collect(Collectors.toList());
-                    return actual.equals(expected);
-                });
+        for (String prop : props) {
+            findPropButtons()
+                    .where(textEquals("+ " + prop))
+                    .expectOne()
+                    .eval();
+        }
         return this;
     }
 
@@ -90,19 +80,5 @@ public class FObject extends FRenderedElement {
     public FObject assertArrayLength(String propName, int expectedCount) {
         this.sections.assertCounter(propName, expectedCount);
         return this;
-    }
-
-    public FObject selectPropertyValue(String property, String value) {
-//        Findr findSelect = findPropRow(property)
-//                .$$(".cds--list-box__menu-icon")
-//                .expectOne();
-//
-//        findSelect.click();
-//        $$(".cds--list-box__menu-item__option")
-//                .where(Findrs.textEquals(value))
-//                .expectOne()
-//                .click();
-
-        throw new UnsupportedOperationException("TODO");
     }
 }
