@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ibm.cloud.diesel</groupId>
@@ -141,7 +143,8 @@
             </plugin>
 
             <plugin>
-                <!-- https://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html#using-multiple-webapp-root-directories -->
+                <!--
+                https://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html#using-multiple-webapp-root-directories -->
                 <!-- For local development use
                     mvn jetty:run
                 -->
@@ -157,7 +160,7 @@
                         <!-- do not scan jars -->
                         <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
                         <resourceBases>
-                            <resourceBase>${project.basedir}/../../sandbox/dist</resourceBase>
+                            <resourceBase>${project.basedir}/../../sandbox2/dist</resourceBase>
                         </resourceBases>
                     </webApp>
                     <skip></skip>
@@ -166,7 +169,8 @@
                     <stopKey>stop-jetty</stopKey>
                     <stopWait>10</stopWait>
                     <!-- use with jetty:run-forked (runs at port 8080) -->
-                    <jvmArgs>-Xdebug -agentlib:jdwp=transport=dt_socket,address=9999,server=y,suspend=n</jvmArgs>
+                    <jvmArgs>-Xdebug
+                        -agentlib:jdwp=transport=dt_socket,address=9999,server=y,suspend=n</jvmArgs>
                 </configuration>
                 <executions>
                     <execution>
