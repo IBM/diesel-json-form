@@ -635,12 +635,15 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "    }\n" +
                         "  }\n" +
                         "}");
-        FObject fObject = f.objectAt(JsPath.empty);
         sandbox.jsonEditor
                 .focus()
                 .clearText()
                 .typeText("{}");
+        sandbox.clickApplyLeftToRight();
+
+        FObject fObject = f.objectAt(JsPath.empty);
         fObject.assertEmptyProperties("name", "children");
+
         sandbox.jsonEditor
                 .focus()
                 .clearText()
@@ -677,6 +680,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "  ]\n" +
                         "}");
 
+        sandbox.clickApplyLeftToRight();
         f.stringAt(JsPath.empty.append("name")).assertValue("Elizabeth");
 
         JsPath firstLevelPath = JsPath.empty.append("children");
@@ -701,7 +705,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         f.stringAt(secondLevelPath.append(1).append("children").append(0).append("name")).assertValue("Archie");
         f.stringAt(secondLevelPath.append(1).append("children").append(1).append("name"))
                 .assertValue("Lilibet");
-
     }
 
     @Test
