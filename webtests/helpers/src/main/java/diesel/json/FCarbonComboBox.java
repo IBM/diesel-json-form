@@ -36,12 +36,15 @@ public class FCarbonComboBox extends AbstractPageObject {
     }
 
     public FCarbonComboBox assertValue(String expected) {
-        fTriggerButton
-                .$$("span.cds--list-box__label")
-                .expectOne()
-                .where(textEquals(expected))
+        getFindr()
+                .where(attrEquals("value", expected))
                 .eval();
         return this;
     }
 
+    public FCarbonComboBox assertHasError(String expected) {
+        getFindr().where(attrEquals("invalid", "true")).eval();
+        getFindr().where(attrEquals("invalid-text", expected)).eval();
+        return this;
+    }
 }

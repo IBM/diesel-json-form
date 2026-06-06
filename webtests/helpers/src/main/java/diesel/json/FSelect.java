@@ -2,6 +2,9 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.Findr;
 
+import static com.pojosontheweb.selenium.Findrs.attrEquals;
+import static com.pojosontheweb.selenium.Findrs.textEquals;
+
 public class FSelect extends FRenderedElement {
 
     private final FCarbonComboBox comboBox;
@@ -20,4 +23,10 @@ public class FSelect extends FRenderedElement {
         comboBox.assertValue(expected);
         return this;
     }
+
+    public FSelect assertHasError(String expected) {
+        comboBox.assertHasError(expected);
+        return this;
+    }
+
 }

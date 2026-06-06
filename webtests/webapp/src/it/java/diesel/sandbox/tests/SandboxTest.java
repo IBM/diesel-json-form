@@ -585,13 +585,18 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .typeText(enumContent)
                 .assertText(enumContent);
 
+        sandbox.clickApplyLeftToRight();
+
         FArray fArray = form.arrayAt(JsPath.empty);
         fArray.assertLength(2);
 
-        FString stringCell1 = fArray.getStringCell(1);
+        FSelect stringCell1 = form.selectAt(JsPath.empty.append(1));
         stringCell1.assertValue("FOO");
-        stringCell1.setValue("BAR");
+        stringCell1.selectValue("BAR");
         stringCell1.assertValue("BAR");
+
+        sandbox.clickApplyRightToLeft();
+
         sandbox.jsonEditor.assertText("[\n" +
                 "  \"BAR\",\n" +
                 "  \"BAR\"\n" +
@@ -606,12 +611,12 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .replaceText(newEnumContent)
                 .assertText(newEnumContent);
+        sandbox.clickApplyLeftToRight();
 
         String expectedError = "Invalid value: should be one of \"FOO\" | \"BAR\"";
-        fArray
-                .getStringCell(1)
+        form
+                .selectAt(JsPath.empty.append(1))
                 .assertHasError(expectedError);
-
     }
 
     @Test
