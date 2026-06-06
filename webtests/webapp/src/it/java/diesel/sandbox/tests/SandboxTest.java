@@ -761,17 +761,15 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
     private void doTestInvalidNumber() {
         sandbox.jsonEditor.replaceText("123");
+        sandbox.clickApplyLeftToRight();
         FNumber num = sandbox.jsonForm.numberAt(JsPath.empty);
-
         num.assertValue("123").assertNoError();
-
         num
                 .setValue("abcdef")
                 .assertHasError("Not a valid number");
-
-        sandbox.jsonEditor.assertText("123");
-
-        num.setValue("333").assertNoError();
+        num
+                .setValue("333")
+                .assertNoError();
     }
 
     @Test
@@ -781,43 +779,23 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "  \"name\": \"\",\n" + //
                 "  \"rating\": 0\n" + //
                 "}");
+        sandbox.clickApplyLeftToRight();
 
-        findRatings()
-                .where(ratingChecked(false))
-                .count(5)
-                .eval();
-
-        clickRating(2);
-
-        assertRating(0, true);
-        assertRating(1, true);
-        assertRating(2, true);
-        assertRating(3, false);
-        assertRating(4, false);
+        FRating rating = new FRating(JsPath.empty.append("rating"), sandbox.jsonForm.getFindr());
+        rating
+                .assertRating(1)
+                .clickRating(3)
+                .assertRating(3);
+        sandbox.clickApplyRightToLeft();
 
         sandbox.jsonEditor.assertText("{\n" + //
                 "  \"name\": \"\",\n" + //
-                "  \"rating\": 3\n" + //
+                "  \"rating\": 2\n" + //
                 "}");
     }
 
     private Findr.ListFindr findRatings() {
         return $$(".rating .rating-item");
-    }
-
-    private void clickRating(int index) {
-        findRatings().at(index).click();
-    }
-
-    private Predicate<WebElement> ratingChecked(boolean checked) {
-        return attrEquals("data-checked", "" + checked);
-    }
-
-    private void assertRating(int index, boolean checked) {
-        findRatings()
-                .at(index)
-                .where(ratingChecked(checked))
-                .eval();
     }
 
     @Test
