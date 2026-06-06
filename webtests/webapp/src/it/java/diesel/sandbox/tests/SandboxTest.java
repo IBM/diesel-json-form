@@ -803,9 +803,13 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         sandbox.selectSample("Renderer1");
         assertMyConfigProp("Config prop is undefined");
         sandbox.jsonEditor.replaceText("\"yalla\"");
+        sandbox.clickApplyLeftToRight();
+
         assertMyStringValue("yalla");
         clickConcat();
         assertMyStringValue("yallaX");
+        sandbox.clickApplyRightToLeft();
+
         sandbox.jsonEditor.assertText("\"yallaX\"");
     }
 
@@ -816,19 +820,19 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     }
 
     private void clickConcat() {
-        $(".my-string button")
+        $("my-string-renderer button")
                 .where(textEquals("Concat !"))
                 .click();
     }
 
     private void assertMyConfigProp(String expected) {
-        $(".my-string p")
+        $("my-string-renderer p")
                 .where(textEquals(expected))
                 .eval();
     }
 
     private void assertMyStringValue(String expected) {
-        $(".my-string .my-value")
+        $("my-string-renderer .my-value")
                 .where(textEquals(expected))
                 .eval();
     }
@@ -843,6 +847,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .objectAt(JsPath.empty)
                 .clickPropertyMenu("customer")
                 .clickPropose("{ firstName, lastName, amount, age }");
+        sandbox.clickApplyRightToLeft();
+
         sandbox.jsonEditor.assertText("{\n" + //
                 "  \"customer\": {\n" + //
                 "    \"firstName\": \"\",\n" + //
