@@ -64,11 +64,6 @@ export class Renderer {
     const { path, metadata } = args;
     const pathStr = path.format();
 
-    const combos = metadata.comboBoxes.get(pathStr);
-    if (combos && combos.length > 0) {
-      return new CarbonStringElemCombo();
-    }
-
     const formats = metadata.formats.get(pathStr);
     if (formats && formats.length > 0) {
       const fmt = formats[0];
@@ -76,6 +71,11 @@ export class Renderer {
       if (ctor) {
         return ctor();
       }
+    }
+
+    const combos = metadata.comboBoxes.get(pathStr);
+    if (combos && combos.length > 0) {
+      return new CarbonStringElemCombo();
     }
 
     return document.createElement(
