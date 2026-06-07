@@ -160,7 +160,7 @@
                         <!-- do not scan jars -->
                         <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
                         <resourceBases>
-                            <resourceBase>${project.basedir}/../../sandbox2/dist</resourceBase>
+                            <resourceBase>${project.basedir}/../../sandbox/dist</resourceBase>
                         </resourceBases>
                     </webApp>
                     <skip></skip>

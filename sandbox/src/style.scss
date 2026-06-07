@@ -1,15 +1,21 @@
-@use '@carbon/react' with (
-  $font-path: '@ibm/plex'
-);
-@use '@carbon/themes';
-@use '@carbon/themes/scss/themes' as *;
+@use '@carbon/styles/scss/reset';
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/themes';
 
 :root {
-  @include themes.theme(react.$white);
+  @include theme(themes.$g10);
+
+  @media (prefers-color-scheme: dark) {
+    @include theme(themes.$g100);
+  }
 }
 
-[data-carbon-theme='g10'] {
-  @include themes.theme(react.$white);
+.g10 {
+  @include theme(themes.$g10);
+}
+
+.g100 {
+  @include theme(themes.$g100);
 }
 
 #sandbox {
@@ -28,9 +34,13 @@
   background-color: black;
 }
 
+.schema-select {
+  flex-grow: 1;
+}
+
 .main {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   flex-grow: 1;
 }
 
@@ -55,7 +65,7 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  width: 33%;
+  /* width: 33%; */
   padding: 4px;
 }
 
@@ -63,6 +73,8 @@
   width: 100%;
   display: flex;
   flex-direction: row;
+  height: 36px;
+  align-items: center;
 }
 
 .sub-head h3 {
@@ -76,34 +88,13 @@
 .editor-wrapper {
   flex-grow: 1;
   position: relative;
+  padding: 4px;
 }
 
 .editor-wrapper textarea {
   height: 100%;
   width: 100%;
-}
-
-.IntelliMirrorEditor {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  border: 1px solid lightgray;
-}
-
-.schema-select {
-  margin-left: 12px;
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-}
-
-.schema-value-at-select {
-  margin-left: 12px;
-  align-items: center;
-  display: flex;
-  flex-direction: row;
+  resize: none;
 }
 
 footer.sandbox {
@@ -139,4 +130,79 @@ footer.sandbox .gas-station {
 #editor1,
 #editor2 {
   height: 100%;
+}
+
+.json-array-items {
+  display: flex;
+  flex-direction: column;
+}
+
+json-form {
+  position: relative;
+  overflow: hidden;
+
+  .json-form-scrollpane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+  }
+}
+
+collapsible-section {
+  display: flex;
+  flex-direction: row;
+}
+
+collapsible-section > .right-pane > .collapsible-content {
+  margin-bottom: 0.5rem;
+}
+
+collapsible-section > .right-pane {
+  flex-grow: 1;
+}
+
+collapsible-section > .right-pane > .label-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  //   margin-bottom: 0.5rem;
+}
+
+collapsible-section > .right-pane > .label-row > .label-container {
+  flex-grow: 1;
+}
+
+section-based-elem.json-validation-error > .json-sections {
+  border: 2px solid $text-error;
+}
+
+.json-errors {
+  color: $text-error;
+  font-size: var(--cds-helper-text-01-font-size, 0.75rem);
+}
+
+json-form-header {
+  display: flex;
+  flex-direction: row;
+
+  .json-form-header-label {
+    flex-grow: 1;
+  }
+}
+
+.json-modal-field {
+  margin-bottom: 1rem;
+}
+
+my-rating-renderer cds-radio-button-group {
+  margin-top: 1rem;
+}
+
+my-string-renderer > div {
+  &:hover {
+    background-color: lightsalmon;
+  }
 }

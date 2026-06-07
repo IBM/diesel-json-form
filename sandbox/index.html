@@ -6,22 +6,11 @@
     <link rel="icon" href="./favicon.ico" />
     <%= htmlWebpackPlugin.tags.headTags %>
   </head>
+
   <body>
     <div id="sandbox">
       <div class="banner">
         <h1>JSON Editor</h1>
-        <div>
-          <label for="debounceMs">Debounce (ms) </label>
-          <input type="text" id="debounceMs" value="500" style="width: 50px" />
-        </div>
-        <div>
-          <input type="checkbox" id="syncPanes" checked />
-          <label for="syncPanes"> Sync text and form </label>
-        </div>
-        <div>
-          <input type="checkbox" id="strictMode" />
-          <label for="strictMode"> Strict mode </label>
-        </div>
         <div id="about"></div>
       </div>
       <div class="main">
@@ -29,29 +18,36 @@
           <div class="sub-head">
             <h3>Schema</h3>
             <div class="schema-select">
-              <label for="sampleSchemaSelect"> Sample Schema </label>
-              <select id="sampleSchemaSelect"></select>
+              <cds-dropdown
+                id="sampleSchemaSelect"
+                trigger-content="Select an item"
+              >
+              </cds-dropdown>
             </div>
           </div>
           <div class="editor-wrapper">
-            <div id="editor1"></div>
+            <textarea id="ta-schema"></textarea>
           </div>
         </div>
-        <div class="spacer"></div>
-        <div class="sub value">
+        <div class="sub texteditor">
           <div class="sub-head">
             <h3>JSON</h3>
+            <cds-button id="btn-to-form" size="xs">
+              <icon-elem slot="icon" icon="arrow-right"></icon-elem>
+            </cds-button>
           </div>
           <div class="editor-wrapper">
-            <div id="editor2"></div>
+            <textarea spellcheck="false" id="ta-json"></textarea>
           </div>
         </div>
-        <div class="spacer"></div>
         <div class="sub form">
           <div class="sub-head">
             <h3>FORM</h3>
+            <cds-button size="xs" id="btn-from-form">
+              <icon-elem slot="icon" icon="arrow-left"></icon-elem>
+            </cds-button>
           </div>
-          <div id="json-form"></div>
+          <json-form id="json-form"></json-form>
         </div>
       </div>
       <footer class="sandbox">

@@ -1,30 +1,23 @@
 {
-  "name": "@diesel-parser/diesel-json-sandbox",
+  "name": "@diesel-parser/diesel-json-sandbox2",
   "version": "1.0.0",
   "private": true,
   "description": "",
   "scripts": {
-    "start": "npm run copy:monacoworkers && npm run build:sass && webpack serve",
-    "build:sass": "sass --style=compressed --load-path=../node_modules/ src/style.scss src/style.css",
+    "start": "webpack serve",
     "prettify": "prettier --write .",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "eslint '**/*.{js,ts}' --fix",
-    "copy:monacoworkers": "shx mkdir -p dist && shx cp -r ../node_modules/monaco-editor-workers/dist/workers/editorWorker* ./dist",
-    "build": "npm run lint && npm run copy:monacoworkers && npm run build:worker && webpack",
-    "build:worker": "webpack --config worker.webpack.config.js",
+    "build": "npm run lint && webpack",
     "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
   },
   "dependencies": {
-    "@carbon/react": "^1.100.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-tea-cup": "^5.1.1",
-    "tea-cup-fp": "^1.1.1",
+    "@carbon/icons": "^11.79.0",
+    "@carbon/styles": "^1.105.0",
+    "@carbon/web-components": "^2.53.0",
     "@diesel-parser/json-form": "^7.0.0",
-    "@diesel-parser/monaco": "~0.1.0",
-    "monaco-editor-workers": "0.45.0",
-    "tea-pop-core": "^6.0.1",
-    "tea-pop-menu": "^6.0.1"
+    "tea-cup-fp": "^1.1.1",
+    "tea-pop-core": "6.0.1"
   },
   "devDependencies": {
     "@diesel-parser/ts-facade": "~0.32.2",
@@ -34,7 +27,8 @@
     "file-loader": "^6.2.0",
     "gh-pages": "^6.0.0",
     "html-webpack-plugin": "^5.3.1",
-    "sass": "^1.81.0",
+    "sass": "^1.99.0",
+    "sass-loader": "^16.0.7",
     "shx": "~0.4.0",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.2.2",
