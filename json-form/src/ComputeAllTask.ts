@@ -1,20 +1,7 @@
-import { Cmd, Task } from 'tea-cup-fp';
-import { gotMetadata, Msg } from './Msg';
 import { Metadata } from './Metadata';
 import { SchemaService, ValidationResult } from './SchemaService';
 import { getValueAt, JsonValue } from './JsonValue';
 import { JsPath } from './JsPath';
-import { Model, nextPendingId } from './Model';
-
-function computeAllTask(
-  schemaService: SchemaService,
-  schema: JsonValue,
-  value: JsonValue,
-): Task<Error, Metadata> {
-  return Task.fromPromise(() => {
-    return validateAndComputeMetadata(schemaService, schema, value);
-  });
-}
 
 export async function validateAndComputeMetadata(
   schemaService: SchemaService,
@@ -60,20 +47,6 @@ export async function validateAndComputeMetadata(
       };
       return res;
     });
-}
-
-export function computeAllCmd(
-  model: Model,
-  schemaService: SchemaService,
-  schema: JsonValue,
-  value: JsonValue,
-): [Model, Cmd<Msg>] {
-  const [newModel, newPendingId] = nextPendingId(model, 'got-metadata');
-  const cmd = Task.attempt(
-    computeAllTask(schemaService, schema, value),
-    gotMetadata(newPendingId),
-  );
-  return [newModel, cmd];
 }
 
 async function doComputePropsToAdd(

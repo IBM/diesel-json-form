@@ -27,20 +27,16 @@ import {
   parseJsonValueUnsafe,
   SchemaRenderer,
   stringify,
+  empty,
+  JsonForm,
 } from '@diesel-parser/json-form';
 import '@carbon/web-components/es/components/dropdown/dropdown-item';
 import '@carbon/web-components/es/components/button/button';
 import '@carbon/web-components/es/components/radio-button/radio-button';
 import '@carbon/web-components/es/components/radio-button/radio-button-group';
-
 import { CDSComboBox, CDSRadioButton } from '@carbon/web-components';
-import { JsonForm } from './form2/JsonForm';
-import { Renderer } from './form2/Renderer';
-import { h } from './jsonform/MyJSXFactory';
-import { NumberElement } from './form2/NumberElement';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
-import { StringElement } from './form2/StringElement';
-import { empty } from './jsonform/HtmlBuilder';
+import { h } from './MyJSXFactory';
 
 const jsonForm = document.getElementById('json-form') as JsonForm;
 

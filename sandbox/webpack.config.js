@@ -5,7 +5,7 @@ const { jsx } = require("react/jsx-runtime");
 
 module.exports = {
   mode: "development",
-  entry: "./src/index.tsx",
+  entry: "./src/index.ts",
   devtool: "inline-source-map",
   output: {
     filename: "[name].bundle.js",

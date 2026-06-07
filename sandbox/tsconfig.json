@@ -21,7 +21,13 @@
         "jsxFragmentFactory": "Fragment"
     },
     "include": [
-        "src"
+        "src",
+        "../json-form/src/form/carbon/ContextMenu.ts",
+        "../json-form/src/form/carbon/IconElement.ts",
+        "../json-form/src/form/carbon/setErrorsOnInput.ts",
+        "../json-form/src/form/HtmlBuilder.ts",
+        "../json-form/src/form/Debouncer.ts",
+        "../json-form/src/augmentProposal.ts"
     ],
     "exclude": [
         "node_modules",
