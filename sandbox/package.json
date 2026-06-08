@@ -1,35 +1,35 @@
 {
-    "name": "@diesel-parser/diesel-json-sandbox2",
-    "version": "1.0.0",
-    "private": true,
-    "description": "",
-    "scripts": {
-        "dev": "vite",
-        "start": "vite",
-        "build": "vite build",
-        "preview": "vite preview",
-        "prettify": "prettier --write .",
-        "lint": "eslint '**/*.{js,ts}'",
-        "lint:fix": "eslint '**/*.{js,ts}' --fix",
-        "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
-    },
-    "dependencies": {
-        "@carbon/ibm-products-web-components": "^0.40.0",
-        "@carbon/icon-helpers": "^10.76.0",
-        "@carbon/icons": "^11.79.0",
-        "@carbon/styles": "^1.105.0",
-        "@carbon/web-components": "^2.53.0",
-        "@diesel-parser/json-form": "^7.0.0",
-        "tea-cup-fp": "^1.1.1",
-        "tea-pop-core": "6.0.1"
-    },
-    "devDependencies": {
-        "@diesel-parser/ts-facade": "~0.32.2",
-        "@types/node": "^22.0.0",
-        "@types/vscode": "~1.100.0",
-        "gh-pages": "^6.0.0",
-        "sass": "^1.99.0",
-        "shx": "~0.4.0",
-        "vite": "^6.0.0"
-    }
+  "name": "@diesel-parser/diesel-json-sandbox2",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prettify": "prettier --write .",
+    "lint": "eslint '**/*.{js,ts}'",
+    "lint:fix": "eslint '**/*.{js,ts}' --fix",
+    "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
+  },
+  "dependencies": {
+    "@carbon/ibm-products-web-components": "^0.40.0",
+    "@carbon/icon-helpers": "^10.76.0",
+    "@carbon/icons": "^11.79.0",
+    "@carbon/styles": "^1.105.0",
+    "@carbon/web-components": "^2.53.0",
+    "@diesel-parser/json-form": "^7.0.0",
+    "tea-cup-fp": "^1.1.1",
+    "tea-pop-core": "6.0.1"
+  },
+  "devDependencies": {
+    "@diesel-parser/ts-facade": "~0.32.2",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "~1.100.0",
+    "gh-pages": "^6.0.0",
+    "sass": "^1.99.0",
+    "shx": "~0.4.0",
+    "vite": "^6.0.0"
+  }
 }
