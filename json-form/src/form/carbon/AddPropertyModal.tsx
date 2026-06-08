@@ -26,13 +26,13 @@ export function createAddPropertyModal(
         m.remove();
       }}
     >
-      Cancel (TODO i18n)
+      {T_FUNCTION('cancel')}
     </cds-modal-footer-button>
   );
 
   const btnAdd = (
     <cds-modal-footer-button kind={BUTTON_KIND.PRIMARY} disabled={true}>
-      Add TODO i18n
+      {T_FUNCTION('add')}
     </cds-modal-footer-button>
   );
 
@@ -40,10 +40,13 @@ export function createAddPropertyModal(
 
   inputName.addEventListener('input', () => {
     const s = inputName.value;
-    if (s === '' || existingNames.has(s)) {
+    if (s.trim() === '' || existingNames.has(s)) {
       btnAdd.setAttribute('disabled', 'true');
       inputName.setAttribute('invalid', 'true');
-      inputName.setAttribute('invalid-text', 'invalid prop name (TODO i18n)');
+      const message = existingNames.has(s)
+        ? T_FUNCTION('propertyAlreadyExists')
+        : T_FUNCTION('propertyNameCannotBeEmpty');
+      inputName.setAttribute('invalid-text', message);
     } else {
       btnAdd.removeAttribute('disabled');
       inputName.removeAttribute('invalid');
@@ -53,7 +56,7 @@ export function createAddPropertyModal(
 
   const radioGroup = (
     <cds-radio-button-group
-      legend-text="Select type (TODO i18n)"
+      legend-text={T_FUNCTION('selectPropertyType')}
       name="radio-group"
       orientation={RADIO_BUTTON_ORIENTATION.VERTICAL}
       value="string"
@@ -78,7 +81,9 @@ export function createAddPropertyModal(
       <cds-modal-header>
         <cds-modal-close-button close-button-label="Close"></cds-modal-close-button>
 
-        <cds-modal-heading>Add property (TODO i18n)</cds-modal-heading>
+        <cds-modal-heading>
+          {T_FUNCTION('contextMenu.addProperty')}
+        </cds-modal-heading>
       </cds-modal-header>
       <cds-modal-body>
         <cds-modal-body-content>
