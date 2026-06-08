@@ -29,6 +29,8 @@ import {
   stringify,
   empty,
   JsonForm,
+  NumberElement,
+  StringElement,
 } from '@diesel-parser/json-form';
 import '@carbon/web-components/es/components/dropdown/dropdown-item';
 import '@carbon/web-components/es/components/button/button';
@@ -37,6 +39,7 @@ import '@carbon/web-components/es/components/radio-button/radio-button-group';
 import { CDSComboBox, CDSRadioButton } from '@carbon/web-components';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
 import { h } from './MyJSXFactory';
+import { Renderer } from '@diesel-parser/json-form/dist/form/Renderer';
 
 const jsonForm = document.getElementById('json-form') as JsonForm;
 

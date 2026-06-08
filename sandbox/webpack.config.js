@@ -1,46 +1,45 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
-const { jsx } = require("react/jsx-runtime");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  mode: "development",
-  entry: "./src/index.ts",
-  devtool: "inline-source-map",
+  mode: 'development',
+  entry: './src/index.tsx',
+  devtool: 'inline-source-map',
   output: {
-    filename: "[name].bundle.js",
-    path: path.resolve(__dirname, "dist"),
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        use: 'ts-loader',
         exclude: /node_modules/,
       },
       {
         test: /\.s[ac]ss$/i,
         use: [
           // Creates `style` nodes from JS strings
-          "style-loader",
+          'style-loader',
           // Translates CSS into CommonJS
-          "css-loader",
+          'css-loader',
           // Compiles Sass to CSS
-          "sass-loader",
+          'sass-loader',
         ],
       },
-    //   {
-    //     test: /\.css$/i,
-    //     use: ["style-loader", "css-loader"],
-    //   },
+      //   {
+      //     test: /\.css$/i,
+      //     use: ["style-loader", "css-loader"],
+      //   },
       {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              name: "[name].[ext]",
-              outputPath: "fonts/",
+              name: '[name].[ext]',
+              outputPath: 'fonts/',
             },
           },
         ],
@@ -48,7 +47,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js"],
+    extensions: ['.ts', '.tsx', '.js'],
   },
   devServer: {
     // contentBase: path.join(__dirname, "dist"),
@@ -63,12 +62,12 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./index.html",
-      filename: "./index.html",
+      template: './index.html',
+      filename: './index.html',
       inject: false,
     }),
     new CopyPlugin({
-      patterns: [{ from: "./public", to: "." }],
+      patterns: [{ from: './public', to: '.' }],
     }),
-  ]
+  ],
 };
