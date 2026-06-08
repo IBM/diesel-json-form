@@ -36,6 +36,7 @@ import '@carbon/web-components/es/components/dropdown/dropdown-item';
 import '@carbon/web-components/es/components/button/button';
 import '@carbon/web-components/es/components/radio-button/radio-button';
 import '@carbon/web-components/es/components/radio-button/radio-button-group';
+import '@carbon/ibm-products-web-components/es/components/page-header/index';
 import { CDSComboBox, CDSRadioButton } from '@carbon/web-components';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
 import { h } from './MyJSXFactory';
