@@ -51,7 +51,14 @@ export class Renderer {
     f: CustomRendererCtor,
   ): RenderedElement<JsonValue> {
     const e = f(key.customKey);
-    return e;
+    if (e.getType() === args.value.tag) {
+      return e;
+    } else {
+      console.warn(
+        `custom renderer ${key.customKey.key} found of type ${e.getType()}, but doesn't match value type ${args.value.tag}`,
+      );
+      return this.createDefault(args);
+    }
   }
 
   private createString(

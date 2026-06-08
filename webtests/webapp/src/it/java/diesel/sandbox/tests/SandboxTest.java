@@ -859,4 +859,12 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "}");
     }
 
+    @Test
+    public void testCustomRendererMustMatchValueType() {
+        sandbox.selectSample("Renderer2");
+        sandbox.jsonForm
+                .objectAt(JsPath.empty)
+                .assertEmpty();
+    }
+
 }
