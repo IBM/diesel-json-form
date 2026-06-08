@@ -9,12 +9,11 @@
         "inlineSources": true,
         "inlineSourceMap": true,
         "strict": true,
-        "module": "esnext",
+        "module": "commonjs",
         "outDir": "dist",
         "declaration": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
-        "moduleResolution": "Node",
         "resolveJsonModule": true,
         "jsx": "react",
         "jsxFactory": "h",
@@ -22,12 +21,6 @@
     },
     "include": [
         "src",
-        "../json-form/src/form/carbon/ContextMenu.ts",
-        "../json-form/src/form/carbon/IconElement.ts",
-        "../json-form/src/form/carbon/setErrorsOnInput.ts",
-        "../json-form/src/form/HtmlBuilder.ts",
-        "../json-form/src/form/Debouncer.ts",
-        "../json-form/src/augmentProposal.ts"
     ],
     "exclude": [
         "node_modules",
