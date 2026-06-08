@@ -4,12 +4,14 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@diesel-parser/json-schema-facade-ts": "^0.15.0",
+    "i18next": "^20.6.1"
+  },
+  "peerDependencies": {
     "@carbon/icon-helpers": "^10.76.0",
     "@carbon/icons": "^11.79.0",
     "@carbon/styles": "^1.105.0",
-    "@carbon/web-components": "^2.53.0",
-    "@diesel-parser/json-schema-facade-ts": "^0.15.0",
-    "i18next": "^20.6.1"
+    "@carbon/web-components": "^2.53.0"
   },
   "devDependencies": {
     "jsdom": "^29.0.1",
@@ -22,8 +24,8 @@
     "build": "npm run clean && npm run lint && npm run build:ts && npm run test && npm run build:sass",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
-    "build:sass-dev": "sass --source-map --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
-    "build:sass": "sass --style=compressed --load-path=../node_modules/ src/JsonEditor.scss dist/JsonEditor.css",
+    "build:sass-dev": "sass --source-map --load-path=../node_modules/ scss/JsonForm.scss dist/JsonForm.css",
+    "build:sass": "sass --style=compressed --load-path=../node_modules/ scss/JsonForm.scss dist/JsonForm.css",
     "clean": "rimraf dist",
     "test": "vitest --run",
     "watch": "npm-scripts-watcher",
