@@ -39,7 +39,7 @@ import '@carbon/web-components/es/components/radio-button/radio-button-group';
 import { CDSComboBox, CDSRadioButton } from '@carbon/web-components';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
 import { h } from './MyJSXFactory';
-import { Renderer } from '@diesel-parser/json-form/dist/form/Renderer';
+import { Renderer } from '@diesel-parser/json-form';
 
 const jsonForm = document.getElementById('json-form') as JsonForm;
 
