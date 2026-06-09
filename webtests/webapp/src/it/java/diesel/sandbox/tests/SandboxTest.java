@@ -801,13 +801,18 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void testRendererAccessSchema1() {
         sandbox.selectSample("Renderer1");
+        sandbox.jsonEditor.clearText().typeText("\"\"");
+        sandbox.clickApplyLeftToRight();
+
         assertMyConfigProp("Config prop is undefined");
+
         sandbox.jsonEditor.replaceText("\"yalla\"");
         sandbox.clickApplyLeftToRight();
 
         assertMyStringValue("yalla");
         clickConcat();
         assertMyStringValue("yallaX");
+
         sandbox.clickApplyRightToLeft();
 
         sandbox.jsonEditor.assertText("\"yallaX\"");
@@ -816,6 +821,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void testRendererAccessSchema2() {
         sandbox.selectSample("Renderer2");
+        sandbox.jsonEditor.clearText().typeText("\"\"");
+        sandbox.clickApplyLeftToRight();
         assertMyConfigProp("Config prop set to 123");
     }
 

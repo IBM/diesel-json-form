@@ -14,13 +14,20 @@ public class FEditor extends AbstractPageObject {
         super(f.$("#" + id));
     }
 
+    private Findr findInput() {
+        return this.getFindr()
+                .shadowRoot()
+                .$$("textarea")
+                .expectOne();
+    }
+
     public FEditor clearText() {
-        this.getFindr().clear();
+        this.findInput().clear();
         return this;
     }
 
     public FEditor typeText(String text) {
-        this.getFindr().sendKeys(text);
+        this.findInput().sendKeys(text);
         return this;
     }
 

@@ -40,7 +40,7 @@ public class FMenu extends AbstractPageObject {
     }
 
     public FAddProperty clickAddProperty() {
-        clickMenuItem("Add property...");
+        clickMenuItem("Add property");
         return new FAddProperty();
     }
 
@@ -68,11 +68,11 @@ public class FMenu extends AbstractPageObject {
 
         public FAddProperty setPropertyName(String foo) {
             var input = $$("cds-modal cds-text-input")
-                    .where(attrEquals("placeholder", "type property name..."))
+                    .where(attrEquals("placeholder", "Enter property name"))
                     .expectOne()
                     .shadowRoot()
                     .$$("input")
-                    .where(attrEquals("placeholder", "type property name..."))
+                    .where(attrEquals("placeholder", "Enter property name"))
                     .expectOne();
             input.clear();
             input.sendKeys(foo);
