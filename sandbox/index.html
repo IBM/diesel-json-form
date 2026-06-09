@@ -14,31 +14,33 @@
             <cds-header class="ui-shell--header" aria-label="IBM Platform Name">
                 <cds-header-name href="javascript:void 0" prefix="IBM">JSON Editor</cds-header-name>
                 <div class="schema-select cds--header__global">
-                    <cds-dropdown label="Select Sample Schema" type="inline" id="sampleSchemaSelect"
-                        trigger-content="Select an item">
-                    </cds-dropdown>
+                    <div id="about"></div>
                 </div>
-                <div id="about"></div>
             </cds-header>
         </div>
         <div class="main">
-            <div class="sub schema">
-                <div class="sub-head">
-                    <h3>Schema</h3>
+            <div class="sub">
+                <div class="texteditor">
+                    <div class="sub-head">
+                        <h3>JSON</h3>
+                    </div>
+                    <div class="editor-wrapper">
+                        <cds-textarea spellcheck="false" id="ta-json" rows="13"></cds-textarea>
+                        <cds-button id="btn-to-form" size="xs">
+                            <icon-elem slot="icon" icon="arrow-right"></icon-elem>
+                        </cds-button>
+                    </div>
                 </div>
-                <div class="editor-wrapper">
-                    <textarea id="ta-schema"></textarea>
-                </div>
-            </div>
-            <div class="sub texteditor">
-                <div class="sub-head">
-                    <h3>JSON</h3>
-                </div>
-                <div class="editor-wrapper">
-                    <textarea spellcheck="false" id="ta-json"></textarea>
-                    <cds-button id="btn-to-form" size="xs">
-                        <icon-elem slot="icon" icon="arrow-right"></icon-elem>
-                    </cds-button>
+                <div class="schema">
+                    <div class="sub-head">
+                        <h3>Schema</h3>
+                        <cds-dropdown label="Select Sample Schema" type="inline" id="sampleSchemaSelect"
+                            trigger-content="Select an item">
+                        </cds-dropdown>
+                    </div>
+                    <div class="editor-wrapper">
+                        <cds-textarea id="ta-schema" rows="13"></cds-textarea>
+                    </div>
                 </div>
             </div>
             <div class="sub form">

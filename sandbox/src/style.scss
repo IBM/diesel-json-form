@@ -46,7 +46,7 @@
 
 .main {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 2fr 3fr;
   flex-grow: 1;
 }
 
@@ -98,10 +98,9 @@
   padding: 4px;
 }
 
-.editor-wrapper textarea {
+.editor-wrapper cds-textarea {
   flex-grow: 1;
   width: 100%;
-  resize: none;
 }
 
 #json-form {
