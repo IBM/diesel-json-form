@@ -29,7 +29,7 @@ export default defineConfig({
       ),
       '@diesel-parser/json-form': path.resolve(
         __dirname,
-        '../json-form/src/index.tsx',
+        '../json-form/src/index.ts',
       ),
     },
   },
