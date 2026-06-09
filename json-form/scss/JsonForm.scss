@@ -6,17 +6,22 @@
 }
 
 json-form {
-  position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
-  .json-form-scrollpane {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: auto;
-  }
+  .json-form-scrollpane-wrapper {
+    position: relative;
+    flex-grow: 1;
+    .json-form-scrollpane {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: auto;
+    }
+  } 
 }
 
 collapsible-section {

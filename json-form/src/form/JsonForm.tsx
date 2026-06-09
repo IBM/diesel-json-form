@@ -11,6 +11,9 @@ import { JsPath } from '../JsPath';
 import { Metadata } from '../Metadata';
 import { validateAndComputeMetadata } from '../ComputeAllTask';
 import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata';
+import { h } from '../MyJSXFactory';
+import { empty } from './HtmlBuilder';
+
 declare global {
   interface GlobalEventHandlersEventMap {
     'json-changed': JsonChangedEvent;
@@ -26,6 +29,7 @@ export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
 
   private headerElement: FormHeaderElement;
+  private scrollPane: HTMLElement = (<div className="json-form-scrollpane" />);
   private element?: RenderedElement<JsonValue>;
   private VALIDATION_COUNTER = 0;
   private schemaService: SchemaService = defaultSchemaService;
@@ -39,11 +43,13 @@ export class JsonForm extends HTMLElement {
 
   connectedCallback() {
     this.appendChild(this.headerElement);
+    this.appendChild(
+      <div className="json-form-scrollpane-wrapper">{this.scrollPane}</div>,
+    );
   }
 
   disconnectedCallback() {
-    this.headerElement.remove();
-    this.element?.remove();
+    empty(this);
   }
 
   initialize(
@@ -68,7 +74,7 @@ export class JsonForm extends HTMLElement {
             path: JsPath.empty,
           });
           this.element = e;
-          this.appendChild(e);
+          this.scrollPane.appendChild(e);
           this.updateHeaderCounter();
         }
       })
@@ -139,7 +145,7 @@ export class JsonForm extends HTMLElement {
             if (e) {
               this.element.remove();
               this.element = e;
-              this.appendChild(this.element);
+              this.scrollPane.appendChild(this.element);
             }
           }
         })
