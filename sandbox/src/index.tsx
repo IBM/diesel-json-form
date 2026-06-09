@@ -74,11 +74,12 @@ const taJson = document.getElementById('ta-json') as HTMLTextAreaElement;
 taJson.value = initialValue;
 
 jsonForm.addEventListener('json-changed', (e) => {
-  const value = e.detail;
-  const valueStr = stringify(value, '  ').withDefault(
-    'Broken JSON from form (invalid numbers)',
-  );
-  taJson.value = valueStr;
+  //   const value = e.detail;
+  //   const valueStr = stringify(value, '  ').withDefault(
+  //     'Broken JSON from form (invalid numbers)',
+  //   );
+  //   taJson.value = valueStr;
+  console.log('json changed', e.detail);
 });
 
 taJson.addEventListener('input', () => {
@@ -91,11 +92,22 @@ taJson.addEventListener('input', () => {
 });
 
 const btnToForm = document.getElementById('btn-to-form') as HTMLButtonElement;
+const btnFromForm = document.getElementById(
+  'btn-from-form',
+) as HTMLButtonElement;
 
 btnToForm.addEventListener('click', () => {
   const value = parseJsonValueUnsafe(taJson.value);
   const schema = parseJsonValueUnsafe(taSchema.value);
   jsonForm.initialize(renderer, defaultSchemaService, schema, value);
+});
+
+btnFromForm.addEventListener('click', () => {
+  const value = jsonForm.toValue();
+  const valueStr = stringify(value, '  ').withDefault(
+    'Broken JSON from form (invalid numbers)',
+  );
+  taJson.value = valueStr;
 });
 
 class RatingRenderer extends NumberElement {
