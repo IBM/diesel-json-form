@@ -32,15 +32,17 @@ import {
   NumberElement,
   StringElement,
 } from '@diesel-parser/json-form';
-import '@carbon/web-components/es/components/dropdown/dropdown-item';
-import '@carbon/web-components/es/components/button/button';
-import '@carbon/web-components/es/components/radio-button/radio-button';
-import '@carbon/web-components/es/components/radio-button/radio-button-group';
-import '@carbon/ibm-products-web-components/es/components/page-header/index';
+import '@carbon/web-components/es/index';
 import { CDSComboBox, CDSRadioButton } from '@carbon/web-components';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
 import { h } from './MyJSXFactory';
 import { Renderer } from '@diesel-parser/json-form';
+import { version } from '@diesel-parser/json-form/package.json';
+
+const about = document.getElementById('about');
+if (about) {
+  about.innerText = version;
+}
 
 const jsonForm = document.getElementById('json-form') as JsonForm;
 
@@ -71,9 +73,13 @@ taSchema.value = initialSchema;
 const taJson = document.getElementById('ta-json') as HTMLTextAreaElement;
 taJson.value = initialValue;
 
-const btnFromForm = document.getElementById(
-  'btn-from-form',
-) as HTMLButtonElement;
+jsonForm.addEventListener('json-changed', (e) => {
+  const value = e.detail;
+  const valueStr = stringify(value, '  ').withDefault(
+    'Broken JSON from form (invalid numbers)',
+  );
+  taJson.value = valueStr;
+});
 
 taJson.addEventListener('input', () => {
   try {
@@ -82,14 +88,6 @@ taJson.addEventListener('input', () => {
   } catch (err) {
     btnToForm.disabled = true;
   }
-});
-
-btnFromForm.addEventListener('click', () => {
-  const value = jsonForm.toValue();
-  const valueStr = stringify(value, '  ').withDefault(
-    'Broken JSON from form (invalid numbers)',
-  );
-  taJson.value = valueStr;
 });
 
 const btnToForm = document.getElementById('btn-to-form') as HTMLButtonElement;
@@ -237,11 +235,6 @@ renderer.addCustomRenderer('RatingRenderer', () => {
 renderer.addCustomRenderer('MyStringRenderer', MyStringRenderer.newInstance);
 
 jsonForm.initialize(renderer, defaultSchemaService, schema, value);
-// jsonForm.addChangeListener((value) => {
-//   btnFromForm.disabled = !stringify(value)
-//     .map(() => true)
-//     .withDefault(false);
-// });
 
 sampleSchemaSelect.addEventListener('cds-dropdown-selected', () => {
   taSchema.value = sampleSchemaSelect.value;

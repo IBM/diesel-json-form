@@ -11,6 +11,16 @@ import { JsPath } from '../JsPath';
 import { Metadata } from '../Metadata';
 import { validateAndComputeMetadata } from '../ComputeAllTask';
 import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata';
+declare global {
+  interface GlobalEventHandlersEventMap {
+    'json-changed': JsonChangedEvent;
+  }
+}
+export type TypedEvent<T extends EventTarget, D = unknown> = CustomEvent<D> & {
+  target: T;
+};
+
+export type JsonChangedEvent = TypedEvent<JsonForm, JsonValue>;
 
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
@@ -116,6 +126,7 @@ export class JsonForm extends HTMLElement {
     if (this.element) {
       this.updateHeaderCounter();
       const value = this.toValue();
+      this.dispatchEvent(new CustomEvent('json-changed', { detail: value }));
       this.doValidate(value)
         .then((metadata) => {
           if (metadata && this.element && this.renderer) {
