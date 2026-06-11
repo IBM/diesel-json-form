@@ -1,4 +1,4 @@
-import { CDSTextArea } from '@carbon/web-components';
+import { CDSTextarea } from '@carbon/web-components';
 import { Debouncer } from '../Debouncer';
 import { setErrors } from './setErrorsOnInput';
 import { StringElement } from '../StringElement';
@@ -6,7 +6,7 @@ import '@carbon/web-components/es/components/textarea/index';
 import { JsonForm } from '../JsonForm';
 import { nextElementId } from './nextElementId';
 import { T_FUNCTION } from '../../JsonFormMessages';
-import { getValueAt, JvString } from '../../JsonValue';
+import { JvString } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
 import { SchemaRenderer } from '../../SchemaService';
@@ -15,7 +15,7 @@ import { setRendererAttributes } from './setRendererAttributes';
 export class CarbonStringElemTextarea extends StringElement {
   static TAG_NAME = 'string-elem-textarea';
 
-  private input: CDSTextArea;
+  private input: CDSTextarea;
   private readonly debouncer = new Debouncer();
 
   static newInstance(schemaRenderer: SchemaRenderer): CarbonStringElemTextarea {
@@ -28,7 +28,7 @@ export class CarbonStringElemTextarea extends StringElement {
 
   constructor() {
     super();
-    this.input = document.createElement('cds-textarea') as CDSTextArea;
+    this.input = document.createElement('cds-textarea') as CDSTextarea;
     this.input.id = nextElementId();
     this.input.setAttribute(
       'placeholder',

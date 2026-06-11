@@ -1,4 +1,4 @@
-import { CDSTable, CDSTableBody, CDSTableHead } from '@carbon/web-components';
+import { CDSTable, CDSTableHead } from '@carbon/web-components';
 import { ArrayElement } from '../ArrayElement';
 import { h } from '../../MyJSXFactory';
 import { JsonProperty, JsonValue, JvArray, JvObject } from '../../JsonValue';
@@ -74,7 +74,7 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     return this.rows;
   }
 
-  protected appendElement(elem: RenderedElement<JsonValue>): void {
+  protected appendElement(): void {
     throw new Error('Method not implemented.');
   }
 
@@ -118,10 +118,7 @@ export class CarbonObjectTableRowElement extends ObjectElement {
     throw new Error('Method not implemented.');
   }
 
-  protected appendProperty(
-    name: string,
-    elem: RenderedElement<JsonValue>,
-  ): void {
+  protected appendProperty(): void {
     throw new Error('Method not implemented.');
   }
 
