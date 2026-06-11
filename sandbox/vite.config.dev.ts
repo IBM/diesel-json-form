@@ -18,5 +18,16 @@ export default defineConfig({
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.scss'],
+    alias: {
+      '@diesel-parser/json-form/scss': path.resolve(
+        __dirname,
+        '../json-form/scss',
+      ),
+      '@diesel-parser/json-form/package.json': path.resolve(
+        __dirname,
+        '../json-form/package.json',
+      ),
+      '@diesel-parser/json-form': path.resolve(__dirname, '../json-form/src'),
+    },
   },
 });

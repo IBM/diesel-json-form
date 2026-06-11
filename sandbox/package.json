@@ -4,8 +4,7 @@
   "private": true,
   "description": "",
   "scripts": {
-    "dev": "vite --port 3000",
-    "start": "vite",
+    "start": "vite --port 3000 --config vite.config.dev.ts",
     "build": "vite build",
     "preview": "vite preview",
     "prettify": "prettier --write .",
