@@ -121,6 +121,10 @@ my-string-renderer > div {
   justify-content: end;
   height: 48px;
   padding-bottom: 0.5rem;
+
+  cds-button:first-child {
+    margin-right: 0.5rem;
+  }
 }
 
 .left-panel {
