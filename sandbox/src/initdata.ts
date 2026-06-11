@@ -285,6 +285,22 @@ const Example_Renderer4 = `
   }
 }`;
 
+const Example_RendererTextArea = `
+{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "comment": {
+      "type": "string",
+      "renderer": {
+        "key": "textarea",
+        "rows": 13
+      }
+    }
+  }
+}`;
+
 const Example_Date = JSON.stringify(
   {
     type: 'string',
@@ -379,6 +395,7 @@ export const samples = [
   ['RendererRating', Example_Renderer3],
   ['RendererObject', Example_Renderer4],
   ['RendererTable', Example_RendererTable],
+  ['RendererTextArea', Example_RendererTextArea],
 ];
 
 export const initialSchema = {};

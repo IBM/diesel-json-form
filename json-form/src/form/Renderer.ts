@@ -16,6 +16,7 @@ import { JsonValue, stringify } from '../JsonValue';
 import { SchemaRenderer } from '../SchemaService';
 import { Metadata } from '../Metadata';
 import { JsPath } from '../JsPath';
+import { CarbonStringElemTextarea } from './carbon/CarbonStringElemTextarea';
 
 export interface RenderArgs {
   readonly value: JsonValue;
@@ -28,7 +29,16 @@ type CustomRendererCtor = (s: SchemaRenderer) => RenderedElement<JsonValue>;
 type FormatCtor = () => StringElement;
 
 export class Renderer {
-  private readonly customRenderers: Map<string, CustomRendererCtor> = new Map();
+  private readonly customRenderers: Map<string, CustomRendererCtor> = new Map<
+    string,
+    CustomRendererCtor
+  >([
+    [
+      'textarea',
+      (schemaRenderer) => CarbonStringElemTextarea.newInstance(schemaRenderer),
+    ],
+  ]);
+
   private readonly formatRenderers: Map<string, FormatCtor> = new Map<
     string,
     FormatCtor
