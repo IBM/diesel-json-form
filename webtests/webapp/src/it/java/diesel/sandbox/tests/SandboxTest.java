@@ -76,12 +76,14 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void simpleLong() {
         sandbox.schemaEditor.assertText("{}");
+        sandbox.clickTabJson();
         sandbox.jsonEditor.assertText("{}");
         sandbox.jsonForm
                 .assertMenuClosed()
                 .objectAt(JsPath.empty)
                 .assertEmpty();
 
+        sandbox.clickTabSchema();
         sandbox.selectSample("Long");
         sandbox.schemaEditor.assertText("{\n" +
                 "  \"type\": [\n" +
@@ -95,6 +97,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .assertError("Invalid type: expected integer | null")
                 .assertEmpty();
 
+        sandbox.clickTabJson();
         sandbox.jsonEditor
                 .focus()
                 .clearText()
@@ -102,7 +105,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .clearText()
                 .typeText("123");
 
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         sandbox.jsonForm
                 .numberAt(JsPath.empty)
@@ -124,21 +127,21 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "    \"age\": 0\n" +
                 "  }\n" +
                 "}";
-        sandbox.selectSample(BeanContainingOtherBean);
+        sandbox.selectSample(BeanContainingOtherBean).clickTabJson();
         sandbox.jsonEditor
                 .focus()
                 .clearText()
                 .typeText(text)
                 .assertText(text);
 
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         sandbox.jsonForm
                 .numberAt(JsPath.empty.append("customer").append("age"))
                 .assertValue("0")
                 .setValue("18");
 
-        sandbox.clickApplyRightToLeft();
+        sandbox.clickApplyFromForm();
 
         sandbox.jsonEditor
                 .assertText("{\n" +
@@ -197,14 +200,9 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .clearText()
                 .typeText("{ \"type\": \"" + type + "\" }");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyFromSchema();
 
         String expectedError = "Invalid type: expected " + type;
-        // sandbox.jsonEditor
-        // .assertHasErrors()
-        // .moveMouseToGutter(0)
-        // .tooltip()
-        // .assertContains(expectedError);
         sandbox.jsonForm
                 .objectAt(JsPath.empty)
                 .assertEmpty()
@@ -243,7 +241,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         f.numberAt(JsPath.empty.append("bar"))
                 .setValue("123");
 
-        sandbox.clickApplyRightToLeft();
+        sandbox.clickTabJson().clickApplyFromForm();
 
         sandbox.jsonEditor.assertText("{\n" +
                 "  \"foo\": \"yalla\",\n" +
@@ -305,7 +303,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .clickCheckbox()
                 .assertChecked(false);
 
-        sandbox.clickApplyRightToLeft();
+        sandbox.clickTabJson().clickApplyFromForm();
 
         sandbox.jsonEditor.assertText("{\n" +
                 "  \"foo\": [\n" +
@@ -330,12 +328,12 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .assertError("Invalid type: expected string")
                 .assertEmpty();
 
+        sandbox.clickTabJson();
         sandbox.jsonEditor
                 .focus()
                 .clearText()
                 .typeText("\"\"");
-
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
@@ -346,7 +344,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .clearText()
                 .typeText("\"" + date + "\"");
 
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
@@ -362,12 +360,13 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "  \"format\": \"date\"\n" +
                 "}");
 
+        sandbox.clickTabJson();
         sandbox.jsonEditor
                 .focus()
                 .clearText()
                 .typeText("\"\"");
 
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
@@ -395,11 +394,12 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .assertError("Invalid type: expected string")
                 .assertEmpty();
 
+        sandbox.clickTabJson();
         sandbox.jsonEditor
                 .focus()
                 .clearText()
                 .typeText("\"\"");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         sandbox.jsonForm
                 .timeAt(JsPath.empty)
@@ -409,7 +409,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .clearText()
                 .typeText("\"" + date + "T10:10:10Z\"");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
@@ -516,12 +516,12 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         f.clickRootMenu().clickPropose("{ what }");
 
-        sandbox.clickApplyRightToLeft();
-
+        sandbox.clickTabJson().clickApplyFromForm();
         sandbox.jsonEditor
                 .assertText("{\n" +
                         "  \"what\": \"schema.animal.Lion\"\n" +
                         "}");
+
         FObject fObject = f.objectAt(JsPath.empty);
         fObject.assertEmptyProperties("mane", "name", "sound", "type", "endangered");
         FSelect select = f.selectAt(JsPath.empty.append("what"));
@@ -539,11 +539,11 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "  \"trunkLength\": 0,\n" +
                         "  \"tusk\": true\n" +
                         "}");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
         fObject.assertProperties("what", "endangered", "name", "sound", "type", "trunkLength", "tusk");
 
         sandbox.jsonEditor.focus().replaceText("{}");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         f.clickRootMenu().clickPropose("{ what }");
         fObject.clickAddPropButton("endangered");
@@ -551,7 +551,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         fObject.clickAddPropButton("name");
         fObject.clickAddPropButton("sound");
         fObject.clickAddPropButton("type");
-        sandbox.clickApplyRightToLeft();
+        sandbox.clickApplyFromForm();
 
         sandbox.jsonEditor
                 .assertText("{\n" +
@@ -570,8 +570,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         sandbox.selectSample(EnumArray);
 
+        sandbox.clickTabJson();
         sandbox.jsonEditor.assertText("{}");
-
         sandbox.jsonEditor
                 .focus()
                 .clearText();
@@ -585,7 +585,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .typeText(enumContent)
                 .assertText(enumContent);
 
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         FArray fArray = form.arrayAt(JsPath.empty);
         fArray.assertLength(2);
@@ -595,7 +595,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         stringCell1.selectValue("BAR");
         stringCell1.assertValue("BAR");
 
-        sandbox.clickApplyRightToLeft();
+        sandbox.clickApplyFromForm();
 
         sandbox.jsonEditor.assertText("[\n" +
                 "  \"BAR\",\n" +
@@ -611,7 +611,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .focus()
                 .replaceText(newEnumContent)
                 .assertText(newEnumContent);
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         String expectedError = "Invalid value: should be one of \"FOO\" | \"BAR\"";
         form
@@ -635,11 +635,12 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "    }\n" +
                         "  }\n" +
                         "}");
+        sandbox.clickTabJson();
         sandbox.jsonEditor
                 .focus()
                 .clearText()
                 .typeText("{}");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         FObject fObject = f.objectAt(JsPath.empty);
         fObject.assertEmptyProperties("name", "children");
@@ -680,7 +681,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "  ]\n" +
                         "}");
 
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
         f.stringAt(JsPath.empty.append("name")).assertValue("Elizabeth");
 
         JsPath firstLevelPath = JsPath.empty.append("children");
@@ -730,8 +731,9 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void testNumberEmptyField() {
         sandbox.schemaEditor.replaceText("{\"type\":\"number\"}");
+        sandbox.clickTabJson();
         sandbox.jsonEditor.replaceText("123");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         FNumber num = sandbox.jsonForm.numberAt(JsPath.empty);
 
@@ -760,8 +762,9 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     }
 
     private void doTestInvalidNumber() {
+        sandbox.clickTabJson();
         sandbox.jsonEditor.replaceText("123");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
         FNumber num = sandbox.jsonForm.numberAt(JsPath.empty);
         num.assertValue("123").assertNoError();
         num
@@ -775,18 +778,19 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void testCustomRenderer() {
         sandbox.selectSample("RendererRating");
+        sandbox.clickTabJson();
         sandbox.jsonEditor.replaceText("{\n" + //
                 "  \"name\": \"\",\n" + //
                 "  \"rating\": 0\n" + //
                 "}");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         FRating rating = new FRating(JsPath.empty.append("rating"), sandbox.jsonForm.getFindr());
         rating
                 .assertRating(1)
                 .clickRating(3)
                 .assertRating(3);
-        sandbox.clickApplyRightToLeft();
+        sandbox.clickApplyFromForm();
 
         sandbox.jsonEditor.assertText("{\n" + //
                 "  \"name\": \"\",\n" + //
@@ -801,19 +805,20 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void testRendererAccessSchema1() {
         sandbox.selectSample("Renderer1");
+        sandbox.clickTabJson();
         sandbox.jsonEditor.clearText().typeText("\"\"");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         assertMyConfigProp("Config prop is undefined");
 
         sandbox.jsonEditor.replaceText("\"yalla\"");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
 
         assertMyStringValue("yalla");
         clickConcat();
         assertMyStringValue("yallaX");
 
-        sandbox.clickApplyRightToLeft();
+        sandbox.clickApplyFromForm();
 
         sandbox.jsonEditor.assertText("\"yallaX\"");
     }
@@ -821,8 +826,9 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void testRendererAccessSchema2() {
         sandbox.selectSample("Renderer2");
+        sandbox.clickTabJson();
         sandbox.jsonEditor.clearText().typeText("\"\"");
-        sandbox.clickApplyLeftToRight();
+        sandbox.clickApplyToForm();
         assertMyConfigProp("Config prop set to 123");
     }
 
@@ -854,8 +860,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .objectAt(JsPath.empty)
                 .clickPropertyMenu("customer")
                 .clickPropose("{ firstName, lastName, amount, age }");
-        sandbox.clickApplyRightToLeft();
-
+        sandbox.clickTabJson().clickApplyFromForm();
         sandbox.jsonEditor.assertText("{\n" + //
                 "  \"customer\": {\n" + //
                 "    \"firstName\": \"\",\n" + //

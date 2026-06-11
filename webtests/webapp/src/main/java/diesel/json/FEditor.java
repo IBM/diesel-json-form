@@ -15,10 +15,7 @@ public class FEditor extends AbstractPageObject {
     }
 
     private Findr findInput() {
-        return this.getFindr()
-                .shadowRoot()
-                .$$("textarea")
-                .expectOne();
+        return this.getFindr();
     }
 
     public FEditor clearText() {

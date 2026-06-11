@@ -20,13 +20,29 @@ public class FSandbox extends AbstractPageObject {
 
     public final FJsonForm jsonForm = new FJsonForm(getFindr(), "#json-form");
 
-    public FSandbox clickApplyLeftToRight() {
+    public FSandbox clickApplyToForm() {
         $("#btn-to-form").click();
         return this;
     }
 
-    public FSandbox clickApplyRightToLeft() {
+    public FSandbox clickApplyFromSchema() {
+        $("#btn-from-schema").click();
+        return this;
+    }
+
+    public FSandbox clickApplyFromForm() {
         $("#btn-from-form").click();
         return this;
     }
+
+    public FSandbox clickTabJson() {
+        $("#tab-json").click();
+        return this;
+    }
+
+    public FSandbox clickTabSchema() {
+        $("#tab-schema").click();
+        return this;
+    }
+
 }

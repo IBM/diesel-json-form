@@ -16,7 +16,7 @@
 
 // @ts-ignore
 import './style.scss';
-import { samples } from './initdata';
+import { Example_RendererTable, samples } from './initdata';
 import {
   defaultSchemaService,
   getValueAt,
@@ -31,12 +31,15 @@ import {
   JsonForm,
   NumberElement,
   StringElement,
+  CarbonTableArrayRenderer,
+  Renderer,
 } from '@diesel-parser/json-form';
+
 import '@carbon/web-components/es/index';
+
 import { CDSComboBox, CDSRadioButton } from '@carbon/web-components';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
 import { h } from './MyJSXFactory';
-import { Renderer } from '@diesel-parser/json-form';
 import { version } from '@diesel-parser/json-form/package.json';
 
 const about = document.getElementById('about');
@@ -61,11 +64,29 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{}`;
+const initialSchema = `{}`; //Example_RendererTable;
 
 const schema = parseJsonValueUnsafe(initialSchema);
 
+// const initialValue = `{
+//   "firstName": "",
+//   "lastName": "",
+//   "category": "SILVER",
+//   "lastOrders": [
+//     {
+//       "productId": "ABCDEF",
+//       "amount": 123,
+//       "quantity": 12
+//     },
+//     {
+//       "productId": "XYZ",
+//       "amount": 333,
+//       "quantity": 2323
+//     }
+//   ]
+// }`;
 const initialValue = `{}`;
+
 const value = parseJsonValueUnsafe(initialValue);
 
 const taSchema = document.getElementById('ta-schema') as HTMLTextAreaElement;
@@ -95,12 +116,18 @@ const btnToForm = document.getElementById('btn-to-form') as HTMLButtonElement;
 const btnFromForm = document.getElementById(
   'btn-from-form',
 ) as HTMLButtonElement;
+const btnFromSchema = document.getElementById(
+  'btn-from-schema',
+) as HTMLButtonElement;
 
-btnToForm.addEventListener('click', () => {
+function toFormClicked() {
   const value = parseJsonValueUnsafe(taJson.value);
   const schema = parseJsonValueUnsafe(taSchema.value);
   jsonForm.initialize(renderer, defaultSchemaService, schema, value);
-});
+}
+
+btnToForm.addEventListener('click', toFormClicked);
+btnFromSchema.addEventListener('click', toFormClicked);
 
 btnFromForm.addEventListener('click', () => {
   const value = jsonForm.toValue();
@@ -245,6 +272,8 @@ renderer.addCustomRenderer('RatingRenderer', () => {
 });
 
 renderer.addCustomRenderer('MyStringRenderer', MyStringRenderer.newInstance);
+
+renderer.addCustomRenderer('ArrayTable', () => new CarbonTableArrayRenderer());
 
 jsonForm.initialize(renderer, defaultSchemaService, schema, value);
 

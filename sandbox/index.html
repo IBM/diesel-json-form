@@ -23,17 +23,54 @@
       </div>
       <div class="main">
         <div class="sub">
-          <div class="texteditor">
-            <div class="sub-head">
-              <h3>JSON</h3>
+          <cds-tabs
+            value="schema"
+            disabled="false"
+            selection-mode="automatic"
+            type="false"
+          >
+            <cds-tab id="tab-schema" target="panel-schema" value="schema">
+              Schema
+            </cds-tab>
+            <cds-tab id="tab-json" target="panel-json" value="json">
+              JSON
+            </cds-tab>
+          </cds-tabs>
+          <div
+            id="panel-schema"
+            role="tabpanel"
+            aria-labelledby="tab-schema"
+            hidden=""
+            class="left-panel"
+          >
+            <div class="panel-content">
+              <div class="drop-down-wrapper">
+                <cds-dropdown
+                  title-text="Samples"
+                  label="Select Sample Schema"
+                  id="sampleSchemaSelect"
+                  type="inline"
+                  trigger-content="Select an item"
+                >
+                </cds-dropdown>
+                <div class="btn-wrapper-schema">
+                  <cds-button id="btn-from-schema" size="xs">
+                    <icon-elem slot="icon" icon="arrow-right"></icon-elem>
+                  </cds-button>
+                </div>
+              </div>
+              <textarea id="ta-schema"></textarea>
             </div>
-            <div class="editor-wrapper">
-              <cds-textarea
-                spellcheck="false"
-                id="ta-json"
-                rows="13"
-              ></cds-textarea>
-              <div class="btn-wrapper">
+          </div>
+          <div
+            id="panel-json"
+            role="tabpanel"
+            aria-labelledby="tab-json"
+            hidden=""
+            class="left-panel"
+          >
+            <div class="panel-content">
+              <div class="btn-wrapper-json">
                 <cds-button id="btn-to-form" size="xs">
                   <icon-elem slot="icon" icon="arrow-right"></icon-elem>
                 </cds-button>
@@ -41,28 +78,11 @@
                   <icon-elem slot="icon" icon="arrow-left"></icon-elem>
                 </cds-button>
               </div>
-            </div>
-          </div>
-          <div class="schema">
-            <div class="sub-head">
-              <h3>Schema</h3>
-              <cds-dropdown
-                label="Select Sample Schema"
-                type="inline"
-                id="sampleSchemaSelect"
-                trigger-content="Select an item"
-              >
-              </cds-dropdown>
-            </div>
-            <div class="editor-wrapper">
-              <cds-textarea id="ta-schema" rows="13"></cds-textarea>
+              <textarea spellcheck="false" id="ta-json"></textarea>
             </div>
           </div>
         </div>
         <div class="sub form">
-          <div class="sub-head">
-            <h3>FORM</h3>
-          </div>
           <json-form id="json-form"></json-form>
         </div>
       </div>
