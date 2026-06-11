@@ -340,6 +340,24 @@ const Example_RendererNumberCdsTextInput = `
   }
 }`;
 
+const Example_RendererBooleanCdsCheckbox = `
+{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "passed": {
+      "type": "boolean",
+      "renderer": {
+        "key": "boolean-cds-checkbox",
+        "attributes": {
+            "helper-text": "Hey hoooo"
+        }
+      }
+    }
+  }
+}`;
+
 const Example_Date = JSON.stringify(
   {
     type: 'string',
@@ -437,6 +455,7 @@ export const samples = [
   ['RendererStringCdsTextInput', Example_RendererStringCdsTextInput],
   ['RendererStringCdsTextArea', Example_RendererStringCdsTextArea],
   ['RendererNumberCdsTextInput', Example_RendererNumberCdsTextInput],
+  ['RendererBooleanCdsCheckbox', Example_RendererBooleanCdsCheckbox],
 ];
 
 export const initialSchema = {};

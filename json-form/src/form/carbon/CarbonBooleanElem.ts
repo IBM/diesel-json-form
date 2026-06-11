@@ -7,11 +7,21 @@ import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
 import { JvBoolean } from '../../JsonValue';
 import { setErrors } from './setErrorsOnInput';
+import { SchemaRenderer } from '../../SchemaService';
+import { setRendererAttributes } from './setRendererAttributes';
 
 export class CarbonBooleanElement extends BooleanElement {
   static TAG_NAME = 'json-boolean';
 
   private input: CDSCheckbox;
+
+  static newInstance(schemaRenderer: SchemaRenderer): CarbonBooleanElement {
+    const e = document.createElement(
+      CarbonBooleanElement.TAG_NAME,
+    ) as CarbonBooleanElement;
+    setRendererAttributes(schemaRenderer, e.input);
+    return e;
+  }
 
   constructor() {
     super();

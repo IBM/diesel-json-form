@@ -45,6 +45,10 @@ export class Renderer {
       'number-cds-text-input',
       (schemaRenderer) => CarbonNumberElement.newInstance(schemaRenderer),
     ],
+    [
+      'boolean-cds-checkbox',
+      (schemaRenderer) => CarbonBooleanElement.newInstance(schemaRenderer),
+    ],
   ]);
 
   private readonly formatRenderers: Map<string, FormatCtor> = new Map<
