@@ -12,6 +12,13 @@ import {
   CDSRadioButtonGroup,
   CDSTag,
   CDSTextInput,
+  CDSTable,
+  CDSTableBody,
+  CDSTableCell,
+  CDSTableHead,
+  CDSTableHeaderCell,
+  CDSTableHeaderRow,
+  CDSTableRow,
 } from '@carbon/web-components';
 
 type EventListener = (e: Event) => void;
@@ -40,6 +47,13 @@ declare global {
       'cds-radio-button-group': Partial<CDSRadioButtonGroup>;
       'cds-radio-button': Partial<CDSRadioButton>;
       'cds-tag': Partial<CDSTag>;
+      'cds-table': Partial<CDSTable>;
+      'cds-table-head': Partial<CDSTableHead>;
+      'cds-table-header-row': Partial<CDSTableHeaderRow>;
+      'cds-table-header-cell': Partial<CDSTableHeaderCell>;
+      'cds-table-body': Partial<CDSTableBody>;
+      'cds-table-row': Partial<CDSTableRow>;
+      'cds-table-cell': Partial<CDSTableCell>;
     }
   }
 }

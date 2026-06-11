@@ -36,3 +36,4 @@ export * from './form/ObjectElement';
 export * from './form/RenderedElement';
 export * from './form/StringElement';
 export * from './form/Renderer';
+export * from './form/carbon/CarbonTableArrayRenderer';

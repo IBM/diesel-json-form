@@ -318,6 +318,46 @@ const Example_DateTimeWithExample = `{
   "examples": [ "2022-11-28T09:27:17Z" ]
 }`;
 
+export const Example_RendererTable = `
+{ 
+    "type": "object",
+    "properties": {
+        "firstName": {
+            "type": "string"
+        },
+        "lastName": {
+            "type": "string"
+        },
+        "category": {
+            "type": "string",
+            "enum": [
+                "SILVER",
+                "GOLD",
+                "PLATINUM"
+            ]
+        },
+        "lastOrders": {
+            "type": "array", 
+            "items": {
+                "type": "object", 
+                "properties": {
+                    "productId": {
+                        "type": "string",
+                        "maxLength": 5
+                    },
+                    "amount": {
+                        "type": "number"
+                    },
+                    "quantity": {
+                        "type": "number"
+                    }
+                }
+            },
+            "renderer": "ArrayTable"
+        }
+    }
+}`;
+
 export const samples = [
   ['All', '{}'],
   ['Long', Sample_Long],
@@ -338,6 +378,7 @@ export const samples = [
   ['Renderer2', Example_Renderer2],
   ['RendererRating', Example_Renderer3],
   ['RendererObject', Example_Renderer4],
+  ['RendererTable', Example_RendererTable],
 ];
 
 export const initialSchema = {};
