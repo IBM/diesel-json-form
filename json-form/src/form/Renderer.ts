@@ -34,8 +34,16 @@ export class Renderer {
     CustomRendererCtor
   >([
     [
-      'textarea',
+      'string-cds-textarea',
       (schemaRenderer) => CarbonStringElemTextarea.newInstance(schemaRenderer),
+    ],
+    [
+      'string-cds-text-input',
+      (schemaRenderer) => CarbonStringElemBasic.newInstance(schemaRenderer),
+    ],
+    [
+      'number-cds-text-input',
+      (schemaRenderer) => CarbonNumberElement.newInstance(schemaRenderer),
     ],
   ]);
 

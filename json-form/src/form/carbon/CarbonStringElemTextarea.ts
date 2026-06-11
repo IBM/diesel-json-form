@@ -10,6 +10,7 @@ import { getValueAt, JvString } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
 import { SchemaRenderer } from '../../SchemaService';
+import { setRendererAttributes } from './setRendererAttributes';
 
 export class CarbonStringElemTextarea extends StringElement {
   static TAG_NAME = 'string-elem-textarea';
@@ -21,22 +22,8 @@ export class CarbonStringElemTextarea extends StringElement {
     const e = document.createElement(
       CarbonStringElemTextarea.TAG_NAME,
     ) as CarbonStringElemTextarea;
-    getValueAt(
-      schemaRenderer.schemaValue,
-      JsPath.parse('renderer/rows'),
-    ).forEach((rows) => {
-      if (rows.tag === 'jv-number') {
-        const r = parseInt(rows.value);
-        if (!isNaN(r)) {
-          e.rows = r;
-        }
-      }
-    });
+    setRendererAttributes(schemaRenderer, e.input);
     return e;
-  }
-
-  set rows(rows: number) {
-    this.input.setAttribute('rows', rows + '');
   }
 
   constructor() {

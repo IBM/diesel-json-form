@@ -9,12 +9,22 @@ import { T_FUNCTION } from '../../JsonFormMessages';
 import { isValidNumberLiteral, JvNumber } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
+import { setRendererAttributes } from './setRendererAttributes';
+import { SchemaRenderer } from '../../SchemaService';
 
 export class CarbonNumberElement extends NumberElement {
   static TAG_NAME = 'json-number';
 
   private input: CDSTextInput;
   private readonly debouncer = new Debouncer();
+
+  static newInstance(schemaRenderer: SchemaRenderer): CarbonNumberElement {
+    const e = document.createElement(
+      CarbonNumberElement.TAG_NAME,
+    ) as CarbonNumberElement;
+    setRendererAttributes(schemaRenderer, e.input);
+    return e;
+  }
 
   constructor() {
     super();

@@ -9,12 +9,22 @@ import { T_FUNCTION } from '../../JsonFormMessages';
 import { JvString } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
+import { SchemaRenderer } from '../../SchemaService';
+import { setRendererAttributes } from './setRendererAttributes';
 
 export class CarbonStringElemBasic extends StringElement {
   static TAG_NAME = 'string-elem-basic';
 
   private input: CDSTextInput;
   private readonly debouncer = new Debouncer();
+
+  static newInstance(schemaRenderer: SchemaRenderer): CarbonStringElemBasic {
+    const e = document.createElement(
+      CarbonStringElemBasic.TAG_NAME,
+    ) as CarbonStringElemBasic;
+    setRendererAttributes(schemaRenderer, e.input);
+    return e;
+  }
 
   constructor() {
     super();

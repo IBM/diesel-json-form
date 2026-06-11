@@ -1,0 +1,22 @@
+import { getValueAt } from '../../JsonValue';
+import { JsPath } from '../../JsPath';
+import { SchemaRenderer } from '../../SchemaService';
+
+export function setRendererAttributes(
+  schemaRenderer: SchemaRenderer,
+  e: HTMLElement,
+): void {
+  getValueAt(
+    schemaRenderer.schemaValue,
+    JsPath.parse('renderer/attributes'),
+  ).forEach((attributes) => {
+    if (attributes.tag === 'jv-object') {
+      for (const attrProp of attributes.properties) {
+        const value = attrProp.value;
+        if (value.tag === 'jv-string') {
+          e.setAttribute(attrProp.name, value.value);
+        }
+      }
+    }
+  });
+}

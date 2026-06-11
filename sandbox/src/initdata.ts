@@ -285,7 +285,7 @@ const Example_Renderer4 = `
   }
 }`;
 
-const Example_RendererTextArea = `
+const Example_RendererStringCdsTextArea = `
 {
   "properties": {
     "name": {
@@ -294,8 +294,47 @@ const Example_RendererTextArea = `
     "comment": {
       "type": "string",
       "renderer": {
-        "key": "textarea",
-        "rows": 13
+        "key": "string-cds-textarea",
+        "attributes": {
+            "rows": "12",
+            "placeholder": "Enter a nice comment"
+        }
+      }
+    }
+  }
+}`;
+
+const Example_RendererStringCdsTextInput = `
+{
+  "properties": {
+    "name": {
+      "type": "string",
+      "renderer": {
+        "key": "string-cds-text-input",
+        "attributes": {
+            "placeholder": "Enter a flashy username"
+        }
+      }
+    },
+    "comment": {
+      "type": "string"
+    }
+  }
+}`;
+
+const Example_RendererNumberCdsTextInput = `
+{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "renderer": {
+        "key": "number-cds-text-input",
+        "attributes": {
+            "placeholder": "Tell us about your rating"
+        }
       }
     }
   }
@@ -395,7 +434,9 @@ export const samples = [
   ['RendererRating', Example_Renderer3],
   ['RendererObject', Example_Renderer4],
   ['RendererTable', Example_RendererTable],
-  ['RendererTextArea', Example_RendererTextArea],
+  ['RendererStringCdsTextInput', Example_RendererStringCdsTextInput],
+  ['RendererStringCdsTextArea', Example_RendererStringCdsTextArea],
+  ['RendererNumberCdsTextInput', Example_RendererNumberCdsTextInput],
 ];
 
 export const initialSchema = {};
