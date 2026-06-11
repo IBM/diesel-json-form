@@ -197,11 +197,6 @@ export class JsonForm extends HTMLElement {
     }
   }
 
-  deleteValue(): void {
-    this.element?.remove();
-    delete this.element;
-  }
-
   static getEnclosingForm(e: Element): JsonForm {
     return findParent(e, (e) => {
       if (e instanceof JsonForm) {

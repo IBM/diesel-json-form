@@ -101,9 +101,6 @@ export class FormHeaderElement extends HTMLElement {
                 form.setValue(proposal);
               });
             },
-            delete() {
-              form.deleteValue();
-            },
           },
         )
       : [];
