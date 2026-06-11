@@ -2,9 +2,11 @@
 @use '@carbon/styles/scss/theme' as *;
 @use '@carbon/styles/scss/themes';
 @use '@diesel-parser/json-form/scss/JsonForm';
+@use '@carbon/type';
 
 :root {
   @include theme(themes.$g10);
+  @include type.type-classes();
 
   @media (prefers-color-scheme: dark) {
     @include theme(themes.$g100);
@@ -60,7 +62,6 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 4px;
 }
 
 #sandbox .banner h1 {
@@ -86,6 +87,8 @@ body {
   flex-grow: 1;
   padding-left: 1rem;
   padding-top: 1rem;
+  font-family: type.font-family('sans');
+  font-size: type.type-scale(2);
 }
 
 my-rating-renderer cds-radio-button-group {
@@ -146,15 +149,18 @@ my-string-renderer > div {
 
     textarea {
       flex-grow: 1;
-      font-family: var(
-        --cds-code-01-font-family,
-        'IBM Plex Mono',
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        '.SFNSText-Regular',
-        monospace
-      );
+      font-family: type.font-family('mono');
+      font-size: type.type-scale(2);
+
+      //   font-family: var(
+      //     --cds-code-01-font-family,
+      //     'IBM Plex Mono',
+      //     system-ui,
+      //     -apple-system,
+      //     BlinkMacSystemFont,
+      //     '.SFNSText-Regular',
+      //     monospace
+      //   );
     }
   }
 }

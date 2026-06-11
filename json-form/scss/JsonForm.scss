@@ -14,14 +14,14 @@ json-form {
     position: relative;
     flex-grow: 1;
     .json-form-scrollpane {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        overflow: auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: auto;
     }
-  } 
+  }
 }
 
 collapsible-section {
@@ -50,6 +50,10 @@ collapsible-section > .right-pane > .label-row > .label-container {
 
 section-based-elem.json-validation-error > .json-sections {
   border: 2px solid $text-error;
+}
+
+.json-sections {
+  margin-top: 0.3rem;
 }
 
 .json-errors {
