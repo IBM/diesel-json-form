@@ -129,7 +129,8 @@ my-string-renderer > div {
 
 .left-panel {
   flex-grow: 1;
-  padding: 4px;
+  padding-bottom: 0.5rem;
+  padding-right: 1rem;
 
   .panel-content {
     display: flex;
