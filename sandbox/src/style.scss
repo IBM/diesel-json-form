@@ -31,8 +31,8 @@
 }
 
 #sandbox cds-header {
-    position: unset;
-    width: 100%;
+  position: unset;
+  width: 100%;
 }
 
 #sandbox.dark {
@@ -104,7 +104,7 @@
 }
 
 .btn-wrapper {
-    align-self: end;
+  align-self: end;
 }
 
 #json-form {
@@ -119,4 +119,9 @@ my-string-renderer > div {
   &:hover {
     background-color: lightsalmon;
   }
+}
+
+#about {
+  display: flex;
+  align-items: center;
 }

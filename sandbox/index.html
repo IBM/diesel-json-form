@@ -1,63 +1,73 @@
 <!doctype html>
 <html lang="en_US">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Diesel JSON Form</title>
     <link rel="icon" href="/favicon.ico" />
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="sandbox">
-        <div class="banner">
-            <cds-header class="ui-shell--header" aria-label="IBM Platform Name">
-                <cds-header-name href="javascript:void 0" prefix="IBM">JSON Editor</cds-header-name>
-                <div class="schema-select cds--header__global">
-                    <div id="about"></div>
-                </div>
-            </cds-header>
-        </div>
-        <div class="main">
-            <div class="sub">
-                <div class="texteditor">
-                    <div class="sub-head">
-                        <h3>JSON</h3>
-                    </div>
-                    <div class="editor-wrapper">
-                        <cds-textarea spellcheck="false" id="ta-json" rows="13"></cds-textarea>
-                        <div class="btn-wrapper">
-                            <cds-button id="btn-to-form" size="xs">
-                                <icon-elem slot="icon" icon="arrow-right"></icon-elem>
-                            </cds-button>
-                            <cds-button id="btn-from-form" size="xs">
-                                <icon-elem slot="icon" icon="arrow-left"></icon-elem>
-                            </cds-button>
-                        </div>
-                    </div>
-                </div>
-                <div class="schema">
-                    <div class="sub-head">
-                        <h3>Schema</h3>
-                        <cds-dropdown label="Select Sample Schema" type="inline" id="sampleSchemaSelect"
-                            trigger-content="Select an item">
-                        </cds-dropdown>
-                    </div>
-                    <div class="editor-wrapper">
-                        <cds-textarea id="ta-schema" rows="13"></cds-textarea>
-                    </div>
-                </div>
+      <div class="banner">
+        <cds-header class="ui-shell--header" aria-label="IBM Platform Name">
+          <cds-header-name
+            href="https://github.com/IBM/diesel-json-form"
+            prefix="IBM"
+            >JSON Editor</cds-header-name
+          >
+          <div class="schema-select cds--header__global">
+            <div id="about"></div>
+          </div>
+        </cds-header>
+      </div>
+      <div class="main">
+        <div class="sub">
+          <div class="texteditor">
+            <div class="sub-head">
+              <h3>JSON</h3>
             </div>
-            <div class="sub form">
-                <div class="sub-head">
-                    <h3>FORM</h3>
-                </div>
-                <json-form id="json-form"></json-form>
+            <div class="editor-wrapper">
+              <cds-textarea
+                spellcheck="false"
+                id="ta-json"
+                rows="13"
+              ></cds-textarea>
+              <div class="btn-wrapper">
+                <cds-button id="btn-to-form" size="xs">
+                  <icon-elem slot="icon" icon="arrow-right"></icon-elem>
+                </cds-button>
+                <cds-button id="btn-from-form" size="xs">
+                  <icon-elem slot="icon" icon="arrow-left"></icon-elem>
+                </cds-button>
+              </div>
             </div>
+          </div>
+          <div class="schema">
+            <div class="sub-head">
+              <h3>Schema</h3>
+              <cds-dropdown
+                label="Select Sample Schema"
+                type="inline"
+                id="sampleSchemaSelect"
+                trigger-content="Select an item"
+              >
+              </cds-dropdown>
+            </div>
+            <div class="editor-wrapper">
+              <cds-textarea id="ta-schema" rows="13"></cds-textarea>
+            </div>
+          </div>
         </div>
+        <div class="sub form">
+          <div class="sub-head">
+            <h3>FORM</h3>
+          </div>
+          <json-form id="json-form"></json-form>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="/src/index.tsx"></script>
-</body>
-
+  </body>
 </html>
