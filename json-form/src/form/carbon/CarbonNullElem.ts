@@ -5,11 +5,21 @@ import { NullElement } from '../NullElement';
 import { JvNull } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
+import { setRendererAttributes } from './setRendererAttributes';
+import { SchemaRenderer } from '../../SchemaService';
 
 export class CarbonNullElement extends NullElement {
   static TAG_NAME = 'json-null';
 
   private input: CDSTextInput;
+
+  static newInstance(schemaRenderer: SchemaRenderer): CarbonNullElement {
+    const e = document.createElement(
+      CarbonNullElement.TAG_NAME,
+    ) as CarbonNullElement;
+    setRendererAttributes(schemaRenderer, e.input);
+    return e;
+  }
 
   constructor() {
     super();

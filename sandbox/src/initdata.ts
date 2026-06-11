@@ -358,6 +358,26 @@ const Example_RendererBooleanCdsCheckbox = `
   }
 }`;
 
+const Example_RendererNullCdsTextInput = `
+{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "nullable": {
+      "type": "null",
+      "renderer": {
+        "key": "null-cds-text-input",
+        "attributes": {
+            "helper-text": "Hey hoooo",
+            "size": "xs",
+            "label": "T'es nul"
+        }
+      }
+    }
+  }
+}`;
+
 const Example_Date = JSON.stringify(
   {
     type: 'string',
@@ -456,6 +476,7 @@ export const samples = [
   ['RendererStringCdsTextArea', Example_RendererStringCdsTextArea],
   ['RendererNumberCdsTextInput', Example_RendererNumberCdsTextInput],
   ['RendererBooleanCdsCheckbox', Example_RendererBooleanCdsCheckbox],
+  ['RendererNullCdsTextInput', Example_RendererNullCdsTextInput],
 ];
 
 export const initialSchema = {};
