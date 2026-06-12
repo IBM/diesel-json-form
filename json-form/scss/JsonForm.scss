@@ -55,6 +55,11 @@ section-based-elem.json-validation-error > .json-sections {
 
 .json-sections {
   margin-top: 0.3rem;
+
+  .json-section-empty {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 
 .json-errors {
