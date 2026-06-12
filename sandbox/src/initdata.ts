@@ -378,6 +378,60 @@ const Example_RendererNullCdsTextInput = `
   }
 }`;
 
+const Example_RendererGridObject = `
+{
+  "renderer": {
+    "key": "GridObject",
+    "attributes": {
+        "align": "bottom"
+    },
+    "columnAttributes": {
+        "rating": {
+            "span": "16"
+        },
+        "name": {
+            "span": "4"
+        },
+        "age": {
+            "span": "4"
+        },
+        "vip": {
+            "span": "16"
+        }
+    }
+  },
+  "properties": {
+    "vip": {
+      "type": "boolean"
+    },
+    "age": {
+      "type": "number",
+      "renderer": {
+         "key": "number-cds-text-input",
+         "attributes": {
+            "label": "... and the age"
+         }
+      }
+    },
+    "name": {
+      "type": "string",
+      "renderer": {
+         "key": "string-cds-text-input",
+         "attributes": {
+            "label": "This is the name"
+         }
+      }
+    },
+    "rating": {
+      "type": "number",
+      "renderer": "RatingRenderer"
+    },
+    "other": {
+      "type": "array"
+    }
+  }
+}`;
+
 const Example_Date = JSON.stringify(
   {
     type: 'string',
@@ -477,6 +531,7 @@ export const samples = [
   ['RendererNumberCdsTextInput', Example_RendererNumberCdsTextInput],
   ['RendererBooleanCdsCheckbox', Example_RendererBooleanCdsCheckbox],
   ['RendererNullCdsTextInput', Example_RendererNullCdsTextInput],
+  ['RendererGridObject', Example_RendererGridObject],
 ];
 
 export const initialSchema = {};

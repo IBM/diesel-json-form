@@ -16,7 +16,7 @@
 
 // @ts-ignore
 import './style.scss';
-import { Example_RendererTable, samples } from './initdata';
+import { samples } from './initdata';
 import {
   defaultSchemaService,
   getValueAt,
@@ -33,6 +33,7 @@ import {
   StringElement,
   CarbonTableArrayRenderer,
   Renderer,
+  CarbonGridObjectRenderer,
 } from '@diesel-parser/json-form';
 
 import '@carbon/web-components/es/index';
@@ -274,6 +275,8 @@ renderer.addCustomRenderer('RatingRenderer', () => {
 renderer.addCustomRenderer('MyStringRenderer', MyStringRenderer.newInstance);
 
 renderer.addCustomRenderer('ArrayTable', () => new CarbonTableArrayRenderer());
+
+renderer.addCustomRenderer('GridObject', CarbonGridObjectRenderer.newInstance);
 
 jsonForm.initialize(renderer, defaultSchemaService, schema, value);
 
