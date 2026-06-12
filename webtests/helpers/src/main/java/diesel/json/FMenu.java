@@ -62,6 +62,19 @@ public class FMenu extends AbstractPageObject {
         clickMenuItem(type);
     }
 
+    public FMenu assertMenuItemVisible(String label, boolean visible) {
+        if (visible) {
+            findMenuItem(label).eval();
+        } else {
+            findMenu()
+                    .$$("cds-menu-item")
+                    .where(attrEquals("label", label))
+                    .count(0)
+                    .eval();
+        }
+        return this;
+    }
+
     public class FAddProperty {
 
 

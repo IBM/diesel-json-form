@@ -14,11 +14,11 @@ public class FArray extends FRenderedElement {
         this.sections = new FSectionBasedElem($("section-based-elem"));
     }
 
-//    public FString getStringCell(int index) {
-//        String indexAsString = "" + index;
-//        Findr cell = $$(".value").where(Findrs.attrEquals("data-path", indexAsString)).at(0);
-//        return new FString(path.append(index), cell);
-//    }
+    //    public FString getStringCell(int index) {
+    //        String indexAsString = "" + index;
+    //        Findr cell = $$(".value").where(Findrs.attrEquals("data-path", indexAsString)).at(0);
+    //        return new FString(path.append(index), cell);
+    //    }
 
     public FArray assertLength(int expectedLength) {
         this.sections.assertLength(expectedLength);

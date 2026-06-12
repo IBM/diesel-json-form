@@ -13,7 +13,7 @@ public class FJsonForm extends AbstractPageObject {
     }
 
     public FObject objectAt(JsPath path) {
-        return new FObject(fRoot, path, getFindr());
+        return new FObject(path, getFindr());
     }
 
     public FNumber numberAt(JsPath path) {

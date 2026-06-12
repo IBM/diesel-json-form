@@ -115,6 +115,12 @@ export class CarbonObjectElement extends ObjectElement {
       if (e) {
         section.setContent(e);
       }
+      const title = metadata.requiredProperties.has(
+        path.append(propertyName).format(),
+      )
+        ? propertyName + ' *'
+        : propertyName;
+      section.setTitle(title);
       const newOrExistingElem = e ?? elem;
       if (newOrExistingElem instanceof ArrayElement) {
         section.setCounter(newOrExistingElem.toValue().elems.length);

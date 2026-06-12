@@ -14,8 +14,7 @@ public class FCarbonComboBox extends AbstractPageObject {
     }
 
     private Findr fTriggerButton = getFindr()
-            .shadowRoot().
-            $$("div")
+            .shadowRoot().$$("div")
             .where(attrEquals("part", "trigger-button"))
             .expectOne();
 
@@ -27,8 +26,7 @@ public class FCarbonComboBox extends AbstractPageObject {
                 .at(0)
                 .eval(e -> {
                     ((JavascriptExecutor) getDriver()).executeScript(
-                            "arguments[0].scrollIntoView(true);", e
-                    );
+                            "arguments[0].scrollIntoView(true);", e);
                     e.click();
                     return true;
                 });

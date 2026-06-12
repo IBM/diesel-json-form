@@ -19,11 +19,9 @@ public class FSectionBasedElem extends AbstractPageObject {
 
     private Findr.ListFindr findSections() {
         return getFindr()
-            .elemList(
-                By.xpath(
-        "./div[contains(@class,'json-sections')]/collapsible-section"
-                )
-            );
+                .elemList(
+                        By.xpath(
+                                "./div[contains(@class,'json-sections')]/collapsible-section"));
     }
 
     public FSectionBasedElem assertLength(int expected) {
@@ -51,7 +49,7 @@ public class FSectionBasedElem extends AbstractPageObject {
         };
     }
 
-    private Findr findSectionByTitle(String sectionTitle) {
+    public Findr findSectionByTitle(String sectionTitle) {
         return findSections()
                 .where(sectionTitleEquals(sectionTitle))
                 .expectOne();
@@ -59,10 +57,8 @@ public class FSectionBasedElem extends AbstractPageObject {
 
     private void clickSectionMenu(Findr fSection) {
         fSection.elemList(
-                    By.xpath(
-                    "./div[contains(@class,'right-pane')]/div[contains(@class,'label-row')]/cds-button"
-                    )
-                )
+                By.xpath(
+                        "./div[contains(@class,'right-pane')]/div[contains(@class,'label-row')]/cds-button"))
                 .where(attrEquals("title", "Open menu"))
                 .where(isDisplayed())
                 .expectOne()

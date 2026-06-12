@@ -3,6 +3,7 @@ package diesel.sandbox.tests;
 import com.pojosontheweb.selenium.Findr;
 import static com.pojosontheweb.selenium.Findrs.attrEquals;
 import static com.pojosontheweb.selenium.Findrs.textEquals;
+import static org.junit.Assert.fail;
 
 import com.pojosontheweb.selenium.ManagedDriverJunit4TestBase;
 import diesel.json.*;
@@ -934,7 +935,46 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "}");
     }
 
-    // @Test
-    // public void test
+    @Test
+    public void testRequiredProperties() {
+        sandbox.selectSample("RequiredPropertiesNested");
+        sandbox.clickTabJson();
+        sandbox.jsonEditor.clearText().typeText("{\n" + //
+                "  \"input\": {\n" + //
+                "    \"foo\": \"\",\n" + //
+                "    \"bar\": 0\n" + //
+                "  }\n" + //
+                "}");
+        sandbox.clickApplyToForm();
+        sandbox.jsonForm
+                .objectAt(JsPath.empty.append("input"))
+                .assertRequiredProperty("foo", true)
+                .assertRequiredProperty("bar", false);
+        sandbox
+                .assertStrictMode(false)
+                .clickStrictMode()
+                .assertStrictMode(true);
+
+        sandbox.jsonForm
+                .objectAt(JsPath.empty.append("input"))
+                .clickPropertyMenu("foo *")
+                .assertMenuItemVisible("Delete", false);
+        sandbox.jsonEditor.focus();
+        sandbox.jsonForm
+                .objectAt(JsPath.empty.append("input"))
+                .clickPropertyMenu("bar")
+                .assertMenuItemVisible("Delete", true);
+    }
+
+    @Test
+    public void testRequiredPropertiesClickingAddButtons() {
+        sandbox.selectSample("RequiredPropertiesNested");
+        sandbox.clickTabJson();
+        sandbox.jsonForm.objectAt(JsPath.empty)
+                .clickAddPropButton("input");
+        sandbox.jsonForm.objectAt(JsPath.empty.append("input"))
+                .clickAddPropButton("foo")
+                        .assertRequiredProperty("foo", true);
+    }
 
 }

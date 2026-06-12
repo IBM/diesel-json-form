@@ -2,6 +2,7 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
+import com.pojosontheweb.selenium.Findrs;
 
 public class FSandbox extends AbstractPageObject {
 
@@ -45,4 +46,17 @@ public class FSandbox extends AbstractPageObject {
         return this;
     }
 
+    public FSandbox assertStrictMode(boolean checked) {
+        if (checked) {
+            $("#cb-strict-mode[checked]").eval();
+        } else {
+            $("#cb-strict-mode:not([checked])").eval();
+        }
+        return this;
+    }
+
+    public FSandbox clickStrictMode() {
+        $("#cb-strict-mode").click();
+        return this;
+    }
 }

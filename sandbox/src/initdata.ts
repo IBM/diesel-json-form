@@ -520,6 +520,24 @@ export const Example_RequiredProperties = `{
     "required": ["foo"]
 }`;
 
+export const Example_RequiredPropertiesNested = `{
+    "type": "object",
+    "properties": {
+        "input": {
+            "type": "object",
+            "properties": {            
+                "foo": {
+                    "type": "string"
+                },
+                "bar": {
+                    "type": "number"
+                }    
+            },
+            "required": ["foo"]
+        }
+    }
+}`;
+
 export const samples = [
   ['All', '{}'],
   ['Long', Sample_Long],
@@ -548,6 +566,7 @@ export const samples = [
   ['RendererNullCdsTextInput', Example_RendererNullCdsTextInput],
   ['RendererGridObject', Example_RendererGridObject],
   ['RequiredProperties', Example_RequiredProperties],
+  ['RequiredPropertiesNested', Example_RequiredPropertiesNested],
 ];
 
 export const initialSchema = {};

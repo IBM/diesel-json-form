@@ -1,8 +1,6 @@
 package diesel.json;
 
 import com.pojosontheweb.selenium.Findr;
-import com.pojosontheweb.selenium.Findrs;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -13,12 +11,10 @@ import static com.pojosontheweb.selenium.Findrs.textEquals;
 
 public class FObject extends FRenderedElement {
 
-    private final Findr fRoot;
     private FSectionBasedElem sections;
 
-    FObject(Findr fRoot, JsPath path, Findr form) {
+    FObject(JsPath path, Findr form) {
         super(path, form);
-        this.fRoot = fRoot;
         this.sections = new FSectionBasedElem($("section-based-elem"));
     }
 
@@ -79,6 +75,11 @@ public class FObject extends FRenderedElement {
 
     public FObject assertArrayLength(String propName, int expectedCount) {
         this.sections.assertCounter(propName, expectedCount);
+        return this;
+    }
+
+    public FObject assertRequiredProperty(String name, boolean required) {
+        this.sections.findSectionByTitle(name + (required ? " *" : "")).eval();
         return this;
     }
 }
