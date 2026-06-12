@@ -31,6 +31,7 @@ export class CarbonGridObjectRenderer extends ObjectElement {
 
   private gridNode: HTMLElement = (<cds-grid />);
   private errorNode: HTMLElement = (<div className="json-errors"></div>);
+  private borderNode: HTMLElement = (<div>{this.gridNode}</div>);
 
   private columnInfos?: readonly ColumnInfo[];
   private rest?: readonly JsonProperty[];
@@ -40,12 +41,12 @@ export class CarbonGridObjectRenderer extends ObjectElement {
   }
 
   connectedCallback() {
-    this.appendChild(this.gridNode);
+    this.appendChild(this.borderNode);
     this.appendChild(this.errorNode);
   }
 
   disconnectedCallback() {
-    this.gridNode.remove();
+    this.borderNode.remove();
     this.errorNode.remove();
   }
 
@@ -126,12 +127,12 @@ export class CarbonGridObjectRenderer extends ObjectElement {
 
   private showErrors(errors?: readonly ValidationError[]) {
     if (errors && errors.length > 0) {
-      this.classList.add('json-validation-error');
+      this.borderNode.classList.add('json-validation-error');
       const allErrors = errors.map((e) => e.message).join(', ');
       this.errorNode.innerText = allErrors;
       this.errorNode.style.display = 'block';
     } else {
-      this.classList.remove('json-validation-error');
+      this.borderNode.classList.remove('json-validation-error');
       this.errorNode.innerText = '';
       this.errorNode.style.display = 'none';
     }
@@ -181,10 +182,6 @@ export class CarbonGridObjectRenderer extends ObjectElement {
       return name && value ? [{ name, value }] : [];
     });
     return jvObject([...props, ...(this.rest ?? [])]);
-  }
-
-  getProperties(): [string, RenderedElement<JsonValue>][] {
-    throw new Error('Method not implemented.');
   }
 
   protected openDialog(): Promise<JsonProperty> {

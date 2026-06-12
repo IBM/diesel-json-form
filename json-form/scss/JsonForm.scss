@@ -53,6 +53,10 @@ section-based-elem.json-validation-error > .json-sections {
   border: 2px solid $text-error;
 }
 
+json-grid-object .json-validation-error {
+  border: 2px solid $text-error;
+}
+
 .json-sections {
   margin-top: 0.3rem;
 
