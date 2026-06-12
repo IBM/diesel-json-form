@@ -383,7 +383,7 @@ const Example_RendererGridObject = `
   "renderer": {
     "key": "GridObject",
     "attributes": {
-        "align": "bottom"
+        "align": "start"
     },
     "columnAttributes": {
         "rating": {
