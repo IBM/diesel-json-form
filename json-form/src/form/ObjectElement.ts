@@ -17,8 +17,6 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
     return 'jv-object';
   }
 
-  abstract toValue(): JvObject;
-
   protected abstract openDialog(): Promise<JsonProperty>;
 
   protected abstract appendProperty(

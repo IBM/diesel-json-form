@@ -17,7 +17,6 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
   getType(): 'jv-array' {
     return 'jv-array';
   }
-  abstract toValue(): JvArray;
 
   protected abstract appendElement(elem: RenderedElement<JsonValue>): void;
 
