@@ -56,7 +56,6 @@ const jsonForm = document.getElementById('json-form') as JsonForm;
 const cbStrictMode = document.getElementById('cb-strict-mode') as CDSCheckbox;
 cbStrictMode.checked = jsonForm.strictMode;
 cbStrictMode.addEventListener('cds-checkbox-changed', () => {
-  debugger;
   jsonForm.strictMode = cbStrictMode.checked;
 });
 

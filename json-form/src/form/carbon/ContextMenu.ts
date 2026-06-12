@@ -19,6 +19,7 @@ import {
 import { SchemaService } from '../../SchemaService';
 import { T_FUNCTION } from '../../JsonFormMessages';
 import { IconElement } from './IconElement';
+import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
 
 export type MenuActions = {
   add?: () => void;
@@ -91,113 +92,130 @@ export function createMenu(
 ): Promise<MenuItem[]> {
   return getValueAt(root, path)
     .map((valueAtPath) =>
-      schemaService.propose(schema, root, path).then((proposals) => {
-        const isArray = valueAtPath.tag === 'jv-array';
-        const addItems: () => MenuItem[] = () => {
-          const isObject = !strictMode && valueAtPath.tag === 'jv-object';
-          if (menuActions.add && (isArray || isObject)) {
-            return [
-              menuItem(
-                T_FUNCTION(
-                  isArray
-                    ? 'contextMenu.addElement'
-                    : 'contextMenu.addProperty',
-                ),
-                menuActions.add,
-                { icon: 'add' },
-              ),
-            ];
-          }
-          return [];
-        };
-
-        const isRoot = path.isEmpty();
-
-        const nbItems = path
-          .parent()
-          .andThen((pp) => getValueAt(root, pp))
-          .map((pv) => {
-            switch (pv.tag) {
-              case 'jv-object':
-                return pv.properties.length;
-              case 'jv-array':
-                return pv.elems.length;
-              default:
-                return 0;
-            }
-          })
-          .withDefault(0);
-
-        const hasMoveMenu = !isRoot && nbItems > 1;
-
-        const moveMenuItems: () => MenuItem[] = () => {
-          const index = indexOfPathInParent(root, path);
-          const canMoveUp = index > 0;
-          const canMoveDown = index >= 0 && index < nbItems - 1;
-          const moveUpItems =
-            menuActions.moveUp && canMoveUp
-              ? [
+      validateAndComputeMetadata(schemaService, schema, root).then(
+        (metadata) => {
+          return schemaService.propose(schema, root, path).then((proposals) => {
+            const isArray = valueAtPath.tag === 'jv-array';
+            const addItems: () => MenuItem[] = () => {
+              const isObject = !strictMode && valueAtPath.tag === 'jv-object';
+              if (menuActions.add && (isArray || isObject)) {
+                return [
                   menuItem(
-                    T_FUNCTION('contextMenu.moveUp'),
-                    menuActions.moveUp,
-                    { icon: 'arrow-up' },
+                    T_FUNCTION(
+                      isArray
+                        ? 'contextMenu.addElement'
+                        : 'contextMenu.addProperty',
+                    ),
+                    menuActions.add,
+                    { icon: 'add' },
                   ),
+                ];
+              }
+              return [];
+            };
+
+            const isRoot = path.isEmpty();
+
+            const nbItems = path
+              .parent()
+              .andThen((pp) => getValueAt(root, pp))
+              .map((pv) => {
+                switch (pv.tag) {
+                  case 'jv-object':
+                    return pv.properties.length;
+                  case 'jv-array':
+                    return pv.elems.length;
+                  default:
+                    return 0;
+                }
+              })
+              .withDefault(0);
+
+            const hasMoveMenu = !isRoot && nbItems > 1;
+
+            const moveMenuItems: () => MenuItem[] = () => {
+              const index = indexOfPathInParent(root, path);
+              const canMoveUp = index > 0;
+              const canMoveDown = index >= 0 && index < nbItems - 1;
+              const moveUpItems =
+                menuActions.moveUp && canMoveUp
+                  ? [
+                      menuItem(
+                        T_FUNCTION('contextMenu.moveUp'),
+                        menuActions.moveUp,
+                        { icon: 'arrow-up' },
+                      ),
+                    ]
+                  : [];
+              const moveDownItems =
+                menuActions.moveDown && canMoveDown
+                  ? [
+                      menuItem(
+                        T_FUNCTION('contextMenu.moveDown'),
+                        menuActions.moveDown,
+                        {
+                          icon: 'arrow-down',
+                        },
+                      ),
+                    ]
+                  : [];
+
+              return moveUpItems.concat(moveDownItems);
+            };
+
+            const moveItems = hasMoveMenu
+              ? [
+                  subMenuItem(T_FUNCTION('contextMenu.move'), moveMenuItems(), {
+                    icon: 'move',
+                  }),
                 ]
               : [];
-          const moveDownItems =
-            menuActions.moveDown && canMoveDown
-              ? [
-                  menuItem(
-                    T_FUNCTION('contextMenu.moveDown'),
-                    menuActions.moveDown,
-                    {
-                      icon: 'arrow-down',
-                    },
-                  ),
-                ]
-              : [];
 
-          return moveUpItems.concat(moveDownItems);
-        };
+            const canDelete = () => {
+              if (strictMode) {
+                return !metadata.requiredProperties.has(path.format());
+              } else {
+                return true;
+              }
+            };
 
-        const moveItems = hasMoveMenu
-          ? [
-              subMenuItem(T_FUNCTION('contextMenu.move'), moveMenuItems(), {
-                icon: 'move',
-              }),
-            ]
-          : [];
+            const deleteItems =
+              menuActions.delete && canDelete()
+                ? [
+                    menuItem(
+                      T_FUNCTION('contextMenu.delete'),
+                      menuActions.delete,
+                      {
+                        danger: true,
+                        icon: 'trash-can',
+                      },
+                    ),
+                  ]
+                : [];
 
-        const deleteItems = menuActions.delete
-          ? [
-              menuItem(T_FUNCTION('contextMenu.delete'), menuActions.delete, {
-                danger: true,
-                icon: 'trash-can',
-              }),
-            ]
-          : [];
+            const changeTypes = createTypesMenu(
+              menuActions,
+              valueAtPath,
+              proposals,
+              strictMode,
+            );
+            const proposeItems = createProposeMenu(
+              menuActions,
+              path,
+              proposals,
+              strictMode,
+            );
 
-        const changeTypes = createTypesMenu(
-          menuActions,
-          valueAtPath,
-          proposals,
-          strictMode,
-        );
-        const proposeItems = createProposeMenu(
-          menuActions,
-          path,
-          proposals,
-          strictMode,
-        );
-
-        const res: MenuItem[] = [];
-        return res
-          .concat(addItems())
-          .concat(moveItems)
-          .concat(changeTypes)
-          .concat(proposeItems)
-          .concat(deleteItems);
-      }),
+            const res: MenuItem[] = [];
+            return res
+              .concat(addItems())
+              .concat(moveItems)
+              .concat(changeTypes)
+              .concat(proposeItems)
+              .concat(deleteItems);
+          });
+        },
+      ),
     )
     .withDefaultSupply(() => Promise.resolve([]));
 }
