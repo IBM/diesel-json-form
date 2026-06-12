@@ -12,7 +12,13 @@ import { empty } from '../HtmlBuilder';
 import { CDSButton } from '@carbon/web-components';
 import { T_FUNCTION } from '../../JsonFormMessages';
 import { augmentProposal } from '../../augmentProposal';
-import { JsonProperty, JsonValue, JvObject, setValueAt } from '../../JsonValue';
+import {
+  JsonProperty,
+  JsonValue,
+  jvObject,
+  JvObject,
+  setValueAt,
+} from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
 import { validateAndComputeMetadata } from '../../ComputeAllTask';
@@ -70,7 +76,7 @@ export class CarbonObjectElement extends ObjectElement {
     this.sectionElem.appendSection(section);
   }
 
-  getProperties(): [string, RenderedElement<JsonValue>][] {
+  private getProperties(): [string, RenderedElement<JsonValue>][] {
     return this.sectionElem.findSections().flatMap((s) => {
       const name = s.getAttribute(CarbonObjectElement.ATTR_PROP_NAME);
       const content = s.getContent();
@@ -80,6 +86,17 @@ export class CarbonObjectElement extends ObjectElement {
         return [];
       }
     });
+  }
+
+  toValue(): JvObject {
+    return jvObject(
+      this.getProperties().map(([name, elem]) => {
+        return {
+          name,
+          value: elem.toValue(),
+        };
+      }),
+    );
   }
 
   setMetadata(metadata: Metadata, path: JsPath, renderer: Renderer): void {

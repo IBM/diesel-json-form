@@ -1,7 +1,13 @@
 import { CDSTable, CDSTableHead } from '@carbon/web-components';
 import { ArrayElement } from '../ArrayElement';
 import { h } from '../../MyJSXFactory';
-import { JsonProperty, JsonValue, JvArray, JvObject } from '../../JsonValue';
+import {
+  JsonProperty,
+  JsonValue,
+  JvArray,
+  jvObject,
+  JvObject,
+} from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
 import { getRendererKey, Renderer } from '../Renderer';
@@ -108,6 +114,17 @@ export class CarbonObjectTableRowElement extends ObjectElement {
 
   getCDSTableRow(): CDSTableRow {
     return this.row;
+  }
+
+  toValue(): JvObject {
+    return jvObject(
+      this.cells.map(([name, elem]) => {
+        return {
+          name,
+          value: elem.toValue(),
+        };
+      }),
+    );
   }
 
   getProperties(): [string, RenderedElement<JsonValue>][] {

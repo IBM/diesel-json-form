@@ -1,6 +1,7 @@
 import { validateAndComputeMetadata } from '../ComputeAllTask';
 import {
   clearPropertiesIfObject,
+  getValueAt,
   JsonProperty,
   JsonValue,
   jvNull,
@@ -15,16 +16,8 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
   getType(): 'jv-object' {
     return 'jv-object';
   }
-  toValue(): JvObject {
-    return jvObject(
-      this.getProperties().map(([name, elem]) => ({
-        name,
-        value: elem.toValue(),
-      })),
-    );
-  }
 
-  abstract getProperties(): [string, RenderedElement<JsonValue>][];
+  abstract toValue(): JvObject;
 
   protected abstract openDialog(): Promise<JsonProperty>;
 
@@ -44,11 +37,16 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
     const schema = form.getSchema();
     const root = form.toValue();
     const p = this.path;
-    const props = this.getProperties();
-    const existingPropValues: JsonProperty[] = props.map(([name, elem]) => ({
-      name,
-      value: elem.toValue(),
-    }));
+    const thisObj = getValueAt(root, p);
+    const existingPropValues = thisObj
+      .map((v) => {
+        if (v.tag === 'jv-object') {
+          return v.properties;
+        } else {
+          return [];
+        }
+      })
+      .withDefault([]);
     const newProps = [...existingPropValues, property];
     const tmpObject = jvObject(newProps);
     const tmpRoot = setValueAt(root, p, tmpObject);
