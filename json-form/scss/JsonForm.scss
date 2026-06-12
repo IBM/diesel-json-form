@@ -74,3 +74,9 @@ json-form-header {
 .json-modal-field {
   margin-bottom: 1rem;
 }
+
+// fix carbon dropdown "hidden" label introducing
+// layout inconsistencies compared to input fields
+.collapsible-content:has(> string-elem-combo) {
+  margin-top: 8px;
+}
