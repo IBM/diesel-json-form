@@ -975,6 +975,18 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         sandbox.jsonForm.objectAt(JsPath.empty.append("input"))
                 .clickAddPropButton("foo")
                         .assertRequiredProperty("foo", true);
+        sandbox.jsonForm
+                .objectAt(JsPath.empty.append("input"))
+                .clickPropertyMenu("foo *")
+                .assertMenuItemVisible("Delete", true);
+        sandbox
+                .assertStrictMode(false)
+                .clickStrictMode()
+                .assertStrictMode(true);
+        sandbox.jsonForm
+                .objectAt(JsPath.empty.append("input"))
+                .clickPropertyMenu("foo *")
+                .assertMenuItemVisible("Delete", false);
     }
 
 }
