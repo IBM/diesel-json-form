@@ -15,7 +15,7 @@ import { ObjectElement } from '../ObjectElement';
 import { RenderedElement } from '../RenderedElement';
 import { Renderer } from '../Renderer';
 import { setRendererAttributes } from './setRendererAttributes';
-
+import '@carbon/web-components/es/components/grid/index.js';
 interface GridValues {
   readonly ordered: readonly [ColumnInfo, JsonProperty][];
   readonly rest: readonly JsonProperty[];
