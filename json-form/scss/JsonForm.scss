@@ -85,3 +85,12 @@ json-form-header {
 .collapsible-content:has(> string-elem-combo) {
   margin-top: 8px;
 }
+
+json-object > .json-prop-buttons {
+  display: flex;
+  flex-direction: column;
+
+  .json-add-prop-btn-wrapper {
+    margin-bottom: 1rem;
+  }
+}

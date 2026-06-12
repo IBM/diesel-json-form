@@ -129,7 +129,9 @@ export class CarbonObjectElement extends ObjectElement {
         btn.disabled = true;
         this.appendPropertyWithName(prop);
       });
-      this.propertiesNode.appendChild(btn);
+      this.propertiesNode.appendChild(
+        <div className="json-add-prop-btn-wrapper">{btn}</div>,
+      );
     }
   }
 
