@@ -20,6 +20,8 @@ import {
   CDSTableHeaderRow,
   CDSTableRow,
 } from '@carbon/web-components/es';
+import CDSGrid from '@carbon/web-components/es/components/grid/grid.js';
+import CDSColumn from '@carbon/web-components/es/components/grid/column.js';
 
 type EventListener = (e: Event) => void;
 
@@ -54,6 +56,8 @@ declare global {
       'cds-table-body': Partial<CDSTableBody>;
       'cds-table-row': Partial<CDSTableRow>;
       'cds-table-cell': Partial<CDSTableCell>;
+      'cds-grid': Partial<CDSGrid>;
+      'cds-column': Partial<CDSColumn>;
     }
   }
 }

@@ -37,3 +37,4 @@ export * from './form/RenderedElement';
 export * from './form/StringElement';
 export * from './form/Renderer';
 export * from './form/carbon/CarbonTableArrayRenderer';
+export * from './form/carbon/CarbonGridObjectRenderer';
