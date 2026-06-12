@@ -87,6 +87,15 @@ jsonForm.addEventListener('json-changed', (e) => {
   console.log('json changed', e.detail);
 });
 
+taSchema.addEventListener('input', () => {
+  try {
+    JSON.parse(taSchema.value);
+    btnFromSchema.disabled = false;
+  } catch (err) {
+    btnFromSchema.disabled = true;
+  }
+});
+
 taJson.addEventListener('input', () => {
   try {
     JSON.parse(taJson.value);
