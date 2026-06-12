@@ -77,6 +77,7 @@ export class CarbonGridObjectRenderer extends ObjectElement {
       this.createAndAppendNewColumn(i, e);
     });
     this.rest = rest;
+    this.setMetadata(metadata, path, renderer);
   }
 
   private createAndAppendNewColumn(
