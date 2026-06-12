@@ -13,10 +13,6 @@
   }
 }
 
-body {
-  //   overflow: hidden;
-}
-
 .g10 {
   @include theme(themes.$g10);
 }
@@ -151,16 +147,15 @@ my-string-renderer > div {
       flex-grow: 1;
       font-family: type.font-family('mono');
       font-size: type.type-scale(2);
-
-      //   font-family: var(
-      //     --cds-code-01-font-family,
-      //     'IBM Plex Mono',
-      //     system-ui,
-      //     -apple-system,
-      //     BlinkMacSystemFont,
-      //     '.SFNSText-Regular',
-      //     monospace
-      //   );
     }
+  }
+}
+
+.cb-wrapper {
+  display: flex;
+  align-items: center;
+
+  cds-checkbox {
+    margin-block-end: unset;
   }
 }

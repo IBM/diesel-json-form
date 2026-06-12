@@ -174,6 +174,14 @@ export class JsonForm extends HTMLElement {
     return this.hasAttribute('strict-mode');
   }
 
+  set strictMode(s: boolean) {
+    if (s) {
+      this.setAttribute('strict-mode', '');
+    } else {
+      this.removeAttribute('strict-mode');
+    }
+  }
+
   getRenderer(): Renderer {
     if (!this.renderer) {
       throw new Error('no renderer available');

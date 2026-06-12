@@ -38,7 +38,11 @@ import {
 
 import '@carbon/web-components/es/index.js';
 
-import { CDSComboBox, CDSRadioButton } from '@carbon/web-components/es';
+import {
+  CDSCheckbox,
+  CDSComboBox,
+  CDSRadioButton,
+} from '@carbon/web-components/es';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group.js';
 import { h } from './MyJSXFactory';
 import { version } from '@diesel-parser/json-form/package.json';
@@ -49,6 +53,12 @@ if (about) {
 }
 
 const jsonForm = document.getElementById('json-form') as JsonForm;
+const cbStrictMode = document.getElementById('cb-strict-mode') as CDSCheckbox;
+cbStrictMode.checked = jsonForm.strictMode;
+cbStrictMode.addEventListener('cds-checkbox-changed', () => {
+  debugger;
+  jsonForm.strictMode = cbStrictMode.checked;
+});
 
 console.log(JsonForm.TAG_NAME);
 
