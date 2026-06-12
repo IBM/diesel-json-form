@@ -112,7 +112,7 @@ export class CarbonObjectElement extends ObjectElement {
       }
       const newOrExistingElem = e ?? elem;
       if (newOrExistingElem instanceof ArrayElement) {
-        section.setCounter(newOrExistingElem.getElements().length);
+        section.setCounter(newOrExistingElem.toValue().elems.length);
       } else {
         section.setCounter(undefined);
       }

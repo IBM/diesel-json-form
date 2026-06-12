@@ -3,6 +3,7 @@ import { maybeOf } from 'tea-cup-fp';
 import { JsonForm } from './JsonForm';
 import {
   clearPropertiesIfObject,
+  getValueAt,
   JsonValue,
   jvArray,
   JvArray,
@@ -16,11 +17,7 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
   getType(): 'jv-array' {
     return 'jv-array';
   }
-  toValue(): JvArray {
-    return jvArray(this.getElements().map((e) => e.toValue()));
-  }
-
-  abstract getElements(): readonly RenderedElement<JsonValue>[];
+  abstract toValue(): JvArray;
 
   protected abstract appendElement(elem: RenderedElement<JsonValue>): void;
 
@@ -46,9 +43,18 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
     const schema = form.getSchema();
     const root = form.toValue();
     const p = this.path;
-    const elems = this.getElements();
-    const newElemIndex = elems.length;
-    const existingValues = elems.map((e) => e.toValue());
+    // const elems = this.getElements();
+    const thisValue = getValueAt(root, p);
+    const existingValues = thisValue
+      .map((v) => {
+        if (v.tag === 'jv-array') {
+          return v.elems;
+        } else {
+          return [];
+        }
+      })
+      .withDefault([]);
+    const newElemIndex = existingValues.length;
     // we create a transient JsonValue with the array updated
     // so that we have a value at new index path
     // otherwise the proposals would be empty because

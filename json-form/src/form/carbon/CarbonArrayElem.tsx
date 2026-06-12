@@ -5,7 +5,7 @@ import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { RenderedElement } from '../RenderedElement';
 import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
 import { T_FUNCTION } from '../../JsonFormMessages';
-import { JsonValue, JvArray, setValueAt } from '../../JsonValue';
+import { JsonValue, jvArray, JvArray, setValueAt } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
 import { validateAndComputeMetadata } from '../../ComputeAllTask';
@@ -63,7 +63,11 @@ export class CarbonArrayElement extends ArrayElement {
     this.sectionElem.appendSection(section);
   }
 
-  getElements(): readonly RenderedElement<JsonValue>[] {
+  toValue(): JvArray {
+    return jvArray(this.getElements().map((e) => e.toValue()));
+  }
+
+  private getElements(): readonly RenderedElement<JsonValue>[] {
     return this.sectionElem.findElems();
   }
 
@@ -77,7 +81,7 @@ export class CarbonArrayElement extends ArrayElement {
       }
       const newOrExistingElem = e ?? elem;
       if (newOrExistingElem instanceof ArrayElement) {
-        section.setCounter(newOrExistingElem.getElements().length);
+        section.setCounter(newOrExistingElem.toValue().elems.length);
       } else {
         section.setCounter(undefined);
       }

@@ -4,6 +4,7 @@ import { h } from '../../MyJSXFactory';
 import {
   JsonProperty,
   JsonValue,
+  jvArray,
   JvArray,
   jvObject,
   JvObject,
@@ -76,7 +77,11 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     });
   }
 
-  getElements(): readonly RenderedElement<JsonValue>[] {
+  toValue(): JvArray {
+    return jvArray(this.getElements().map((e) => e.toValue()));
+  }
+
+  private getElements(): readonly RenderedElement<JsonValue>[] {
     return this.rows;
   }
 
