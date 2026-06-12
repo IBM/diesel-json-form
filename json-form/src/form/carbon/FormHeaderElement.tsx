@@ -1,15 +1,15 @@
-import { CDSButton } from '@carbon/web-components';
+import { CDSButton } from '@carbon/web-components/es';
 import { h } from '../../MyJSXFactory';
 import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
 import { empty } from '../HtmlBuilder';
 import { JsonForm } from '../JsonForm';
 import { createMenu, openMenu } from './ContextMenu';
 import { augmentProposal } from '../../augmentProposal';
-import '@carbon/web-components/es/components/tag/tag';
+import '@carbon/web-components/es/components/tag/tag.js';
 import {
   TAG_SIZE,
   TAG_TYPE,
-} from '@carbon/web-components/es/components/tag/defs';
+} from '@carbon/web-components/es/components/tag/defs.js';
 import { T_FUNCTION } from '../../JsonFormMessages';
 import { JsPath } from '../../JsPath';
 

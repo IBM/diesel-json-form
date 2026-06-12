@@ -1,7 +1,7 @@
-import { CDSDatePicker, CDSDatePickerInput } from '@carbon/web-components';
+import { CDSDatePicker, CDSDatePickerInput } from '@carbon/web-components/es';
 import { Debouncer } from '../Debouncer';
 import { setErrors } from './setErrorsOnInput';
-import '@carbon/web-components/es/components/date-picker/index';
+import '@carbon/web-components/es/components/date-picker/index.js';
 import { nextElementId } from './nextElementId';
 import { ValidationError } from '../../SchemaService';
 

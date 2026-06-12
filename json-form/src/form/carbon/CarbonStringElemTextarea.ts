@@ -1,8 +1,8 @@
-import { CDSTextarea } from '@carbon/web-components';
+import { CDSTextarea } from '@carbon/web-components/es';
 import { Debouncer } from '../Debouncer';
 import { setErrors } from './setErrorsOnInput';
 import { StringElement } from '../StringElement';
-import '@carbon/web-components/es/components/textarea/index';
+import '@carbon/web-components/es/components/textarea/index.js';
 import { JsonForm } from '../JsonForm';
 import { nextElementId } from './nextElementId';
 import { T_FUNCTION } from '../../JsonFormMessages';

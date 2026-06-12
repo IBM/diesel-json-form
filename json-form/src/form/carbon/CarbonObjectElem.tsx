@@ -9,7 +9,7 @@ import { ArrayElement } from '../ArrayElement';
 import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
 import { h } from '../../MyJSXFactory';
 import { empty } from '../HtmlBuilder';
-import { CDSButton } from '@carbon/web-components';
+import { CDSButton } from '@carbon/web-components/es';
 import { T_FUNCTION } from '../../JsonFormMessages';
 import { augmentProposal } from '../../augmentProposal';
 import {

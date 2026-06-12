@@ -1,9 +1,9 @@
-import { CDSModal, CDSTextInput } from '@carbon/web-components';
-import '@carbon/web-components/es/components/modal/index';
-import { MODAL_SIZE } from '@carbon/web-components/es/components/modal/modal';
-import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs';
-import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/defs';
-import '@carbon/web-components/es/components/radio-button/index';
+import { CDSModal, CDSTextInput } from '@carbon/web-components/es';
+import '@carbon/web-components/es/components/modal/index.js';
+import { MODAL_SIZE } from '@carbon/web-components/es/components/modal/modal.js';
+import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs.js';
+import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/defs.js';
+import '@carbon/web-components/es/components/radio-button/index.js';
 import { h } from '../../MyJSXFactory';
 import { DEFAULT_TYPES, JsonProperty, valueType } from '../../JsonValue';
 import { T_FUNCTION } from '../../JsonFormMessages';

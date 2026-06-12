@@ -1,4 +1,4 @@
-import { CDSTable, CDSTableHead } from '@carbon/web-components';
+import { CDSTable, CDSTableHead } from '@carbon/web-components/es';
 import { ArrayElement } from '../ArrayElement';
 import { h } from '../../MyJSXFactory';
 import {

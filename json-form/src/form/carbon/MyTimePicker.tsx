@@ -2,12 +2,12 @@ import {
   CDSTimePicker,
   CDSTimePickerSelect,
   CDSSelectItem,
-} from '@carbon/web-components';
-import '@carbon/web-components/es/components/time-picker/index';
+} from '@carbon/web-components/es';
+import '@carbon/web-components/es/components/time-picker/index.js';
 import { Debouncer } from '../Debouncer';
 import { h } from '../../MyJSXFactory';
 import { setErrors } from './setErrorsOnInput';
-import '@carbon/web-components/es/components/time-picker/index';
+import '@carbon/web-components/es/components/time-picker/index.js';
 import { nextElementId } from './nextElementId';
 import { allOffsets } from './allOffsets';
 import { MyTime } from './MyTime';

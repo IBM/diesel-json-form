@@ -4,7 +4,7 @@ import {
   CDSDatePickerInput,
   CDSTextInput,
   CDSTimePicker,
-} from '@carbon/web-components';
+} from '@carbon/web-components/es';
 import { ValidationError } from '../../SchemaService';
 
 export function setErrors(

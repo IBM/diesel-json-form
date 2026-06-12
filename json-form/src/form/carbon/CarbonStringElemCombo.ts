@@ -1,7 +1,7 @@
-import { CDSComboBox, CDSComboBoxItem } from '@carbon/web-components';
+import { CDSComboBox, CDSComboBoxItem } from '@carbon/web-components/es';
 import { setErrors } from './setErrorsOnInput';
 import { StringElement } from '../StringElement';
-import '@carbon/web-components/es/components/combo-box/index';
+import '@carbon/web-components/es/components/combo-box/index.js';
 import { empty } from '../HtmlBuilder';
 import { JsonForm } from '../JsonForm';
 import { nextElementId } from './nextElementId';

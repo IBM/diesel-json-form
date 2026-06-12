@@ -1,6 +1,6 @@
-import '@carbon/web-components/es/components/menu/index';
-import CDSMenu from '@carbon/web-components/es/components/menu/menu';
-import CDSmenuItem from '@carbon/web-components/es/components/menu/menu-item';
+import '@carbon/web-components/es/components/menu/index.js';
+import CDSMenu from '@carbon/web-components/es/components/menu/menu.js';
+import CDSmenuItem from '@carbon/web-components/es/components/menu/menu-item.js';
 import { JsPath } from '../../JsPath';
 import {
   DEFAULT_TYPES,

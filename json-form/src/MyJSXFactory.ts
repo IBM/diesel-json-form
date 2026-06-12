@@ -19,7 +19,7 @@ import {
   CDSTableHeaderCell,
   CDSTableHeaderRow,
   CDSTableRow,
-} from '@carbon/web-components';
+} from '@carbon/web-components/es';
 
 type EventListener = (e: Event) => void;
 

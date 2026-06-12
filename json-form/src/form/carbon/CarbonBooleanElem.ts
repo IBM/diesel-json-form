@@ -1,5 +1,5 @@
-import { CDSCheckbox } from '@carbon/web-components';
-import '@carbon/web-components/es/components/checkbox/checkbox';
+import { CDSCheckbox } from '@carbon/web-components/es';
+import '@carbon/web-components/es/components/checkbox/checkbox.js';
 import { BooleanElement } from '../BooleanElement';
 import { JsonForm } from '../JsonForm';
 import { nextElementId } from './nextElementId';

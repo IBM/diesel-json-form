@@ -36,7 +36,7 @@ import DecisionTree from '@carbon/icons/es/decision-tree/16.js';
 import StringText from '@carbon/icons/es/string-text/16.js';
 
 import { getAttributes, toSVG } from '@carbon/icon-helpers';
-import { CDSButton } from '@carbon/web-components';
+import { CDSButton } from '@carbon/web-components/es';
 
 export class IconElement extends HTMLElement {
   static TAG_NAME = 'icon-elem';

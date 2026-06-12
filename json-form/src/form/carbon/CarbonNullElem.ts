@@ -1,5 +1,5 @@
-import '@carbon/web-components/es/components/text-input/index';
-import { CDSTextInput } from '@carbon/web-components';
+import '@carbon/web-components/es/components/text-input/index.js';
+import { CDSTextInput } from '@carbon/web-components/es';
 import { setErrors } from './setErrorsOnInput';
 import { NullElement } from '../NullElement';
 import { JvNull } from '../../JsonValue';

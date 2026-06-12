@@ -1,13 +1,13 @@
 import { h, Fragment } from '../../MyJSXFactory';
-import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs';
-import { CDSButton } from '@carbon/web-components';
+import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs.js';
+import { CDSButton } from '@carbon/web-components/es';
 import { MenuItem, openMenu } from './ContextMenu';
 import { IconElement } from './IconElement';
 import { RenderedElement } from '../RenderedElement';
 import {
   TAG_SIZE,
   TAG_TYPE,
-} from '@carbon/web-components/es/components/tag/defs';
+} from '@carbon/web-components/es/components/tag/defs.js';
 import { T_FUNCTION } from '../../JsonFormMessages';
 import { empty } from '../HtmlBuilder';
 import { JsonValue } from '../../JsonValue';
