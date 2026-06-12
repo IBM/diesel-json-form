@@ -6,6 +6,7 @@ export interface Metadata {
   readonly formats: ReadonlyMap<string, ReadonlyArray<string>>;
   readonly propertiesToAdd: ReadonlyMap<string, ReadonlyArray<string>>;
   readonly renderers: ReadonlyMap<string, SchemaRenderer>;
+  readonly requiredProperties: ReadonlySet<string>;
 }
 
 export const emptyMetadata: Metadata = {
@@ -14,4 +15,5 @@ export const emptyMetadata: Metadata = {
   formats: new Map(),
   propertiesToAdd: new Map(),
   renderers: new Map(),
+  requiredProperties: new Set(),
 };

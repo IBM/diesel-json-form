@@ -8,7 +8,7 @@ import { T_FUNCTION } from '../../JsonFormMessages';
 import { JsonValue, jvArray, JvArray, setValueAt } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
-import { validateAndComputeMetadata } from '../../ComputeAllTask';
+import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
 import { augmentProposal } from '../../augmentProposal';
 import { createMenu, MenuItem } from './ContextMenu';
 

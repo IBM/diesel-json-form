@@ -125,4 +125,7 @@ class WorkerValidationResult implements ValidationResult {
   getDiscriminator(path: JsPath): string | undefined {
     return this.response.discriminators.get(path.format());
   }
+  getRequiredProperties(): ReadonlySet<string> {
+    return this.response.requiredProperties;
+  }
 }

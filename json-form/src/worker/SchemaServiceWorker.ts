@@ -143,6 +143,7 @@ export class SchemaServiceWorker {
       renderers: validationResult.getRenderers(),
       formats,
       discriminators,
+      requiredProperties: validationResult.getRequiredProperties(),
     };
     postMessage(validateResponse);
   }

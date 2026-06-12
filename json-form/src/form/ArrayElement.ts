@@ -11,7 +11,7 @@ import {
   setValueAt,
 } from '../JsonValue';
 import { JsPath } from '../JsPath';
-import { validateAndComputeMetadata } from '../ComputeAllTask';
+import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
 
 export abstract class ArrayElement extends RenderedElement<JvArray> {
   getType(): 'jv-array' {

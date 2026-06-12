@@ -15,6 +15,7 @@ export interface ValidateResponse {
   readonly renderers: ReadonlyMap<string, SchemaRenderer>;
   readonly formats: ReadonlyMap<string, readonly string[]>;
   readonly discriminators: ReadonlyMap<string, string>;
+  readonly requiredProperties: ReadonlySet<string>;
 }
 
 export interface ProposeRequest {

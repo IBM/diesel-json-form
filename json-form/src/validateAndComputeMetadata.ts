@@ -44,6 +44,7 @@ export async function validateAndComputeMetadata(
         formats,
         propertiesToAdd,
         renderers: validationResult.getRenderers(),
+        requiredProperties: validationResult.getRequiredProperties(),
       };
       return res;
     });

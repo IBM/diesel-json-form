@@ -9,7 +9,7 @@ import { JsonValue, jvObject, stringify } from '../JsonValue';
 import { defaultSchemaService, SchemaService } from '../SchemaService';
 import { JsPath } from '../JsPath';
 import { Metadata } from '../Metadata';
-import { validateAndComputeMetadata } from '../ComputeAllTask';
+import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
 import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata';
 import { h } from '../MyJSXFactory';
 import { empty } from './HtmlBuilder';
@@ -111,6 +111,7 @@ export class JsonForm extends HTMLElement {
                 'validate',
                 validationCounter,
                 this.VALIDATION_COUNTER,
+                metadata,
               );
               resolve(metadata);
             } else {

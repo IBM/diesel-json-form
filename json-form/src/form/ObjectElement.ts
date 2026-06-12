@@ -1,4 +1,4 @@
-import { validateAndComputeMetadata } from '../ComputeAllTask';
+import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
 import {
   clearPropertiesIfObject,
   getValueAt,
@@ -11,6 +11,8 @@ import {
 } from '../JsonValue';
 import { RenderedElement } from './RenderedElement';
 import { maybeOf } from 'tea-cup-fp';
+import { Metadata } from '../Metadata';
+import { JsPath } from '../JsPath';
 
 export abstract class ObjectElement extends RenderedElement<JvObject> {
   getType(): 'jv-object' {
@@ -22,6 +24,8 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
   protected abstract appendProperty(
     name: string,
     elem: RenderedElement<JsonValue>,
+    metadata: Metadata,
+    path: JsPath,
   ): void;
 
   appendPropertyWithDialog(): void {
@@ -48,9 +52,10 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
     const newProps = [...existingPropValues, property];
     const tmpObject = jvObject(newProps);
     const tmpRoot = setValueAt(root, p, tmpObject);
+    const propPath = p.append(property.name);
     form
       .getSchemaService()
-      .propose(schema, tmpRoot, p.append(property.name))
+      .propose(schema, tmpRoot, propPath)
       .then((proposals) => maybeOf(proposals[0]).withDefault(property.value))
       .then(clearPropertiesIfObject)
       .then((proposal) => {
@@ -67,9 +72,9 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
           const e = form.getRenderer().render({
             value: proposal,
             metadata,
-            path: p.append(property.name),
+            path: propPath,
           });
-          this.appendProperty(property.name, e);
+          this.appendProperty(property.name, e, metadata, propPath);
           form.onChange();
         });
       });

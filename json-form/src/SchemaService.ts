@@ -43,6 +43,7 @@ export interface ValidationResult {
   getRenderers(): ReadonlyMap<string, SchemaRenderer>;
   getFormats(path: JsPath): readonly string[];
   getDiscriminator(path: JsPath): string | undefined;
+  getRequiredProperties(): ReadonlySet<string>;
 }
 
 function toFacadeValue(jsonValue: JsonValue): Maybe<JsFacade.JsonValue> {
@@ -122,6 +123,9 @@ class JsFacadeValidationResult implements ValidationResult {
   }
   getDiscriminator(path: JsPath): string | undefined {
     return JsFacade.getDiscriminator(this.result, path.format());
+  }
+  getRequiredProperties(): Set<string> {
+    return JsFacade.getRequiredProperties(this.result);
   }
 }
 

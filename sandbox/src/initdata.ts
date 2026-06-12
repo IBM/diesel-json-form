@@ -465,8 +465,7 @@ const Example_DateTimeWithExample = `{
   "examples": [ "2022-11-28T09:27:17Z" ]
 }`;
 
-export const Example_RendererTable = `
-{ 
+export const Example_RendererTable = `{ 
     "type": "object",
     "properties": {
         "firstName": {
@@ -508,6 +507,19 @@ export const Example_RendererTable = `
     }
 }`;
 
+export const Example_RequiredProperties = `{
+    "type": "object",
+    "properties": {
+        "foo": {
+            "type": "string"
+        },
+        "bar": {
+            "type": "number"
+        }    
+    },
+    "required": ["foo"]
+}`;
+
 export const samples = [
   ['All', '{}'],
   ['Long', Sample_Long],
@@ -535,6 +547,7 @@ export const samples = [
   ['RendererBooleanCdsCheckbox', Example_RendererBooleanCdsCheckbox],
   ['RendererNullCdsTextInput', Example_RendererNullCdsTextInput],
   ['RendererGridObject', Example_RendererGridObject],
+  ['RequiredProperties', Example_RequiredProperties],
 ];
 
 export const initialSchema = {};

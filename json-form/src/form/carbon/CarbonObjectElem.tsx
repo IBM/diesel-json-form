@@ -21,7 +21,7 @@ import {
 } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
-import { validateAndComputeMetadata } from '../../ComputeAllTask';
+import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';
@@ -59,7 +59,7 @@ export class CarbonObjectElement extends ObjectElement {
         metadata,
         path: propPath,
       });
-      this.createAndAppendNewSection(prop.name, e);
+      this.createAndAppendNewSection(prop.name, e, metadata, path);
     });
     this.setMetadata(metadata, path, renderer);
   }
@@ -67,9 +67,14 @@ export class CarbonObjectElement extends ObjectElement {
   private createAndAppendNewSection(
     name: string,
     elem: RenderedElement<JsonValue>,
+    metadata: Metadata,
+    path: JsPath,
   ) {
     const section = CarbonCollapsibleSection.newInstance();
-    section.setTitle(name);
+    const title = metadata.requiredProperties.has(path.append(name).format())
+      ? name + ' *'
+      : name;
+    section.setTitle(title);
     section.setAttribute(CarbonObjectElement.ATTR_PROP_NAME, name);
     section.setContent(elem);
     section.setMenuItems(() => this.createMenuItems(section));
@@ -149,8 +154,10 @@ export class CarbonObjectElement extends ObjectElement {
   protected appendProperty(
     name: string,
     elem: RenderedElement<JsonValue>,
+    metadata: Metadata,
+    path: JsPath,
   ): void {
-    this.createAndAppendNewSection(name, elem);
+    this.createAndAppendNewSection(name, elem, metadata, path);
   }
 
   private setSectionContent(
