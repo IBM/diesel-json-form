@@ -2,7 +2,7 @@ import { CDSTable, CDSTableHead } from '@carbon/web-components/es';
 import { ArrayElement } from '../ArrayElement';
 import { h } from '../../MyJSXFactory';
 import {
-  JsonProperty,
+  getValueAt,
   JsonValue,
   jvArray,
   JvArray,
@@ -11,11 +11,12 @@ import {
 } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
-import { getRendererKey, Renderer } from '../Renderer';
+import { Renderer } from '../Renderer';
 import { RenderedElement } from '../RenderedElement';
-import { ObjectElement } from '../ObjectElement';
 import { CDSTableRow } from '@carbon/web-components/es';
 import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
+import { SchemaRenderer } from '../../SchemaService';
+import { just, nothing } from 'tea-cup-fp';
 
 export class CarbonTableArrayRenderer extends ArrayElement {
   static TAG_NAME = 'json-array-table';
@@ -23,7 +24,26 @@ export class CarbonTableArrayRenderer extends ArrayElement {
   private tableElem: CDSTable;
   private headerElem: CDSTableHead;
   private bodyElem: HTMLElement;
-  private rows: CarbonObjectTableRowElement[];
+  private rows: TableRow[];
+  private cols: readonly string[] = [];
+
+  static newInstance(schemaRenderer: SchemaRenderer): CarbonTableArrayRenderer {
+    const e = document.createElement(
+      CarbonTableArrayRenderer.TAG_NAME,
+    ) as CarbonTableArrayRenderer;
+    const rendererObj = getValueAt(
+      schemaRenderer.schemaValue,
+      JsPath.parse('renderer'),
+    )
+      .andThen((v) => (v.tag === 'jv-object' ? just(v) : nothing))
+      .withDefaultSupply(() => jvObject());
+    const columns = getValueAt(rendererObj, JsPath.empty.append('columns'))
+      .andThen((v) => (v.tag === 'jv-array' ? just(v.elems) : nothing))
+      .withDefault([])
+      .flatMap((c) => (c.tag === 'jv-string' ? [c.value] : []));
+    e.columns = columns;
+    return e;
+  }
 
   constructor() {
     super();
@@ -37,6 +57,10 @@ export class CarbonTableArrayRenderer extends ArrayElement {
         {this.bodyElem}
       </cds-table>
     );
+  }
+
+  set columns(columns: readonly string[]) {
+    this.cols = columns;
   }
 
   connectedCallback() {
@@ -53,22 +77,16 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     path: JsPath,
     renderer: Renderer,
   ): void {
+    const headerRow = <cds-table-header-row></cds-table-header-row>;
+    this.cols.forEach((c) => {
+      headerRow.appendChild(<cds-table-header-cell>{c}</cds-table-header-cell>);
+    });
+    this.headerElem.appendChild(headerRow);
+
     value.elems.forEach((item, index) => {
       if (item.tag === 'jv-object') {
-        if (index === 0) {
-          const headerRow = <cds-table-header-row></cds-table-header-row>;
-          item.properties.forEach((prop) => {
-            headerRow.appendChild(
-              <cds-table-header-cell>{prop.name}</cds-table-header-cell>,
-            );
-          });
-          this.headerElem.appendChild(headerRow);
-        }
-        const row = CarbonObjectTableRowElement.newInstance();
         const rowPath = path.append(index);
-        const rowKey = getRendererKey(row.getType(), metadata, rowPath);
-        row.rendererKey = rowKey;
-        row.initialize(item, metadata, rowPath, renderer);
+        const row = new TableRow(item, this.cols, metadata, rowPath, renderer);
         this.bodyElem.appendChild(row.getCDSTableRow());
         this.rows.push(row);
       } else {
@@ -78,11 +96,7 @@ export class CarbonTableArrayRenderer extends ArrayElement {
   }
 
   toValue(): JvArray {
-    return jvArray(this.getElements().map((e) => e.toValue()));
-  }
-
-  private getElements(): readonly RenderedElement<JsonValue>[] {
-    return this.rows;
+    return jvArray(this.rows.map((r) => r.toValue()));
   }
 
   protected appendElement(): void {
@@ -101,20 +115,37 @@ customElements.define(
   CarbonTableArrayRenderer,
 );
 
-export class CarbonObjectTableRowElement extends ObjectElement {
-  static TAG_NAME = 'json-object-row';
-
+class TableRow {
   private row: CDSTableRow = (<cds-table-row></cds-table-row>);
-  private cells: [string, RenderedElement<JsonValue>][] = [];
+  private initialValue: JvObject;
+  private cells: Map<string, RenderedElement<JsonValue>> = new Map();
 
-  constructor() {
-    super();
-  }
-
-  static newInstance(): CarbonObjectTableRowElement {
-    return document.createElement(
-      CarbonObjectTableRowElement.TAG_NAME,
-    ) as CarbonObjectTableRowElement;
+  constructor(
+    value: JvObject,
+    columns: readonly string[],
+    metadata: Metadata,
+    path: JsPath,
+    renderer: Renderer,
+  ) {
+    this.initialValue = value;
+    const indexedProps = new Map(
+      value.properties.map((prop) => [prop.name, prop.value]),
+    );
+    for (const col of columns) {
+      const cdsCell = <cds-table-cell></cds-table-cell>;
+      const value = indexedProps.get(col);
+      if (value !== undefined) {
+        cdsCell.setAttribute('json-property-name', col);
+        const e = renderer.render({
+          value: value,
+          metadata,
+          path: path.append(col),
+        });
+        cdsCell.appendChild(e);
+        this.cells.set(col, e);
+      }
+      this.row.appendChild(cdsCell);
+    }
   }
 
   getCDSTableRow(): CDSTableRow {
@@ -123,49 +154,22 @@ export class CarbonObjectTableRowElement extends ObjectElement {
 
   toValue(): JvObject {
     return jvObject(
-      this.cells.map(([name, elem]) => {
-        return {
-          name,
-          value: elem.toValue(),
-        };
+      this.initialValue.properties.map((prop) => {
+        const cellElem = this.cells.get(prop.name);
+        if (cellElem) {
+          return {
+            name: prop.name,
+            value: cellElem.toValue(),
+          };
+        } else {
+          return prop;
+        }
       }),
     );
   }
 
-  getProperties(): [string, RenderedElement<JsonValue>][] {
-    return this.cells;
-  }
-
-  protected openDialog(): Promise<JsonProperty> {
-    throw new Error('Method not implemented.');
-  }
-
-  protected appendProperty(): void {
-    throw new Error('Method not implemented.');
-  }
-
-  initialize(
-    value: JvObject,
-    metadata: Metadata,
-    path: JsPath,
-    renderer: Renderer,
-  ): void {
-    value.properties.forEach((prop) => {
-      const name = prop.name;
-      const e = renderer.render({
-        value: prop.value,
-        metadata,
-        path: path.append(name),
-      });
-      this.cells.push([name, e]);
-      const cdsCell = <cds-table-cell>{e}</cds-table-cell>;
-      cdsCell.setAttribute('json-property-name', name);
-      this.row.appendChild(cdsCell);
-    });
-  }
-
   setMetadata(metadata: Metadata, path: JsPath, renderer: Renderer): void {
-    this.cells.forEach(([name, elem]) => {
+    this.cells.forEach((elem, name) => {
       const propPath = path.append(name);
       const e = renderNewOrSetMetadata(elem, metadata, propPath, renderer);
       if (e) {
@@ -181,8 +185,3 @@ export class CarbonObjectTableRowElement extends ObjectElement {
     });
   }
 }
-
-customElements.define(
-  CarbonObjectTableRowElement.TAG_NAME,
-  CarbonObjectTableRowElement,
-);

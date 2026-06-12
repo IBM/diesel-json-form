@@ -36,10 +36,10 @@ import {
   CarbonGridObjectRenderer,
 } from '@diesel-parser/json-form';
 
-import '@carbon/web-components/es/index';
+import '@carbon/web-components/es/index.js';
 
-import { CDSComboBox, CDSRadioButton } from '@carbon/web-components';
-import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group';
+import { CDSComboBox, CDSRadioButton } from '@carbon/web-components/es';
+import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group.js';
 import { h } from './MyJSXFactory';
 import { version } from '@diesel-parser/json-form/package.json';
 
@@ -65,27 +65,10 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{}`; //Example_RendererTable;
+const initialSchema = '{}';
 
 const schema = parseJsonValueUnsafe(initialSchema);
 
-// const initialValue = `{
-//   "firstName": "",
-//   "lastName": "",
-//   "category": "SILVER",
-//   "lastOrders": [
-//     {
-//       "productId": "ABCDEF",
-//       "amount": 123,
-//       "quantity": 12
-//     },
-//     {
-//       "productId": "XYZ",
-//       "amount": 333,
-//       "quantity": 2323
-//     }
-//   ]
-// }`;
 const initialValue = `{}`;
 
 const value = parseJsonValueUnsafe(initialValue);
@@ -274,7 +257,7 @@ renderer.addCustomRenderer('RatingRenderer', () => {
 
 renderer.addCustomRenderer('MyStringRenderer', MyStringRenderer.newInstance);
 
-renderer.addCustomRenderer('ArrayTable', () => new CarbonTableArrayRenderer());
+renderer.addCustomRenderer('ArrayTable', CarbonTableArrayRenderer.newInstance);
 
 renderer.addCustomRenderer('GridObject', CarbonGridObjectRenderer.newInstance);
 

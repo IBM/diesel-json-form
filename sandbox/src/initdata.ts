@@ -500,7 +500,10 @@ export const Example_RendererTable = `
                     }
                 }
             },
-            "renderer": "ArrayTable"
+            "renderer": {
+                "key": "ArrayTable",
+                "columns": ["productId", "amount", "quantity"]
+            }
         }
     }
 }`;

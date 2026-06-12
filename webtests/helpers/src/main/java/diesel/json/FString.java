@@ -22,19 +22,13 @@ public class FString extends FRenderedElement {
     }
 
     public FString assertNoError() {
-        $$(".cds--form-requirement").count(0).eval();
         findInput().where(not(attrEquals("data-invalid", "true"))).eval();
         return this;
     }
 
     public FString assertHasError(String expected) {
         findInput().where(attrEquals("invalid", "true")).eval();
-        findInput()
-                .shadowRoot()
-                .$$(".cds--form-requirement")
-                .where(textEquals(expected))
-                .expectOne()
-                .eval();
+        findInput().where(attrEquals("invalid-text", expected)).eval();
         return this;
     }
 

@@ -879,4 +879,59 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .assertEmpty();
     }
 
+    @Test
+    public void testTableRenderer() {
+        sandbox.selectSample("RendererTable");
+        sandbox.clickTabJson();
+        sandbox.jsonEditor.clearText().typeText("{\n" +
+                "  \"firstName\": \"\",\n" +
+                "  \"lastName\": \"\",\n" +
+                "  \"category\": \"SILVER\",\n" +
+                "  \"lastOrders\": [\n" +
+                "    {\n" +
+                "      \"productId\": \"ABCDEF\",\n" +
+                "      \"amount\": 123,\n" +
+                "      \"quantity\": 12,\n" +
+                "      \"tags\": [\n" +
+                "        \"food\"\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"productId\": \"XYZ\",\n" +
+                "      \"amount\": 333,\n" +
+                "      \"quantity\": 2323,\n" +
+                "      \"free\": true\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}");
+        sandbox.clickApplyToForm();
+        FString s = sandbox.jsonForm.stringAt(JsPath.empty.append("lastOrders").append(0).append("productId"));
+        s.assertHasError("Invalid string length: max 5");
+        s.setValue("ABC");
+        s.assertNoError();
+
+        sandbox.clickApplyFromForm();
+        sandbox.jsonEditor.assertText("{\n" +
+                "  \"firstName\": \"\",\n" +
+                "  \"lastName\": \"\",\n" +
+                "  \"category\": \"SILVER\",\n" +
+                "  \"lastOrders\": [\n" +
+                "    {\n" +
+                "      \"productId\": \"ABC\",\n" +
+                "      \"amount\": 123,\n" +
+                "      \"quantity\": 12,\n" +
+                "      \"tags\": [\n" +
+                "        \"food\"\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"productId\": \"XYZ\",\n" +
+                "      \"amount\": 333,\n" +
+                "      \"quantity\": 2323,\n" +
+                "      \"free\": true\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}");
+    }
+
 }
