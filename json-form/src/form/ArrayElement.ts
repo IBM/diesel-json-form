@@ -70,6 +70,7 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
     this.getAppendItemProposal()
       .then(({ root, proposal, existingValues, newElemIndex }) => {
         const finalArray = existingValues.concat([proposal]);
+        const p = this.path;
         const finalRoot = setValueAt(root, p, jvArray(finalArray));
         const form = this.parentForm;
         this.appendValue(
