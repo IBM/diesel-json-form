@@ -15,6 +15,13 @@ import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
 
 type Appender = (elem: RenderedElement<JsonValue>) => void;
 
+type AppendItemProposal = {
+  root: JsonValue;
+  proposal: JsonValue;
+  existingValues: readonly JsonValue[];
+  newElemIndex: number;
+};
+
 export abstract class ArrayElement extends RenderedElement<JvArray> {
   getType(): 'jv-array' {
     return 'jv-array';
@@ -22,7 +29,7 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
 
   appendItem?(): void;
 
-  protected doAppendItem(appender: Appender) {
+  protected getAppendItemProposal(): Promise<AppendItemProposal> {
     const form = this.parentForm;
     const schema = form.getSchema();
     const root = form.toValue();
@@ -46,14 +53,25 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
     const newArrayElems = existingValues.concat([jvNull]);
     const tmpArray = jvArray(newArrayElems);
     const tmpRoot = setValueAt(root, p, tmpArray);
-    form
+    return form
       .getSchemaService()
       .propose(schema, tmpRoot, p.append(newElemIndex))
       .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
       .then(clearPropertiesIfObject)
-      .then((proposal) => {
+      .then((proposal) => ({
+        root,
+        proposal,
+        existingValues,
+        newElemIndex,
+      }));
+  }
+
+  protected doAppendItem(appender: Appender) {
+    this.getAppendItemProposal()
+      .then(({ root, proposal, existingValues, newElemIndex }) => {
         const finalArray = existingValues.concat([proposal]);
         const finalRoot = setValueAt(root, p, jvArray(finalArray));
+        const form = this.parentForm;
         this.appendValue(
           appender,
           form,

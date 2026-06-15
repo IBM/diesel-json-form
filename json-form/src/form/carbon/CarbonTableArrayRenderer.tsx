@@ -1,4 +1,5 @@
 import {
+  CDSButton,
   CDSTable,
   CDSTableBatchActions,
   CDSTableHead,
@@ -21,6 +22,7 @@ import { CDSTableRow } from '@carbon/web-components/es';
 import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
 import { SchemaRenderer } from '../../SchemaService';
 import { just, nothing } from 'tea-cup-fp';
+import { T_FUNCTION } from '../../JsonFormMessages';
 
 export class CarbonTableArrayRenderer extends ArrayElement {
   static TAG_NAME = 'json-array-table';
@@ -56,7 +58,9 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     this.bodyElem = <cds-table-body></cds-table-body>;
     const contentElem = (
       <cds-table-toolbar-content>
-        <cds-button>Add new</cds-button>
+        <cds-button onclick={this.doAppendElem.bind(this)}>
+          {T_FUNCTION('contextMenu.addElement')}
+        </cds-button>
       </cds-table-toolbar-content>
     );
     contentElem.setAttribute('?has-batch-actions', 'true');
@@ -76,6 +80,14 @@ export class CarbonTableArrayRenderer extends ArrayElement {
         {this.headerElem}
         {this.bodyElem}
       </cds-table>
+    );
+  }
+
+  private doAppendElem() {
+    this.getAppendItemProposal().then(
+      ({ root, proposal, existingValues, newElemIndex }) => {
+        debugger;
+      },
     );
   }
 
@@ -126,14 +138,6 @@ export class CarbonTableArrayRenderer extends ArrayElement {
 
   toValue(): JvArray {
     return jvArray(this.rows.map((r) => r.toValue()));
-  }
-
-  protected appendElement(): void {
-    throw new Error('Method not implemented.');
-  }
-
-  canAppendItem(): boolean {
-    return false;
   }
 
   setMetadata(metadata: Metadata, path: JsPath, renderer: Renderer): void {
