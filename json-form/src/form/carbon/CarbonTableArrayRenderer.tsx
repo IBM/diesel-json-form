@@ -1,9 +1,4 @@
-import {
-  CDSButton,
-  CDSTable,
-  CDSTableBatchActions,
-  CDSTableHead,
-} from '@carbon/web-components/es';
+import { CDSTable, CDSTableHead } from '@carbon/web-components/es';
 import { ArrayElement } from '../ArrayElement';
 import { h } from '../../MyJSXFactory';
 import {
@@ -13,6 +8,7 @@ import {
   JvArray,
   jvObject,
   JvObject,
+  setValueAt,
 } from '../../JsonValue';
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
@@ -23,6 +19,7 @@ import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
 import { SchemaRenderer } from '../../SchemaService';
 import { just, nothing } from 'tea-cup-fp';
 import { T_FUNCTION } from '../../JsonFormMessages';
+import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
 
 export class CarbonTableArrayRenderer extends ArrayElement {
   static TAG_NAME = 'json-array-table';
@@ -68,7 +65,14 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     const toolbar = (
       <cds-table-toolbar slot="toolbar">
         <cds-table-batch-actions>
-          <cds-button data-context="data-table">Delete</cds-button>
+          <cds-button
+            data-context="data-table"
+            onclick={() => {
+              this.doDeleteSelectedElements();
+            }}
+          >
+            {T_FUNCTION('contextMenu.delete')}
+          </cds-button>
         </cds-table-batch-actions>
         {contentElem}
       </cds-table-toolbar>
@@ -83,12 +87,14 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     );
   }
 
-  private doAppendElem() {
-    this.getAppendItemProposal().then(
-      ({ root, proposal, existingValues, newElemIndex }) => {
-        debugger;
-      },
-    );
+  private doDeleteSelectedElements() {
+    this.bodyElem.querySelectorAll(':scope > cds-table-row').forEach((e) => {
+      if (e instanceof CDSTableRow && e.selected) {
+        e.remove();
+        this.rows = this.rows.filter((r) => r.getCDSTableRow() !== e);
+      }
+    });
+    this.parentForm.onChange();
   }
 
   set columns(columns: readonly string[]) {
@@ -118,21 +124,7 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     this.headerElem.appendChild(headerRow);
 
     value.elems.forEach((item, index) => {
-      if (item.tag === 'jv-object') {
-        const rowPath = path.append(index);
-        const row = new TableRow(
-          item,
-          this.cols,
-          metadata,
-          rowPath,
-          renderer,
-          index,
-        );
-        this.bodyElem.appendChild(row.getCDSTableRow());
-        this.rows.push(row);
-      } else {
-        throw new Error('array item is not an object');
-      }
+      this.doAddRow(item, index, path, metadata, renderer);
     });
   }
 
@@ -143,6 +135,54 @@ export class CarbonTableArrayRenderer extends ArrayElement {
   setMetadata(metadata: Metadata, path: JsPath, renderer: Renderer): void {
     this.rows.forEach((row, index) =>
       row.setMetadata(metadata, path.append(index), renderer),
+    );
+  }
+
+  private doAddRow(
+    item: JsonValue,
+    index: number,
+    path: JsPath,
+    metadata: Metadata,
+    renderer: Renderer,
+  ): void {
+    if (item.tag === 'jv-object') {
+      const rowPath = path.append(index);
+      const row = new TableRow(
+        item,
+        this.cols,
+        metadata,
+        rowPath,
+        renderer,
+        index,
+      );
+      this.bodyElem.appendChild(row.getCDSTableRow());
+      this.rows.push(row);
+    } else {
+      throw new Error('array item is not an object');
+    }
+  }
+
+  private doAppendElem() {
+    this.getAppendItemProposal(false).then(
+      ({ root, proposal, existingValues, newElemIndex }) => {
+        const form = this.parentForm;
+        const finalArray = existingValues.concat([proposal]);
+        const p = this.path;
+        const finalRoot = setValueAt(root, p, jvArray(finalArray));
+        return validateAndComputeMetadata(
+          form.getSchemaService(),
+          form.getSchema(),
+          finalRoot,
+        ).then((metadata) => {
+          this.doAddRow(
+            proposal,
+            newElemIndex,
+            this.path,
+            metadata,
+            form.getRenderer(),
+          );
+        });
+      },
     );
   }
 }

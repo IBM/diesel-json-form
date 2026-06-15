@@ -74,28 +74,38 @@ samples
   })
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
-const initialSchema = `{}`; //Example_RendererTable; // '{}';
+const initialSchema = Example_RendererTable; //`{}`;
+//   "type": [
+//     "array", "null"
+//   ],
+//   "items": {
+//     "type": [ "object", "null" ],
+//     "properties": {
+//       "foo": { "type": "number" },
+//       "bar": { "type": "boolean" }
+//     }
+//   }
+// }`;
 
 const schema = parseJsonValueUnsafe(initialSchema);
 
-const initialValue = `{}`;
-// {
-//   "firstName": "",
-//   "lastName": "",
-//   "category": "SILVER",
-//   "lastOrders": [
-//     {
-//       "productId": "ABC",
-//       "amount": 12,
-//       "quantity": 13
-//     },
-//     {
-//       "productId": "DEF",
-//       "amount": 111,
-//       "quantity": 222
-//     }
-//   ]
-// }`;
+const initialValue = `{
+  "firstName": "",
+  "lastName": "",
+  "category": "SILVER",
+  "lastOrders": [
+    {
+      "productId": "ABC",
+      "amount": 12,
+      "quantity": 13
+    },
+    {
+      "productId": "DEF",
+      "amount": 111,
+      "quantity": 222
+    }
+  ]
+}`;
 
 const value = parseJsonValueUnsafe(initialValue);
 

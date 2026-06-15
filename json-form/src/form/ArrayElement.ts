@@ -12,6 +12,7 @@ import {
 } from '../JsonValue';
 import { JsPath } from '../JsPath';
 import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
+import { proposeNested } from '../proposeNested';
 
 type Appender = (elem: RenderedElement<JsonValue>) => void;
 
@@ -29,7 +30,9 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
 
   appendItem?(): void;
 
-  protected getAppendItemProposal(): Promise<AppendItemProposal> {
+  protected getAppendItemProposal(
+    clearObjectProperties: boolean,
+  ): Promise<AppendItemProposal> {
     const form = this.parentForm;
     const schema = form.getSchema();
     const root = form.toValue();
@@ -53,21 +56,31 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
     const newArrayElems = existingValues.concat([jvNull]);
     const tmpArray = jvArray(newArrayElems);
     const tmpRoot = setValueAt(root, p, tmpArray);
-    return form
-      .getSchemaService()
-      .propose(schema, tmpRoot, p.append(newElemIndex))
-      .then((proposals) => maybeOf(proposals[0]).withDefault(jvNull))
-      .then(clearPropertiesIfObject)
-      .then((proposal) => ({
-        root,
-        proposal,
-        existingValues,
-        newElemIndex,
-      }));
+    const proposals = proposeNested(
+      schema,
+      form.getSchemaService(),
+      tmpRoot,
+      p.append(newElemIndex),
+      2,
+    );
+    return (
+      proposals
+        // form
+        //       .getSchemaService()
+        //       .propose(schema, tmpRoot, p.append(newElemIndex))
+        .then((ps) => maybeOf(ps[0]).withDefault(jvNull))
+        .then((x) => (clearObjectProperties ? clearPropertiesIfObject(x) : x))
+        .then((proposal) => ({
+          root,
+          proposal,
+          existingValues,
+          newElemIndex,
+        }))
+    );
   }
 
-  protected doAppendItem(appender: Appender) {
-    this.getAppendItemProposal()
+  protected doAppendItem(appender: Appender, clearObjectProperties: boolean) {
+    this.getAppendItemProposal(clearObjectProperties)
       .then(({ root, proposal, existingValues, newElemIndex }) => {
         const finalArray = existingValues.concat([proposal]);
         const p = this.path;

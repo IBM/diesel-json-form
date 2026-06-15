@@ -93,7 +93,7 @@ export class CarbonArrayElement extends ArrayElement {
   }
 
   appendItem(): void {
-    this.doAppendItem(this.appendElement.bind(this));
+    this.doAppendItem(this.appendElement.bind(this), true);
   }
 
   private appendElement(elem: RenderedElement<JsonValue>): void {
