@@ -8,17 +8,11 @@ public class FArray extends FRenderedElement {
     private final Findr fRoot;
     private final FSectionBasedElem sections;
 
-    FArray(Findr fRoot, JsPath path, Findr form) {
-        super(path, form);
+    FArray(Findr fRoot, Findr f) {
+        super(f);
         this.fRoot = fRoot;
         this.sections = new FSectionBasedElem($("section-based-elem"));
     }
-
-    //    public FString getStringCell(int index) {
-    //        String indexAsString = "" + index;
-    //        Findr cell = $$(".value").where(Findrs.attrEquals("data-path", indexAsString)).at(0);
-    //        return new FString(path.append(index), cell);
-    //    }
 
     public FArray assertLength(int expectedLength) {
         this.sections.assertLength(expectedLength);

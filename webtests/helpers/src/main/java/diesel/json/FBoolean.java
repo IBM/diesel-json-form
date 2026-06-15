@@ -5,8 +5,8 @@ import static com.pojosontheweb.selenium.Findrs.attrEquals;
 
 public class FBoolean extends FRenderedElement {
 
-    FBoolean(JsPath path, Findr findr) {
-        super(path, findr);
+    FBoolean(Findr findr) {
+        super(findr);
     }
 
     private Findr findCheckbox() {

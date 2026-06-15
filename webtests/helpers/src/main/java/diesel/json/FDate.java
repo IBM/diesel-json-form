@@ -6,8 +6,8 @@ import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FDate extends FRenderedElement {
 
-    FDate(JsPath path, Findr findr) {
-        super(path, findr);
+    FDate(Findr findr) {
+        super(findr);
     }
 
     private Findr findPicker() {

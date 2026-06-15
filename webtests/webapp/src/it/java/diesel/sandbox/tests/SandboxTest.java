@@ -28,51 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class SandboxTest extends ManagedDriverJunit4TestBase {
-
-    protected static final Logger logger = Logger.getLogger(SandboxTest.class.getName());
-
-    private FSandbox sandbox;
-
-    @Override
-    protected WebDriver createWebDriver() {
-        return createWebDriver("en");
-    }
-
-    protected WebDriver createWebDriver(String lng) {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--ignore-certificate-errors");
-        HashMap<String, String> prefs = new HashMap<>();
-        prefs.put("intl.accept_languages", lng);
-        options.setExperimentalOption("prefs", prefs);
-        LoggingPreferences loggingPrefs = new LoggingPreferences();
-        loggingPrefs.enable(LogType.BROWSER, Level.ALL);
-        options.setCapability("goog:loggingPrefs", loggingPrefs);
-        WebDriver d = new ChromeDriver(options);
-        d.manage().window().setSize(new Dimension(1920, 1200));
-        return d;
-    }
-
-    @After
-    public void logBrowserConsole() {
-        String browserLog = getWebDriver().manage()
-                .logs().get(LogType.BROWSER).getAll().stream()
-                .map(logEntry -> "  |BROWSER| " + logEntry.toString())
-                .collect(Collectors.joining("\n"));
-        if (browserLog.isEmpty()) {
-            return;
-        }
-        logger.info("\n" + browserLog);
-        if (Findr.isDebugEnabled()) {
-            Findr.logDebug(browserLog);
-        }
-    }
-
-    @Before
-    public void loadPage() {
-        getWebDriver().get("http://localhost:3000");
-        sandbox = new FSandbox(findr());
-    }
+public class SandboxTest extends TestBase {
 
     @Test
     public void simpleLong() {
@@ -786,7 +742,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "}");
         sandbox.clickApplyToForm();
 
-        FRating rating = new FRating(JsPath.empty.append("rating"), sandbox.jsonForm.getFindr());
+        FRating rating = new FRating(FJsonForm.findByPath(findr(), JsPath.empty.append("rating")));
         rating
                 .assertRating(1)
                 .clickRating(3)

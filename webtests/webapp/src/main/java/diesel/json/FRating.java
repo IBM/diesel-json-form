@@ -1,15 +1,13 @@
 package diesel.json;
 
-import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
-import com.pojosontheweb.selenium.Findrs;
 
 import static com.pojosontheweb.selenium.Findrs.attrEquals;
 
 public class FRating extends FRenderedElement {
 
-    public FRating(JsPath path, Findr form) {
-        super(path, form);
+    public FRating(Findr f) {
+        super(f);
     }
 
     public FRating assertRating(int expected) {

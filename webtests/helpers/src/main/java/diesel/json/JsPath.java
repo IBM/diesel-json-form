@@ -1,6 +1,7 @@
 package diesel.json;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,11 @@ public class JsPath {
 
     public boolean isEmpty() {
         return this.elems.isEmpty();
+    }
+
+    public static JsPath parse(String s) {
+        String [] parts = s.split("/");
+        return new JsPath(Arrays.asList(parts));
     }
 
 }

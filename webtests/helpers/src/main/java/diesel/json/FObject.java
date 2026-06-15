@@ -13,8 +13,8 @@ public class FObject extends FRenderedElement {
 
     private FSectionBasedElem sections;
 
-    FObject(JsPath path, Findr form) {
-        super(path, form);
+    FObject(Findr f) {
+        super(f);
         this.sections = new FSectionBasedElem($("section-based-elem"));
     }
 

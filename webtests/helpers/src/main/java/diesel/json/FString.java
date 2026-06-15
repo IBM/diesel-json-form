@@ -8,8 +8,8 @@ import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FString extends FRenderedElement {
 
-    FString(JsPath path, Findr findr) {
-        super(path, findr);
+    FString(Findr findr) {
+        super(findr);
     }
 
     private Findr findInput() {

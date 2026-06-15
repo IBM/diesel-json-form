@@ -7,17 +7,13 @@ import com.pojosontheweb.selenium.Findr;
 
 public abstract class FRenderedElement extends AbstractPageObject {
 
-    public final JsPath path;
-    private final Findr fForm;
-
-    FRenderedElement(JsPath path, Findr form) {
-        super(form.$$("*").where(attrEquals("json-form-path", path.format())).expectOne());
-        this.path = path;
-        this.fForm = form;
+    FRenderedElement(Findr f) { //}, Findr f) {
+//        super(form.$$("*").where(attrEquals("json-form-path", path.format())).expectOne());
+        super(f);
     }
 
-    protected Findr getForm() {
-        return fForm;
-    }
+//    String getPathAttribute() {
+//        return getFindr().eval(e -> e.getAttribute("json-form-path"));
+//    }
 
 }

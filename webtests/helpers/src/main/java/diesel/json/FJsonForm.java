@@ -3,9 +3,19 @@ package diesel.json;
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
 
+import static com.pojosontheweb.selenium.Findrs.attrEquals;
+
 public class FJsonForm extends AbstractPageObject {
 
     private final Findr fRoot;
+
+    private Findr findElementByPathPath(JsPath path) {
+        return findByPath(fRoot, path);
+    }
+
+    public static Findr findByPath(Findr root, JsPath path) {
+        return root.$$("*").where(attrEquals("json-form-path", path.format())).expectOne();
+    }
 
     public FJsonForm(Findr findr, String cssSelector) {
         super(findr.$$(cssSelector).expectOne());
@@ -13,31 +23,35 @@ public class FJsonForm extends AbstractPageObject {
     }
 
     public FObject objectAt(JsPath path) {
-        return new FObject(path, getFindr());
+        return new FObject(findElementByPathPath(path));
     }
 
     public FNumber numberAt(JsPath path) {
-        return new FNumber(path, getFindr());
+        return new FNumber(findElementByPathPath(path));
     }
 
     public FString stringAt(JsPath path) {
-        return new FString(path, getFindr());
+        return new FString(findElementByPathPath(path));
     }
 
     public FArray arrayAt(JsPath path) {
-        return new FArray(fRoot, path, getFindr());
+        return new FArray(fRoot, findElementByPathPath(path));
+    }
+
+    public FArrayTable arrayTableAt(JsPath path) {
+        return new FArrayTable(findElementByPathPath(path));
     }
 
     public FBoolean booleanAt(JsPath path) {
-        return new FBoolean(path, getFindr());
+        return new FBoolean(findElementByPathPath(path));
     }
 
     public FDate dateAt(JsPath path) {
-        return new FDate(path, getFindr());
+        return new FDate(findElementByPathPath(path));
     }
 
     public FTime timeAt(JsPath path) {
-        return new FTime(path, getFindr());
+        return new FTime(findElementByPathPath(path));
     }
 
     public FJsonForm assertMenuClosed() {
@@ -46,7 +60,7 @@ public class FJsonForm extends AbstractPageObject {
     }
 
     public FSelect selectAt(JsPath path) {
-        return new FSelect(path, getFindr());
+        return new FSelect(findElementByPathPath(path));
     }
 
     public FMenu clickRootMenu() {

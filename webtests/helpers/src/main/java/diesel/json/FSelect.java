@@ -2,15 +2,12 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.Findr;
 
-import static com.pojosontheweb.selenium.Findrs.attrEquals;
-import static com.pojosontheweb.selenium.Findrs.textEquals;
-
 public class FSelect extends FRenderedElement {
 
     private final FCarbonComboBox comboBox;
 
-    FSelect(JsPath path, Findr findr) {
-        super(path, findr);
+    FSelect(Findr findr) {
+        super(findr);
         this.comboBox = new FCarbonComboBox(getFindr().$("cds-combo-box"));
     }
 

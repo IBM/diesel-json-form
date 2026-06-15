@@ -18,8 +18,8 @@ public class FTime extends FRenderedElement {
                 .expectOne();
     }
 
-    FTime(JsPath path, Findr findr) {
-        super(path, findr);
+    FTime(Findr findr) {
+        super(findr);
     }
 
     public FTime assertValue(String expected) {

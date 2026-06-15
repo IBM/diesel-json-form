@@ -7,8 +7,8 @@ import static com.pojosontheweb.selenium.Findrs.*;
 
 public class FNumber extends FRenderedElement {
 
-    FNumber(JsPath path, Findr findr) {
-        super(path, findr);
+    FNumber(Findr findr) {
+        super(findr);
     }
 
     public Findr findInput() {
