@@ -183,6 +183,10 @@ export class JsonForm extends HTMLElement {
     }
   }
 
+  get renderedElement(): RenderedElement<JsonValue> | undefined {
+    return this.element;
+  }
+
   getRenderer(): Renderer {
     if (!this.renderer) {
       throw new Error('no renderer available');
@@ -192,7 +196,7 @@ export class JsonForm extends HTMLElement {
 
   addPropertyOrElement() {
     if (this.element instanceof ArrayElement) {
-      this.element.appendItem();
+      this.element.appendItem?.();
     } else if (this.element instanceof ObjectElement) {
       this.element.appendPropertyWithDialog();
     }

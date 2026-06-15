@@ -11,6 +11,7 @@ import { JsPath } from '../../JsPath';
 import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
 import { augmentProposal } from '../../augmentProposal';
 import { createMenu, MenuItem } from './ContextMenu';
+import { canAdd } from '../canAdd';
 
 export class CarbonArrayElement extends ArrayElement {
   static TAG_NAME = 'json-array';
@@ -91,7 +92,11 @@ export class CarbonArrayElement extends ArrayElement {
     this.sectionElem.showErrors(errors);
   }
 
-  protected appendElement(elem: RenderedElement<JsonValue>): void {
+  appendItem(): void {
+    this.doAppendItem(this.appendElement.bind(this));
+  }
+
+  private appendElement(elem: RenderedElement<JsonValue>): void {
     const section = CarbonCollapsibleSection.newInstance();
     const nbSections = this.sectionElem.findSections().length;
     section.setTitle('#' + nbSections);
@@ -155,13 +160,15 @@ export class CarbonArrayElement extends ArrayElement {
       path.append(rowIndex),
       form.strictMode,
       {
-        add: () => {
-          const elem = section.getContent();
-          if (elem instanceof ArrayElement) {
-            elem.appendItem();
-            form.onChange();
-          }
-        },
+        add: canAdd(section.getContent())
+          ? () => {
+              const elem = section.getContent();
+              if (elem instanceof ArrayElement && elem.appendItem) {
+                elem.appendItem();
+                form.onChange();
+              }
+            }
+          : undefined,
         delete: () => {
           this.sectionElem.delete(section);
           this.refreshItemNumbers();

@@ -98,3 +98,7 @@ json-object > .json-prop-buttons {
     margin-bottom: 1rem;
   }
 }
+
+.collapsible-content:has(> json-array-table) {
+  margin-top: 8px;
+}

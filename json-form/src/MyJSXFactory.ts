@@ -19,6 +19,9 @@ import {
   CDSTableHeaderCell,
   CDSTableHeaderRow,
   CDSTableRow,
+  CDSTableToolbar,
+  CDSTableBatchActions,
+  CDSTableToolbarContent,
 } from '@carbon/web-components/es';
 import CDSGrid from '@carbon/web-components/es/components/grid/grid.js';
 import CDSColumn from '@carbon/web-components/es/components/grid/column.js';
@@ -56,6 +59,11 @@ declare global {
       'cds-table-body': Partial<CDSTableBody>;
       'cds-table-row': Partial<CDSTableRow>;
       'cds-table-cell': Partial<CDSTableCell>;
+      'cds-table-toolbar': Partial<CDSTableToolbar>;
+      'cds-table-batch-actions': Partial<CDSTableBatchActions>;
+      'cds-table-toolbar-content': Partial<CDSTableToolbarContent>;
+      svg: Partial<SVGElement>;
+      path: Partial<SVGPathElement>;
       'cds-grid': Partial<CDSGrid>;
       'cds-column': Partial<CDSColumn>;
     }

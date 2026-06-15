@@ -1,4 +1,8 @@
-import { CDSTable, CDSTableHead } from '@carbon/web-components/es';
+import {
+  CDSTable,
+  CDSTableBatchActions,
+  CDSTableHead,
+} from '@carbon/web-components/es';
 import { ArrayElement } from '../ArrayElement';
 import { h } from '../../MyJSXFactory';
 import {
@@ -51,8 +55,20 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     this.headerElem = <cds-table-head></cds-table-head>;
     this.bodyElem = <cds-table-body></cds-table-body>;
 
+    const toolbar = (
+      <cds-table-toolbar slot="toolbar">
+        <cds-table-batch-actions>
+          <cds-button data-context="data-table">Delete</cds-button>
+        </cds-table-batch-actions>
+        <cds-table-toolbar-content has-batch-actions="true">
+          <cds-button>Add new</cds-button>
+        </cds-table-toolbar-content>
+      </cds-table-toolbar>
+    );
+
     this.tableElem = (
       <cds-table>
+        {toolbar}
         {this.headerElem}
         {this.bodyElem}
       </cds-table>
@@ -77,7 +93,9 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     path: JsPath,
     renderer: Renderer,
   ): void {
-    const headerRow = <cds-table-header-row></cds-table-header-row>;
+    const headerRow = (
+      <cds-table-header-row selection-name="header"></cds-table-header-row>
+    );
     this.cols.forEach((c) => {
       headerRow.appendChild(<cds-table-header-cell>{c}</cds-table-header-cell>);
     });
@@ -86,7 +104,14 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     value.elems.forEach((item, index) => {
       if (item.tag === 'jv-object') {
         const rowPath = path.append(index);
-        const row = new TableRow(item, this.cols, metadata, rowPath, renderer);
+        const row = new TableRow(
+          item,
+          this.cols,
+          metadata,
+          rowPath,
+          renderer,
+          index,
+        );
         this.bodyElem.appendChild(row.getCDSTableRow());
         this.rows.push(row);
       } else {
@@ -103,6 +128,10 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     throw new Error('Method not implemented.');
   }
 
+  canAppendItem(): boolean {
+    return false;
+  }
+
   setMetadata(metadata: Metadata, path: JsPath, renderer: Renderer): void {
     this.rows.forEach((row, index) =>
       row.setMetadata(metadata, path.append(index), renderer),
@@ -116,7 +145,7 @@ customElements.define(
 );
 
 class TableRow {
-  private row: CDSTableRow = (<cds-table-row></cds-table-row>);
+  private row: CDSTableRow;
   private initialValue: JvObject;
   private cells: Map<string, RenderedElement<JsonValue>> = new Map();
 
@@ -126,7 +155,9 @@ class TableRow {
     metadata: Metadata,
     path: JsPath,
     renderer: Renderer,
+    index: number,
   ) {
+    this.row = <cds-table-row selection-name={index + ''}></cds-table-row>;
     this.initialValue = value;
     const indexedProps = new Map(
       value.properties.map((prop) => [prop.name, prop.value]),

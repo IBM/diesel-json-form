@@ -13,31 +13,16 @@ import {
 import { JsPath } from '../JsPath';
 import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
 
+type Appender = (elem: RenderedElement<JsonValue>) => void;
+
 export abstract class ArrayElement extends RenderedElement<JvArray> {
   getType(): 'jv-array' {
     return 'jv-array';
   }
 
-  protected abstract appendElement(elem: RenderedElement<JsonValue>): void;
+  appendItem?(): void;
 
-  private async appendValue(
-    form: JsonForm,
-    root: JsonValue,
-    v: JsonValue,
-    path: JsPath,
-  ) {
-    return validateAndComputeMetadata(
-      form.getSchemaService(),
-      form.getSchema(),
-      root,
-    ).then((metadata) => {
-      const e = form.getRenderer().render({ value: v, metadata, path });
-      this.appendElement(e);
-      form.onChange();
-    });
-  }
-
-  appendItem() {
+  protected doAppendItem(appender: Appender) {
     const form = this.parentForm;
     const schema = form.getSchema();
     const root = form.toValue();
@@ -69,10 +54,34 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
       .then((proposal) => {
         const finalArray = existingValues.concat([proposal]);
         const finalRoot = setValueAt(root, p, jvArray(finalArray));
-        this.appendValue(form, finalRoot, proposal, p.append(newElemIndex));
+        this.appendValue(
+          appender,
+          form,
+          finalRoot,
+          proposal,
+          p.append(newElemIndex),
+        );
       })
       .catch((err) => {
         console.error('error while adding element', err);
       });
+  }
+
+  private async appendValue(
+    appender: Appender,
+    form: JsonForm,
+    root: JsonValue,
+    v: JsonValue,
+    path: JsPath,
+  ) {
+    return validateAndComputeMetadata(
+      form.getSchemaService(),
+      form.getSchema(),
+      root,
+    ).then((metadata) => {
+      const e = form.getRenderer().render({ value: v, metadata, path });
+      appender(e);
+      form.onChange();
+    });
   }
 }
