@@ -54,15 +54,19 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     this.rows = [];
     this.headerElem = <cds-table-head></cds-table-head>;
     this.bodyElem = <cds-table-body></cds-table-body>;
+    const contentElem = (
+      <cds-table-toolbar-content>
+        <cds-button>Add new</cds-button>
+      </cds-table-toolbar-content>
+    );
+    contentElem.setAttribute('?has-batch-actions', 'true');
 
     const toolbar = (
       <cds-table-toolbar slot="toolbar">
         <cds-table-batch-actions>
           <cds-button data-context="data-table">Delete</cds-button>
         </cds-table-batch-actions>
-        <cds-table-toolbar-content has-batch-actions="true">
-          <cds-button>Add new</cds-button>
-        </cds-table-toolbar-content>
+        {contentElem}
       </cds-table-toolbar>
     );
 
