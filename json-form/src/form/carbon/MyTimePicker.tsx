@@ -77,7 +77,6 @@ export class MyTimePicker extends HTMLElement {
 
   setValue(value: string) {
     this.value = value;
-    debugger;
     const t = new MyTime(value);
     this.timePicker.value = t.time;
     this.timePickerSelect.value = t.offset;
