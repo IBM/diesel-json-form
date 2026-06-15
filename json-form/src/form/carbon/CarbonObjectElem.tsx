@@ -22,7 +22,7 @@ import {
 import { Metadata } from '../../Metadata';
 import { JsPath } from '../../JsPath';
 import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
-import { canAdd } from '../canAdd';
+import { getAddFunction } from '../AppendElement';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';
@@ -219,15 +219,6 @@ export class CarbonObjectElement extends ObjectElement {
     return propertyName;
   }
 
-  private addItemOrElementAt(section: CarbonCollapsibleSection): void {
-    const e = section.getContent();
-    if (e instanceof ArrayElement && e.appendItem) {
-      e.appendItem();
-    } else if (e instanceof ObjectElement && e.appendProperty) {
-      e.appendProperty();
-    }
-  }
-
   private createMenuItems(
     section: CarbonCollapsibleSection,
   ): Promise<MenuItem[]> {
@@ -245,11 +236,7 @@ export class CarbonObjectElement extends ObjectElement {
           this.sectionElem.delete(section);
           form.onChange();
         },
-        add: canAdd(section.getContent())
-          ? () => {
-              this.addItemOrElementAt(section);
-            }
-          : undefined,
+        add: getAddFunction(section.getContent()),
         moveUp: () => {
           if (this.sectionElem.moveUp(section)) {
             form.onChange();

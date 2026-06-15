@@ -3,11 +3,12 @@ import { ArrayElement } from './ArrayElement';
 import { ObjectElement } from './ObjectElement';
 import { RenderedElement } from './RenderedElement';
 
-export function canAdd(e?: RenderedElement<JsonValue>): boolean {
+export function getAddFunction(
+  e?: RenderedElement<JsonValue>,
+): (() => void) | undefined {
   if (e instanceof ArrayElement && e.appendItem) {
-    return true;
+    return e.appendItem.bind(e);
   } else if (e instanceof ObjectElement && e.appendProperty) {
-    return true;
+    return e.appendProperty.bind(e);
   }
-  return false;
 }

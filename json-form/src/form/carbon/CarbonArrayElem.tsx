@@ -11,8 +11,7 @@ import { JsPath } from '../../JsPath';
 import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
 import { augmentProposal } from '../../augmentProposal';
 import { createMenu, MenuItem } from './ContextMenu';
-import { canAdd } from '../canAdd';
-import { ObjectElement } from '../ObjectElement';
+import { getAddFunction } from '../AppendElement';
 
 export class CarbonArrayElement extends ArrayElement {
   static TAG_NAME = 'json-array';
@@ -161,16 +160,7 @@ export class CarbonArrayElement extends ArrayElement {
       path.append(rowIndex),
       form.strictMode,
       {
-        add: canAdd(section.getContent())
-          ? () => {
-              const elem = section.getContent();
-              if (elem instanceof ArrayElement && elem.appendItem) {
-                elem.appendItem();
-              } else if (elem instanceof ObjectElement && elem.appendProperty) {
-                elem.appendProperty();
-              }
-            }
-          : undefined,
+        add: getAddFunction(section.getContent()),
         delete: () => {
           this.sectionElem.delete(section);
           this.refreshItemNumbers();

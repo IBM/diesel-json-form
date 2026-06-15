@@ -4,7 +4,6 @@ import { FormHeaderElement } from './carbon/FormHeaderElement';
 import { findParent } from './findParent';
 import { RenderedElement } from './RenderedElement';
 import { ArrayElement } from './ArrayElement';
-import { ObjectElement } from './ObjectElement';
 import { JsonValue, jvObject, stringify } from '../JsonValue';
 import { defaultSchemaService, SchemaService } from '../SchemaService';
 import { JsPath } from '../JsPath';
@@ -13,6 +12,7 @@ import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
 import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata';
 import { h } from '../MyJSXFactory';
 import { empty } from './HtmlBuilder';
+import { getAddFunction } from './AppendElement';
 
 declare global {
   interface GlobalEventHandlersEventMap {
@@ -195,11 +195,7 @@ export class JsonForm extends HTMLElement {
   }
 
   addPropertyOrElement() {
-    if (this.element instanceof ArrayElement) {
-      this.element.appendItem?.();
-    } else if (this.element instanceof ObjectElement) {
-      this.element.appendProperty?.();
-    }
+    getAddFunction(this.element)?.();
   }
 
   setValue(value: JsonValue): void {

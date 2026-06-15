@@ -12,7 +12,7 @@ import {
 } from '@carbon/web-components/es/components/tag/defs.js';
 import { T_FUNCTION } from '../../JsonFormMessages';
 import { JsPath } from '../../JsPath';
-import { canAdd } from '../canAdd';
+import { getAddFunction } from '../AppendElement';
 
 export class FormHeaderElement extends HTMLElement {
   static TAG_NAME = 'json-form-header';
@@ -84,9 +84,7 @@ export class FormHeaderElement extends HTMLElement {
           JsPath.empty,
           form.strictMode,
           {
-            add: canAdd(form.renderedElement)
-              ? () => form.addPropertyOrElement()
-              : undefined,
+            add: getAddFunction(form.renderedElement),
             changeType(value) {
               form.setValue(value);
             },
