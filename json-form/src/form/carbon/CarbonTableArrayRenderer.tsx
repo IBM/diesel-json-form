@@ -55,7 +55,10 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     this.bodyElem = <cds-table-body></cds-table-body>;
     const contentElem = (
       <cds-table-toolbar-content>
-        <cds-button onclick={this.doAppendElem.bind(this)}>
+        <cds-button
+          onclick={this.doAppendElem.bind(this)}
+          className="json-add-element"
+        >
           {T_FUNCTION('contextMenu.addElement')}
         </cds-button>
       </cds-table-toolbar-content>

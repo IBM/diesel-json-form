@@ -56,17 +56,17 @@ public class ArrayTableTest extends TestBase {
         s.assertNoError().assertValue("ABC");
         s.setValue("ABCDEFGH").assertHasError("Invalid string length: max 5");
 
-//        t.clickAddElement()
-//                .assertRowCount(3);
-//        FString s2 = t.stringAt(0, 2);
-//        s2.assertNoError().assertValue("");
-//        s2.setValue("ABCDEFGH").assertHasError("Invalid string length: max 5");
-//
-//        t.selectRows(1,2)
-//                .clickDelete();
-//                .assertRowCount(1);
-//        FString s3 = t.stringAt(0, 0);
-//        s3.assertValue("ABCDEFGH").assertHasError("Invalid string length: max 5");
+        t.clickAddElement()
+                .assertRowCount(3);
+        FString s2 = t.stringAt(0, 2);
+        s2.assertNoError().assertValue("");
+        s2.setValue("ABCDEFGH").assertHasError("Invalid string length: max 5");
+
+        t.selectRows(1,2)
+                .clickDelete()
+                .assertRowCount(1);
+        FString s3 = t.stringAt(0, 0);
+        s3.assertValue("ABCDEFGH").assertHasError("Invalid string length: max 5");
     }
 
 
