@@ -183,14 +183,6 @@ export class CarbonGridObjectRenderer extends ObjectElement {
     });
     return jvObject([...props, ...(this.rest ?? [])]);
   }
-
-  protected openDialog(): Promise<JsonProperty> {
-    throw new Error('Method not implemented.');
-  }
-
-  protected appendProperty(): void {
-    throw new Error('Method not implemented.');
-  }
 }
 
 customElements.define(

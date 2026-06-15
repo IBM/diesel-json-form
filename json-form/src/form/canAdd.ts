@@ -6,7 +6,7 @@ import { RenderedElement } from './RenderedElement';
 export function canAdd(e?: RenderedElement<JsonValue>): boolean {
   if (e instanceof ArrayElement && e.appendItem) {
     return true;
-  } else if (e instanceof ObjectElement) {
+  } else if (e instanceof ObjectElement && e.appendProperty) {
     return true;
   }
   return false;

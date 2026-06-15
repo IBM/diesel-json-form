@@ -198,7 +198,7 @@ export class JsonForm extends HTMLElement {
     if (this.element instanceof ArrayElement) {
       this.element.appendItem?.();
     } else if (this.element instanceof ObjectElement) {
-      this.element.appendPropertyWithDialog();
+      this.element.appendProperty?.();
     }
   }
 

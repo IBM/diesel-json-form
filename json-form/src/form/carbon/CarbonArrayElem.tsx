@@ -12,6 +12,7 @@ import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
 import { augmentProposal } from '../../augmentProposal';
 import { createMenu, MenuItem } from './ContextMenu';
 import { canAdd } from '../canAdd';
+import { ObjectElement } from '../ObjectElement';
 
 export class CarbonArrayElement extends ArrayElement {
   static TAG_NAME = 'json-array';
@@ -165,7 +166,8 @@ export class CarbonArrayElement extends ArrayElement {
               const elem = section.getContent();
               if (elem instanceof ArrayElement && elem.appendItem) {
                 elem.appendItem();
-                form.onChange();
+              } else if (elem instanceof ObjectElement && elem.appendProperty) {
+                elem.appendProperty();
               }
             }
           : undefined,

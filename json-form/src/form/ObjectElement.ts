@@ -14,27 +14,24 @@ import { maybeOf } from 'tea-cup-fp';
 import { Metadata } from '../Metadata';
 import { JsPath } from '../JsPath';
 
+type Appender = (
+  name: string,
+  elem: RenderedElement<JsonValue>,
+  metadata: Metadata,
+  path: JsPath,
+) => void;
+
 export abstract class ObjectElement extends RenderedElement<JvObject> {
   getType(): 'jv-object' {
     return 'jv-object';
   }
 
-  protected abstract openDialog(): Promise<JsonProperty>;
+  appendProperty?(): void;
 
-  protected abstract appendProperty(
-    name: string,
-    elem: RenderedElement<JsonValue>,
-    metadata: Metadata,
-    path: JsPath,
-  ): void;
-
-  appendPropertyWithDialog(): void {
-    this.openDialog()
-      .then(this.appendPropertyFromValue.bind(this))
-      .catch((err) => console.error('error while adding property', err));
-  }
-
-  private appendPropertyFromValue(property: JsonProperty) {
+  protected appendPropertyFromValue(
+    property: JsonProperty,
+    appender: Appender,
+  ) {
     const form = this.parentForm;
     const schema = form.getSchema();
     const root = form.toValue();
@@ -74,13 +71,13 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
             metadata,
             path: propPath,
           });
-          this.appendProperty(property.name, e, metadata, propPath);
+          appender(property.name, e, metadata, propPath);
           form.onChange();
         });
       });
   }
 
-  protected appendPropertyWithName(propertyName: string) {
+  protected appendPropertyWithName(propertyName: string, appender: Appender) {
     // create the new object with a null value
     // because we need it to propose
     const value = this.toValue();
@@ -101,7 +98,10 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
         const propertyProposals = proposals.map(clearPropertiesIfObject);
         const proposal = propertyProposals[0];
         if (proposal) {
-          this.appendPropertyFromValue({ name: propertyName, value: proposal });
+          this.appendPropertyFromValue(
+            { name: propertyName, value: proposal },
+            appender,
+          );
         }
       })
       .catch((err) => console.error('error', err));

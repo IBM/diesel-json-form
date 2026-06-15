@@ -139,7 +139,10 @@ export class CarbonObjectElement extends ObjectElement {
       btn.innerText = '+ ' + prop;
       btn.addEventListener('click', () => {
         btn.disabled = true;
-        this.appendPropertyWithName(prop);
+        this.appendPropertyWithName(
+          prop,
+          this.createAndAppendNewSection.bind(this),
+        );
       });
       this.propertiesNode.appendChild(
         <div className="json-add-prop-btn-wrapper">{btn}</div>,
@@ -147,7 +150,22 @@ export class CarbonObjectElement extends ObjectElement {
     }
   }
 
-  protected openDialog(): Promise<JsonProperty> {
+  appendProperty() {
+    this.appendPropertyWithDialog();
+  }
+
+  private appendPropertyWithDialog(): void {
+    this.openDialog()
+      .then((prop) =>
+        this.appendPropertyFromValue(
+          prop,
+          this.createAndAppendNewSection.bind(this),
+        ),
+      )
+      .catch((err) => console.error('error while adding property', err));
+  }
+
+  private openDialog(): Promise<JsonProperty> {
     return new Promise((resolve) => {
       const modal = createAddPropertyModal(
         this.getProperties().map((x) => x[0]),
@@ -156,15 +174,6 @@ export class CarbonObjectElement extends ObjectElement {
       document.body.appendChild(modal);
       modal.open = true;
     });
-  }
-
-  protected appendProperty(
-    name: string,
-    elem: RenderedElement<JsonValue>,
-    metadata: Metadata,
-    path: JsPath,
-  ): void {
-    this.createAndAppendNewSection(name, elem, metadata, path);
   }
 
   private setSectionContent(
@@ -214,8 +223,8 @@ export class CarbonObjectElement extends ObjectElement {
     const e = section.getContent();
     if (e instanceof ArrayElement && e.appendItem) {
       e.appendItem();
-    } else if (e instanceof ObjectElement) {
-      e.appendPropertyWithDialog();
+    } else if (e instanceof ObjectElement && e.appendProperty) {
+      e.appendProperty();
     }
   }
 
