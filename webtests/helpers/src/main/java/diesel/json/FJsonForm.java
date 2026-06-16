@@ -2,8 +2,10 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
+import com.pojosontheweb.selenium.Retry;
 
 import static com.pojosontheweb.selenium.Findrs.attrEquals;
+import static com.pojosontheweb.selenium.Findrs.isDisplayed;
 
 public class FJsonForm extends AbstractPageObject {
 
@@ -64,7 +66,17 @@ public class FJsonForm extends AbstractPageObject {
     }
 
     public FMenu clickRootMenu() {
-        $$("json-form-header cds-button").expectOne().click();
+        Retry.retry()
+                .add(() -> {
+                    $$("json-form-header cds-button").expectOne().click();
+                })
+                .add(() ->
+                    fRoot.$$("cds-menu")
+                            .where(isDisplayed())
+                            .count(1)
+                )
+                .eval();
+
         return new FMenu(fRoot);
     }
 

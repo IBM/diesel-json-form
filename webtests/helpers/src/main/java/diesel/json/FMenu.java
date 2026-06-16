@@ -77,8 +77,6 @@ public class FMenu extends AbstractPageObject {
 
     public class FAddProperty {
 
-
-
         public FAddProperty setPropertyName(String foo) {
             var input = $$("cds-modal cds-text-input")
                     .where(attrEquals("placeholder", "Enter property name"))

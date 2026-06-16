@@ -1,32 +1,12 @@
 package diesel.sandbox.tests;
 
 import com.pojosontheweb.selenium.Findr;
-import static com.pojosontheweb.selenium.Findrs.attrEquals;
 import static com.pojosontheweb.selenium.Findrs.textEquals;
-import static org.junit.Assert.fail;
-
-import com.pojosontheweb.selenium.ManagedDriverJunit4TestBase;
 import diesel.json.*;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class SandboxTest extends TestBase {
 
@@ -930,7 +910,7 @@ public class SandboxTest extends TestBase {
                 .clickAddPropButton("input");
         sandbox.jsonForm.objectAt(JsPath.empty.append("input"))
                 .clickAddPropButton("foo")
-                        .assertRequiredProperty("foo", true);
+                .assertRequiredProperty("foo", true);
         sandbox.jsonForm
                 .objectAt(JsPath.empty.append("input"))
                 .clickPropertyMenu("foo *")
