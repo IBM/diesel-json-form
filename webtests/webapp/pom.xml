@@ -131,7 +131,7 @@
                         <webtests.video.dir>${project.build.directory}/videos</webtests.video.dir>
                         <!--                        <webtests.video.failures.only>true</webtests.video.failures.only>-->
                         <webdriver.chrome.driver>${chromeDriver}</webdriver.chrome.driver>
-                        <webtests.findr.timeout>30</webtests.findr.timeout>
+                        <webtests.findr.timeout>10</webtests.findr.timeout>
                         <webtests.video.use.selenium>true</webtests.video.use.selenium>
                     </systemProperties>
                     <environmentVariables>
