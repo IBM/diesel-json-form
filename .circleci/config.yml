@@ -40,9 +40,9 @@ jobs:
           name: Check install
       - run: cd webtests && export DISPLAY=:99 && mvn clean install -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
       - store_artifacts:
-          path: ~/repo/webtests/target/surefire-reports
+          path: ~/repo/webtests/webapp/target/failsafe-reports
       - store_artifacts:
-          path: ~/repo/webtests/target/videos
+          path: ~/repo/webtests/webapp/target/videos
 
   docs-deploy:
     <<: *defaults
