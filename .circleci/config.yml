@@ -30,7 +30,8 @@ jobs:
       - run: sudo Xvfb :99 -screen 0 1920x1200x24 > /dev/null 2>&1 &
       - attach_workspace:
           at: ~/repo
-      - browser-tools/install_chrome
+      - browser-tools/install_chrome:
+        replace_existing: true
       - browser-tools/install_chromedriver
       - run:
           command: |
