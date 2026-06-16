@@ -132,6 +132,7 @@
                         <!--                        <webtests.video.failures.only>true</webtests.video.failures.only>-->
                         <webdriver.chrome.driver>${chromeDriver}</webdriver.chrome.driver>
                         <webtests.findr.timeout>30</webtests.findr.timeout>
+                        <webtests.video.use.selenium>true</webtests.video.use.selenium>
                     </systemProperties>
                     <environmentVariables>
                         <TZ>Europe/Paris</TZ>

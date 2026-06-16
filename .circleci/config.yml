@@ -34,6 +34,12 @@ jobs:
       - browser-tools/install-chromedriver
       - run:
           command: |
+            sudo apt-get update
+            sudo apt-get install ffmpeg
+            ffmpeg --version
+          name: install FFMPG
+      - run:
+          command: |
             google-chrome --version
             chromedriver --version
             ps -efa | grep Xvfb
