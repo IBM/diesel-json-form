@@ -14,6 +14,15 @@ jobs:
 
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - maven-repo-v1-{{ .Branch }}-{{ checksum "webtests/pom.xml" }}
+            - maven-repo-v1-{{ .Branch }}-
+            - maven-repo-v1-
+      - save_cache:
+          paths:
+            - ~/.m2/repository
+          key: maven-repo-v1-{{ .Branch }}-{{ checksum "webtests/pom.xml" }}
       - run: ./build.sh
       - persist_to_workspace:
           root: ~/repo
