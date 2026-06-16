@@ -31,7 +31,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - browser-tools/install_chrome:
-        replace_existing: true
+          replace_existing: true
       - browser-tools/install_chromedriver
       - run:
           command: |
