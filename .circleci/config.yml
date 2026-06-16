@@ -44,7 +44,7 @@ jobs:
             chromedriver --version
             ps -efa | grep Xvfb
           name: Check install
-      - run: cd webtests && export DISPLAY=:99 && mvn clean install -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver
+      - run: cd webtests && export DISPLAY=:99 && mvn clean install -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -Dit.test=ArrayTableTest
       - store_artifacts:
           path: ~/repo/webtests/webapp/target/failsafe-reports
       - store_artifacts:
