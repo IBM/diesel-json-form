@@ -2,7 +2,7 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
-import com.pojosontheweb.selenium.Findrs;
+import static com.pojosontheweb.selenium.Findrs.isEnabled;
 
 public class FSandbox extends AbstractPageObject {
 
@@ -22,17 +22,17 @@ public class FSandbox extends AbstractPageObject {
     public final FJsonForm jsonForm = new FJsonForm(getFindr(), "#json-form");
 
     public FSandbox clickApplyToForm() {
-        $("#btn-to-form").click();
+        $("#btn-to-form").where(isEnabled()).click();
         return this;
     }
 
     public FSandbox clickApplyFromSchema() {
-        $("#btn-from-schema").click();
+        $("#btn-from-schema").where(isEnabled()).click();
         return this;
     }
 
     public FSandbox clickApplyFromForm() {
-        $("#btn-from-form").click();
+        $("#btn-from-form").where(isEnabled()).click();
         return this;
     }
 
