@@ -54,7 +54,7 @@ export class CarbonTableArrayRenderer extends ArrayElement {
     this.headerElem = <cds-table-head></cds-table-head>;
     this.bodyElem = <cds-table-body></cds-table-body>;
     const contentElem = (
-      <cds-table-toolbar-content>
+      <cds-table-toolbar-content hasBatchActions={true}>
         <cds-button
           onclick={this.doAppendElem.bind(this)}
           className="json-add-element"
@@ -63,7 +63,6 @@ export class CarbonTableArrayRenderer extends ArrayElement {
         </cds-button>
       </cds-table-toolbar-content>
     );
-    contentElem.setAttribute('?has-batch-actions', 'true');
 
     const toolbar = (
       <cds-table-toolbar slot="toolbar">

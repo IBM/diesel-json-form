@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './form/JsonForm';
 export * from './JsonValue';
 export * from './JsPath';
 export * from './SchemaService';
@@ -26,7 +27,6 @@ export * from './proposeNested';
 export * from './UtcOffsets';
 export * from './i18n/MyI18n';
 export * from './form/HtmlBuilder';
-export * from './form/JsonForm';
 export * from './form/ArrayElement';
 export * from './form/BooleanElement';
 export * from './form/Debouncer';

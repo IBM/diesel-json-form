@@ -111,7 +111,8 @@ export function h(
         } else if (typeof attributeValue === 'string') {
           element.setAttribute(key, attributeValue);
         } else {
-          throw 'Unsupported attribute ' + key;
+          //   console.debug('Unsupported attribute', key);
+          (element as any)[key] = attributeValue;
         }
       }
     }
