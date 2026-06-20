@@ -1,5 +1,5 @@
-import { jvNull, JvNull } from '../JsonValue';
-import { RenderedElement } from './RenderedElement';
+import { jvNull, JvNull } from '../JsonValue.js';
+import { RenderedElement } from './RenderedElement.js';
 
 export abstract class NullElement extends RenderedElement<JvNull> {
   getType(): 'jv-null' {

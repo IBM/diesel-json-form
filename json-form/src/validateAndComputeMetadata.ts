@@ -1,7 +1,7 @@
-import { Metadata } from './Metadata';
-import { SchemaService, ValidationResult } from './SchemaService';
-import { getValueAt, JsonValue } from './JsonValue';
-import { JsPath } from './JsPath';
+import { Metadata } from './Metadata.js';
+import { SchemaService, ValidationResult } from './SchemaService.js';
+import { getValueAt, JsonValue } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
 
 export async function validateAndComputeMetadata(
   schemaService: SchemaService,

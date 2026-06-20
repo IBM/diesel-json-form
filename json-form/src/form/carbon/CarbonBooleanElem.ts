@@ -1,14 +1,14 @@
 import { CDSCheckbox } from '@carbon/web-components/es';
 import '@carbon/web-components/es/components/checkbox/checkbox.js';
-import { BooleanElement } from '../BooleanElement';
-import { JsonForm } from '../JsonForm';
-import { nextElementId } from './nextElementId';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
-import { JvBoolean } from '../../JsonValue';
-import { setErrors } from './setErrorsOnInput';
-import { SchemaRenderer } from '../../SchemaService';
-import { setRendererAttributes } from './setRendererAttributes';
+import { BooleanElement } from '../BooleanElement.js';
+import { JsonForm } from '../JsonForm.js';
+import { nextElementId } from './nextElementId.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
+import { JvBoolean } from '../../JsonValue.js';
+import { setErrors } from './setErrorsOnInput.js';
+import { SchemaRenderer } from '../../SchemaService.js';
+import { setRendererAttributes } from './setRendererAttributes.js';
 
 export class CarbonBooleanElement extends BooleanElement {
   static TAG_NAME = 'json-boolean';

@@ -9,25 +9,21 @@
         "inlineSources": true,
         "inlineSourceMap": true,
         "strict": true,
-        "module": "esnext",
+        "module": "commonjs",
+        "rootDir": ".",
         "outDir": "dist",
         "declaration": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
+        "resolveJsonModule": true,
         "jsx": "react",
         "jsxFactory": "h",
-        "jsxFragmentFactory": "Fragment",
-        "resolveJsonModule": true,
-        "moduleResolution": "bundler"
+        "jsxFragmentFactory": "Fragment"
     },
     "include": [
-        "src"
+        "src",
     ],
     "exclude": [
-        "node_modules",
-        "dist",
-        "src/test",
-        "**/*.tests.ts?",
-        "**/*.spec.ts?"
+        "node_modules"
     ]
 }

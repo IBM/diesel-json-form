@@ -6,7 +6,7 @@ import {
   Metadata,
   parseJsonValueUnsafe,
   Renderer,
-} from '../../index';
+} from '../../index.js';
 
 describe('CarbonGridObjectRenderer', () => {
   const myKey = 'MyGridObject';

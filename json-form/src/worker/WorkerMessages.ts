@@ -1,5 +1,5 @@
-import { JsonValue } from '../JsonValue';
-import { SchemaRenderer, ValidationError } from '../SchemaService';
+import { JsonValue } from '../JsonValue.js';
+import { SchemaRenderer, ValidationError } from '../SchemaService.js';
 
 export interface ValidateRequest {
   readonly tag: 'VALIDATE_REQUEST';

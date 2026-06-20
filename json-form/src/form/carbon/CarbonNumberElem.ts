@@ -1,16 +1,16 @@
 import { CDSTextInput } from '@carbon/web-components/es';
 import '@carbon/web-components/es/components/text-input/index.js';
-import { NumberElement } from '../NumberElement';
-import { Debouncer } from '../Debouncer';
-import { setErrors } from './setErrorsOnInput';
-import { JsonForm } from '../JsonForm';
-import { nextElementId } from './nextElementId';
-import { T_FUNCTION } from '../../JsonFormMessages';
-import { isValidNumberLiteral, JvNumber } from '../../JsonValue';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
-import { setRendererAttributes } from './setRendererAttributes';
-import { SchemaRenderer } from '../../SchemaService';
+import { NumberElement } from '../NumberElement.js';
+import { Debouncer } from '../Debouncer.js';
+import { setErrors } from './setErrorsOnInput.js';
+import { JsonForm } from '../JsonForm.js';
+import { nextElementId } from './nextElementId.js';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
+import { isValidNumberLiteral, JvNumber } from '../../JsonValue.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
+import { setRendererAttributes } from './setRendererAttributes.js';
+import { SchemaRenderer } from '../../SchemaService.js';
 
 export class CarbonNumberElement extends NumberElement {
   static TAG_NAME = 'json-number';

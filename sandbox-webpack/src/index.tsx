@@ -16,7 +16,7 @@
 
 // @ts-ignore
 import './style.scss';
-import { samples } from './initdata.js';
+import { samples } from './initdata';
 import {
   defaultSchemaService,
   getValueAt,
@@ -36,7 +36,7 @@ import {
   CarbonGridObjectRenderer,
 } from '@diesel-parser/json-form';
 
-import '@carbon/web-components/es/index.js';
+// import '@carbon/web-components/es';
 
 import {
   CDSCheckbox,
@@ -44,7 +44,7 @@ import {
   CDSRadioButton,
 } from '@carbon/web-components/es';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group.js';
-import { h } from './MyJSXFactory.js';
+import { h } from './MyJSXFactory';
 import { version } from '@diesel-parser/json-form/package.json';
 
 const about = document.getElementById('about');

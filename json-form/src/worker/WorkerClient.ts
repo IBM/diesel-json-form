@@ -1,18 +1,18 @@
-import { JsonValue } from '../JsonValue';
-import { JsPath } from '../JsPath';
+import { JsonValue } from '../JsonValue.js';
+import { JsPath } from '../JsPath.js';
 import {
   SchemaRenderer,
   SchemaService,
   ValidationError,
   ValidationResult,
-} from '../SchemaService';
+} from '../SchemaService.js';
 import {
   ProposeRequest,
   ProposeResponse,
   RejectedResponse,
   ValidateRequest,
   ValidateResponse,
-} from './WorkerMessages';
+} from './WorkerMessages.js';
 
 type PendingRequest = {
   readonly resolve: (o: any) => void;

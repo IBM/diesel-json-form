@@ -1,28 +1,28 @@
-import { Renderer } from '../Renderer';
-import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
-import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
-import { ObjectElement } from '../ObjectElement';
-import { createAddPropertyModal } from './AddPropertyModal';
-import { createMenu, MenuItem } from './ContextMenu';
-import { RenderedElement } from '../RenderedElement';
-import { ArrayElement } from '../ArrayElement';
-import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
-import { h } from '../../MyJSXFactory';
-import { empty } from '../HtmlBuilder';
+import { Renderer } from '../Renderer.js';
+import { CarbonSectionBasedElement } from './CarbonSectionBasedElement.js';
+import { CarbonCollapsibleSection } from './CarbonCollapsibleSection.js';
+import { ObjectElement } from '../ObjectElement.js';
+import { createAddPropertyModal } from './AddPropertyModal.js';
+import { createMenu, MenuItem } from './ContextMenu.js';
+import { RenderedElement } from '../RenderedElement.js';
+import { ArrayElement } from '../ArrayElement.js';
+import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata.js';
+import { h } from '../../MyJSXFactory.js';
+import { empty } from '../HtmlBuilder.js';
 import { CDSButton } from '@carbon/web-components/es';
-import { T_FUNCTION } from '../../JsonFormMessages';
-import { augmentProposal } from '../../augmentProposal';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
+import { augmentProposal } from '../../augmentProposal.js';
 import {
   JsonProperty,
   JsonValue,
   jvObject,
   JvObject,
   setValueAt,
-} from '../../JsonValue';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
-import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
-import { getAddFunction } from '../AppendElement';
+} from '../../JsonValue.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
+import { validateAndComputeMetadata } from '../../validateAndComputeMetadata.js';
+import { getAddFunction } from '../AppendElement.js';
 
 export class CarbonObjectElement extends ObjectElement {
   static TAG_NAME = 'json-object';

@@ -4,9 +4,9 @@ import { MODAL_SIZE } from '@carbon/web-components/es/components/modal/modal.js'
 import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs.js';
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/defs.js';
 import '@carbon/web-components/es/components/radio-button/index.js';
-import { h } from '../../MyJSXFactory';
-import { DEFAULT_TYPES, JsonProperty, valueType } from '../../JsonValue';
-import { T_FUNCTION } from '../../JsonFormMessages';
+import { h } from '../../MyJSXFactory.js';
+import { DEFAULT_TYPES, JsonProperty, valueType } from '../../JsonValue.js';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
 
 export function createAddPropertyModal(
   existing: readonly string[],

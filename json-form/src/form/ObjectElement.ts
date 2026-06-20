@@ -1,4 +1,4 @@
-import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
+import { validateAndComputeMetadata } from '../validateAndComputeMetadata.js';
 import {
   clearPropertiesIfObject,
   getValueAt,
@@ -8,11 +8,11 @@ import {
   jvObject,
   JvObject,
   setValueAt,
-} from '../JsonValue';
-import { RenderedElement } from './RenderedElement';
+} from '../JsonValue.js';
+import { RenderedElement } from './RenderedElement.js';
 import { maybeOf } from 'tea-cup-fp';
-import { Metadata } from '../Metadata';
-import { JsPath } from '../JsPath';
+import { Metadata } from '../Metadata.js';
+import { JsPath } from '../JsPath.js';
 
 type Appender = (
   name: string,

@@ -1,5 +1,5 @@
-import { jvString, JvString } from '../JsonValue';
-import { RenderedElement } from './RenderedElement';
+import { jvString, JvString } from '../JsonValue.js';
+import { RenderedElement } from './RenderedElement.js';
 
 export abstract class StringElement extends RenderedElement<JvString> {
   getType(): 'jv-string' {

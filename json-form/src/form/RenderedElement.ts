@@ -1,9 +1,9 @@
-import { Renderer, RendererKey } from './Renderer';
-import { findEnclosingForm } from './findParent';
-import { JsonForm } from './JsonForm';
-import { JsonValue } from '../JsonValue';
-import { Metadata } from '../Metadata';
-import { JsPath } from '../JsPath';
+import { Renderer, RendererKey } from './Renderer.js';
+import { findEnclosingForm } from './findParent.js';
+import { JsonForm } from './JsonForm.js';
+import { JsonValue } from '../JsonValue.js';
+import { Metadata } from '../Metadata.js';
+import { JsPath } from '../JsPath.js';
 
 export abstract class RenderedElement<T extends JsonValue> extends HTMLElement {
   rendererKey?: RendererKey;

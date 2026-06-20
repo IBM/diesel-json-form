@@ -1,7 +1,7 @@
-import { JsonValue } from '../JsonValue';
-import { ArrayElement } from './ArrayElement';
-import { ObjectElement } from './ObjectElement';
-import { RenderedElement } from './RenderedElement';
+import { JsonValue } from '../JsonValue.js';
+import { ArrayElement } from './ArrayElement.js';
+import { ObjectElement } from './ObjectElement.js';
+import { RenderedElement } from './RenderedElement.js';
 
 export function getAddFunction(
   e?: RenderedElement<JsonValue>,

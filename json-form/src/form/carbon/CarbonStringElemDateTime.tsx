@@ -1,12 +1,12 @@
-import { StringElement } from '../StringElement';
-import { MyDatePicker } from './MyDatePicker';
-import { MyTimePicker } from './MyTimePicker';
-import { h } from '../../MyJSXFactory';
-import { MyDateTime } from './MyDateTime';
-import { JsonForm } from '../JsonForm';
-import { JvString } from '../../JsonValue';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
+import { StringElement } from '../StringElement.js';
+import { MyDatePicker } from './MyDatePicker.js';
+import { MyTimePicker } from './MyTimePicker.js';
+import { h } from '../../MyJSXFactory.js';
+import { MyDateTime } from './MyDateTime.js';
+import { JsonForm } from '../JsonForm.js';
+import { JvString } from '../../JsonValue.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
 
 export class CarbonStringElemDateTime extends StringElement {
   static TAG_NAME = 'string-elem-date-time';

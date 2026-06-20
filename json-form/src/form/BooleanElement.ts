@@ -1,5 +1,5 @@
-import { jvBool, JvBoolean } from '../JsonValue';
-import { RenderedElement } from './RenderedElement';
+import { jvBool, JvBoolean } from '../JsonValue.js';
+import { RenderedElement } from './RenderedElement.js';
 
 export abstract class BooleanElement extends RenderedElement<JvBoolean> {
   getType(): 'jv-boolean' {

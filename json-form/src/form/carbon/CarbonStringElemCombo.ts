@@ -1,13 +1,13 @@
 import { CDSComboBox, CDSComboBoxItem } from '@carbon/web-components/es';
-import { setErrors } from './setErrorsOnInput';
-import { StringElement } from '../StringElement';
+import { setErrors } from './setErrorsOnInput.js';
+import { StringElement } from '../StringElement.js';
 import '@carbon/web-components/es/components/combo-box/index.js';
-import { empty } from '../HtmlBuilder';
-import { JsonForm } from '../JsonForm';
-import { nextElementId } from './nextElementId';
-import { JsPath } from '../../JsPath';
-import { Metadata } from '../../Metadata';
-import { JvString } from '../../JsonValue';
+import { empty } from '../HtmlBuilder.js';
+import { JsonForm } from '../JsonForm.js';
+import { nextElementId } from './nextElementId.js';
+import { JsPath } from '../../JsPath.js';
+import { Metadata } from '../../Metadata.js';
+import { JvString } from '../../JsonValue.js';
 
 export class CarbonStringElemCombo extends StringElement {
   static TAG_NAME = 'string-elem-combo';

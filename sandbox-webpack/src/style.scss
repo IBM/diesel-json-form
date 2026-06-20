@@ -1,0 +1,161 @@
+@use '@carbon/styles/scss/reset';
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/themes';
+@use '@diesel-parser/json-form/scss/JsonForm';
+@use '@carbon/type';
+
+:root {
+  @include theme(themes.$g10);
+  @include type.type-classes();
+
+  @media (prefers-color-scheme: dark) {
+    @include theme(themes.$g100);
+  }
+}
+
+.g10 {
+  @include theme(themes.$g10);
+}
+
+.g100 {
+  @include theme(themes.$g100);
+}
+
+#sandbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui;
+}
+
+#sandbox cds-header {
+  position: unset;
+  width: 100%;
+}
+
+#sandbox.dark {
+  color: white;
+  background-color: black;
+}
+
+.schema-select {
+  flex-grow: 1;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  flex-grow: 1;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+#sandbox .banner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#sandbox .banner h1 {
+  flex-grow: 1;
+  padding: 0;
+  margin: 0;
+}
+
+#sandbox .banner div {
+  margin: 0px 1rem 0px 1rem;
+}
+
+.sub {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  &:first-child {
+    border-right: 1px solid var(--cds-border-subtle);
+  }
+}
+
+#json-form {
+  flex-grow: 1;
+  padding-left: 1rem;
+  padding-top: 1rem;
+  font-family: type.font-family('sans');
+  font-size: type.type-scale(2);
+}
+
+my-rating-renderer cds-radio-button-group {
+  margin-top: 1rem;
+}
+
+my-string-renderer > div {
+  &:hover {
+    background-color: lightsalmon;
+  }
+}
+
+#about {
+  display: flex;
+  align-items: center;
+}
+
+.btn-wrapper-schema {
+  display: flex;
+  flex-direction: row;
+  // height: 100%;
+  align-items: center;
+  margin-left: 1rem;
+  flex-grow: 1;
+  justify-content: end;
+}
+
+.btn-wrapper-json {
+  display: flex;
+  flex-direction: row;
+  // height: 100%;
+  align-items: center;
+  justify-content: end;
+  height: 48px;
+  padding-bottom: 0.5rem;
+
+  cds-button:first-child {
+    margin-right: 0.5rem;
+  }
+}
+
+.left-panel {
+  flex-grow: 1;
+  padding-bottom: 0.5rem;
+  padding-right: 1rem;
+
+  .panel-content {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    padding-top: 1rem;
+
+    .drop-down-wrapper {
+      padding-bottom: 0.5rem;
+      display: flex;
+      flex-direction: row;
+    }
+
+    textarea {
+      flex-grow: 1;
+      font-family: type.font-family('mono');
+      font-size: type.type-scale(2);
+    }
+  }
+}
+
+.cb-wrapper {
+  display: flex;
+  align-items: center;
+
+  cds-checkbox {
+    margin-block-end: unset;
+  }
+}

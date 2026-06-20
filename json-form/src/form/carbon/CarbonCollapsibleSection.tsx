@@ -1,16 +1,16 @@
-import { h, Fragment } from '../../MyJSXFactory';
+import { h, Fragment } from '../../MyJSXFactory.js';
 import { BUTTON_KIND } from '@carbon/web-components/es/components/button/defs.js';
 import { CDSButton } from '@carbon/web-components/es';
-import { MenuItem, openMenu } from './ContextMenu';
-import { IconElement } from './IconElement';
-import { RenderedElement } from '../RenderedElement';
+import { MenuItem, openMenu } from './ContextMenu.js';
+import { IconElement } from './IconElement.js';
+import { RenderedElement } from '../RenderedElement.js';
 import {
   TAG_SIZE,
   TAG_TYPE,
 } from '@carbon/web-components/es/components/tag/defs.js';
-import { T_FUNCTION } from '../../JsonFormMessages';
-import { empty } from '../HtmlBuilder';
-import { JsonValue } from '../../JsonValue';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
+import { empty } from '../HtmlBuilder.js';
+import { JsonValue } from '../../JsonValue.js';
 
 export class CarbonCollapsibleSection extends HTMLElement {
   static TAG_NAME = 'collapsible-section';

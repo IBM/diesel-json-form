@@ -4,17 +4,17 @@ import {
   JvObject,
   getValueAt,
   jvObject,
-} from '../../JsonValue';
-import { JsPath } from '../../JsPath';
-import { Metadata } from '../../Metadata';
-import { h } from '../../MyJSXFactory';
-import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
-import { ValidationError, SchemaRenderer } from '../../SchemaService';
-import { empty } from '../HtmlBuilder';
-import { ObjectElement } from '../ObjectElement';
-import { RenderedElement } from '../RenderedElement';
-import { Renderer } from '../Renderer';
-import { setRendererAttributes } from './setRendererAttributes';
+} from '../../JsonValue.js';
+import { JsPath } from '../../JsPath.js';
+import { Metadata } from '../../Metadata.js';
+import { h } from '../../MyJSXFactory.js';
+import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata.js';
+import { ValidationError, SchemaRenderer } from '../../SchemaService.js';
+import { empty } from '../HtmlBuilder.js';
+import { ObjectElement } from '../ObjectElement.js';
+import { RenderedElement } from '../RenderedElement.js';
+import { Renderer } from '../Renderer.js';
+import { setRendererAttributes } from './setRendererAttributes.js';
 import '@carbon/web-components/es/components/grid/index.js';
 interface GridValues {
   readonly ordered: readonly [ColumnInfo, JsonProperty][];

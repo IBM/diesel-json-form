@@ -1,6 +1,6 @@
-import { getValueAt } from '../../JsonValue';
-import { JsPath } from '../../JsPath';
-import { SchemaRenderer } from '../../SchemaService';
+import { getValueAt } from '../../JsonValue.js';
+import { JsPath } from '../../JsPath.js';
+import { SchemaRenderer } from '../../SchemaService.js';
 
 export function setRendererAttributes(
   schemaRenderer: SchemaRenderer,

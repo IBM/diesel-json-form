@@ -1,9 +1,9 @@
-import { StringElement } from '../StringElement';
-import { MyDatePicker } from './MyDatePicker';
-import { JsonForm } from '../JsonForm';
-import { Metadata } from '../../Metadata';
-import { JvString } from '../../JsonValue';
-import { JsPath } from '../../JsPath';
+import { StringElement } from '../StringElement.js';
+import { MyDatePicker } from './MyDatePicker.js';
+import { JsonForm } from '../JsonForm.js';
+import { Metadata } from '../../Metadata.js';
+import { JvString } from '../../JsonValue.js';
+import { JsPath } from '../../JsPath.js';
 
 export class CarbonStringElemDate extends StringElement {
   static TAG_NAME = 'string-elem-date';

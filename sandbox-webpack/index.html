@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en_US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diesel JSON Form</title>
+    <link rel="icon" href="/favicon.ico" />
+    <%= htmlWebpackPlugin.tags.headTags %>
+  </head>
+
+  <body>
+    <div id="sandbox">
+      <div class="banner">
+        <cds-header class="ui-shell--header" aria-label="IBM Platform Name">
+          <cds-header-name
+            href="https://github.com/IBM/diesel-json-form"
+            prefix="IBM"
+            >JSON Editor</cds-header-name
+          >
+          <div class="schema-select cds--header__global">
+            <div class="cb-wrapper">
+              <cds-checkbox id="cb-strict-mode">Strict mode</cds-checkbox>
+            </div>
+            <div id="about"></div>
+          </div>
+        </cds-header>
+      </div>
+      <div class="main">
+        <div class="sub">
+          <cds-tabs
+            value="schema"
+            disabled="false"
+            selection-mode="automatic"
+            type="false"
+          >
+            <cds-tab id="tab-schema" target="panel-schema" value="schema">
+              Schema
+            </cds-tab>
+            <cds-tab id="tab-json" target="panel-json" value="json">
+              JSON
+            </cds-tab>
+          </cds-tabs>
+          <div
+            id="panel-schema"
+            role="tabpanel"
+            aria-labelledby="tab-schema"
+            hidden=""
+            class="left-panel"
+          >
+            <div class="panel-content">
+              <div class="drop-down-wrapper">
+                <cds-dropdown
+                  title-text="Samples"
+                  label="Select Sample Schema"
+                  id="sampleSchemaSelect"
+                  type="inline"
+                  trigger-content="Select an item"
+                >
+                </cds-dropdown>
+                <div class="btn-wrapper-schema">
+                  <cds-button
+                    id="btn-from-schema"
+                    size="xs"
+                    tooltip-text="Apply schema changes to the FORM editor"
+                  >
+                    <icon-elem slot="icon" icon="arrow-right"></icon-elem>
+                  </cds-button>
+                </div>
+              </div>
+              <textarea id="ta-schema"></textarea>
+            </div>
+          </div>
+          <div
+            id="panel-json"
+            role="tabpanel"
+            aria-labelledby="tab-json"
+            hidden=""
+            class="left-panel"
+          >
+            <div class="panel-content">
+              <div class="btn-wrapper-json">
+                <cds-button
+                  id="btn-to-form"
+                  size="xs"
+                  tooltip-text="Apply JSON text changes to the FORM editor"
+                >
+                  <icon-elem slot="icon" icon="arrow-right"></icon-elem>
+                </cds-button>
+                <cds-button
+                  id="btn-from-form"
+                  size="xs"
+                  tooltip-text="Apply FORM editor changes to the JSON text editor"
+                >
+                  <icon-elem slot="icon" icon="arrow-left"></icon-elem>
+                </cds-button>
+              </div>
+              <textarea spellcheck="false" id="ta-json"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="sub form">
+          <json-form id="json-form"></json-form>
+        </div>
+      </div>
+    </div>
+
+    <%= htmlWebpackPlugin.tags.bodyTags %>
+  </body>
+</html>

@@ -1,6 +1,6 @@
-import { RenderedElement } from './RenderedElement';
+import { RenderedElement } from './RenderedElement.js';
 import { maybeOf } from 'tea-cup-fp';
-import { JsonForm } from './JsonForm';
+import { JsonForm } from './JsonForm.js';
 import {
   clearPropertiesIfObject,
   getValueAt,
@@ -9,10 +9,10 @@ import {
   JvArray,
   jvNull,
   setValueAt,
-} from '../JsonValue';
-import { JsPath } from '../JsPath';
-import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
-import { proposeNested } from '../proposeNested';
+} from '../JsonValue.js';
+import { JsPath } from '../JsPath.js';
+import { validateAndComputeMetadata } from '../validateAndComputeMetadata.js';
+import { proposeNested } from '../proposeNested.js';
 
 type Appender = (elem: RenderedElement<JsonValue>) => void;
 

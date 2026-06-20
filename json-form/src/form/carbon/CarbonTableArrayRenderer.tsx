@@ -1,6 +1,10 @@
-import { CDSTable, CDSTableHead } from '@carbon/web-components/es';
-import { ArrayElement } from '../ArrayElement';
-import { h } from '../../MyJSXFactory';
+import {
+  CDSTable,
+  CDSTableHead,
+  CDSTableRow,
+} from '@carbon/web-components/es/index.js';
+import { ArrayElement } from '../ArrayElement.js';
+import { h } from '../../MyJSXFactory.js';
 import {
   getValueAt,
   JsonValue,
@@ -9,17 +13,16 @@ import {
   jvObject,
   JvObject,
   setValueAt,
-} from '../../JsonValue';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
-import { Renderer } from '../Renderer';
-import { RenderedElement } from '../RenderedElement';
-import { CDSTableRow } from '@carbon/web-components/es';
-import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
-import { SchemaRenderer } from '../../SchemaService';
+} from '../../JsonValue.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
+import { Renderer } from '../Renderer.js';
+import { RenderedElement } from '../RenderedElement.js';
+import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata.js';
+import { SchemaRenderer } from '../../SchemaService.js';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
+import { validateAndComputeMetadata } from '../../validateAndComputeMetadata.js';
 import { just, nothing } from 'tea-cup-fp';
-import { T_FUNCTION } from '../../JsonFormMessages';
-import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
 
 export class CarbonTableArrayRenderer extends ArrayElement {
   static TAG_NAME = 'json-array-table';

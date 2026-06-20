@@ -1,7 +1,7 @@
 import '@carbon/web-components/es/components/menu/index.js';
 import CDSMenu from '@carbon/web-components/es/components/menu/menu.js';
 import CDSmenuItem from '@carbon/web-components/es/components/menu/menu-item.js';
-import { JsPath } from '../../JsPath';
+import { JsPath } from '../../JsPath.js';
 import {
   DEFAULT_TYPES,
   getValueAt,
@@ -15,11 +15,11 @@ import {
   jvObject,
   jvString,
   valueType,
-} from '../../JsonValue';
-import { SchemaService } from '../../SchemaService';
-import { T_FUNCTION } from '../../JsonFormMessages';
-import { IconElement } from './IconElement';
-import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
+} from '../../JsonValue.js';
+import { SchemaService } from '../../SchemaService.js';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
+import { IconElement } from './IconElement.js';
+import { validateAndComputeMetadata } from '../../validateAndComputeMetadata.js';
 
 export type MenuActions = {
   add?: () => void;

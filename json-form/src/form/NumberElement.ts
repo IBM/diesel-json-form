@@ -1,5 +1,5 @@
-import { jvNumber, JvNumber } from '../JsonValue';
-import { RenderedElement } from './RenderedElement';
+import { jvNumber, JvNumber } from '../JsonValue.js';
+import { RenderedElement } from './RenderedElement.js';
 
 export abstract class NumberElement extends RenderedElement<JvNumber> {
   getType(): 'jv-number' {

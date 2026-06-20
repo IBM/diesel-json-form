@@ -12,19 +12,7 @@ import {
   CDSRadioButtonGroup,
   CDSTag,
   CDSTextInput,
-  CDSTable,
-  CDSTableBody,
-  CDSTableCell,
-  CDSTableHead,
-  CDSTableHeaderCell,
-  CDSTableHeaderRow,
-  CDSTableRow,
-  CDSTableToolbar,
-  CDSTableBatchActions,
-  CDSTableToolbarContent,
 } from '@carbon/web-components/es/index.js';
-import CDSGrid from '@carbon/web-components/es/components/grid/grid.js';
-import CDSColumn from '@carbon/web-components/es/components/grid/column.js';
 
 type EventListener = (e: Event) => void;
 
@@ -52,20 +40,6 @@ declare global {
       'cds-radio-button-group': Partial<CDSRadioButtonGroup>;
       'cds-radio-button': Partial<CDSRadioButton>;
       'cds-tag': Partial<CDSTag>;
-      'cds-table': Partial<CDSTable>;
-      'cds-table-head': Partial<CDSTableHead>;
-      'cds-table-header-row': Partial<CDSTableHeaderRow>;
-      'cds-table-header-cell': Partial<CDSTableHeaderCell>;
-      'cds-table-body': Partial<CDSTableBody>;
-      'cds-table-row': Partial<CDSTableRow>;
-      'cds-table-cell': Partial<CDSTableCell>;
-      'cds-table-toolbar': Partial<CDSTableToolbar>;
-      'cds-table-batch-actions': Partial<CDSTableBatchActions>;
-      'cds-table-toolbar-content': Partial<CDSTableToolbarContent>;
-      svg: Partial<SVGElement>;
-      path: Partial<SVGPathElement>;
-      'cds-grid': Partial<CDSGrid>;
-      'cds-column': Partial<CDSColumn>;
     }
   }
 }
@@ -111,8 +85,7 @@ export function h(
         } else if (typeof attributeValue === 'string') {
           element.setAttribute(key, attributeValue);
         } else {
-          //   console.debug('Unsupported attribute', key);
-          (element as any)[key] = attributeValue;
+          throw 'Unsupported attribute ' + key;
         }
       }
     }

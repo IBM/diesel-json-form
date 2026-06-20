@@ -1,18 +1,18 @@
 import { CDSButton } from '@carbon/web-components/es';
-import { h } from '../../MyJSXFactory';
-import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
-import { empty } from '../HtmlBuilder';
-import { JsonForm } from '../JsonForm';
-import { createMenu, openMenu } from './ContextMenu';
-import { augmentProposal } from '../../augmentProposal';
+import { h } from '../../MyJSXFactory.js';
+import { CarbonCollapsibleSection } from './CarbonCollapsibleSection.js';
+import { empty } from '../HtmlBuilder.js';
+import { JsonForm } from '../JsonForm.js';
+import { createMenu, openMenu } from './ContextMenu.js';
+import { augmentProposal } from '../../augmentProposal.js';
 import '@carbon/web-components/es/components/tag/tag.js';
 import {
   TAG_SIZE,
   TAG_TYPE,
 } from '@carbon/web-components/es/components/tag/defs.js';
-import { T_FUNCTION } from '../../JsonFormMessages';
-import { JsPath } from '../../JsPath';
-import { getAddFunction } from '../AppendElement';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
+import { JsPath } from '../../JsPath.js';
+import { getAddFunction } from '../AppendElement.js';
 
 export class FormHeaderElement extends HTMLElement {
   static TAG_NAME = 'json-form-header';

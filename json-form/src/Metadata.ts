@@ -1,4 +1,4 @@
-import { ValidationError, SchemaRenderer } from './SchemaService';
+import { ValidationError, SchemaRenderer } from './SchemaService.js';
 
 export interface Metadata {
   readonly errors: ReadonlyMap<string, ReadonlyArray<ValidationError>>;

@@ -1,12 +1,12 @@
 import '@carbon/web-components/es/components/text-input/index.js';
 import { CDSTextInput } from '@carbon/web-components/es';
-import { setErrors } from './setErrorsOnInput';
-import { NullElement } from '../NullElement';
-import { JvNull } from '../../JsonValue';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
-import { setRendererAttributes } from './setRendererAttributes';
-import { SchemaRenderer } from '../../SchemaService';
+import { setErrors } from './setErrorsOnInput.js';
+import { NullElement } from '../NullElement.js';
+import { JvNull } from '../../JsonValue.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
+import { setRendererAttributes } from './setRendererAttributes.js';
+import { SchemaRenderer } from '../../SchemaService.js';
 
 export class CarbonNullElement extends NullElement {
   static TAG_NAME = 'json-null';

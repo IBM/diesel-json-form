@@ -1,9 +1,9 @@
-import { h } from '../../MyJSXFactory';
-import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
-import { moveElementDown, moveElementUp } from '../HtmlBuilder';
-import { RenderedElement } from '../RenderedElement';
-import { ValidationError } from '../../SchemaService';
-import { JsonValue } from '../../JsonValue';
+import { h } from '../../MyJSXFactory.js';
+import { CarbonCollapsibleSection } from './CarbonCollapsibleSection.js';
+import { moveElementDown, moveElementUp } from '../HtmlBuilder.js';
+import { RenderedElement } from '../RenderedElement.js';
+import { ValidationError } from '../../SchemaService.js';
+import { JsonValue } from '../../JsonValue.js';
 
 export class CarbonSectionBasedElement extends HTMLElement {
   static TAG_NAME = 'section-based-elem';

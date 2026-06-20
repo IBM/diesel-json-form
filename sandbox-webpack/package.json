@@ -1,13 +1,12 @@
 {
-  "name": "@diesel-parser/diesel-json-sandbox",
+  "name": "@diesel-parser/diesel-json-sandbox-webpack",
   "version": "1.0.0",
   "private": true,
   "description": "",
-  "type": "module",
   "scripts": {
-    "start": "vite --port 3000 --config vite.config.dev.ts",
-    "build": "vite build",
-    "preview": "vite preview",
+    "compile": "tsc",
+    "start": "webpack serve",
+    "build": "npm run lint && webpack",
     "prettify": "prettier --write .",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "eslint '**/*.{js,ts}' --fix",
@@ -27,9 +26,19 @@
     "@diesel-parser/ts-facade": "~0.32.2",
     "@types/node": "^22.0.0",
     "@types/vscode": "~1.100.0",
+    "copy-webpack-plugin": "^13.0.0",
+    "css-loader": "^7.0.0",
+    "file-loader": "^6.2.0",
     "gh-pages": "^6.0.0",
+    "html-webpack-plugin": "^5.3.1",
+    "ignore-webpack-plugin": "^0.3.0",
     "sass": "^1.99.0",
+    "sass-loader": "^16.0.7",
     "shx": "~0.4.0",
-    "vite": "^6.0.0"
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.6.1",
+    "webpack": "^5.37.1",
+    "webpack-cli": "^6.0.0",
+    "webpack-dev-server": "^5.0.0"
   }
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { JsonProperty, JsonValue, jvObject, setValueAt } from './JsonValue';
-import { JsPath } from './JsPath';
-import { SchemaService } from './SchemaService';
+import { JsonProperty, JsonValue, jvObject, setValueAt } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
+import { SchemaService } from './SchemaService.js';
 
 export async function proposeNested(
   schema: JsonValue,

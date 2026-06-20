@@ -1,17 +1,17 @@
-import { ArrayElement } from '../ArrayElement';
-import { Renderer } from '../Renderer';
-import { CarbonSectionBasedElement } from './CarbonSectionBasedElement';
-import { CarbonCollapsibleSection } from './CarbonCollapsibleSection';
-import { RenderedElement } from '../RenderedElement';
-import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata';
-import { T_FUNCTION } from '../../JsonFormMessages';
-import { JsonValue, jvArray, JvArray, setValueAt } from '../../JsonValue';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
-import { validateAndComputeMetadata } from '../../validateAndComputeMetadata';
-import { augmentProposal } from '../../augmentProposal';
-import { createMenu, MenuItem } from './ContextMenu';
-import { getAddFunction } from '../AppendElement';
+import { ArrayElement } from '../ArrayElement.js';
+import { Renderer } from '../Renderer.js';
+import { CarbonSectionBasedElement } from './CarbonSectionBasedElement.js';
+import { CarbonCollapsibleSection } from './CarbonCollapsibleSection.js';
+import { RenderedElement } from '../RenderedElement.js';
+import { renderNewOrSetMetadata } from '../../renderNewOrSetMetadata.js';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
+import { JsonValue, jvArray, JvArray, setValueAt } from '../../JsonValue.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
+import { validateAndComputeMetadata } from '../../validateAndComputeMetadata.js';
+import { augmentProposal } from '../../augmentProposal.js';
+import { createMenu, MenuItem } from './ContextMenu.js';
+import { getAddFunction } from '../AppendElement.js';
 
 export class CarbonArrayElement extends ArrayElement {
   static TAG_NAME = 'json-array';

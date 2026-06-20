@@ -8,7 +8,7 @@ import {
   Metadata,
   parseJsonValueUnsafe,
   Renderer,
-} from '../../index';
+} from '../../index.js';
 
 describe('CarbonTableArrayRenderer', () => {
   const myKey = 'MyTableArray';

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { getUtcOffsets } from './UtcOffsets';
+import { getUtcOffsets } from './UtcOffsets.js';
 
 describe('UTC offsets', () => {
   test('get UTC offsets', () => {

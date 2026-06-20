@@ -4,14 +4,14 @@ import {
   CDSSelectItem,
 } from '@carbon/web-components/es';
 import '@carbon/web-components/es/components/time-picker/index.js';
-import { Debouncer } from '../Debouncer';
-import { h } from '../../MyJSXFactory';
-import { setErrors } from './setErrorsOnInput';
+import { Debouncer } from '../Debouncer.js';
+import { h } from '../../MyJSXFactory.js';
+import { setErrors } from './setErrorsOnInput.js';
 import '@carbon/web-components/es/components/time-picker/index.js';
-import { nextElementId } from './nextElementId';
-import { allOffsets } from './allOffsets';
-import { MyTime } from './MyTime';
-import { ValidationError } from '../../SchemaService';
+import { nextElementId } from './nextElementId.js';
+import { allOffsets } from './allOffsets.js';
+import { MyTime } from './MyTime.js';
+import { ValidationError } from '../../SchemaService.js';
 
 export class MyTimePicker extends HTMLElement {
   static TAG_NAME = 'my-time-picker';

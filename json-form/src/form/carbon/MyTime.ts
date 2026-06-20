@@ -1,4 +1,4 @@
-import { allOffsets } from './allOffsets';
+import { allOffsets } from './allOffsets.js';
 
 export class MyTime {
   readonly time: string;

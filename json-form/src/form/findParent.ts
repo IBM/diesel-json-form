@@ -1,5 +1,5 @@
 import { just, Maybe, nothing } from 'tea-cup-fp';
-import { JsonForm } from './JsonForm';
+import { JsonForm } from './JsonForm.js';
 
 export function findEnclosingForm(e: Element): JsonForm {
   return findParent(e, (e) => {

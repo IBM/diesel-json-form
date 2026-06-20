@@ -16,7 +16,7 @@
 
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { err, just, Maybe, nothing, ok, Result } from 'tea-cup-fp';
-import { JsPath } from './JsPath';
+import { JsPath } from './JsPath.js';
 
 export type JsonValue =
   | JvNull

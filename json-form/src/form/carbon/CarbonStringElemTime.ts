@@ -1,9 +1,9 @@
-import { StringElement } from '../StringElement';
-import { MyTimePicker } from './MyTimePicker';
-import { JsonForm } from '../JsonForm';
-import { JvString } from '../../JsonValue';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
+import { StringElement } from '../StringElement.js';
+import { MyTimePicker } from './MyTimePicker.js';
+import { JsonForm } from '../JsonForm.js';
+import { JvString } from '../../JsonValue.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
 
 export class CarbonStringElemTime extends StringElement {
   static TAG_NAME = 'string-elem-time';

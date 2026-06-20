@@ -1,4 +1,4 @@
-import { MyTime } from './MyTime';
+import { MyTime } from './MyTime.js';
 
 export class MyDateTime {
   readonly date: string;

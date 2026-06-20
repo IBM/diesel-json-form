@@ -5,7 +5,7 @@ import {
   CDSTextInput,
   CDSTimePicker,
 } from '@carbon/web-components/es';
-import { ValidationError } from '../../SchemaService';
+import { ValidationError } from '../../SchemaService.js';
 
 export function setErrors(
   errors: readonly ValidationError[] | undefined,

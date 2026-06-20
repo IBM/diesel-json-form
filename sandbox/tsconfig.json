@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "esnext",
         "lib": [
             "dom",
             "dom.iterable",
@@ -9,11 +9,11 @@
         "inlineSources": true,
         "inlineSourceMap": true,
         "strict": true,
-        "module": "commonjs",
+        "module": "esnext",
         "outDir": "dist",
         "declaration": true,
         "skipLibCheck": true,
-        "esModuleInterop": true,
+        "esModuleInterop": false,
         "resolveJsonModule": true,
         "jsx": "react",
         "jsxFactory": "h",

@@ -4,10 +4,10 @@ import {
   JsonValue,
   mergeProperties,
   setValueAt,
-} from './JsonValue';
-import { SchemaService } from './SchemaService';
-import { JsPath } from './JsPath';
-import { proposeNested } from './proposeNested';
+} from './JsonValue.js';
+import { SchemaService } from './SchemaService.js';
+import { JsPath } from './JsPath.js';
+import { proposeNested } from './proposeNested.js';
 
 export function applyProposalTask(
   schemaService: SchemaService,

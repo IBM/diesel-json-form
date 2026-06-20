@@ -1,8 +1,8 @@
-import { RenderedElement } from './form/RenderedElement';
-import { getRendererKey, Renderer } from './form/Renderer';
-import { JsonValue } from './JsonValue';
-import { JsPath } from './JsPath';
-import { Metadata } from './Metadata';
+import { RenderedElement } from './form/RenderedElement.js';
+import { getRendererKey, Renderer } from './form/Renderer.js';
+import { JsonValue } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
+import { Metadata } from './Metadata.js';
 
 export function renderNewOrSetMetadata(
   elem: RenderedElement<JsonValue>,

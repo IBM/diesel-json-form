@@ -1,9 +1,9 @@
 import { CDSDatePicker, CDSDatePickerInput } from '@carbon/web-components/es';
-import { Debouncer } from '../Debouncer';
-import { setErrors } from './setErrorsOnInput';
+import { Debouncer } from '../Debouncer.js';
+import { setErrors } from './setErrorsOnInput.js';
 import '@carbon/web-components/es/components/date-picker/index.js';
-import { nextElementId } from './nextElementId';
-import { ValidationError } from '../../SchemaService';
+import { nextElementId } from './nextElementId.js';
+import { ValidationError } from '../../SchemaService.js';
 
 export class MyDatePicker extends HTMLElement {
   static TAG_NAME = 'my-date-picker';

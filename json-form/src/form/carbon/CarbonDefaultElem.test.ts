@@ -10,8 +10,8 @@ import {
   jvObject,
   Metadata,
   Renderer,
-} from '../../index';
-import { CarbonNullElement } from './CarbonNullElem';
+} from '../../index.js';
+import { CarbonNullElement } from './CarbonNullElem.js';
 
 describe('Carbon default elements', () => {
   const renderer = new Renderer();

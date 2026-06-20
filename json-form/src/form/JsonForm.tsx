@@ -1,18 +1,18 @@
 import { just, map2, nothing } from 'tea-cup-fp';
-import { Renderer } from './Renderer';
-import { FormHeaderElement } from './carbon/FormHeaderElement';
-import { findParent } from './findParent';
-import { RenderedElement } from './RenderedElement';
-import { ArrayElement } from './ArrayElement';
-import { JsonValue, jvObject, stringify } from '../JsonValue';
-import { defaultSchemaService, SchemaService } from '../SchemaService';
-import { JsPath } from '../JsPath';
-import { Metadata } from '../Metadata';
-import { validateAndComputeMetadata } from '../validateAndComputeMetadata';
-import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata';
-import { h } from '../MyJSXFactory';
-import { empty } from './HtmlBuilder';
-import { getAddFunction } from './AppendElement';
+import { Renderer } from './Renderer.js';
+import { FormHeaderElement } from './carbon/FormHeaderElement.js';
+import { findParent } from './findParent.js';
+import { RenderedElement } from './RenderedElement.js';
+import { ArrayElement } from './ArrayElement.js';
+import { JsonValue, jvObject, stringify } from '../JsonValue.js';
+import { defaultSchemaService, SchemaService } from '../SchemaService.js';
+import { JsPath } from '../JsPath.js';
+import { Metadata } from '../Metadata.js';
+import { validateAndComputeMetadata } from '../validateAndComputeMetadata.js';
+import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata.js';
+import { h } from '../MyJSXFactory.js';
+import { empty } from './HtmlBuilder.js';
+import { getAddFunction } from './AppendElement.js';
 
 declare global {
   interface GlobalEventHandlersEventMap {

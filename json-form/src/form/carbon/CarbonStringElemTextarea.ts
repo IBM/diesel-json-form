@@ -1,16 +1,16 @@
 import { CDSTextarea } from '@carbon/web-components/es';
-import { Debouncer } from '../Debouncer';
-import { setErrors } from './setErrorsOnInput';
-import { StringElement } from '../StringElement';
+import { Debouncer } from '../Debouncer.js';
+import { setErrors } from './setErrorsOnInput.js';
+import { StringElement } from '../StringElement.js';
 import '@carbon/web-components/es/components/textarea/index.js';
-import { JsonForm } from '../JsonForm';
-import { nextElementId } from './nextElementId';
-import { T_FUNCTION } from '../../JsonFormMessages';
-import { JvString } from '../../JsonValue';
-import { Metadata } from '../../Metadata';
-import { JsPath } from '../../JsPath';
-import { SchemaRenderer } from '../../SchemaService';
-import { setRendererAttributes } from './setRendererAttributes';
+import { JsonForm } from '../JsonForm.js';
+import { nextElementId } from './nextElementId.js';
+import { T_FUNCTION } from '../../JsonFormMessages.js';
+import { JvString } from '../../JsonValue.js';
+import { Metadata } from '../../Metadata.js';
+import { JsPath } from '../../JsPath.js';
+import { SchemaRenderer } from '../../SchemaService.js';
+import { setRendererAttributes } from './setRendererAttributes.js';
 
 export class CarbonStringElemTextarea extends StringElement {
   static TAG_NAME = 'string-elem-textarea';

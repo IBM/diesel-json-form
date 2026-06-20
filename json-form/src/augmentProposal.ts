@@ -1,8 +1,8 @@
 import { just, maybeOf, nothing } from 'tea-cup-fp';
-import { getValueAt, JsonValue, mergeProperties } from './JsonValue';
-import { JsPath } from './JsPath';
-import { proposeNested } from './proposeNested';
-import { SchemaService } from './SchemaService';
+import { getValueAt, JsonValue, mergeProperties } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
+import { proposeNested } from './proposeNested.js';
+import { SchemaService } from './SchemaService.js';
 
 export async function augmentProposal(
   schemaService: SchemaService,
