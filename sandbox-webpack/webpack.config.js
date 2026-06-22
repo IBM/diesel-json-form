@@ -23,18 +23,11 @@ export default {
       {
         test: /\.s[ac]ss$/i,
         use: [
-          // Creates `style` nodes from JS strings
           'style-loader',
-          // Translates CSS into CommonJS
           'css-loader',
-          // Compiles Sass to CSS
           'sass-loader',
         ],
       },
-      //   {
-      //     test: /\.css$/i,
-      //     use: ["style-loader", "css-loader"],
-      //   },
       {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
@@ -72,12 +65,6 @@ export default {
     new CopyPlugin({
       patterns: [{ from: './public', to: '.' }],
     }),
-    // new webpack.IgnorePlugin({
-    //     checkResource(resource) {
-    //         console.log("rvkb", resource);
-    //         return false;
-    //     }
-    // }),
     new webpack.NormalModuleReplacementPlugin(
         /.*throttle$/, "lodash-es/throttle.js"
     )
