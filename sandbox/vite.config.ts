@@ -9,7 +9,7 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: true,
     commonjsOptions: {
-      include: [/node_modules/, /json-form/],
+      include: [/node_modules/],
     },
   },
   server: {
