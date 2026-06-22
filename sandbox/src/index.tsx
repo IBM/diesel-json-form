@@ -59,8 +59,6 @@ cbStrictMode.addEventListener('cds-checkbox-changed', () => {
   jsonForm.strictMode = cbStrictMode.checked;
 });
 
-console.log(JsonForm.TAG_NAME);
-
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
 ) as CDSComboBox;
