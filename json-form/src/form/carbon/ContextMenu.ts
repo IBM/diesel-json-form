@@ -399,7 +399,6 @@ export async function openMenu(
   refElement: HTMLElement,
 ) {
   prevFocus = refElement;
-  console.log('prevFocus', prevFocus);
   closeMenu();
   const rect = refElement.getBoundingClientRect();
   menu = document.createElement('cds-menu') as CDSMenu;

@@ -64,12 +64,10 @@ export class CarbonCollapsibleSection extends HTMLElement {
       if (this.menu) {
         CarbonCollapsibleSection.TRIGGER_COUNT++;
         const triggerCount = CarbonCollapsibleSection.TRIGGER_COUNT;
-        console.log('context menu', triggerCount);
         this.menuButton.disabled = true;
         this.menu()
           .then((i) => {
             if (CarbonCollapsibleSection.TRIGGER_COUNT === triggerCount) {
-              console.log('open menu', triggerCount, i);
               openMenu(i, this.menuButton);
             }
           })

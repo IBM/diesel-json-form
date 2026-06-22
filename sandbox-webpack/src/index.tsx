@@ -59,8 +59,6 @@ cbStrictMode.addEventListener('cds-checkbox-changed', () => {
   jsonForm.strictMode = cbStrictMode.checked;
 });
 
-console.log(JsonForm.TAG_NAME);
-
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
 ) as CDSComboBox;
@@ -115,11 +113,6 @@ const taJson = document.getElementById('ta-json') as HTMLTextAreaElement;
 taJson.value = initialValue;
 
 jsonForm.addEventListener('json-changed', (e) => {
-  //   const value = e.detail;
-  //   const valueStr = stringify(value, '  ').withDefault(
-  //     'Broken JSON from form (invalid numbers)',
-  //   );
-  //   taJson.value = valueStr;
   console.log('json changed', e.detail);
 });
 

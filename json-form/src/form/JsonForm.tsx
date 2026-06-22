@@ -100,19 +100,19 @@ export class JsonForm extends HTMLElement {
     if (validJson) {
       this.VALIDATION_COUNTER++;
       const validationCounter = this.VALIDATION_COUNTER;
-      console.log('validate', validationCounter, value);
+      //   console.log('validate', validationCounter, value);
       const res = new Promise<Metadata | undefined>((resolve, reject) => {
         // setTimeout(() => {
         validateAndComputeMetadata(this.schemaService, this.schema, value)
           .then((metadata) => {
-            console.log('validated', metadata);
+            // console.log('validated', metadata);
             if (validationCounter === this.VALIDATION_COUNTER) {
-              console.log(
-                'validate',
-                validationCounter,
-                this.VALIDATION_COUNTER,
-                metadata,
-              );
+              //   console.log(
+              //     'validate',
+              //     validationCounter,
+              //     this.VALIDATION_COUNTER,
+              //     metadata,
+              //   );
               resolve(metadata);
             } else {
               resolve(undefined);
