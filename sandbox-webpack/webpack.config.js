@@ -11,13 +11,18 @@ export default {
   devtool: 'inline-source-map',
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist-webpack'),
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [{
+            loader: 'ts-loader',
+            options: {
+                configFile: "tsconfig.webpack.json"
+            }
+        }],
         exclude: /node_modules/,
       },
       {
@@ -51,6 +56,7 @@ export default {
     port: 3000,
     hot: true,
     open: true,
+
   },
   watchOptions: {
     aggregateTimeout: 200,
@@ -58,7 +64,7 @@ export default {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html',
+      template: './index-webpack.html',
       filename: './index.html',
       inject: false,
     }),
