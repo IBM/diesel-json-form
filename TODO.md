@@ -1,9 +1,5 @@
 Web Components :
 
-- custom rendering
-- layout options ?
-
 - slash in prop name
-
-BUG: added props/items cannot be moved up
-BUG: index.tsx#154
+- allow to change the doc when some value is modified (useful for if/then)
+- customize menu entries
