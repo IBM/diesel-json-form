@@ -310,3 +310,19 @@ sampleSchemaSelect.addEventListener('cds-dropdown-selected', () => {
     (err) => console.error(err),
   );
 });
+
+const schemaSelect = document.getElementById('serviceSelect') as CDSComboBox;
+schemaSelect.addEventListener('cds-dropdown-selected', () => {
+  const value = schemaSelect.value;
+  switch (value) {
+    case 'typed-json': {
+      // TODO
+      jsonForm.setSchemaService(defaultSchemaService);
+      break;
+    }
+    default: {
+      jsonForm.setSchemaService(defaultSchemaService);
+      break;
+    }
+  }
+});

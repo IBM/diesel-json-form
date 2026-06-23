@@ -171,6 +171,11 @@ export class JsonForm extends HTMLElement {
     return this.schemaService;
   }
 
+  setSchemaService(schemaService: SchemaService) {
+    this.schemaService = schemaService;
+    this.onChange();
+  }
+
   get strictMode(): boolean {
     return this.hasAttribute('strict-mode');
   }

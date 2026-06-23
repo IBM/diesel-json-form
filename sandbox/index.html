@@ -16,7 +16,22 @@
             prefix="IBM"
             >JSON Editor</cds-header-name
           >
-          <div class="schema-select cds--header__global">
+          <div class="cds--header__global">
+            <cds-dropdown
+              title-text="Schema Service"
+              id="serviceSelect"
+              type="inline"
+              trigger-content="Select a service"
+              value="default"
+            >
+              <cds-dropdown-item value="default"
+                >@diesel-parser/json-schema-facade-ts</cds-dropdown-item
+              >
+              <cds-dropdown-item value="typed-json"
+                >typed-json-ts</cds-dropdown-item
+              >
+            </cds-dropdown>
+
             <div class="cb-wrapper">
               <cds-checkbox id="cb-strict-mode">Strict mode</cds-checkbox>
             </div>
