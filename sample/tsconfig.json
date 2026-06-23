@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ],
+        "inlineSources": true,
+        "inlineSourceMap": true,
+        "strict": true,
+        "module": "esnext",
+        "outDir": "dist",
+        "declaration": true,
+        "skipLibCheck": true,
+        "esModuleInterop": false,
+        "resolveJsonModule": true,
+        "jsx": "react",
+        "jsxFactory": "h",
+        "jsxFragmentFactory": "Fragment"
+    },
+    "include": [
+        "src",
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "json-form",
-    "sandbox"
+    "sandbox",
+    "sample"
   ],
   "devDependencies": {
     "@eslint/js": "^8.57.0",
