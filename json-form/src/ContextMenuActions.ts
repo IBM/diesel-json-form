@@ -138,7 +138,9 @@ export function createTypesMenu(
             case 'jv-object':
               return buildChangeTypeItem(jvObject());
             case 'jv-string':
-              return buildChangeTypeItem(jvString(''));
+              return buildChangeTypeItem(
+                proposals.find((p) => p.tag === 'jv-string') ?? jvString(''),
+              );
           }
         })
     );
