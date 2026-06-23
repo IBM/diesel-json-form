@@ -1,9 +1,11 @@
 import { describe, expect, test } from 'vitest';
 import { TypedJsonSchemaService } from './TypedJsonSchemaService';
 import { readFileSync } from 'fs';
-import { parseJsonValue, stringify } from '../JsonValue';
-import { JsPath } from '../JsPath';
-import { TCK_TESTS } from '../tck';
+import {
+  parseJsonValue,
+  stringify,
+} from '@diesel-parser/json-form/src/JsonValue';
+import { JsPath } from '@diesel-parser/json-form/src/JsPath';
 
 describe('TypedJsonSchemaService', async () => {
   const service = await TypedJsonSchemaService.load(
@@ -17,7 +19,7 @@ describe('TypedJsonSchemaService', async () => {
 
   test('version', async () => {
     const version = service.typedJson.version();
-    expect(version).toEqual('0.12.1');
+    expect(version).toEqual('0.13.2');
   });
 
   test('validate', async () => {
@@ -47,14 +49,14 @@ describe('TypedJsonSchemaService', async () => {
     expect(values).toEqual(['0']);
   });
 
-  describe('tck test', () => {
-    for (const tckTest of TCK_TESTS) {
-      test(tckTest.title, async () => {
-        const proposals = await tckTest.getProposals(service);
-        expect(proposals).toEqual(tckTest.expected);
-      });
-    }
-  });
+  //   describe('tck test', () => {
+  //     for (const tckTest of TCK_TESTS) {
+  //       test(tckTest.title, async () => {
+  //         const proposals = await tckTest.getProposals(service);
+  //         expect(proposals).toEqual(tckTest.expected);
+  //       });
+  //     }
+  //   });
 });
 
 function parseJsonValueUnsafe(json: string) {

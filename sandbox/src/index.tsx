@@ -46,6 +46,9 @@ import {
 import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group.js';
 import { h } from './MyJSXFactory';
 import { version } from '@diesel-parser/json-form/package.json';
+import { TypedJsonSchemaService } from './TypedJsonSchemaService';
+
+// import wasmUrl from './dist/typedJson.wasm?url';
 
 const about = document.getElementById('about');
 if (about) {
@@ -145,7 +148,7 @@ const btnFromSchema = document.getElementById(
 function toFormClicked() {
   const value = parseJsonValueUnsafe(taJson.value);
   const schema = parseJsonValueUnsafe(taSchema.value);
-  jsonForm.initialize(renderer, defaultSchemaService, schema, value);
+  jsonForm.initialize(renderer, jsonForm.getSchemaService(), schema, value);
 }
 
 btnToForm.addEventListener('click', toFormClicked);
@@ -306,7 +309,7 @@ sampleSchemaSelect.addEventListener('cds-dropdown-selected', () => {
   const value = jsonForm.toValue();
   parseJsonValue(taSchema.value).match(
     (schema) =>
-      jsonForm.initialize(renderer, defaultSchemaService, schema, value),
+      jsonForm.initialize(renderer, jsonForm.getSchemaService(), schema, value),
     (err) => console.error(err),
   );
 });
@@ -316,8 +319,10 @@ schemaSelect.addEventListener('cds-dropdown-selected', () => {
   const value = schemaSelect.value;
   switch (value) {
     case 'typed-json': {
-      // TODO
-      jsonForm.setSchemaService(defaultSchemaService);
+      //   console.log('wasm', wasmUrl);
+      TypedJsonSchemaService.load('typedJson.wasm').then((s) => {
+        jsonForm.setSchemaService(s);
+      });
       break;
     }
     default: {

@@ -1,18 +1,18 @@
 import { map2 } from 'tea-cup-fp';
+import { BasicOutput, toValueWithMeta, TypedJson } from 'typed-json-ts';
 import {
-  BasicOutput,
-  OutputUnit,
-  toValueWithMeta,
-  TypedJson,
-} from 'typed-json-ts';
-import { JsonValue, jvNull, parseJsonValue, stringify } from '../JsonValue';
-import { JsPath } from '../JsPath';
+  JsonValue,
+  jvNull,
+  parseJsonValue,
+  stringify,
+} from '@diesel-parser/json-form/src/JsonValue';
+import { JsPath } from '@diesel-parser/json-form/src/JsPath';
 import {
   SchemaRenderer,
   SchemaService,
   ValidationError,
   ValidationResult,
-} from '../SchemaService';
+} from '@diesel-parser/json-form/src/SchemaService';
 
 export class TypedJsonSchemaService implements SchemaService {
   static async load(
@@ -57,6 +57,13 @@ export class TypedJsonSchemaService implements SchemaService {
         );
         // console.log('propose', path.format(), suggestOutputs);
         const vs = toValueWithMeta(suggestOutputs)
+          .filter((v) =>
+            v.value !== null &&
+            v.value !== undefined &&
+            typeof v.value === 'object'
+              ? Object.keys(v.value as any).length > 0
+              : true,
+          )
           .map((v) => v.value)
           .map((v) => JSON.stringify(v));
         return vs.map((v) =>
@@ -80,7 +87,10 @@ class TypedJsonValidationResult implements ValidationResult {
           message: (o as any).error,
           path: o.instanceLocation.slice(1),
         }))
-        .filter((e) => e.message.indexOf('sub schema') == -1) ?? []
+        .filter(
+          (e) =>
+            e.message !== undefined && e.message.indexOf('sub schema') == -1,
+        ) ?? []
     );
   }
 
@@ -134,6 +144,10 @@ class TypedJsonValidationResult implements ValidationResult {
         .filter((o) => o.instanceLocation.slice(1) == path.format())
         .map((o) => o.value as string) ?? [];
     return discriminator[0];
+  }
+
+  getRequiredProperties(): ReadonlySet<string> {
+    return new Set();
   }
 }
 

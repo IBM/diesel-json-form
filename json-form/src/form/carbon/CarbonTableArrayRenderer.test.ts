@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
   CarbonTableArrayRenderer,
-  defaultSchemaService,
   emptyMetadata,
   JsonForm,
   JsPath,
@@ -287,7 +286,7 @@ describe('CarbonTableArrayRenderer', () => {
     );
 
     const form = document.createElement(JsonForm.TAG_NAME) as JsonForm;
-    form.initialize(renderer, defaultSchemaService, schema, data);
+    form.initialize(renderer, form.getSchemaService(), schema, data);
     document.body.append(form);
     await waitALittle();
 

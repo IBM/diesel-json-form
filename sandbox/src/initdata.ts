@@ -41,15 +41,14 @@ const Sample_ObjectArray = `{
 }`;
 
 const Sample_BeanContainingOtherBean = `{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "http://schema.BeanWithBean",
   "type": "object",
   "properties": {
     "customer": {
-      "$ref": "#/definitions/schema.Customer"
+      "$ref": "#/$defs/schema.Customer"
     }
   },
-  "definitions": {
+  "$defs": {
     "schema.Customer": {
       "type": "object",
       "properties": {

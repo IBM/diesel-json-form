@@ -6,7 +6,7 @@
   "type": "module",
   "module": "dist/index.js",
   "dependencies": {
-    "@diesel-parser/json-schema-facade-ts": "^0.17.0",
+    "@diesel-parser/json-schema-facade-ts": "^0.17.1",
     "i18next": "^20.6.1"
   },
   "peerDependencies": {
