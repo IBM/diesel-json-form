@@ -25,6 +25,7 @@ import {
   jvNull,
   jvNumber,
   jvObject,
+  JvString,
   jvString,
 } from './JsonValue';
 import {
@@ -139,7 +140,7 @@ export function createTypesMenu(
               return buildChangeTypeItem(jvObject());
             case 'jv-string':
               return buildChangeTypeItem(
-                proposals.find((p) => p.tag === 'jv-string') ?? jvString(''),
+                jvString((proposals.at(0) as JvString)?.value ?? ''),
               );
           }
         })
