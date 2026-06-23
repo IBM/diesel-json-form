@@ -25,6 +25,7 @@ import {
   jvNull,
   jvNumber,
   jvObject,
+  JvString,
   jvString,
 } from './JsonValue';
 import {
@@ -138,7 +139,9 @@ export function createTypesMenu(
             case 'jv-object':
               return buildChangeTypeItem(jvObject());
             case 'jv-string':
-              return buildChangeTypeItem(jvString(''));
+              return buildChangeTypeItem(
+                jvString((proposals.at(0) as JvString)?.value ?? ''),
+              );
           }
         })
     );
