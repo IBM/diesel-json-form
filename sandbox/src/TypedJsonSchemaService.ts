@@ -5,14 +5,12 @@ import {
   jvNull,
   parseJsonValue,
   stringify,
-} from '@diesel-parser/json-form/src/JsonValue';
-import { JsPath } from '@diesel-parser/json-form/src/JsPath';
-import {
   SchemaRenderer,
   SchemaService,
   ValidationError,
   ValidationResult,
-} from '@diesel-parser/json-form/src/SchemaService';
+  JsPath,
+} from '@diesel-parser/json-form';
 
 export class TypedJsonSchemaService implements SchemaService {
   static async load(

@@ -1,11 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { TypedJsonSchemaService } from './TypedJsonSchemaService';
 import { readFileSync } from 'fs';
-import {
-  parseJsonValue,
-  stringify,
-} from '@diesel-parser/json-form/src/JsonValue';
-import { JsPath } from '@diesel-parser/json-form/src/JsPath';
+import { parseJsonValue, stringify, JsPath } from '@diesel-parser/json-form';
 
 describe('TypedJsonSchemaService', async () => {
   const service = await TypedJsonSchemaService.load(
