@@ -6,6 +6,7 @@ import { JsonValue, stringify } from '../JsonValue.js';
 import { SchemaRenderer } from '../SchemaService.js';
 import { Metadata } from '../Metadata.js';
 import { JsPath } from '../JsPath.js';
+import { HeaderElement } from './HeaderElement.js';
 
 export interface RenderArgs {
   readonly value: JsonValue;
@@ -24,6 +25,7 @@ export class Renderer {
   private readonly formatRenderers: Map<string, FormatCtor> = new Map();
   private readonly defaultRenderers: Map<JsonValue['tag'], DefaultCtor> =
     new Map();
+  private headerElement?: () => HeaderElement;
 
   addCustomRenderer(
     customKey: string,
@@ -42,6 +44,10 @@ export class Renderer {
 
   setStringComboRenderer(r: DefaultCtor) {
     this.comboRenderer = r;
+  }
+
+  setHeaderElement(f: () => HeaderElement) {
+    this.headerElement = f;
   }
 
   private createCustom(
@@ -104,6 +110,13 @@ export class Renderer {
     e.rendererKey = key;
     e.initialize(args.value, args.metadata, args.path, this);
     return e;
+  }
+
+  createHeaderElement(): HeaderElement {
+    if (this.headerElement) {
+      return this.headerElement();
+    }
+    throw new Error("HeaderElement isn't configured");
   }
 
   private create(

@@ -13,9 +13,10 @@ import {
 import { T_FUNCTION } from '../../JsonFormMessages.js';
 import { JsPath } from '../../JsPath.js';
 import { getAddFunction } from '../AppendElement.js';
+import { HeaderElement } from '../HeaderElement.js';
 
-export class FormHeaderElement extends HTMLElement {
-  static TAG_NAME = 'json-form-header';
+export class CarbonFormHeaderElement extends HeaderElement {
+  static TAG_NAME = 'carbon-json-form-header';
 
   private static MENU_COUNTER = 0;
   private menuButton: CDSButton;
@@ -71,9 +72,9 @@ export class FormHeaderElement extends HTMLElement {
   }
 
   private async triggerMenu() {
-    FormHeaderElement.MENU_COUNTER++;
+    CarbonFormHeaderElement.MENU_COUNTER++;
     const form = this.findEnclosingForm();
-    const counter = FormHeaderElement.MENU_COUNTER;
+    const counter = CarbonFormHeaderElement.MENU_COUNTER;
     const schema = form.schema;
     const value = form.toValue();
     const items = schema
@@ -103,10 +104,13 @@ export class FormHeaderElement extends HTMLElement {
           },
         )
       : [];
-    if (items.length > 0 && FormHeaderElement.MENU_COUNTER === counter) {
+    if (items.length > 0 && CarbonFormHeaderElement.MENU_COUNTER === counter) {
       openMenu(items, this.menuButton);
     }
   }
 }
 
-customElements.define(FormHeaderElement.TAG_NAME, FormHeaderElement);
+customElements.define(
+  CarbonFormHeaderElement.TAG_NAME,
+  CarbonFormHeaderElement,
+);

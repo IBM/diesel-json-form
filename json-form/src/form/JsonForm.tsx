@@ -1,6 +1,5 @@
 import { just, map2, nothing } from 'tea-cup-fp';
 import { Renderer } from './Renderer.js';
-import { FormHeaderElement } from './carbon/FormHeaderElement.js';
 import { findParent } from './findParent.js';
 import { RenderedElement } from './RenderedElement.js';
 import { ArrayElement } from './ArrayElement.js';
@@ -13,6 +12,7 @@ import { renderNewOrSetMetadata } from '../renderNewOrSetMetadata.js';
 import { h } from '../MyJSXFactory.js';
 import { empty } from './HtmlBuilder.js';
 import { getAddFunction } from './AppendElement.js';
+import { HeaderElement } from './HeaderElement.js';
 
 declare global {
   interface GlobalEventHandlersEventMap {
@@ -28,7 +28,10 @@ export type JsonChangedEvent = TypedEvent<JsonForm, JsonValue>;
 export class JsonForm extends HTMLElement {
   static TAG_NAME = 'json-form';
 
-  private headerElement: FormHeaderElement;
+  private headerContainer: HTMLElement = (
+    <div className="json-form-header-container"></div>
+  );
+  private headerElement?: HeaderElement;
   private scrollPane: HTMLElement = (<div className="json-form-scrollpane" />);
   private element?: RenderedElement<JsonValue>;
   private VALIDATION_COUNTER = 0;
@@ -38,14 +41,13 @@ export class JsonForm extends HTMLElement {
 
   constructor() {
     super();
-    this.headerElement = new FormHeaderElement();
   }
 
   connectedCallback() {
     if (this.hideHeader) {
-      this.headerElement.style.display = 'none';
+      this.headerContainer.style.display = 'none';
     }
-    this.appendChild(this.headerElement);
+    this.appendChild(this.headerContainer);
     this.appendChild(
       <div className="json-form-scrollpane-wrapper">{this.scrollPane}</div>,
     );
@@ -66,6 +68,9 @@ export class JsonForm extends HTMLElement {
       this.element.remove();
       delete this.element;
     }
+    empty(this.headerContainer);
+    const header = renderer.createHeaderElement();
+    this.headerContainer.appendChild(header);
     this._schema = schema;
     this._schemaService = schemaService;
     this.doValidate(value)
@@ -91,7 +96,7 @@ export class JsonForm extends HTMLElement {
       this.element instanceof ArrayElement
         ? this.element.toValue().elems.length
         : undefined;
-    this.headerElement.setCounter(nbElems);
+    this.headerElement?.setCounter(nbElems);
   }
 
   private doValidate(value: JsonValue): Promise<Metadata | undefined> {
@@ -209,10 +214,10 @@ export class JsonForm extends HTMLElement {
   set hideHeader(hide: boolean) {
     if (hide) {
       this.setAttribute('hide-header', '');
-      this.headerElement.style.display = 'none';
+      this.headerContainer.style.display = 'none';
     } else {
       this.removeAttribute('hide-header');
-      this.headerElement.style.display = 'flex';
+      this.headerContainer.style.display = 'block';
     }
   }
 

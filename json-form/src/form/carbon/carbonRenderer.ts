@@ -1,6 +1,7 @@
 import { Renderer } from '../Renderer.js';
 import { CarbonArrayElement } from './CarbonArrayElem.js';
 import { CarbonBooleanElement } from './CarbonBooleanElem.js';
+import { CarbonFormHeaderElement } from './CarbonFormHeaderElement.js';
 import { CarbonNullElement } from './CarbonNullElem.js';
 import { CarbonNumberElement } from './CarbonNumberElem.js';
 import { CarbonObjectElement } from './CarbonObjectElem.js';
@@ -12,6 +13,14 @@ import { CarbonStringElemTextarea } from './CarbonStringElemTextarea.js';
 import { CarbonStringElemTime } from './CarbonStringElemTime.js';
 
 export function carbonRenderer(renderer: Renderer): Renderer {
+  // header
+  renderer.setHeaderElement(
+    () =>
+      document.createElement(
+        CarbonFormHeaderElement.TAG_NAME,
+      ) as CarbonFormHeaderElement,
+  );
+
   // default
   renderer.addDefaultRenderer('jv-null', () => {
     return document.createElement(
