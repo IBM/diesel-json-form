@@ -35,5 +35,6 @@ export * from './form/ObjectElement.js';
 export * from './form/RenderedElement.js';
 export * from './form/StringElement.js';
 export * from './form/Renderer.js';
+export * from './form/carbon/carbonRenderer.js';
 export * from './form/carbon/CarbonTableArrayRenderer.js';
 export * from './form/carbon/CarbonGridObjectRenderer.js';

@@ -1,22 +1,11 @@
 import { stringArrayEquals } from './stringArrayEquals.js';
 import { map2 } from 'tea-cup-fp';
-import { CarbonStringElemBasic } from './carbon/CarbonStringElemBasic.js';
-import { CarbonNullElement } from './carbon/CarbonNullElem.js';
-import { CarbonBooleanElement } from './carbon/CarbonBooleanElem.js';
-import { CarbonNumberElement } from './carbon/CarbonNumberElem.js';
-import { CarbonArrayElement } from './carbon/CarbonArrayElem.js';
-import { CarbonObjectElement } from './carbon/CarbonObjectElem.js';
 import { StringElement } from './StringElement.js';
-import { CarbonStringElemDate } from './carbon/CarbonStringElemDate.js';
-import { CarbonStringElemTime } from './carbon/CarbonStringElemTime.js';
-import { CarbonStringElemDateTime } from './carbon/CarbonStringElemDateTime.js';
-import { CarbonStringElemCombo } from './carbon/CarbonStringElemCombo.js';
 import { RenderedElement } from './RenderedElement.js';
 import { JsonValue, stringify } from '../JsonValue.js';
 import { SchemaRenderer } from '../SchemaService.js';
 import { Metadata } from '../Metadata.js';
 import { JsPath } from '../JsPath.js';
-import { CarbonStringElemTextarea } from './carbon/CarbonStringElemTextarea.js';
 
 export interface RenderArgs {
   readonly value: JsonValue;
@@ -27,48 +16,32 @@ export interface RenderArgs {
 type CustomRendererCtor = (s: SchemaRenderer) => RenderedElement<JsonValue>;
 
 type FormatCtor = () => StringElement;
+type DefaultCtor = () => RenderedElement<JsonValue>;
 
 export class Renderer {
-  private readonly customRenderers: Map<string, CustomRendererCtor> = new Map<
-    string,
-    CustomRendererCtor
-  >([
-    [
-      'string-cds-textarea',
-      (schemaRenderer) => CarbonStringElemTextarea.newInstance(schemaRenderer),
-    ],
-    [
-      'string-cds-text-input',
-      (schemaRenderer) => CarbonStringElemBasic.newInstance(schemaRenderer),
-    ],
-    [
-      'number-cds-text-input',
-      (schemaRenderer) => CarbonNumberElement.newInstance(schemaRenderer),
-    ],
-    [
-      'boolean-cds-checkbox',
-      (schemaRenderer) => CarbonBooleanElement.newInstance(schemaRenderer),
-    ],
-    [
-      'null-cds-text-input',
-      (schemaRenderer) => CarbonNullElement.newInstance(schemaRenderer),
-    ],
-  ]);
-
-  private readonly formatRenderers: Map<string, FormatCtor> = new Map<
-    string,
-    FormatCtor
-  >([
-    ['date', () => new CarbonStringElemDate()],
-    ['time', () => new CarbonStringElemTime()],
-    ['date-time', () => new CarbonStringElemDateTime()],
-  ]);
+  private comboRenderer?: DefaultCtor;
+  private readonly customRenderers: Map<string, CustomRendererCtor> = new Map();
+  private readonly formatRenderers: Map<string, FormatCtor> = new Map();
+  private readonly defaultRenderers: Map<JsonValue['tag'], DefaultCtor> =
+    new Map();
 
   addCustomRenderer(
     customKey: string,
     f: (s: SchemaRenderer) => RenderedElement<JsonValue>,
   ) {
     this.customRenderers.set(customKey, f);
+  }
+
+  addStringFormatRenderer(format: string, f: FormatCtor) {
+    this.formatRenderers.set(format, f);
+  }
+
+  addDefaultRenderer(tag: JsonValue['tag'], f: DefaultCtor) {
+    this.defaultRenderers.set(tag, f);
+  }
+
+  setStringComboRenderer(r: DefaultCtor) {
+    this.comboRenderer = r;
   }
 
   private createCustom(
@@ -104,46 +77,24 @@ export class Renderer {
     }
 
     const combos = metadata.comboBoxes.get(pathStr);
-    if (combos && combos.length > 0) {
-      return new CarbonStringElemCombo();
+    if (combos && combos.length > 0 && this.comboRenderer) {
+      return this.comboRenderer();
     }
 
-    return document.createElement(
-      CarbonStringElemBasic.TAG_NAME,
-    ) as CarbonStringElemBasic;
+    const r = this.defaultRenderers.get('jv-string');
+    if (r) {
+      return r();
+    }
+
+    throw new Error('no renderer found for default string');
   }
 
   private createDefault(args: RenderArgs): RenderedElement<JsonValue> {
-    switch (args.value.tag) {
-      case 'jv-null': {
-        return document.createElement(
-          CarbonNullElement.TAG_NAME,
-        ) as CarbonNullElement;
-      }
-      case 'jv-string': {
-        return this.createString(args.value.value, args);
-      }
-      case 'jv-boolean': {
-        return document.createElement(
-          CarbonBooleanElement.TAG_NAME,
-        ) as CarbonBooleanElement;
-      }
-      case 'jv-number': {
-        return document.createElement(
-          CarbonNumberElement.TAG_NAME,
-        ) as CarbonNumberElement;
-      }
-      case 'jv-array': {
-        return document.createElement(
-          CarbonArrayElement.TAG_NAME,
-        ) as CarbonArrayElement;
-      }
-      case 'jv-object': {
-        return document.createElement(
-          CarbonObjectElement.TAG_NAME,
-        ) as CarbonObjectElement;
-      }
+    const ctor = this.defaultRenderers.get(args.value.tag);
+    if (!ctor) {
+      throw new Error('no renderer found for type ' + args.value.tag);
     }
+    return ctor();
   }
 
   render(args: RenderArgs): RenderedElement<JsonValue> {

@@ -34,6 +34,7 @@ import {
   CarbonTableArrayRenderer,
   Renderer,
   CarbonGridObjectRenderer,
+  carbonRenderer,
 } from '@diesel-parser/json-form';
 
 import '@carbon/web-components/es/index.js';
@@ -47,8 +48,6 @@ import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/r
 import { h } from './MyJSXFactory';
 import { version } from '@diesel-parser/json-form/package.json';
 import { TypedJsonSchemaService } from './TypedJsonSchemaService';
-
-// import wasmUrl from './dist/typedJson.wasm?url';
 
 const about = document.getElementById('about');
 if (about) {
@@ -82,37 +81,10 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 const initialSchema = `{}`;
-//   "type": [
-//     "array", "null"
-//   ],
-//   "items": {
-//     "type": [ "object", "null" ],
-//     "properties": {
-//       "foo": { "type": "number" },
-//       "bar": { "type": "boolean" }
-//     }
-//   }
-// }`;
 
 const schema = parseJsonValueUnsafe(initialSchema);
 
 const initialValue = `{}`;
-//   "firstName": "",
-//   "lastName": "",
-//   "category": "SILVER",
-//   "lastOrders": [
-//     {
-//       "productId": "ABC",
-//       "amount": 12,
-//       "quantity": 13
-//     },
-//     {
-//       "productId": "DEF",
-//       "amount": 111,
-//       "quantity": 222
-//     }
-//   ]
-// }`;
 
 const value = parseJsonValueUnsafe(initialValue);
 
@@ -297,6 +269,7 @@ class MyStringRenderer extends StringElement {
 customElements.define(MyStringRenderer.TAG_NAME, MyStringRenderer);
 
 const renderer: Renderer = new Renderer();
+carbonRenderer(renderer);
 
 renderer.addCustomRenderer('RatingRenderer', () => {
   return new RatingRenderer();
