@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
+  carbonRenderer,
   CarbonTableArrayRenderer,
   emptyMetadata,
   JsonForm,
@@ -11,7 +12,7 @@ import {
 
 describe('CarbonTableArrayRenderer', () => {
   const myKey = 'MyTableArray';
-  const renderer = new Renderer();
+  const renderer = carbonRenderer(new Renderer());
   renderer.addCustomRenderer(myKey, CarbonTableArrayRenderer.newInstance);
 
   const metadata: Metadata = {

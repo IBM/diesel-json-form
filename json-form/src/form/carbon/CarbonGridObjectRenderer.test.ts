@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import {
   CarbonGridObjectRenderer,
+  carbonRenderer,
   emptyMetadata,
   JsPath,
   Metadata,
@@ -10,7 +11,7 @@ import {
 
 describe('CarbonGridObjectRenderer', () => {
   const myKey = 'MyGridObject';
-  const renderer = new Renderer();
+  const renderer = carbonRenderer(new Renderer());
   renderer.addCustomRenderer(myKey, CarbonGridObjectRenderer.newInstance);
 
   const metadata: Metadata = {

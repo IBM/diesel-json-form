@@ -1,6 +1,7 @@
 // import { JsonForm } from '../JsonForm';
 import { describe, expect, test } from 'vitest';
 import {
+  carbonRenderer,
   emptyMetadata,
   JsPath,
   jvArray,
@@ -14,7 +15,7 @@ import {
 import { CarbonNullElement } from './CarbonNullElem.js';
 
 describe('Carbon default elements', () => {
-  const renderer = new Renderer();
+  const renderer = carbonRenderer(new Renderer());
   describe('CarbonNullElem', () => {
     test('empty element', () => {
       const e = document.createElement(
@@ -81,7 +82,6 @@ describe('Carbon default elements', () => {
     `);
   });
   test('rendered boolean', () => {
-    const renderer = new Renderer();
     const e = renderer.render({
       value: jvBool(true),
       metadata: emptyMetadata,
@@ -281,6 +281,7 @@ describe('Carbon default elements', () => {
             >
               <div
                 class="btn-container"
+                style="display: block;"
               >
                 <cds-button
                   kind="ghost"
