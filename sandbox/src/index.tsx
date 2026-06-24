@@ -62,6 +62,12 @@ cbStrictMode.addEventListener('cds-checkbox-changed', () => {
   jsonForm.strictMode = cbStrictMode.checked;
 });
 
+const cbHideHeader = document.getElementById('cb-hide-header') as CDSCheckbox;
+cbHideHeader.checked = jsonForm.hideHeader;
+cbHideHeader.addEventListener('cds-checkbox-changed', () => {
+  jsonForm.hideHeader = cbHideHeader.checked;
+});
+
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
 ) as CDSComboBox;
@@ -148,7 +154,7 @@ const btnFromSchema = document.getElementById(
 function toFormClicked() {
   const value = parseJsonValueUnsafe(taJson.value);
   const schema = parseJsonValueUnsafe(taSchema.value);
-  jsonForm.initialize(renderer, jsonForm.getSchemaService(), schema, value);
+  jsonForm.initialize(renderer, jsonForm.schemaService, schema, value);
 }
 
 btnToForm.addEventListener('click', toFormClicked);
@@ -309,7 +315,7 @@ sampleSchemaSelect.addEventListener('cds-dropdown-selected', () => {
   const value = jsonForm.toValue();
   parseJsonValue(taSchema.value).match(
     (schema) =>
-      jsonForm.initialize(renderer, jsonForm.getSchemaService(), schema, value),
+      jsonForm.initialize(renderer, jsonForm.schemaService, schema, value),
     (err) => console.error(err),
   );
 });
@@ -321,12 +327,12 @@ schemaSelect.addEventListener('cds-dropdown-selected', () => {
     case 'typed-json': {
       //   console.log('wasm', wasmUrl);
       TypedJsonSchemaService.load('typedJson.wasm').then((s) => {
-        jsonForm.setSchemaService(s);
+        jsonForm.schemaService = s;
       });
       break;
     }
     default: {
-      jsonForm.setSchemaService(defaultSchemaService);
+      jsonForm.schemaService = defaultSchemaService;
       break;
     }
   }

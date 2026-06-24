@@ -42,6 +42,9 @@ export class JsonForm extends HTMLElement {
   }
 
   connectedCallback() {
+    if (this.hideHeader) {
+      this.headerElement.style.display = 'none';
+    }
     this.appendChild(this.headerElement);
     this.appendChild(
       <div className="json-form-scrollpane-wrapper">{this.scrollPane}</div>,
@@ -197,6 +200,20 @@ export class JsonForm extends HTMLElement {
       throw new Error('no renderer available');
     }
     return this._renderer;
+  }
+
+  get hideHeader() {
+    return this.hasAttribute('hide-header');
+  }
+
+  set hideHeader(hide: boolean) {
+    if (hide) {
+      this.setAttribute('hide-header', '');
+      this.headerElement.style.display = 'none';
+    } else {
+      this.removeAttribute('hide-header');
+      this.headerElement.style.display = 'flex';
+    }
   }
 
   addPropertyOrElement() {
