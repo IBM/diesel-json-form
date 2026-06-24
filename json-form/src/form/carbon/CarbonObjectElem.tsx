@@ -79,6 +79,7 @@ export class CarbonObjectElement extends ObjectElement {
     section.setAttribute(CarbonObjectElement.ATTR_PROP_NAME, name);
     section.setContent(elem);
     section.setMenuItems(() => this.createMenuItems(section));
+    section.expandable = this.expandable;
     this.sectionElem.appendSection(section);
   }
 
@@ -92,6 +93,19 @@ export class CarbonObjectElement extends ObjectElement {
         return [];
       }
     });
+  }
+
+  get expandable(): boolean {
+    return this.getAttribute('expandable') !== 'false';
+  }
+
+  set expandable(expandable: boolean) {
+    if (expandable) {
+      this.removeAttribute('expandable');
+    } else {
+      this.setAttribute('expandable', 'false');
+    }
+    this.sectionElem.findSections().forEach((s) => (s.expandable = expandable));
   }
 
   toValue(): JvObject {

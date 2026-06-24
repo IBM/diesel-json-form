@@ -15,6 +15,9 @@ import { JsonValue } from '../../JsonValue.js';
 export class CarbonCollapsibleSection extends HTMLElement {
   static TAG_NAME = 'collapsible-section';
 
+  private expandCollapseButtonContainer = (
+    <div className="btn-container"></div>
+  );
   private expandCollapseButton: CDSButton;
   private contentContainer: HTMLElement;
   private labelElement: HTMLElement;
@@ -58,6 +61,7 @@ export class CarbonCollapsibleSection extends HTMLElement {
     );
 
     IconElement.addToButton(this.expandCollapseButton, 'chevron-up');
+    this.expandCollapseButtonContainer.appendChild(this.expandCollapseButton);
 
     this.menuButton = CarbonCollapsibleSection.createMenuButton();
     this.menuButton.addEventListener('click', () => {
@@ -83,7 +87,7 @@ export class CarbonCollapsibleSection extends HTMLElement {
   connectedCallback() {
     this.appendChild(
       <>
-        <div className="btn-container">{this.expandCollapseButton}</div>
+        {this.expandCollapseButtonContainer}
         <div className="right-pane">
           <div className="label-row">
             <div className="label-container">{this.labelElement}</div>
@@ -151,6 +155,20 @@ export class CarbonCollapsibleSection extends HTMLElement {
 
   setMenuItems(f: () => Promise<MenuItem[]>): void {
     this.menu = f;
+  }
+
+  get expandable(): boolean {
+    return this.getAttribute('expandable') !== 'false';
+  }
+
+  set expandable(expandable: boolean) {
+    if (expandable) {
+      this.removeAttribute('expandable');
+      this.expandCollapseButtonContainer.style.display = 'block';
+    } else {
+      this.setAttribute('expandable', 'false');
+      this.expandCollapseButtonContainer.style.display = 'none';
+    }
   }
 }
 
