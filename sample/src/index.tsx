@@ -24,16 +24,13 @@ import {
 } from '@diesel-parser/json-form';
 
 import '@carbon/web-components/es/index.js';
+import { issueTrackerJson, IssueTrackerSchema } from './issuetracker_sample';
 
 const jsonForm = document.getElementById('json-form') as JsonForm;
 
-const initialSchema = `{}`;
+const schema = parseJsonValueUnsafe(IssueTrackerSchema);
 
-const schema = parseJsonValueUnsafe(initialSchema);
-
-const initialValue = `{}`;
-
-const value = parseJsonValueUnsafe(initialValue);
+const value = parseJsonValueUnsafe(issueTrackerJson);
 
 const renderer: Renderer = new Renderer();
 
