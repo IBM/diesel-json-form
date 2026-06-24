@@ -68,13 +68,11 @@ public class FJsonForm extends AbstractPageObject {
     public FMenu clickRootMenu() {
         Retry.retry()
                 .add(() -> {
-                    $$("json-form-header cds-button").expectOne().click();
+                    $$("carbon-json-form-header cds-button").expectOne().click();
                 })
-                .add(() ->
-                    fRoot.$$("cds-menu")
-                            .where(isDisplayed())
-                            .count(1)
-                )
+                .add(() -> fRoot.$$("cds-menu")
+                        .where(isDisplayed())
+                        .count(1))
                 .eval();
 
         return new FMenu(fRoot);

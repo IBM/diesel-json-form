@@ -66,10 +66,7 @@ export class Renderer {
     }
   }
 
-  private createString(
-    value: string,
-    args: RenderArgs,
-  ): RenderedElement<JsonValue> {
+  private createString(args: RenderArgs): RenderedElement<JsonValue> {
     const { path, metadata } = args;
     const pathStr = path.format();
 
@@ -87,11 +84,7 @@ export class Renderer {
       return this.comboRenderer();
     }
 
-    const r = this.defaultRenderers.get('jv-string');
-    if (r) {
-      return r();
-    }
-
+    return this.createDefault(args);
     throw new Error('no renderer found for default string');
   }
 
@@ -133,7 +126,7 @@ export class Renderer {
       }
     } else if (key instanceof StringRendererKey) {
       if (args.value.tag === 'jv-string') {
-        return this.createString(args.value.value, args);
+        return this.createString(args);
       } else {
         throw "key and type don't match " + key + ', ' + args.value.tag;
       }
@@ -163,13 +156,19 @@ class DefaultRendererKey extends RendererKey {
 }
 
 class StringRendererKey extends RendererKey {
-  constructor(readonly formats: readonly string[]) {
+  constructor(
+    readonly formats: readonly string[],
+    readonly combos: readonly string[],
+  ) {
     super();
   }
 
   equals(other: RendererKey): boolean {
     if (other instanceof StringRendererKey) {
-      return stringArrayEquals(this.formats, other.formats);
+      return (
+        stringArrayEquals(this.formats, other.formats) &&
+        stringArrayEquals(this.combos, other.combos)
+      );
     } else {
       return false;
     }
@@ -203,10 +202,9 @@ export function getRendererKey(
     return new CustomRendererKey(customRenderer);
   }
   if (type === 'jv-string') {
-    const formats = metadata.formats.get(pathStr);
-    if (formats !== undefined) {
-      return new StringRendererKey(formats);
-    }
+    const formats = metadata.formats.get(pathStr) ?? [];
+    const combos = metadata.comboBoxes.get(pathStr) ?? [];
+    return new StringRendererKey(formats, combos);
   }
   return new DefaultRendererKey(type);
 }
