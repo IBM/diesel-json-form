@@ -35,16 +35,12 @@ import {
   Renderer,
   CarbonGridObjectRenderer,
   carbonRenderer,
+  IconElement,
 } from '@diesel-parser/json-form';
 
 import '@carbon/web-components/es/index.js';
 
-import {
-  CDSCheckbox,
-  CDSComboBox,
-  CDSRadioButton,
-} from '@carbon/web-components/es';
-import { RADIO_BUTTON_ORIENTATION } from '@carbon/web-components/es/components/radio-button/radio-button-group.js';
+import { CDSCheckbox, CDSComboBox } from '@carbon/web-components/es';
 import { h } from './MyJSXFactory';
 import { version } from '@diesel-parser/json-form/package.json';
 import { TypedJsonSchemaService } from './TypedJsonSchemaService';
@@ -140,57 +136,83 @@ btnFromForm.addEventListener('click', () => {
   taJson.value = valueStr;
 });
 
+class StarElement extends HTMLElement {
+  static TAG_NAME = 'star-element';
+
+  private _checked: boolean = false;
+  private _onClick?: () => void;
+
+  constructor() {
+    super();
+  }
+
+  set checked(checked: boolean) {
+    empty(this);
+    this._checked = checked;
+    const icon = IconElement.newInstance(checked ? 'star--filled32' : 'star32');
+    this.appendChild(icon);
+    icon.addEventListener('click', () => {
+      this._onClick?.();
+    });
+  }
+
+  get checked(): boolean {
+    return this._checked;
+  }
+
+  set onClick(f: () => void) {
+    this._onClick = f;
+  }
+}
+
+customElements.define(StarElement.TAG_NAME, StarElement);
+
 class RatingRenderer extends NumberElement {
   static TAG_NAME = 'my-rating-renderer';
 
-  private static COUNTER = 0;
-
-  private radio: CDSRadioButton = RatingRenderer.createRadio();
-  private value?: string;
-
-  private static createRadio(): CDSRadioButton {
-    RatingRenderer.COUNTER++;
-    const name = 'json-rating-radio-' + RatingRenderer.COUNTER;
-    return (
-      <cds-radio-button-group
-        orientation={RADIO_BUTTON_ORIENTATION.HORIZONTAL}
-        name={name}
-      >
-        <cds-radio-button value={'0'} label-text={'1'}></cds-radio-button>
-        <cds-radio-button value={'1'} label-text={'2'}></cds-radio-button>
-        <cds-radio-button value={'2'} label-text={'3'}></cds-radio-button>
-        <cds-radio-button value={'3'} label-text={'4'}></cds-radio-button>
-        <cds-radio-button value={'4'} label-text={'5'}></cds-radio-button>
-      </cds-radio-button-group>
-    );
-  }
+  private readonly stars: readonly StarElement[] = [
+    new StarElement(),
+    new StarElement(),
+    new StarElement(),
+    new StarElement(),
+    new StarElement(),
+  ];
 
   constructor() {
     super();
   }
 
   connectedCallback() {
-    this.appendChild(this.radio);
+    this.stars.forEach((s) => {
+      this.appendChild(s);
+      s.onClick = () => {
+        const i = this.stars.indexOf(s) + 1;
+        this.setValue(i);
+      };
+    });
   }
 
   disconnectedCallback() {
-    this.radio.remove();
+    empty(this);
   }
 
   getNumValue(): string {
-    return this.value ?? this.radio.value;
+    return '' + this.stars.filter((s) => s.checked).length;
+  }
+
+  private setValue(v: number) {
+    for (let i = 0; i < this.stars.length; i++) {
+      this.stars[i].checked = i < v;
+    }
+    this.setAttribute('rating', v + '');
   }
 
   initialize(value: JvNumber): void {
-    this.value = value.value;
-    this.radio.value = value.value;
-    this.radio.addEventListener('cds-radio-button-changed', () => {
-      const newValue = this.radio.value;
-      if (newValue !== this.value) {
-        this.value = newValue;
-        this.parentForm.onChange();
-      }
-    });
+    let intVal = parseInt(value.value);
+    if (isNaN(intVal)) {
+      intVal = 0;
+    }
+    this.setValue(intVal);
   }
 
   setMetadata(): void {

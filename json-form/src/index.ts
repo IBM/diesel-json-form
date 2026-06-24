@@ -38,3 +38,4 @@ export * from './form/Renderer.js';
 export * from './form/carbon/carbonRenderer.js';
 export * from './form/carbon/CarbonTableArrayRenderer.js';
 export * from './form/carbon/CarbonGridObjectRenderer.js';
+export * from './form/carbon/IconElement.js';

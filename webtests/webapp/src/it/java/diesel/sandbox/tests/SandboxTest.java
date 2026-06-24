@@ -724,19 +724,15 @@ public class SandboxTest extends TestBase {
 
         FRating rating = new FRating(FJsonForm.findByPath(findr(), JsPath.empty.append("rating")));
         rating
-                .assertRating(1)
+                .assertRating(0)
                 .clickRating(3)
                 .assertRating(3);
         sandbox.clickApplyFromForm();
 
         sandbox.jsonEditor.assertText("{\n" + //
                 "  \"name\": \"\",\n" + //
-                "  \"rating\": 2\n" + //
+                "  \"rating\": 3\n" + //
                 "}");
-    }
-
-    private Findr.ListFindr findRatings() {
-        return $$(".rating .rating-item");
     }
 
     @Test

@@ -11,15 +11,13 @@ public class FRating extends FRenderedElement {
     }
 
     public FRating assertRating(int expected) {
-        $$("cds-radio-button")
-                .at(expected - 1)
-                .where(attrEquals("checked", "true"))
-                .eval();
+        getFindr().where(attrEquals("rating", expected + "")).eval();
+        ;
         return this;
     }
 
     public FRating clickRating(int rating) {
-        $$("cds-radio-button")
+        $$("star-element icon-elem")
                 .at(rating - 1)
                 .click();
         return this;

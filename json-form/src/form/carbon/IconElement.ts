@@ -34,6 +34,10 @@ import StringInteger from '@carbon/icons/es/string-integer/16.js';
 import DecisionTree from '@carbon/icons/es/decision-tree/16.js';
 // @ts-ignore
 import StringText from '@carbon/icons/es/string-text/16.js';
+// @ts-ignore
+import Star32 from '@carbon/icons/es/star/32.js';
+// @ts-ignore
+import StarFilled32 from '@carbon/icons/es/star--filled/32.js';
 
 import { getAttributes, toSVG } from '@carbon/icon-helpers';
 import { CDSButton } from '@carbon/web-components/es';
@@ -60,6 +64,8 @@ export class IconElement extends HTMLElement {
     'string-integer': StringInteger,
     'decision-tree': DecisionTree,
     'string-text': StringText,
+    star32: Star32,
+    'star--filled32': StarFilled32,
   };
 
   static newInstance(iconName: string): IconElement {
