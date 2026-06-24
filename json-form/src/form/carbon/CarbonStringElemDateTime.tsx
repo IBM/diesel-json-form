@@ -3,7 +3,6 @@ import { MyDatePicker } from './MyDatePicker.js';
 import { MyTimePicker } from './MyTimePicker.js';
 import { h } from '../../MyJSXFactory.js';
 import { MyDateTime } from './MyDateTime.js';
-import { JsonForm } from '../JsonForm.js';
 import { JvString } from '../../JsonValue.js';
 import { Metadata } from '../../Metadata.js';
 import { JsPath } from '../../JsPath.js';
@@ -40,10 +39,10 @@ export class CarbonStringElemDateTime extends StringElement {
     this.datePicker.setValue(dt.date);
     this.timePicker.setValue(dt.time.fullTime);
     this.datePicker.setOnChange(() => {
-      JsonForm.getEnclosingForm(this).onChange();
+      this.parentForm.onChange();
     });
     this.timePicker.setOnChange(() => {
-      JsonForm.getEnclosingForm(this).onChange();
+      this.parentForm.onChange();
     });
     this.setMetadata(metadata, path);
   }

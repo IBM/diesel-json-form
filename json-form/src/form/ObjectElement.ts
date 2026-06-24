@@ -33,7 +33,7 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
     appender: Appender,
   ) {
     const form = this.parentForm;
-    const schema = form.getSchema();
+    const schema = form.schema;
     const root = form.toValue();
     const p = this.path;
     const thisObj = getValueAt(root, p);
@@ -50,8 +50,7 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
     const tmpObject = jvObject(newProps);
     const tmpRoot = setValueAt(root, p, tmpObject);
     const propPath = p.append(property.name);
-    form
-      .getSchemaService()
+    form.schemaService
       .propose(schema, tmpRoot, propPath)
       .then((proposals) => maybeOf(proposals[0]).withDefault(property.value))
       .then(clearPropertiesIfObject)
@@ -62,11 +61,11 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
         ]);
         const finalRoot = setValueAt(root, p, finalObject);
         return validateAndComputeMetadata(
-          form.getSchemaService(),
-          form.getSchema(),
+          form.schemaService,
+          form.schema,
           finalRoot,
         ).then((metadata) => {
-          const e = form.getRenderer().render({
+          const e = form.renderer.render({
             value: proposal,
             metadata,
             path: propPath,
@@ -88,11 +87,10 @@ export abstract class ObjectElement extends RenderedElement<JvObject> {
     const form = this.parentForm;
     const curRoot = form.toValue();
     const path = this.path;
-    const schema = form.getSchema();
+    const schema = form.schema;
     const newRoot = setValueAt(curRoot, path, newObject);
     const propPath = path.append(propertyName);
-    form
-      .getSchemaService()
+    form.schemaService
       .propose(schema, newRoot, propPath)
       .then((proposals) => {
         const propertyProposals = proposals.map(clearPropertiesIfObject);

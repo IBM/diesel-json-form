@@ -1,7 +1,6 @@
 import { CDSCheckbox } from '@carbon/web-components/es';
 import '@carbon/web-components/es/components/checkbox/checkbox.js';
 import { BooleanElement } from '../BooleanElement.js';
-import { JsonForm } from '../JsonForm.js';
 import { nextElementId } from './nextElementId.js';
 import { Metadata } from '../../Metadata.js';
 import { JsPath } from '../../JsPath.js';
@@ -47,7 +46,7 @@ export class CarbonBooleanElement extends BooleanElement {
     this.input.checked = value.value;
     this.setMetadata(metadata, path);
     this.input.addEventListener('input', () => {
-      JsonForm.getEnclosingForm(this).onChange();
+      this.parentForm.onChange();
     });
   }
 

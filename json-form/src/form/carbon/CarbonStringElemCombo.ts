@@ -3,7 +3,6 @@ import { setErrors } from './setErrorsOnInput.js';
 import { StringElement } from '../StringElement.js';
 import '@carbon/web-components/es/components/combo-box/index.js';
 import { empty } from '../HtmlBuilder.js';
-import { JsonForm } from '../JsonForm.js';
 import { nextElementId } from './nextElementId.js';
 import { JsPath } from '../../JsPath.js';
 import { Metadata } from '../../Metadata.js';
@@ -37,7 +36,7 @@ export class CarbonStringElemCombo extends StringElement {
     this.combo.value = value.value;
     this.setMetadata(metadata, path);
     this.combo.addEventListener('cds-combo-box-selected', () => {
-      JsonForm.getEnclosingForm(this).onChange();
+      this.parentForm.onChange();
     });
   }
 

@@ -3,7 +3,6 @@ import '@carbon/web-components/es/components/text-input/index.js';
 import { NumberElement } from '../NumberElement.js';
 import { Debouncer } from '../Debouncer.js';
 import { setErrors } from './setErrorsOnInput.js';
-import { JsonForm } from '../JsonForm.js';
 import { nextElementId } from './nextElementId.js';
 import { T_FUNCTION } from '../../JsonFormMessages.js';
 import { isValidNumberLiteral, JvNumber } from '../../JsonValue.js';
@@ -58,7 +57,7 @@ export class CarbonNumberElement extends NumberElement {
         }
       }
       this.debouncer.debounce(() => {
-        JsonForm.getEnclosingForm(this).onChange();
+        this.parentForm.onChange();
       });
     });
     this.setMetadata(metadata, path);

@@ -74,11 +74,11 @@ export class FormHeaderElement extends HTMLElement {
     FormHeaderElement.MENU_COUNTER++;
     const form = this.findEnclosingForm();
     const counter = FormHeaderElement.MENU_COUNTER;
-    const schema = form.getSchema();
+    const schema = form.schema;
     const value = form.toValue();
     const items = schema
       ? await createMenu(
-          form.getSchemaService(),
+          form.schemaService,
           schema,
           value,
           JsPath.empty,
@@ -90,7 +90,7 @@ export class FormHeaderElement extends HTMLElement {
             },
             proposal(path_, proposal, proposalIndex) {
               augmentProposal(
-                form.getSchemaService(),
+                form.schemaService,
                 schema,
                 value,
                 JsPath.empty,

@@ -3,7 +3,6 @@ import { Debouncer } from '../Debouncer.js';
 import { setErrors } from './setErrorsOnInput.js';
 import { StringElement } from '../StringElement.js';
 import '@carbon/web-components/es/components/text-input/index.js';
-import { JsonForm } from '../JsonForm.js';
 import { nextElementId } from './nextElementId.js';
 import { T_FUNCTION } from '../../JsonFormMessages.js';
 import { JvString } from '../../JsonValue.js';
@@ -48,7 +47,7 @@ export class CarbonStringElemBasic extends StringElement {
     this.input.value = value.value;
     this.setMetadata(metadata, path);
     this.input.addEventListener('input', () => {
-      this.debouncer.debounce(() => JsonForm.getEnclosingForm(this).onChange());
+      this.debouncer.debounce(() => this.parentForm.onChange());
     });
   }
 

@@ -34,7 +34,7 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
     clearObjectProperties: boolean,
   ): Promise<AppendItemProposal> {
     const form = this.parentForm;
-    const schema = form.getSchema();
+    const schema = form.schema;
     const root = form.toValue();
     const p = this.path;
     // const elems = this.getElements();
@@ -58,7 +58,7 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
     const tmpRoot = setValueAt(root, p, tmpArray);
     const proposals = proposeNested(
       schema,
-      form.getSchemaService(),
+      form.schemaService,
       tmpRoot,
       p.append(newElemIndex),
       2,
@@ -107,11 +107,11 @@ export abstract class ArrayElement extends RenderedElement<JvArray> {
     path: JsPath,
   ) {
     return validateAndComputeMetadata(
-      form.getSchemaService(),
-      form.getSchema(),
+      form.schemaService,
+      form.schema,
       root,
     ).then((metadata) => {
-      const e = form.getRenderer().render({ value: v, metadata, path });
+      const e = form.renderer.render({ value: v, metadata, path });
       appender(e);
       form.onChange();
     });

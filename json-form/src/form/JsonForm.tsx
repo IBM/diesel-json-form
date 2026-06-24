@@ -32,9 +32,9 @@ export class JsonForm extends HTMLElement {
   private scrollPane: HTMLElement = (<div className="json-form-scrollpane" />);
   private element?: RenderedElement<JsonValue>;
   private VALIDATION_COUNTER = 0;
-  private schemaService: SchemaService = defaultSchemaService;
-  private schema: JsonValue = jvObject();
-  private renderer: Renderer = new Renderer();
+  private _schemaService: SchemaService = defaultSchemaService;
+  private _schema: JsonValue = jvObject();
+  private _renderer: Renderer = new Renderer();
 
   constructor() {
     super();
@@ -58,13 +58,13 @@ export class JsonForm extends HTMLElement {
     schema: JsonValue,
     value: JsonValue,
   ) {
-    this.renderer = renderer;
+    this._renderer = renderer;
     if (this.element) {
       this.element.remove();
       delete this.element;
     }
-    this.schema = schema;
-    this.schemaService = schemaService;
+    this._schema = schema;
+    this._schemaService = schemaService;
     this.doValidate(value)
       .then((metadata) => {
         if (metadata) {
@@ -93,7 +93,7 @@ export class JsonForm extends HTMLElement {
 
   private doValidate(value: JsonValue): Promise<Metadata | undefined> {
     const validJson = map2(
-      stringify(this.schema),
+      stringify(this._schema),
       stringify(value),
       () => true,
     ).withDefault(false);
@@ -103,7 +103,7 @@ export class JsonForm extends HTMLElement {
       //   console.log('validate', validationCounter, value);
       const res = new Promise<Metadata | undefined>((resolve, reject) => {
         // setTimeout(() => {
-        validateAndComputeMetadata(this.schemaService, this.schema, value)
+        validateAndComputeMetadata(this._schemaService, this._schema, value)
           .then((metadata) => {
             // console.log('validated', metadata);
             if (validationCounter === this.VALIDATION_COUNTER) {
@@ -136,12 +136,12 @@ export class JsonForm extends HTMLElement {
       this.dispatchEvent(new CustomEvent('json-changed', { detail: value }));
       this.doValidate(value)
         .then((metadata) => {
-          if (metadata && this.element && this.renderer) {
+          if (metadata && this.element && this._renderer) {
             const e = renderNewOrSetMetadata(
               this.element,
               metadata,
               JsPath.empty,
-              this.renderer,
+              this._renderer,
             );
             if (e) {
               this.element.remove();
@@ -163,16 +163,16 @@ export class JsonForm extends HTMLElement {
     return this.element.toValue();
   }
 
-  getSchema(): JsonValue {
-    return this.schema;
+  get schema(): JsonValue {
+    return this._schema;
   }
 
-  getSchemaService(): SchemaService {
-    return this.schemaService;
+  get schemaService(): SchemaService {
+    return this._schemaService;
   }
 
-  setSchemaService(schemaService: SchemaService) {
-    this.schemaService = schemaService;
+  set schemaService(schemaService: SchemaService) {
+    this._schemaService = schemaService;
     this.onChange();
   }
 
@@ -192,11 +192,11 @@ export class JsonForm extends HTMLElement {
     return this.element;
   }
 
-  getRenderer(): Renderer {
-    if (!this.renderer) {
+  get renderer(): Renderer {
+    if (!this._renderer) {
       throw new Error('no renderer available');
     }
-    return this.renderer;
+    return this._renderer;
   }
 
   addPropertyOrElement() {
@@ -204,8 +204,8 @@ export class JsonForm extends HTMLElement {
   }
 
   setValue(value: JsonValue): void {
-    if (this.renderer) {
-      this.initialize(this.renderer, this.schemaService, this.schema, value);
+    if (this._renderer) {
+      this.initialize(this._renderer, this._schemaService, this._schema, value);
     } else {
       throw new Error('No renderer found');
     }

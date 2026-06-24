@@ -122,14 +122,10 @@ export class CarbonArrayElement extends ArrayElement {
       const thisPath = this.path;
       const itemPath = thisPath.append(index);
       const newRoot = setValueAt(form.toValue(), itemPath, value);
-      validateAndComputeMetadata(
-        form.getSchemaService(),
-        form.getSchema(),
-        newRoot,
-      )
+      validateAndComputeMetadata(form.schemaService, form.schema, newRoot)
         .then((metadata) => {
           if (metadata) {
-            const e = form.getRenderer().render({
+            const e = form.renderer.render({
               metadata,
               value,
               path: itemPath,
@@ -150,11 +146,11 @@ export class CarbonArrayElement extends ArrayElement {
     section: CarbonCollapsibleSection,
   ): Promise<MenuItem[]> {
     const form = this.parentForm;
-    const schema = form.getSchema();
+    const schema = form.schema;
     const path = this.path;
     const rowIndex = this.sectionElem.findSections().indexOf(section);
     return createMenu(
-      form.getSchemaService(),
+      form.schemaService,
       schema,
       form.toValue(),
       path.append(rowIndex),
@@ -184,7 +180,7 @@ export class CarbonArrayElement extends ArrayElement {
         },
         proposal: (path, proposal, proposalIndex) => {
           augmentProposal(
-            form.getSchemaService(),
+            form.schemaService,
             schema,
             form.toValue(),
             path,

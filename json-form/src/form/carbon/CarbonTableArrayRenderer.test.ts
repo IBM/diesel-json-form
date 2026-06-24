@@ -286,7 +286,7 @@ describe('CarbonTableArrayRenderer', () => {
     );
 
     const form = document.createElement(JsonForm.TAG_NAME) as JsonForm;
-    form.initialize(renderer, form.getSchemaService(), schema, data);
+    form.initialize(renderer, form.schemaService, schema, data);
     document.body.append(form);
     await waitALittle();
 

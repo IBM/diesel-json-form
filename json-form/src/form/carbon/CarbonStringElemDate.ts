@@ -1,6 +1,5 @@
 import { StringElement } from '../StringElement.js';
 import { MyDatePicker } from './MyDatePicker.js';
-import { JsonForm } from '../JsonForm.js';
 import { Metadata } from '../../Metadata.js';
 import { JvString } from '../../JsonValue.js';
 import { JsPath } from '../../JsPath.js';
@@ -28,7 +27,7 @@ export class CarbonStringElemDate extends StringElement {
     this.myPicker.setValue(value.value);
     this.myPicker.setOnChange((value) => {
       this.stringValue = value;
-      JsonForm.getEnclosingForm(this).onChange();
+      this.parentForm.onChange();
     });
     this.setMetadata(metadata, path);
   }

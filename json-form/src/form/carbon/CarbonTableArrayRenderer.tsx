@@ -175,8 +175,8 @@ export class CarbonTableArrayRenderer extends ArrayElement {
         const p = this.path;
         const finalRoot = setValueAt(root, p, jvArray(finalArray));
         return validateAndComputeMetadata(
-          form.getSchemaService(),
-          form.getSchema(),
+          form.schemaService,
+          form.schema,
           finalRoot,
         ).then((metadata) => {
           this.doAddRow(
@@ -184,7 +184,7 @@ export class CarbonTableArrayRenderer extends ArrayElement {
             newElemIndex,
             this.path,
             metadata,
-            form.getRenderer(),
+            form.renderer,
           );
         });
       },

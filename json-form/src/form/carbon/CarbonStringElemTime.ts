@@ -1,6 +1,5 @@
 import { StringElement } from '../StringElement.js';
 import { MyTimePicker } from './MyTimePicker.js';
-import { JsonForm } from '../JsonForm.js';
 import { JvString } from '../../JsonValue.js';
 import { Metadata } from '../../Metadata.js';
 import { JsPath } from '../../JsPath.js';
@@ -26,7 +25,7 @@ export class CarbonStringElemTime extends StringElement {
   initialize(value: JvString, metadata: Metadata, path: JsPath): void {
     this.myPicker.setValue(value.value);
     this.myPicker.setOnChange(() => {
-      JsonForm.getEnclosingForm(this).onChange();
+      this.parentForm.onChange();
     });
     this.setMetadata(metadata, path);
   }
