@@ -16,6 +16,7 @@
 
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
 import { JsPath } from './JsPath';
+import { just, maybeOf, nothing } from 'tea-cup-fp';
 import {
   getValueAt,
   indexOfPathInParent,
@@ -25,7 +26,6 @@ import {
   jvNull,
   jvNumber,
   jvObject,
-  JvString,
   jvString,
 } from './JsonValue';
 import {
@@ -140,7 +140,15 @@ export function createTypesMenu(
               return buildChangeTypeItem(jvObject());
             case 'jv-string':
               return buildChangeTypeItem(
-                jvString((proposals.at(0) as JvString)?.value ?? ''),
+                maybeOf(proposals[0])
+                  .andThen((p) => {
+                    if (p.tag === 'jv-string') {
+                      return just(p);
+                    } else {
+                      return nothing;
+                    }
+                  })
+                  .withDefaultSupply(() => jvString('')),
               );
           }
         })
