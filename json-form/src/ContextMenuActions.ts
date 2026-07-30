@@ -16,6 +16,7 @@
 
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
 import { JsPath } from './JsPath';
+import { just, maybeOf, nothing } from 'tea-cup-fp';
 import {
   getValueAt,
   indexOfPathInParent,
@@ -138,7 +139,17 @@ export function createTypesMenu(
             case 'jv-object':
               return buildChangeTypeItem(jvObject());
             case 'jv-string':
-              return buildChangeTypeItem(jvString(''));
+              return buildChangeTypeItem(
+                maybeOf(proposals[0])
+                  .andThen((p) => {
+                    if (p.tag === 'jv-string') {
+                      return just(p);
+                    } else {
+                      return nothing;
+                    }
+                  })
+                  .withDefaultSupply(() => jvString('')),
+              );
           }
         })
     );

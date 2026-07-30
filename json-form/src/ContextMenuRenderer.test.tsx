@@ -102,6 +102,32 @@ describe('Change type menu', () => {
       expect(typesMenu).toStrictEqual(expectedTypesMenu);
     },
   );
+
+  test(
+    '[SM: ON, P: string enum + null, V: null] ' +
+      'change-type to string uses first enum value as the proposed value',
+    () => {
+      const proposals: ReadonlyArray<JsonValue> = [
+        jvString('FOO'),
+        jvString('BAR'),
+        jvNull,
+      ];
+      const typesMenu = buildTypesMenuStrictMode(proposals, jvNull);
+      const expectedTypesMenu = buildExpectedTypesMenu([jvString('FOO')]);
+      expect(typesMenu).toStrictEqual(expectedTypesMenu);
+    },
+  );
+
+  test(
+    '[SM: ON, P: null + string enum, V: null] ' +
+      'change-type to string falls back to empty string when first proposal is not a string',
+    () => {
+      const proposals: ReadonlyArray<JsonValue> = [jvNull, jvString('FOO')];
+      const typesMenu = buildTypesMenuStrictMode(proposals, jvNull);
+      const expectedTypesMenu = buildExpectedTypesMenu([jvString('')]);
+      expect(typesMenu).toStrictEqual(expectedTypesMenu);
+    },
+  );
 });
 
 describe('menu render options', () => {
