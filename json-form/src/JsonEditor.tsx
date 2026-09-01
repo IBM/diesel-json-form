@@ -407,6 +407,10 @@ export function update(
       );
     }
     case 'got-updated-value': {
+      const pendingId = model.pendingIds.get('got-updated-value');
+      if (pendingId !== msg.id) {
+        return noOut(noCmd(model)); // stale task — discard
+      }
       return msg.r.match(
         (newRoot) => {
           const mac = setRoot(schemaService, model, newRoot);
