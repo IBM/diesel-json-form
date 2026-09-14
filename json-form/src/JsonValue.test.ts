@@ -32,9 +32,9 @@ import {
   parseJsonValue,
   setValueAt,
   stringify,
-} from './JsonValue';
+} from './JsonValue.js';
 import { just, nothing, ok } from 'tea-cup-fp';
-import { JsPath } from './JsPath';
+import { JsPath } from './JsPath.js';
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { describe, test, expect } from 'vitest';
 

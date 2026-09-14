@@ -1,10 +1,10 @@
-import { JsonValue } from '../JsonValue';
-import { Model } from '../Model';
-import { JsPath } from '../JsPath';
+import { JsonValue } from '../JsonValue.js';
+import { Model } from '../Model.js';
+import { JsPath } from '../JsPath.js';
 import { Dispatcher } from 'tea-cup-fp';
-import { Msg } from '../Msg';
-import { RendererFactory } from './Renderer';
-import { RenderOptions } from '../RenderOptions';
+import { Msg } from '../Msg.js';
+import { RendererFactory } from './Renderer.js';
+import { RenderOptions } from '../RenderOptions.js';
 
 export interface ViewValueProps<T extends JsonValue> {
   readonly model: Model;

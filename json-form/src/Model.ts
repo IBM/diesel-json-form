@@ -15,14 +15,14 @@
  */
 
 import { Maybe, nothing } from 'tea-cup-fp';
-import { getValueAt, JsonValue } from './JsonValue';
-import { JsPath } from './JsPath';
+import { getValueAt, JsonValue } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
 import * as TPM from 'tea-pop-menu';
-import { MenuAction } from './ContextMenuActions';
-import { initMyI18n } from './i18n/MyI18n';
-import { ValidationError } from './SchemaService';
-import { FormTFunction } from './FormTFunction';
-import { GotMsg } from './Msg';
+import { MenuAction } from './ContextMenuActions.js';
+import { initMyI18n } from './i18n/MyI18n.js';
+import { ValidationError } from './SchemaService.js';
+import { FormTFunction } from './FormTFunction.js';
+import { GotMsg } from './Msg.js';
 
 export interface Model {
   readonly schema: Maybe<JsonValue>;

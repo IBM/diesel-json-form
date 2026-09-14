@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { contextMenuMsg, gotUpdatedValue, Msg, noOp } from './Msg';
+import { contextMenuMsg, gotUpdatedValue, Msg, noOp } from './Msg.js';
 import { Cmd, just, noCmd, nothing, Task, Tuple } from 'tea-cup-fp';
-import { Model, nextPendingId } from './Model';
-import { JsPath } from './JsPath';
+import { Model, nextPendingId } from './Model.js';
+import { JsPath } from './JsPath.js';
 import {
   deleteValueAt,
   getValueAt,
@@ -29,14 +29,14 @@ import {
   moveElement,
   moveProperty,
   setValueAt,
-} from './JsonValue';
-import { MenuOptionFilter } from './RenderOptions';
+} from './JsonValue.js';
+import { MenuOptionFilter } from './RenderOptions.js';
 import { Box } from 'tea-pop-core';
-import { createMenu, MenuAction } from './ContextMenuActions';
+import { createMenu, MenuAction } from './ContextMenuActions.js';
 import * as TPM from 'tea-pop-menu';
-import { applyProposalTask } from './applyProposal';
-import { SchemaService } from './SchemaService';
-import { computeAllCmd } from './ComputeAllTask';
+import { applyProposalTask } from './applyProposal.js';
+import { SchemaService } from './SchemaService.js';
+import { computeAllCmd } from './ComputeAllTask.js';
 
 export function actionDeleteValue(
   schemaService: SchemaService,

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { JsPath } from './JsPath';
-import { JsonValue } from './JsonValue';
+import { JsPath } from './JsPath.js';
+import { JsonValue } from './JsonValue.js';
 import * as TPM from 'tea-pop-menu';
 import { Box } from 'tea-pop-core';
-import { MenuAction } from './ContextMenuActions';
+import { MenuAction } from './ContextMenuActions.js';
 import { Maybe, Result } from 'tea-cup-fp';
 import {
   SchemaRenderer,
   ValidationError,
   ValidationResult,
-} from './SchemaService';
+} from './SchemaService.js';
 
 export interface HasPath {
   readonly path: JsPath;

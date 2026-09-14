@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 import { render } from '@testing-library/react';
-import { JsPath } from './JsPath';
+import { JsPath } from './JsPath.js';
 import {
   MenuTrigger,
   RendererFactory,
   ViewJsonValue,
-} from './renderer/Renderer';
-import { ViewJsonEditor } from './JsonEditor';
-import { initialModel } from './Model';
+} from './renderer/Renderer.js';
+import { ViewJsonEditor } from './JsonEditor.js';
+import { initialModel } from './Model.js';
 import { nothing } from 'tea-cup-fp';
-import { jvArray, jvNull, jvObject } from './JsonValue';
-import { defaultSchemaService } from './SchemaService';
+import { jvArray, jvNull, jvObject } from './JsonValue.js';
+import { defaultSchemaService } from './SchemaService.js';
 import { describe, test, expect } from 'vitest';
 
 describe('Render options', () => {

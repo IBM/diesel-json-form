@@ -15,7 +15,7 @@
  */
 
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import { jvObject, jvString, stringify } from './JsonValue';
+import { jvObject, jvString, stringify } from './JsonValue.js';
 import { describe, test, expect } from 'vitest';
 
 describe('JsFacade', () => {
