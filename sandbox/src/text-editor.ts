@@ -32,10 +32,10 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import * as vscode from 'vscode';
 
 import * as JsonFacade from '@diesel-parser/json-schema-facade-ts';
-import { DieselMonaco } from '@diesel-parser/monaco';
 import { buildWorkerDefinition } from 'monaco-editor-workers';
 import { DieselParserFacade } from '@diesel-parser/ts-facade';
 import { initialSchema, initialValue } from './initdata';
+import { DieselMonaco } from './DieselMonaco';
 
 buildWorkerDefinition('.', new URL('', window.location.href).href, false);
 
