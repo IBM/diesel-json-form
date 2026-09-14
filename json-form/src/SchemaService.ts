@@ -15,8 +15,8 @@
  */
 
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
-import { JsonValue, parseJsonValue, stringify } from './JsonValue';
-import { JsPath } from './JsPath';
+import { JsonValue, parseJsonValue, stringify } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
 import { map2, Maybe } from 'tea-cup-fp';
 
 export interface ValidationError {

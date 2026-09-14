@@ -47,13 +47,13 @@ import {
   JvObject,
   jvString,
   JvString,
-} from '../JsonValue';
-import { JsPath } from '../JsPath';
-import { CustomRendererModel, Model as FormModel } from '../Model';
-import { Msg } from '../Msg';
-import { ViewValueProps } from './ViewValueProps';
-import { RenderOptions } from '../RenderOptions';
-import { FormTFunction } from '../FormTFunction';
+} from '../JsonValue.js';
+import { JsPath } from '../JsPath.js';
+import { CustomRendererModel, Model as FormModel } from '../Model.js';
+import { Msg } from '../Msg.js';
+import { ViewValueProps } from './ViewValueProps.js';
+import { RenderOptions } from '../RenderOptions.js';
+import { FormTFunction } from '../FormTFunction.js';
 
 export interface RendererInitArgs<Model> {
   readonly path: JsPath;

@@ -1,13 +1,13 @@
-import { JsonValue } from '../JsonValue';
-import { JsPath } from '../JsPath';
-import { SchemaService, ValidationResult } from '../SchemaService';
+import { JsonValue } from '../JsonValue.js';
+import { JsPath } from '../JsPath.js';
+import { SchemaService, ValidationResult } from '../SchemaService.js';
 import {
   ProposeRequest,
   ProposeResponse,
   RejectedResponse,
   ValidateRequest,
   ValidateResponse,
-} from './WorkerMessages';
+} from './WorkerMessages.js';
 
 export class SchemaServiceWorker {
   constructor(private readonly schemaService: SchemaService) {}

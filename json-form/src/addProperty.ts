@@ -6,9 +6,9 @@ import {
   jvNull,
   jvObject,
   setValueAt,
-} from './JsonValue';
-import { SchemaService } from './SchemaService';
-import { JsPath } from './JsPath';
+} from './JsonValue.js';
+import { SchemaService } from './SchemaService.js';
+import { JsPath } from './JsPath.js';
 
 export function addPropertyTask(
   schemaService: SchemaService,

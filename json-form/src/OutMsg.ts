@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { JsonValue } from './JsonValue';
+import { JsonValue } from './JsonValue.js';
 
 export type OutMsg = { tag: 'value-changed'; value: JsonValue };
 

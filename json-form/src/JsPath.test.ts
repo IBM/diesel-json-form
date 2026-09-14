@@ -15,7 +15,7 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { containsNonEscapedSlash, JsPath } from './JsPath';
+import { containsNonEscapedSlash, JsPath } from './JsPath.js';
 import { just, nothing } from 'tea-cup-fp';
 
 describe('JsPath', () => {

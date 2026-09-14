@@ -21,12 +21,12 @@ import {
   actionDeleteValue,
   actionMoveValue,
   actionUpdateValue,
-} from './Actions';
-import { MenuAction } from './ContextMenuActions';
-import { Model, nextPendingId } from './Model';
-import { gotUpdatedValue, Msg } from './Msg';
-import { SchemaService } from './SchemaService';
-import { addElementToArrayTask } from './addElementToArray';
+} from './Actions.js';
+import { MenuAction } from './ContextMenuActions.js';
+import { Model, nextPendingId } from './Model.js';
+import { gotUpdatedValue, Msg } from './Msg.js';
+import { SchemaService } from './SchemaService.js';
+import { addElementToArrayTask } from './addElementToArray.js';
 
 export default function executeContextMenuAction(
   schemaService: SchemaService,

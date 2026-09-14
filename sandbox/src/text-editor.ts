@@ -123,6 +123,7 @@ model1.onDidChangeContent(() => {
       JsonFacade.parseValue(model1.getValue()),
     );
   } catch (e) {
+    console.warn('could not parse', e);
     parser2 = JsonFacade.getJsonParser(JsonFacade.parseValue(INITIAL_VALUE));
   }
 });

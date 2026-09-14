@@ -15,7 +15,7 @@
  */
 
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
-import { JsPath } from './JsPath';
+import { JsPath } from './JsPath.js';
 import { just, maybeOf, nothing } from 'tea-cup-fp';
 import {
   getValueAt,
@@ -27,12 +27,12 @@ import {
   jvNumber,
   jvObject,
   jvString,
-} from './JsonValue';
+} from './JsonValue.js';
 import {
   isMenuOptionHidden,
   MenuOptionFilter,
   MenuOptions,
-} from './RenderOptions';
+} from './RenderOptions.js';
 
 export type MenuAction =
   | { tag: 'delete'; path: JsPath }

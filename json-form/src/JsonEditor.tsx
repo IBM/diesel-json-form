@@ -40,19 +40,19 @@ import {
   actionTriggerClicked,
   actionUpdateValue,
   setRoot,
-} from './Actions';
-import executeContextMenuAction from './ContextMenu';
-import { MenuAction } from './ContextMenuActions';
-import { contextMenuRenderer } from './ContextMenuRenderer';
-import { getValueAt, JsonValue, setValueAt } from './JsonValue';
-import { JsPath } from './JsPath';
+} from './Actions.js';
+import executeContextMenuAction from './ContextMenu.js';
+import { MenuAction } from './ContextMenuActions.js';
+import { contextMenuRenderer } from './ContextMenuRenderer.js';
+import { getValueAt, JsonValue, setValueAt } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
 import {
   CustomRendererModel,
   initialModel,
   Model,
   nextPendingId,
   updateAddingPropertyName,
-} from './Model';
+} from './Model.js';
 import {
   contextMenuMsg,
   gotMenuProposals,
@@ -61,24 +61,24 @@ import {
   setDebounceMsMsg,
   setJsonStr,
   setStrictModeMsg,
-} from './Msg';
-import { OutMsg, outValueChanged } from './OutMsg';
+} from './Msg.js';
+import { OutMsg, outValueChanged } from './OutMsg.js';
 import {
   ArrayCounter,
   MenuTrigger,
   RendererFactory,
   ViewJsonValue,
-} from './renderer/Renderer';
-import { MenuOptionFilter, RenderOptions } from './RenderOptions';
+} from './renderer/Renderer.js';
+import { MenuOptionFilter, RenderOptions } from './RenderOptions.js';
 import {
   defaultSchemaService,
   SchemaRenderer,
   SchemaService,
-} from './SchemaService';
-import { computeAllCmd } from './ComputeAllTask';
-import { getMenuProposals } from './getMenuProposals';
-import { addPropertyTask } from './addProperty';
-import { Debouncer } from './Debouncer';
+} from './SchemaService.js';
+import { computeAllCmd } from './ComputeAllTask.js';
+import { getMenuProposals } from './getMenuProposals.js';
+import { addPropertyTask } from './addProperty.js';
+import { Debouncer } from './Debouncer.js';
 
 export function init(
   language: string,
@@ -601,7 +601,9 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
         maco[2].forEach((outMsg) => {
           switch (outMsg.tag) {
             case 'value-changed': {
-              props.onChange && props.onChange(outMsg.value);
+              if (props.onChange) {
+                props.onChange(outMsg.value);
+              }
             }
           }
         });

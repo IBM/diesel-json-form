@@ -19,7 +19,7 @@ import {
   createTypesMenu,
   MenuAction,
   MenuPropertyProps,
-} from './ContextMenuActions';
+} from './ContextMenuActions.js';
 import {
   JsonValue,
   jvArray,
@@ -28,10 +28,10 @@ import {
   jvNumber,
   jvObject,
   jvString,
-} from './JsonValue';
-import { JsPath } from './JsPath';
+} from './JsonValue.js';
+import { JsPath } from './JsPath.js';
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
-import { MenuOptions } from './RenderOptions';
+import { MenuOptions } from './RenderOptions.js';
 import { describe, test, expect } from 'vitest';
 
 describe('Change type menu', () => {

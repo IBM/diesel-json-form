@@ -16,15 +16,10 @@
 
 import * as JsFacade from '@diesel-parser/json-schema-facade-ts';
 import { err, just, Maybe, nothing, ok, Result } from 'tea-cup-fp';
-import { JsPath } from './JsPath';
+import { JsPath } from './JsPath.js';
 
 export type JsonValue =
-  | JvNull
-  | JvString
-  | JvBoolean
-  | JvNumber
-  | JvArray
-  | JvObject;
+  JvNull | JvString | JvBoolean | JvNumber | JvArray | JvObject;
 
 export interface JvNull {
   readonly tag: 'jv-null';
@@ -99,12 +94,7 @@ export interface JsonProperty {
 }
 
 export type JsonValueType =
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'null'
-  | 'object'
-  | 'array';
+  'string' | 'number' | 'boolean' | 'null' | 'object' | 'array';
 
 export function valueType(value: JsonValue): JsonValueType {
   switch (value.tag) {

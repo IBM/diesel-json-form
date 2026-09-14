@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-export * from './Model';
-export * from './JsonValue';
-export * from './JsPath';
-export * from './JsonEditor';
-export * from './OutMsg';
-export * from './Msg';
-export * from './renderer/Renderer';
-export * from './SchemaService';
-export * from './worker/SchemaServiceWorker';
-export * from './worker/WorkerClient';
+export * from './Model.js';
+export * from './JsonValue.js';
+export * from './JsPath.js';
+export * from './JsonEditor.js';
+export * from './OutMsg.js';
+export * from './Msg.js';
+export * from './renderer/Renderer.js';
+export * from './SchemaService.js';
+export * from './worker/SchemaServiceWorker.js';
+export * from './worker/WorkerClient.js';

@@ -7,9 +7,9 @@ import {
   jvArray,
   jvNull,
   setValueAt,
-} from './JsonValue';
-import { JsPath } from './JsPath';
-import { SchemaService } from './SchemaService';
+} from './JsonValue.js';
+import { JsPath } from './JsPath.js';
+import { SchemaService } from './SchemaService.js';
 
 export function addElementToArrayTask(
   schemaService: SchemaService,

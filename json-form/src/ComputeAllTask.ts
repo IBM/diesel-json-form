@@ -1,9 +1,9 @@
 import { Cmd, Task } from 'tea-cup-fp';
-import { gotMetadata, Metadata, Msg } from './Msg';
-import { SchemaService, ValidationResult } from './SchemaService';
-import { getValueAt, JsonValue } from './JsonValue';
-import { JsPath } from './JsPath';
-import { Model, nextPendingId } from './Model';
+import { gotMetadata, Metadata, Msg } from './Msg.js';
+import { SchemaService, ValidationResult } from './SchemaService.js';
+import { getValueAt, JsonValue } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
+import { Model, nextPendingId } from './Model.js';
 
 function computeAllTask(
   schemaService: SchemaService,

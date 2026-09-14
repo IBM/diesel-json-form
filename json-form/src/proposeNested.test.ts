@@ -21,10 +21,10 @@ import {
   jvNumber,
   jvObject,
   parseJsonValue,
-} from './JsonValue';
-import { defaultSchemaService } from './SchemaService';
-import { JsPath } from './JsPath';
-import { proposeNested } from './proposeNested';
+} from './JsonValue.js';
+import { defaultSchemaService } from './SchemaService.js';
+import { JsPath } from './JsPath.js';
+import { proposeNested } from './proposeNested.js';
 
 function getSchema(): JsonValue {
   const schema = parseJsonValue(`{

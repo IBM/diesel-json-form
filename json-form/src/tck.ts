@@ -1,6 +1,6 @@
-import { JsonValue, parseJsonValue } from './JsonValue';
-import { JsPath } from './JsPath';
-import { SchemaService } from './SchemaService';
+import { JsonValue, parseJsonValue } from './JsonValue.js';
+import { JsPath } from './JsPath.js';
+import { SchemaService } from './SchemaService.js';
 
 export class TckTest {
   constructor(
