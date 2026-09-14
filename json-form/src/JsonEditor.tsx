@@ -601,7 +601,9 @@ export function JsonEditor(props: JsonEditorProps): React.ReactElement {
         maco[2].forEach((outMsg) => {
           switch (outMsg.tag) {
             case 'value-changed': {
-              props.onChange && props.onChange(outMsg.value);
+              if (props.onChange) {
+                props.onChange(outMsg.value);
+              }
             }
           }
         });

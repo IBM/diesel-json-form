@@ -39,7 +39,9 @@ describe('Render options', () => {
           renderOptions: {},
         }),
       );
-      expect(container.querySelector('button')!.style).toBeUndefined;
+      expect(
+        Object.keys(container.querySelector('button')!.style).length,
+      ).toEqual(0);
     });
     test('menu document root', () => {
       const { container } = render(
