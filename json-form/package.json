@@ -3,6 +3,7 @@
   "version": "7.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "dependencies": {
     "@diesel-parser/json-schema-facade-ts": "^0.17.1",
     "i18next": "^20.6.1",
@@ -25,7 +26,7 @@
     "npm-scripts-watcher": "^1.0.2",
     "rimraf": "^6.0.1",
     "sass": "^1.81.0",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   },
   "scripts": {
     "build": "npm run clean && npm run lint && npm run build:ts && npm run test && npm run build:sass",
