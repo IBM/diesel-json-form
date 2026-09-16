@@ -20,7 +20,6 @@ import { createRoot } from 'react-dom/client';
 import * as JsonForm from '@diesel-parser/json-form';
 import { RendererFactory } from '@diesel-parser/json-form';
 
-import { editor1, editor2 } from './text-editor';
 import { MyStringRenderer } from './MyStringRenderer';
 import { RatingRenderer } from './RatingRenderer';
 import { MyObjectRenderer } from './MyObjectRenderer';
@@ -34,18 +33,23 @@ MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
 const myworker = new Worker('myworker.bundle.js');
 const workerClient = new JsonForm.WorkerClient(myworker);
 
-editor1.getModel()?.onDidChangeContent(() => {
+const editor1 = document.getElementById('editor1') as HTMLTextAreaElement;
+const editor2 = document.getElementById('editor2') as HTMLTextAreaElement;
+editor1.value = JSON.stringify(initialSchema, null, '  ');
+editor2.value = JSON.stringify(initialValue, null, '  ');
+
+editor1.addEventListener('input', () => {
   sendJsonStr();
 });
 
 function getSchema() {
-  const value = editor1.getValue();
-  return JsonForm.parseJsonValue(value).toMaybe();
+  return JsonForm.parseJsonValue(editor1.value).toMaybe();
 }
 
 function getValue() {
-  const v = editor2.getValue();
-  return JsonForm.parseJsonValue(v).toMaybe().withDefault(JsonForm.jvNull);
+  return JsonForm.parseJsonValue(editor2.value)
+    .toMaybe()
+    .withDefault(JsonForm.jvNull);
 }
 
 function sendJsonStr() {
@@ -59,7 +63,7 @@ const syncPanesCb: HTMLInputElement = document.getElementById(
   'syncPanes',
 ) as HTMLInputElement;
 
-editor2.getModel()?.onDidChangeContent(() => {
+editor2.addEventListener('input', () => {
   console.log('ed2 change');
   if (syncPanesCb.checked) {
     sendJsonStr();
@@ -80,7 +84,7 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 sampleSchemaSelect.addEventListener('change', () => {
-  editor1.setValue(sampleSchemaSelect.value);
+  editor1.value = sampleSchemaSelect.value;
   sendJsonStr();
 });
 
@@ -145,7 +149,7 @@ function initJsonForm(
       onChange: (value: JsonForm.JsonValue) => {
         console.log('FORM value changed', value);
         if (syncPanesCb.checked) {
-          JsonForm.stringify(value, '  ').forEach((s) => editor2.setValue(s));
+          JsonForm.stringify(value, '  ').forEach((s) => (editor2.value = s));
         }
       },
       strictMode,
