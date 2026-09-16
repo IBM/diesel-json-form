@@ -24,6 +24,7 @@ import { MyStringRenderer } from './MyStringRenderer';
 import { RatingRenderer } from './RatingRenderer';
 import { MyObjectRenderer } from './MyObjectRenderer';
 import { initialSchema, initialValue, samples } from './initdata';
+import { createEditor, getEditorValue, setEditorValue } from './editor';
 
 const MyRendererFactory = new RendererFactory();
 MyRendererFactory.addRenderer('MyStringRenderer', MyStringRenderer);
@@ -33,21 +34,32 @@ MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
 const myworker = new Worker('myworker.bundle.js');
 const workerClient = new JsonForm.WorkerClient(myworker);
 
-const editor1 = document.getElementById('editor1') as HTMLTextAreaElement;
-const editor2 = document.getElementById('editor2') as HTMLTextAreaElement;
-editor1.value = JSON.stringify(initialSchema, null, '  ');
-editor2.value = JSON.stringify(initialValue, null, '  ');
+const editor1 = createEditor(
+  document.getElementById('editor1')!,
+  JSON.stringify(initialSchema, null, '  '),
+  () => {
+    console.log('ed1 change');
+    sendJsonStr();
+  },
+);
 
-editor1.addEventListener('input', () => {
-  sendJsonStr();
-});
+const editor2 = createEditor(
+  document.getElementById('editor2')!,
+  JSON.stringify(initialValue, null, '  '),
+  () => {
+    console.log('ed2 change');
+    if (syncPanesCb.checked) {
+      sendJsonStr();
+    }
+  },
+);
 
 function getSchema() {
-  return JsonForm.parseJsonValue(editor1.value).toMaybe();
+  return JsonForm.parseJsonValue(getEditorValue(editor1)).toMaybe();
 }
 
 function getValue() {
-  return JsonForm.parseJsonValue(editor2.value)
+  return JsonForm.parseJsonValue(getEditorValue(editor2))
     .toMaybe()
     .withDefault(JsonForm.jvNull);
 }
@@ -63,13 +75,6 @@ const syncPanesCb: HTMLInputElement = document.getElementById(
   'syncPanes',
 ) as HTMLInputElement;
 
-editor2.addEventListener('input', () => {
-  console.log('ed2 change');
-  if (syncPanesCb.checked) {
-    sendJsonStr();
-  }
-});
-
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
 ) as HTMLSelectElement;
@@ -84,7 +89,7 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 sampleSchemaSelect.addEventListener('change', () => {
-  editor1.value = sampleSchemaSelect.value;
+  setEditorValue(editor1, sampleSchemaSelect.value);
   sendJsonStr();
 });
 
@@ -149,7 +154,9 @@ function initJsonForm(
       onChange: (value: JsonForm.JsonValue) => {
         console.log('FORM value changed', value);
         if (syncPanesCb.checked) {
-          JsonForm.stringify(value, '  ').forEach((s) => (editor2.value = s));
+          JsonForm.stringify(value, '  ').forEach((s) =>
+            setEditorValue(editor2, s),
+          );
         }
       },
       strictMode,
