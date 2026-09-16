@@ -2,53 +2,41 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
-import org.openqa.selenium.JavascriptExecutor;
+import com.pojosontheweb.selenium.Retry;
 
-import java.util.Arrays;
+import static com.pojosontheweb.selenium.Findrs.attrEquals;
+
+import org.openqa.selenium.Keys;
 
 public class FEditor extends AbstractPageObject {
 
-    private final String id;
-    private final JavascriptExecutor js = (JavascriptExecutor) getDriver();
-    private final String windowEditorRef;
-
     public FEditor(Findr f, String id) {
         super(f.$("#" + id));
-        this.id = id;
-        this.windowEditorRef = "window." + this.id;
     }
 
     public FEditor clearText() {
-        getFindr().eval(e -> {
-            js.executeScript(windowEditorRef + ".setValue('');");
-            return true;
-        });
+        Retry.retry()
+                .add(() -> {
+                    // very strange clear to send events
+                    getFindr().click();
+                    getFindr().clear();
+                    getFindr().sendKeys(" ");
+                    getFindr().sendKeys(Keys.BACK_SPACE);
+                })
+                .add(() -> {
+                    assertText("");
+                })
+                .eval();
         return this;
     }
 
     public FEditor typeText(String text) {
-        getFindr().eval(e -> {
-            String[] escaped = text.split("\n");
-            Arrays.asList(escaped).forEach(line -> {
-                String script = windowEditorRef +
-                        ".setValue(" +
-                        windowEditorRef +
-                        ".getValue() + '" +
-                        line + "\\n" +
-                        "');";
-                js.executeScript(script);
-            });
-
-            return true;
-        });
+        getFindr().sendKeys(text);
         return this;
     }
 
     public FEditor assertText(String expected) {
-        getFindr().where(e -> {
-            String value = (String) js.executeScript("return " + windowEditorRef + ".getValue();");
-            return expected.equals(value.trim());
-        }).eval();
+        getFindr().where(attrEquals("value", expected)).eval();
         return this;
     }
 
@@ -58,7 +46,7 @@ public class FEditor extends AbstractPageObject {
     }
 
     public FEditor focus() {
-        getFindr().$(".view-lines").click();
+        getFindr().click();
         return this;
     }
 }

@@ -4,13 +4,12 @@
   "private": true,
   "description": "",
   "scripts": {
-    "start": "npm run copy:monacoworkers && npm run build:sass && webpack serve",
+    "start": "npm run build:sass && webpack serve",
     "build:sass": "sass --style=compressed --load-path=../node_modules/ src/style.scss src/style.css",
     "prettify": "prettier --write .",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "eslint '**/*.{js,ts}' --fix",
-    "copy:monacoworkers": "shx mkdir -p dist && shx cp -r ../node_modules/monaco-editor-workers/dist/workers/editorWorker* ./dist",
-    "build": "npm run lint && npm run copy:monacoworkers && npm run build:worker && webpack",
+    "build": "npm run lint && npm run build:worker && webpack",
     "build:worker": "webpack --config worker.webpack.config.js",
     "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
   },
@@ -21,16 +20,11 @@
     "react-tea-cup": "^5.1.1",
     "tea-cup-fp": "^1.1.1",
     "@diesel-parser/json-form": "^7.0.1",
-    "monaco-editor-workers": "0.45.0",
     "tea-pop-core": "^6.0.1",
-    "tea-pop-menu": "^6.0.1",
-    "vscode-json-languageservice": "5.1.3",
-    "monaco-languageclient": "4.0.2",
-    "monaco-editor": "^0.34.1"
+    "tea-pop-menu": "^6.0.1"
   },
   "devDependencies": {
     "@diesel-parser/ts-facade": "~0.32.2",
-    "@types/vscode": "~1.100.0",
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^7.0.0",
     "file-loader": "^6.2.0",
