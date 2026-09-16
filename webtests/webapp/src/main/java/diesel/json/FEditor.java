@@ -2,39 +2,36 @@ package diesel.json;
 
 import com.pojosontheweb.selenium.AbstractPageObject;
 import com.pojosontheweb.selenium.Findr;
+import com.pojosontheweb.selenium.Retry;
 
 import static com.pojosontheweb.selenium.Findrs.attrEquals;
 
-public class FEditor extends AbstractPageObject {
+import org.openqa.selenium.Keys;
 
-    private final String id;
+public class FEditor extends AbstractPageObject {
 
     public FEditor(Findr f, String id) {
         super(f.$("#" + id));
-        this.id = id;
     }
 
     public FEditor clearText() {
-        getFindr().clear();
+        Retry.retry()
+                .add(() -> {
+                    // very strange clear to send events
+                    getFindr().click();
+                    getFindr().clear();
+                    getFindr().sendKeys(" ");
+                    getFindr().sendKeys(Keys.BACK_SPACE);
+                })
+                .add(() -> {
+                    assertText("");
+                })
+                .eval();
         return this;
     }
 
     public FEditor typeText(String text) {
         getFindr().sendKeys(text);
-        // getFindr().eval(e -> {
-        //     String[] escaped = text.split("\n");
-        //     Arrays.asList(escaped).forEach(line -> {
-        //         String script = windowEditorRef +
-        //                 ".setValue(" +
-        //                 windowEditorRef +
-        //                 ".getValue() + '" +
-        //                 line + "\\n" +
-        //                 "');";
-        //         js.executeScript(script);
-        //     });
-
-        //     return true;
-        // });
         return this;
     }
 
