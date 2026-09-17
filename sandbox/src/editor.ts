@@ -20,46 +20,54 @@ type Style = {
 };
 
 const setStyles = StateEffect.define<Style[]>({
-  map: (styles, change) =>
-    styles.map((style) => {
+  map: (styles, change) => {
+    debugger;
+    console.log('setStyles map()');
+    return styles.map((style) => {
       return {
         from: change.mapPos(style.from),
         to: change.mapPos(style.to),
         name: style.name,
       };
-    }),
+    });
+  },
 });
 
 function stylesToDecorations(styles: Style[]): DecorationSet {
   return RangeSet.of(styles.map((s) => underlineMark.range(s.from, s.to)));
 }
 
-const styleDecorations = StateField.define<DecorationSet>({
+const styleDecorations = StateField.define<Style[]>({
   create() {
-    return Decoration.none;
+    console.log('create field');
+    return [];
   },
-  update(decSet, tx) {
-    console.log('update', decSet);
+  update(styles, tx) {
+    console.log('update', styles);
     for (const e of tx.effects) {
       if (e.is(setStyles)) {
-        const styles = e.value;
-        console.log('update styles : ', styles);
-        decSet =
-          e.value.length === 0 ? Decoration.none : stylesToDecorations(styles);
-        return decSet;
+        return e.value;
       }
     }
-
-    const it = decSet.iter();
-    while (it.value !== null) {
-      console.log('flkjf', it.value);
-      it.next();
+    if (tx.docChanged) {
+      return styles.map((style) => {
+        const { from, to } = style;
+        const newFrom = tx.changes.mapPos(from, 1);
+        const newTo = tx.changes.mapPos(to, -1);
+        console.log('from', from, 'to', to, 'newFrom', newFrom, 'newTo', newTo);
+        return {
+          ...style,
+          from: newFrom,
+          to: newTo,
+        };
+      });
     }
-
-    // no new styles : move positions ?
-    return decSet;
+    return styles;
   },
-  provide: (f) => EditorView.decorations.from(f),
+  provide: (f) => {
+    console.log('provide decorations');
+    return EditorView.decorations.from(f, stylesToDecorations);
+  },
 });
 
 export function createEditor(
@@ -67,11 +75,16 @@ export function createEditor(
   value: string,
   onChange: (value: string) => void,
 ): EditorView {
+  let t: any = undefined;
+
   const updateListenerExtension = EditorView.updateListener.of((viewUpdate) => {
     if (viewUpdate.docChanged) {
       onChange(viewUpdate.state.doc.toString());
-      setTimeout(() => {
-        const text = viewUpdate.state.doc.toString();
+      if (t !== undefined) {
+        clearTimeout(t);
+      }
+      const text = viewUpdate.state.doc.toString();
+      t = setTimeout(() => {
         const styles: Style[] = [];
         for (let i = 0; i < text.length; i++) {
           if (text.charAt(i) === '{') {
