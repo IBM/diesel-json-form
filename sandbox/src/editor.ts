@@ -20,17 +20,17 @@ type Style = {
 };
 
 const setStyles = StateEffect.define<Style[]>({
-  map: (styles, change) => {
-    debugger;
-    console.log('setStyles map()');
-    return styles.map((style) => {
-      return {
-        from: change.mapPos(style.from),
-        to: change.mapPos(style.to),
-        name: style.name,
-      };
-    });
-  },
+  //   map: (styles, change) => {
+  //     debugger;
+  //     console.log('setStyles map()');
+  //     return styles.map((style) => {
+  //       return {
+  //         from: change.mapPos(style.from),
+  //         to: change.mapPos(style.to),
+  //         name: style.name,
+  //       };
+  //     });
+  //   },
 });
 
 function stylesToDecorations(styles: Style[]): DecorationSet {
@@ -52,6 +52,7 @@ const styleDecorations = StateField.define<Style[]>({
     if (tx.docChanged) {
       return styles.map((style) => {
         const { from, to } = style;
+        // TODO wtf ???
         const newFrom = tx.changes.mapPos(from, 1);
         const newTo = tx.changes.mapPos(to, -1);
         console.log('from', from, 'to', to, 'newFrom', newFrom, 'newTo', newTo);
