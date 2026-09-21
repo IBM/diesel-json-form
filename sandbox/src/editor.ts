@@ -1,4 +1,4 @@
-import { StateField, StateEffect, RangeSet } from '@codemirror/state';
+import { StateField, StateEffect, RangeSet, MapMode } from '@codemirror/state';
 import {
   Decoration,
   DecorationSet,
@@ -6,11 +6,18 @@ import {
   keymap,
 } from '@codemirror/view';
 import { defaultKeymap } from '@codemirror/commands';
+import {
+  getJsonParser,
+  parseValue,
+} from '@diesel-parser/json-schema-facade-ts';
 
-const underlineMark = Decoration.mark({ class: 'cm-underline' });
+const schemaValue = parseValue('{}');
+const jsonParser = getJsonParser(schemaValue);
 
-const underlineTheme = EditorView.baseTheme({
-  '.cm-underline': { textDecoration: 'underline 3px red' },
+const keywordMark = Decoration.mark({ class: 'cm-keyword' });
+
+const dieselTheme = EditorView.baseTheme({
+  '.cm-keyword': { color: 'blue' },
 });
 
 type Style = {
@@ -33,8 +40,27 @@ const setStyles = StateEffect.define<Style[]>({
   //   },
 });
 
-function stylesToDecorations(styles: Style[]): DecorationSet {
-  return RangeSet.of(styles.map((s) => underlineMark.range(s.from, s.to)));
+// function getStyles(text: string): Style[] {
+//   const styles = [];
+//   for (let i = 0; i < text.length; i++) {
+//     const sub = text.substring(i, i + 3);
+//     if (sub === 'foo') {
+//       styles.push({
+//         from: i,
+//         to: i + 3,
+//         name: 'foo',
+//       });
+//     }
+//   }
+//   console.log('styles', styles);
+//   return styles;
+// }
+
+function stylesToDecorations(styles: readonly Style[]): DecorationSet {
+  const sortedStyles = [...styles].sort((s1, s2) => s1.from - s2.from);
+  return RangeSet.of(
+    sortedStyles.map((s) => underlineMark.range(s.from, s.to)),
+  );
 }
 
 const styleDecorations = StateField.define<Style[]>({
@@ -49,21 +75,22 @@ const styleDecorations = StateField.define<Style[]>({
         return e.value;
       }
     }
-    if (tx.docChanged) {
-      return styles.map((style) => {
-        const { from, to } = style;
-        // TODO wtf ???
-        const newFrom = tx.changes.mapPos(from, 1);
-        const newTo = tx.changes.mapPos(to, -1);
-        console.log('from', from, 'to', to, 'newFrom', newFrom, 'newTo', newTo);
-        return {
-          ...style,
-          from: newFrom,
-          to: newTo,
-        };
-      });
+    if (tx.changes.empty) {
+      return styles;
     }
-    return styles;
+    // if (tx.docChanged) {
+    return styles.map((style) => {
+      const { from, to } = style;
+      // TODO wtf ???
+      const newFrom = tx.changes.mapPos(from, -1, MapMode.TrackBefore);
+      const newTo = tx.changes.mapPos(to, 0, MapMode.TrackDel);
+      console.log('from', from, 'to', to, 'newFrom', newFrom, 'newTo', newTo);
+      return {
+        ...style,
+        from: newFrom ?? from,
+        to: newTo ?? to,
+      };
+    });
   },
   provide: (f) => {
     console.log('provide decorations');
@@ -78,26 +105,28 @@ export function createEditor(
 ): EditorView {
   let t: any = undefined;
 
+  //   let dispatched = false;
+
   const updateListenerExtension = EditorView.updateListener.of((viewUpdate) => {
     if (viewUpdate.docChanged) {
-      onChange(viewUpdate.state.doc.toString());
+      const text = viewUpdate.state.doc.toString();
+      // && !dispatched) {
+      onChange(text);
       if (t !== undefined) {
         clearTimeout(t);
       }
-      const text = viewUpdate.state.doc.toString();
       t = setTimeout(() => {
-        const styles: Style[] = [];
-        for (let i = 0; i < text.length; i++) {
-          if (text.charAt(i) === '{') {
-            styles.push({
-              from: i,
-              to: i + 1,
-              name: 'brace',
-            });
-          }
-        }
+        const parseRes = jsonParser.parse({ text });
+        const styles: Style[] = parseRes.styles.map((s) => {
+          return {
+            from: s.offset,
+            to: s.offset + s.length,
+            name: s.name,
+          };
+        });
         const fx = setStyles.of(styles);
         console.log('dispatch styles : ', styles);
+        // dispatched = true;
         viewUpdate.view.dispatch({ effects: [fx] });
       }, 2000);
     }
@@ -108,7 +137,6 @@ export function createEditor(
       updateListenerExtension,
       keymap.of(defaultKeymap),
       styleDecorations,
-      //   underlineField,
       underlineTheme,
     ],
     doc: value,
