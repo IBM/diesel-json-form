@@ -54,7 +54,7 @@ function stylesToDecorations(styles: readonly Style[]): DecorationSet {
   return RangeSet.of(
     sortedStyles.flatMap((s) => {
       const mark = getMarkForStyle(s.name);
-      if (mark) {
+      if (mark && s.from !== s.to) {
         return [mark.range(s.from, s.to)];
       } else {
         console.error('no mark found for style ', s);
@@ -128,7 +128,7 @@ export function createEditor(
         console.log('dispatch styles : ', styles);
         // dispatched = true;
         viewUpdate.view.dispatch({ effects: [fx] });
-      }, 2000);
+      }, 200);
     }
   });
 
