@@ -15,9 +15,15 @@ const schemaValue = parseValue('{}');
 const jsonParser = getJsonParser(schemaValue);
 
 const keywordMark = Decoration.mark({ class: 'cm-keyword' });
+const stringMark = Decoration.mark({ class: 'cm-string' });
+const numberMark = Decoration.mark({ class: 'cm-number' });
+const attrMark = Decoration.mark({ class: 'cm-attr' });
 
-const dieselTheme = EditorView.baseTheme({
-  '.cm-keyword': { color: 'blue' },
+const dieselJsonTheme = EditorView.baseTheme({
+  '.cm-keyword': { backroundColor: 'lightgrey' },
+  '.cm-string': { color: 'green' },
+  '.cm-number': { color: 'blue' },
+  '.cm-attr': { color: 'orange' },
 });
 
 type Style = {
@@ -26,40 +32,35 @@ type Style = {
   readonly name: string;
 };
 
-const setStyles = StateEffect.define<Style[]>({
-  //   map: (styles, change) => {
-  //     debugger;
-  //     console.log('setStyles map()');
-  //     return styles.map((style) => {
-  //       return {
-  //         from: change.mapPos(style.from),
-  //         to: change.mapPos(style.to),
-  //         name: style.name,
-  //       };
-  //     });
-  //   },
-});
+const setStyles = StateEffect.define<Style[]>();
 
-// function getStyles(text: string): Style[] {
-//   const styles = [];
-//   for (let i = 0; i < text.length; i++) {
-//     const sub = text.substring(i, i + 3);
-//     if (sub === 'foo') {
-//       styles.push({
-//         from: i,
-//         to: i + 3,
-//         name: 'foo',
-//       });
-//     }
-//   }
-//   console.log('styles', styles);
-//   return styles;
-// }
+function getMarkForStyle(styleName: string): Decoration | undefined {
+  switch (styleName) {
+    case 'keyword':
+      return keywordMark;
+    case 'string':
+      return stringMark;
+    case 'number':
+      return numberMark;
+    case 'attr':
+      return attrMark;
+    default:
+      return undefined;
+  }
+}
 
 function stylesToDecorations(styles: readonly Style[]): DecorationSet {
   const sortedStyles = [...styles].sort((s1, s2) => s1.from - s2.from);
   return RangeSet.of(
-    sortedStyles.map((s) => underlineMark.range(s.from, s.to)),
+    sortedStyles.flatMap((s) => {
+      const mark = getMarkForStyle(s.name);
+      if (mark) {
+        return [mark.range(s.from, s.to)];
+      } else {
+        console.error('no mark found for style ', s);
+        return [];
+      }
+    }),
   );
 }
 
@@ -93,7 +94,6 @@ const styleDecorations = StateField.define<Style[]>({
     });
   },
   provide: (f) => {
-    console.log('provide decorations');
     return EditorView.decorations.from(f, stylesToDecorations);
   },
 });
@@ -137,7 +137,7 @@ export function createEditor(
       updateListenerExtension,
       keymap.of(defaultKeymap),
       styleDecorations,
-      underlineTheme,
+      dieselJsonTheme,
     ],
     doc: value,
     parent,
