@@ -16,6 +16,7 @@
   "dependencies": {
     "@carbon/react": "^1.100.0",
     "@codemirror/commands": "^6.11.1",
+    "@codemirror/lint": "^6.9.7",
     "@codemirror/state": "^6.7.5",
     "@codemirror/view": "^6.43.12",
     "@diesel-parser/json-form": "^7.0.1",

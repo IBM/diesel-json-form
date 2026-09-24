@@ -10,6 +10,8 @@ import {
   getJsonParser,
   parseValue,
 } from '@diesel-parser/json-schema-facade-ts';
+import { linter, Diagnostic } from '@codemirror/lint';
+import { DieselMarker } from '@diesel-parser/ts-facade';
 
 const schemaValue = parseValue('{}');
 const jsonParser = getJsonParser(schemaValue);
@@ -98,6 +100,33 @@ const styleDecorations = StateField.define<Style[]>({
   },
 });
 
+function getMarkerSeverity(m: DieselMarker): Diagnostic['severity'] {
+  switch (m.severity) {
+    case 'warning':
+      return m.severity;
+    default:
+      return 'error';
+  }
+}
+
+const jsonLintSource = linter((view: EditorView) => {
+  const text = view.state.doc.toString();
+  return new Promise<Diagnostic[]>((resolve) => {
+    const diags: Diagnostic[] = [];
+    const parseRes = jsonParser.parse({ text });
+    console.log(parseRes);
+    parseRes.markers.forEach((m) => {
+      diags.push({
+        from: m.offset,
+        to: m.offset + m.length,
+        severity: getMarkerSeverity(m),
+        message: m.getMessage('en_US'),
+      });
+    });
+    resolve(diags);
+  });
+});
+
 export function createEditor(
   parent: Element,
   value: string,
@@ -138,6 +167,7 @@ export function createEditor(
       keymap.of(defaultKeymap),
       styleDecorations,
       dieselJsonTheme,
+      jsonLintSource,
     ],
     doc: value,
     parent,
