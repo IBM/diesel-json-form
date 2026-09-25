@@ -19,19 +19,29 @@ import {
   parseValue,
 } from '@diesel-parser/json-schema-facade-ts';
 import { linter, Diagnostic } from '@codemirror/lint';
+import { oneDarkTheme } from '@codemirror/theme-one-dark';
 import { DieselMarker, DieselParserFacade } from '@diesel-parser/ts-facade';
 
-const keywordMark = Decoration.mark({ class: 'cm-keyword' });
 const stringMark = Decoration.mark({ class: 'cm-string' });
 const numberMark = Decoration.mark({ class: 'cm-number' });
 const attrMark = Decoration.mark({ class: 'cm-attr' });
 
-const dieselJsonTheme = EditorView.baseTheme({
-  '.cm-keyword': { backroundColor: 'lightgrey' },
+const dieselJsonThemeLight = EditorView.baseTheme({
   '.cm-string': { color: 'green' },
   '.cm-number': { color: 'blue' },
   '.cm-attr': { color: 'orange' },
 });
+
+const dieselJsonThemeDark = EditorView.baseTheme({
+  '.cm-string': { color: 'lightgreen' },
+  '.cm-number': { color: 'lightblue' },
+  '.cm-attr': { color: 'orange' },
+});
+
+const jsonThemeExtensions = {
+  light: [dieselJsonThemeLight],
+  dark: [oneDarkTheme, dieselJsonThemeDark],
+};
 
 type Style = {
   readonly from: number;
@@ -221,7 +231,7 @@ export class JsonEditor {
           },
         ]),
         styleDecorations,
-        dieselJsonTheme,
+        jsonThemeExtensions['dark'],
         jsonLinter,
         autocompletion({
           override: [jsonCompleter],
@@ -245,8 +255,6 @@ function getMarkerSeverity(m: DieselMarker): Diagnostic['severity'] {
 
 function getMarkForStyle(styleName: string): Decoration | undefined {
   switch (styleName) {
-    case 'keyword':
-      return keywordMark;
     case 'string':
       return stringMark;
     case 'number':
