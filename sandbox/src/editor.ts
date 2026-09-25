@@ -1,5 +1,6 @@
 import { StateField, StateEffect, RangeSet, MapMode } from '@codemirror/state';
 import {
+  Command,
   Decoration,
   DecorationSet,
   EditorView,
@@ -193,10 +194,32 @@ export class JsonEditor {
       });
     };
 
+    const formatCmd: Command = (view) => {
+      const text = view.state.doc.toString();
+      try {
+        const formatted = JSON.stringify(JSON.parse(text), null, '  ');
+        view.dispatch({
+          changes: [
+            { from: 0, to: this.ed.state.doc.length, insert: formatted },
+          ],
+          effects: [setStyles.of([])],
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     return new EditorView({
       extensions: [
         updateListenerExtension,
-        keymap.of(defaultKeymap),
+        keymap.of([
+          ...defaultKeymap,
+          {
+            key: 'Ctrl-F', // needs shift ?
+            run: formatCmd,
+          },
+        ]),
         styleDecorations,
         dieselJsonTheme,
         jsonLinter,
