@@ -24,6 +24,7 @@ import { MyStringRenderer } from './MyStringRenderer';
 import { RatingRenderer } from './RatingRenderer';
 import { MyObjectRenderer } from './MyObjectRenderer';
 import { initialSchema, initialValue, samples } from './initdata';
+import { JsonEditor, parseJsonValueWithDefault } from './editor';
 
 const MyRendererFactory = new RendererFactory();
 MyRendererFactory.addRenderer('MyStringRenderer', MyStringRenderer);
@@ -33,14 +34,32 @@ MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
 const myworker = new Worker('myworker.bundle.js');
 const workerClient = new JsonForm.WorkerClient(myworker);
 
-const editor1 = document.getElementById('editor1') as HTMLTextAreaElement;
-const editor2 = document.getElementById('editor2') as HTMLTextAreaElement;
-editor1.value = JSON.stringify(initialSchema, null, '  ');
-editor2.value = JSON.stringify(initialValue, null, '  ');
+const editor2 = new JsonEditor(
+  document.getElementById('editor2')!,
+  JSON.stringify(initialValue, null, '  '),
+  () => {
+    console.log('ed2 change');
+    if (syncPanesCb.checked) {
+      sendJsonStr();
+    }
+  },
+);
 
-editor1.addEventListener('input', () => {
-  sendJsonStr();
-});
+const editor1 = new JsonEditor(
+  document.getElementById('editor1')!,
+  JSON.stringify(initialSchema, null, '  '),
+  (value) => {
+    console.log('ed1 change');
+    editor2.schema = parseJsonValueWithDefault(value);
+    sendJsonStr();
+  },
+);
+
+// for webtests
+// @ts-ignore
+window['editor1'] = editor1;
+// @ts-ignore
+window['editor2'] = editor2;
 
 function getSchema() {
   return JsonForm.parseJsonValue(editor1.value).toMaybe();
@@ -62,13 +81,6 @@ function sendJsonStr() {
 const syncPanesCb: HTMLInputElement = document.getElementById(
   'syncPanes',
 ) as HTMLInputElement;
-
-editor2.addEventListener('input', () => {
-  console.log('ed2 change');
-  if (syncPanesCb.checked) {
-    sendJsonStr();
-  }
-});
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
