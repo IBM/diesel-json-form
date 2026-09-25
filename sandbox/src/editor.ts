@@ -7,6 +7,13 @@ import {
 } from '@codemirror/view';
 import { defaultKeymap } from '@codemirror/commands';
 import {
+  CompletionContext,
+  CompletionResult,
+  CompletionSection,
+  CompletionSource,
+  autocompletion,
+} from '@codemirror/autocomplete';
+import {
   getJsonParser,
   JsonValue,
   parseValue,
@@ -100,7 +107,6 @@ export class JsonEditor {
 
   set schema(s: JsonValue) {
     this.schemaValue = s;
-    debugger;
     this.parserFacade = getJsonParser(s);
   }
 
@@ -154,7 +160,7 @@ export class JsonEditor {
       },
     );
 
-    const jsonLintSource = linter((view: EditorView) => {
+    const jsonLinter = linter((view: EditorView) => {
       const text = view.state.doc.toString();
       return new Promise<Diagnostic[]>((resolve) => {
         const diags: Diagnostic[] = [];
@@ -172,13 +178,32 @@ export class JsonEditor {
       });
     });
 
+    const jsonCompleter: CompletionSource = (context) => {
+      return new Promise<CompletionResult>((resolve) => {
+        const text = context.state.doc.toString();
+        const predictRes = this.parser.predict({
+          offset: context.pos,
+          text,
+        });
+        resolve({
+          from: context.pos,
+          options: predictRes.proposals.map((p) => ({
+            label: p.text,
+          })),
+        });
+      });
+    };
+
     return new EditorView({
       extensions: [
         updateListenerExtension,
         keymap.of(defaultKeymap),
         styleDecorations,
         dieselJsonTheme,
-        jsonLintSource,
+        jsonLinter,
+        autocompletion({
+          override: [jsonCompleter],
+        }),
       ],
       doc: value,
       parent,
