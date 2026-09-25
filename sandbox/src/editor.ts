@@ -27,9 +27,9 @@ const numberMark = Decoration.mark({ class: 'cm-number' });
 const attrMark = Decoration.mark({ class: 'cm-attr' });
 
 const dieselJsonThemeLight = EditorView.baseTheme({
-  '.cm-string': { color: 'green' },
+  '.cm-string': { color: 'darkgreen' },
   '.cm-number': { color: 'blue' },
-  '.cm-attr': { color: 'orange' },
+  '.cm-attr': { color: '#B7410E' },
 });
 
 const dieselJsonThemeDark = EditorView.baseTheme({
@@ -231,7 +231,7 @@ export class JsonEditor {
           },
         ]),
         styleDecorations,
-        jsonThemeExtensions['dark'],
+        jsonThemeExtensions['light'],
         jsonLinter,
         autocompletion({
           override: [jsonCompleter],
