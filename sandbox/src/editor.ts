@@ -88,7 +88,7 @@ const styleDecorations = StateField.define<Style[]>({
 export function parseJsonValueWithDefault(s: string): JsonValue {
   try {
     return parseValue(s);
-  } catch (_) {
+  } catch {
     return parseValue('{}');
   }
 }
