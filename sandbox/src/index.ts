@@ -55,6 +55,12 @@ const editor1 = new JsonEditor(
   },
 );
 
+// for webtests
+// @ts-ignore
+window['editor1'] = editor1;
+// @ts-ignore
+window['editor2'] = editor2;
+
 function getSchema() {
   return JsonForm.parseJsonValue(editor1.value).toMaybe();
 }

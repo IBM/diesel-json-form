@@ -25,17 +25,20 @@ import { DieselMarker, DieselParserFacade } from '@diesel-parser/ts-facade';
 const stringMark = Decoration.mark({ class: 'cm-string' });
 const numberMark = Decoration.mark({ class: 'cm-number' });
 const attrMark = Decoration.mark({ class: 'cm-attr' });
+const keywordMark = Decoration.mark({ class: 'cm-keyword' });
 
 const dieselJsonThemeLight = EditorView.baseTheme({
   '.cm-string': { color: 'darkgreen' },
   '.cm-number': { color: 'blue' },
   '.cm-attr': { color: '#B7410E' },
+  '.cm-keyword': { color: 'gray' },
 });
 
 const dieselJsonThemeDark = EditorView.baseTheme({
   '.cm-string': { color: 'lightgreen' },
   '.cm-number': { color: 'lightblue' },
   '.cm-attr': { color: 'orange' },
+  '.cm-keyword': { color: 'lightgray' },
 });
 
 const jsonThemeExtensions = {
@@ -66,18 +69,23 @@ const styleDecorations = StateField.define<Style[]>({
     if (tx.changes.empty) {
       return styles;
     }
-    // if (tx.docChanged) {
-    return styles.map((style) => {
+    return styles.flatMap((style) => {
       const { from, to } = style;
       // TODO wtf ???
       const newFrom = tx.changes.mapPos(from, -1, MapMode.TrackBefore);
       const newTo = tx.changes.mapPos(to, 0, MapMode.TrackDel);
-      console.log('from', from, 'to', to, 'newFrom', newFrom, 'newTo', newTo);
-      return {
-        ...style,
-        from: newFrom ?? from,
-        to: newTo ?? to,
-      };
+      if (newTo == null || newFrom == null) {
+        debugger;
+        return [];
+      }
+      //   console.log('from', from, 'to', to, 'newFrom', newFrom, 'newTo', newTo);
+      return [
+        {
+          ...style,
+          from: newFrom ?? from,
+          to: newTo ?? to,
+        },
+      ];
     });
   },
   provide: (f) => {
@@ -261,6 +269,8 @@ function getMarkForStyle(styleName: string): Decoration | undefined {
       return numberMark;
     case 'attr':
       return attrMark;
+    case 'keyword':
+      return keywordMark;
     default:
       return undefined;
   }
