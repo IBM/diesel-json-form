@@ -4,12 +4,11 @@ import {
   DecorationSet,
   EditorView,
   keymap,
+  lineNumbers,
 } from '@codemirror/view';
 import { defaultKeymap } from '@codemirror/commands';
 import {
-  CompletionContext,
   CompletionResult,
-  CompletionSection,
   CompletionSource,
   autocompletion,
 } from '@codemirror/autocomplete';
@@ -204,6 +203,7 @@ export class JsonEditor {
         autocompletion({
           override: [jsonCompleter],
         }),
+        lineNumbers(),
       ],
       doc: value,
       parent,
