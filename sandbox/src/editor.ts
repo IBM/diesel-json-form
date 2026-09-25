@@ -8,13 +8,11 @@ import {
 import { defaultKeymap } from '@codemirror/commands';
 import {
   getJsonParser,
+  JsonValue,
   parseValue,
 } from '@diesel-parser/json-schema-facade-ts';
 import { linter, Diagnostic } from '@codemirror/lint';
-import { DieselMarker } from '@diesel-parser/ts-facade';
-
-const schemaValue = parseValue('{}');
-const jsonParser = getJsonParser(schemaValue);
+import { DieselMarker, DieselParserFacade } from '@diesel-parser/ts-facade';
 
 const keywordMark = Decoration.mark({ class: 'cm-keyword' });
 const stringMark = Decoration.mark({ class: 'cm-string' });
@@ -35,36 +33,6 @@ type Style = {
 };
 
 const setStyles = StateEffect.define<Style[]>();
-
-function getMarkForStyle(styleName: string): Decoration | undefined {
-  switch (styleName) {
-    case 'keyword':
-      return keywordMark;
-    case 'string':
-      return stringMark;
-    case 'number':
-      return numberMark;
-    case 'attr':
-      return attrMark;
-    default:
-      return undefined;
-  }
-}
-
-function stylesToDecorations(styles: readonly Style[]): DecorationSet {
-  const sortedStyles = [...styles].sort((s1, s2) => s1.from - s2.from);
-  return RangeSet.of(
-    sortedStyles.flatMap((s) => {
-      const mark = getMarkForStyle(s.name);
-      if (mark && s.from !== s.to) {
-        return [mark.range(s.from, s.to)];
-      } else {
-        console.error('no mark found for style ', s);
-        return [];
-      }
-    }),
-  );
-}
 
 const styleDecorations = StateField.define<Style[]>({
   create() {
@@ -100,6 +68,124 @@ const styleDecorations = StateField.define<Style[]>({
   },
 });
 
+export function parseJsonValueWithDefault(s: string): JsonValue {
+  try {
+    return parseValue(s);
+  } catch (_) {
+    return parseValue('{}');
+  }
+}
+
+export class JsonEditor {
+  private schemaValue: JsonValue;
+  private readonly ed: EditorView;
+  private parserFacade: DieselParserFacade;
+
+  constructor(
+    parent: Element,
+    initialValue: string,
+    onChange: (value: string) => void,
+    initialSchema?: string,
+  ) {
+    this.ed = this.createEditor(parent, initialValue, onChange);
+    this.schemaValue = initialSchema
+      ? parseJsonValueWithDefault(initialSchema)
+      : parseValue('{}');
+    this.parserFacade = getJsonParser(this.schemaValue);
+  }
+
+  get parser(): DieselParserFacade {
+    return this.parserFacade;
+  }
+
+  set schema(s: JsonValue) {
+    this.schemaValue = s;
+    debugger;
+    this.parserFacade = getJsonParser(s);
+  }
+
+  get value(): string {
+    return this.ed.state.doc.toString();
+  }
+
+  set value(value: string) {
+    this.ed.dispatch({
+      changes: {
+        from: 0,
+        to: this.ed.state.doc.length,
+        insert: value,
+      },
+    });
+  }
+
+  private createEditor(
+    parent: Element,
+    value: string,
+    onChange: (value: string) => void,
+  ): EditorView {
+    let t: any = undefined;
+
+    //   let dispatched = false;
+
+    const updateListenerExtension = EditorView.updateListener.of(
+      (viewUpdate) => {
+        if (viewUpdate.docChanged) {
+          const text = viewUpdate.state.doc.toString();
+          // && !dispatched) {
+          onChange(text);
+          if (t !== undefined) {
+            clearTimeout(t);
+          }
+          t = setTimeout(() => {
+            const parseRes = this.parser.parse({ text });
+            const styles: Style[] = parseRes.styles.map((s) => {
+              return {
+                from: s.offset,
+                to: s.offset + s.length,
+                name: s.name,
+              };
+            });
+            const fx = setStyles.of(styles);
+            console.log('dispatch styles : ', styles);
+            // dispatched = true;
+            viewUpdate.view.dispatch({ effects: [fx] });
+          }, 200);
+        }
+      },
+    );
+
+    const jsonLintSource = linter((view: EditorView) => {
+      const text = view.state.doc.toString();
+      return new Promise<Diagnostic[]>((resolve) => {
+        const diags: Diagnostic[] = [];
+        const parseRes = this.parser.parse({ text });
+        console.log(parseRes);
+        parseRes.markers.forEach((m) => {
+          diags.push({
+            from: m.offset,
+            to: m.offset + m.length,
+            severity: getMarkerSeverity(m),
+            message: m.getMessage('en_US'),
+          });
+        });
+        resolve(diags);
+      });
+    });
+
+    return new EditorView({
+      extensions: [
+        updateListenerExtension,
+        keymap.of(defaultKeymap),
+        styleDecorations,
+        dieselJsonTheme,
+        jsonLintSource,
+      ],
+      doc: value,
+      parent,
+    });
+  }
+}
+
 function getMarkerSeverity(m: DieselMarker): Diagnostic['severity'] {
   switch (m.severity) {
     case 'warning':
@@ -109,81 +195,32 @@ function getMarkerSeverity(m: DieselMarker): Diagnostic['severity'] {
   }
 }
 
-const jsonLintSource = linter((view: EditorView) => {
-  const text = view.state.doc.toString();
-  return new Promise<Diagnostic[]>((resolve) => {
-    const diags: Diagnostic[] = [];
-    const parseRes = jsonParser.parse({ text });
-    console.log(parseRes);
-    parseRes.markers.forEach((m) => {
-      diags.push({
-        from: m.offset,
-        to: m.offset + m.length,
-        severity: getMarkerSeverity(m),
-        message: m.getMessage('en_US'),
-      });
-    });
-    resolve(diags);
-  });
-});
+function getMarkForStyle(styleName: string): Decoration | undefined {
+  switch (styleName) {
+    case 'keyword':
+      return keywordMark;
+    case 'string':
+      return stringMark;
+    case 'number':
+      return numberMark;
+    case 'attr':
+      return attrMark;
+    default:
+      return undefined;
+  }
+}
 
-export function createEditor(
-  parent: Element,
-  value: string,
-  onChange: (value: string) => void,
-): EditorView {
-  let t: any = undefined;
-
-  //   let dispatched = false;
-
-  const updateListenerExtension = EditorView.updateListener.of((viewUpdate) => {
-    if (viewUpdate.docChanged) {
-      const text = viewUpdate.state.doc.toString();
-      // && !dispatched) {
-      onChange(text);
-      if (t !== undefined) {
-        clearTimeout(t);
+function stylesToDecorations(styles: readonly Style[]): DecorationSet {
+  const sortedStyles = [...styles].sort((s1, s2) => s1.from - s2.from);
+  return RangeSet.of(
+    sortedStyles.flatMap((s) => {
+      const mark = getMarkForStyle(s.name);
+      if (mark && s.from !== s.to) {
+        return [mark.range(s.from, s.to)];
+      } else {
+        console.error('no mark found for style ', s);
+        return [];
       }
-      t = setTimeout(() => {
-        const parseRes = jsonParser.parse({ text });
-        const styles: Style[] = parseRes.styles.map((s) => {
-          return {
-            from: s.offset,
-            to: s.offset + s.length,
-            name: s.name,
-          };
-        });
-        const fx = setStyles.of(styles);
-        console.log('dispatch styles : ', styles);
-        // dispatched = true;
-        viewUpdate.view.dispatch({ effects: [fx] });
-      }, 200);
-    }
-  });
-
-  return new EditorView({
-    extensions: [
-      updateListenerExtension,
-      keymap.of(defaultKeymap),
-      styleDecorations,
-      dieselJsonTheme,
-      jsonLintSource,
-    ],
-    doc: value,
-    parent,
-  });
-}
-
-export function getEditorValue(view: EditorView): string {
-  return view.state.doc.toString();
-}
-
-export function setEditorValue(view: EditorView, value: string) {
-  view.dispatch({
-    changes: {
-      from: 0,
-      to: view.state.doc.length,
-      insert: value,
-    },
-  });
+    }),
+  );
 }

@@ -24,7 +24,7 @@ import { MyStringRenderer } from './MyStringRenderer';
 import { RatingRenderer } from './RatingRenderer';
 import { MyObjectRenderer } from './MyObjectRenderer';
 import { initialSchema, initialValue, samples } from './initdata';
-import { createEditor, getEditorValue, setEditorValue } from './editor';
+import { JsonEditor, parseJsonValueWithDefault } from './editor';
 
 const MyRendererFactory = new RendererFactory();
 MyRendererFactory.addRenderer('MyStringRenderer', MyStringRenderer);
@@ -34,16 +34,7 @@ MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
 const myworker = new Worker('myworker.bundle.js');
 const workerClient = new JsonForm.WorkerClient(myworker);
 
-const editor1 = createEditor(
-  document.getElementById('editor1')!,
-  JSON.stringify(initialSchema, null, '  '),
-  () => {
-    console.log('ed1 change');
-    sendJsonStr();
-  },
-);
-
-const editor2 = createEditor(
+const editor2 = new JsonEditor(
   document.getElementById('editor2')!,
   JSON.stringify(initialValue, null, '  '),
   () => {
@@ -54,12 +45,22 @@ const editor2 = createEditor(
   },
 );
 
+const editor1 = new JsonEditor(
+  document.getElementById('editor1')!,
+  JSON.stringify(initialSchema, null, '  '),
+  (value) => {
+    console.log('ed1 change');
+    editor2.schema = parseJsonValueWithDefault(value);
+    sendJsonStr();
+  },
+);
+
 function getSchema() {
-  return JsonForm.parseJsonValue(getEditorValue(editor1)).toMaybe();
+  return JsonForm.parseJsonValue(editor1.value).toMaybe();
 }
 
 function getValue() {
-  return JsonForm.parseJsonValue(getEditorValue(editor2))
+  return JsonForm.parseJsonValue(editor2.value)
     .toMaybe()
     .withDefault(JsonForm.jvNull);
 }
@@ -89,7 +90,7 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 sampleSchemaSelect.addEventListener('change', () => {
-  setEditorValue(editor1, sampleSchemaSelect.value);
+  editor1.value = sampleSchemaSelect.value;
   sendJsonStr();
 });
 
@@ -154,9 +155,7 @@ function initJsonForm(
       onChange: (value: JsonForm.JsonValue) => {
         console.log('FORM value changed', value);
         if (syncPanesCb.checked) {
-          JsonForm.stringify(value, '  ').forEach((s) =>
-            setEditorValue(editor2, s),
-          );
+          JsonForm.stringify(value, '  ').forEach((s) => (editor2.value = s));
         }
       },
       strictMode,
