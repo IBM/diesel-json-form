@@ -21,8 +21,8 @@ import * as TPM from 'tea-pop-menu';
 import { MenuAction } from './ContextMenuActions.js';
 import { initMyI18n } from './i18n/MyI18n.js';
 import { ValidationError } from './SchemaService.js';
-import { FormTFunction } from './FormTFunction.js';
 import { GotMsg } from './Msg.js';
+import { TFunction } from 'i18next';
 
 export interface Model {
   readonly schema: Maybe<JsonValue>;
@@ -34,7 +34,7 @@ export interface Model {
   readonly propertiesToAdd: ReadonlyMap<string, ReadonlyArray<string>>;
   readonly comboBoxes: ReadonlyMap<string, ReadonlyArray<string>>;
   readonly formats: ReadonlyMap<string, ReadonlyArray<string>>;
-  readonly t: FormTFunction;
+  readonly t: TFunction;
   readonly lang: string;
   readonly strictMode: boolean;
   readonly customRenderers: ReadonlyMap<string, Maybe<CustomRendererModel>>;
