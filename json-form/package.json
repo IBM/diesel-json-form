@@ -7,7 +7,7 @@
   "module": "dist/index.js",
   "dependencies": {
     "@diesel-parser/json-schema-facade-ts": "^0.17.1",
-    "i18next": "^20.6.1"
+    "i18next": "^26.7.1"
   },
   "peerDependencies": {
     "@carbon/icon-helpers": "^10.76.0",
