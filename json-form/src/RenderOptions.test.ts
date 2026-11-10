@@ -26,6 +26,7 @@ import { nothing } from 'tea-cup-fp';
 import { jvArray, jvNull, jvObject } from './JsonValue.js';
 import { defaultSchemaService } from './SchemaService.js';
 import { describe, test, expect } from 'vitest';
+import { TFunction } from 'i18next';
 
 describe('Render options', () => {
   describe('defaults', () => {
@@ -34,7 +35,7 @@ describe('Render options', () => {
         MenuTrigger({
           path: JsPath.empty,
           disabled: false,
-          t: () => 'no-t',
+          t: (() => 'no-t') as TFunction,
           dispatch: () => {},
           renderOptions: {},
         }),
@@ -93,7 +94,7 @@ describe('Render options', () => {
         MenuTrigger({
           path: JsPath.empty,
           disabled: false,
-          t: () => 'no-t',
+          t: (() => 'no-t') as TFunction,
           dispatch: () => {},
           renderOptions: { hideMenuTooltip: true },
         }),

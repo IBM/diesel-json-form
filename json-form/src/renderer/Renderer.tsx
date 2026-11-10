@@ -53,7 +53,7 @@ import { CustomRendererModel, Model as FormModel } from '../Model.js';
 import { Msg } from '../Msg.js';
 import { ViewValueProps } from './ViewValueProps.js';
 import { RenderOptions } from '../RenderOptions.js';
-import { FormTFunction } from '../FormTFunction.js';
+import { TFunction } from 'i18next';
 
 export interface RendererInitArgs<Model> {
   readonly path: JsPath;
@@ -183,7 +183,7 @@ function ViewObject(p: ViewValueProps<JvObject>): React.ReactElement {
                 key: e.key,
               });
             }}
-            invalidText={t<string>('propertyAlreadyExists')}
+            invalidText={t('propertyAlreadyExists')}
             invalid={addingState.isDuplicate}
           />
           <div className={'buttons-row'}>
@@ -325,7 +325,7 @@ interface ExpandCollapseButtonProps {
   readonly collapsed: boolean;
   readonly dispatch: Dispatcher<Msg>;
   readonly path: JsPath;
-  readonly t: FormTFunction;
+  readonly t: TFunction;
 }
 
 function ExpandCollapseButton(props: ExpandCollapseButtonProps) {
@@ -559,7 +559,7 @@ interface MyTimePickerProps {
   readonly value: string;
   readonly isInvalid: boolean;
   readonly invalidText: string;
-  readonly t: FormTFunction;
+  readonly t: TFunction;
   readonly instanceId: string;
 }
 
@@ -611,7 +611,7 @@ interface MyDatePickerProps {
   readonly onChange: (s: string, debounce: boolean) => void;
   readonly isInvalid: boolean;
   readonly invalidText: string;
-  readonly t: FormTFunction;
+  readonly t: TFunction;
   readonly language: string;
   readonly instanceId: string;
 }
@@ -848,7 +848,7 @@ export interface MenuTriggerProps {
   readonly dispatch: Dispatcher<Msg>;
   readonly path: JsPath;
   readonly disabled: boolean;
-  readonly t: FormTFunction;
+  readonly t: TFunction;
   readonly renderOptions?: RenderOptions;
 }
 
