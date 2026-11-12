@@ -23,6 +23,8 @@ import {
   DatePicker,
   DatePickerInput,
   DatePickerProps,
+  RadioButton,
+  RadioButtonGroup,
   SelectItem,
   Tag,
   TextInput,
@@ -773,21 +775,46 @@ function ViewBoolean(p: ViewValueProps<JvBoolean>): React.ReactElement {
   return (
     <WrapErrors {...p}>
       <div className="checkbox-wrapper">
-        <Checkbox
-          labelText={t('booleanValueLabel', {
-            path: p.path.format('.'),
-          }).toString()}
-          hideLabel={true}
-          id={'input-' + p.path.format('_') + p.instanceId}
-          checked={p.value.value}
-          disabled={p.model.adding.isJust()}
-          onChange={() => {
-            dispatchUpdateProperty(p, {
-              tag: 'jv-boolean',
-              value: !p.value.value,
-            });
-          }}
-        />
+        {p.renderOptions?.booleanAsRadio ? (
+          <RadioButtonGroup
+            name={'boolean-button-group' + p.path.format('_') + p.instanceId}
+            onChange={(value) => {
+              dispatchUpdateProperty(p, {
+                tag: 'jv-boolean',
+                value: value === 'true',
+              });
+            }}
+            valueSelected={p.value.value ? 'true' : 'false'}
+            disabled={p.model.adding.isJust()}
+          >
+            <RadioButton
+              id={'boolean-true' + p.path.format('_') + p.instanceId}
+              labelText={t('booleanRadioTrue', 'True')}
+              value="true"
+            />
+            <RadioButton
+              id={'boolean-false' + p.path.format('_') + p.instanceId}
+              labelText={t('booleanRadioFalse', 'False')}
+              value="false"
+            />
+          </RadioButtonGroup>
+        ) : (
+          <Checkbox
+            labelText={t('booleanValueLabel', {
+              path: p.path.format('.'),
+            }).toString()}
+            hideLabel={true}
+            id={'input-' + p.path.format('_') + p.instanceId}
+            checked={p.value.value}
+            disabled={p.model.adding.isJust()}
+            onChange={() => {
+              dispatchUpdateProperty(p, {
+                tag: 'jv-boolean',
+                value: !p.value.value,
+              });
+            }}
+          />
+        )}
       </div>
     </WrapErrors>
   );

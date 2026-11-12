@@ -18,6 +18,7 @@ export interface RenderOptions {
   readonly hideMenuTooltip?: boolean | undefined;
   readonly hideDocRoot?: boolean | undefined;
   readonly hideCollapsiblePanel?: boolean | undefined;
+  readonly booleanAsRadio?: boolean | undefined;
 }
 
 export enum MenuOptions {
