@@ -10,6 +10,8 @@
   "stringValueComboLabel": "select text string of {{path}}",
   "numberValueLabel": "number of {{path}}",
   "booleanValueLabel": "check boolean of {{path}}",
+  "booleanRadioTrue": "True",
+  "booleanRadioFalse": "False",
   "dateValueLabel": "date of {{path}}",
   "timeValueLabel": "time of {{path}}",
   "contextMenu": {

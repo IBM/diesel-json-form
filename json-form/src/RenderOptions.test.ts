@@ -23,7 +23,7 @@ import {
 import { ViewJsonEditor } from './JsonEditor.js';
 import { initialModel } from './Model.js';
 import { nothing } from 'tea-cup-fp';
-import { jvArray, jvNull, jvObject } from './JsonValue.js';
+import { jvArray, jvBool, jvNull, jvObject } from './JsonValue.js';
 import { defaultSchemaService } from './SchemaService.js';
 import { describe, test, expect } from 'vitest';
 import { TFunction } from 'i18next';
@@ -86,6 +86,24 @@ describe('Render options', () => {
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(1);
     });
+    test('boolean as checkbox', () => {
+      const { container } = render(
+        ViewJsonValue({
+          model: initialModel('en', nothing, jvNull, false, 0),
+          path: JsPath.empty,
+          value: jvBool(true),
+          language: 'en',
+          dispatch: () => {},
+          rendererFactory: new RendererFactory(),
+          renderOptions: {},
+          instanceId: '',
+        }),
+      );
+      expect(container.querySelectorAll('input[type="checkbox"]')).toHaveLength(
+        1,
+      );
+      expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(0);
+    });
   });
 
   describe('with options', () => {
@@ -144,6 +162,24 @@ describe('Render options', () => {
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(0);
+    });
+    test('boolean as radio button', () => {
+      const { container } = render(
+        ViewJsonValue({
+          model: initialModel('en', nothing, jvNull, false, 0),
+          path: JsPath.empty,
+          value: jvBool(true),
+          language: 'en',
+          dispatch: () => {},
+          rendererFactory: new RendererFactory(),
+          renderOptions: { booleanAsRadio: true },
+          instanceId: '',
+        }),
+      );
+      expect(container.querySelectorAll('input[type="radio"]')).toHaveLength(2);
+      expect(container.querySelectorAll('input[type="checkbox"]')).toHaveLength(
+        0,
+      );
     });
   });
 });
