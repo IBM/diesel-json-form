@@ -25,6 +25,7 @@ import { ViewJsonEditor } from './JsonEditor';
 import { initialModel } from './Model';
 import { nothing } from 'tea-cup-core';
 import { jvArray, jvNull, jvObject } from './JsonValue';
+import { TFunction } from 'i18next';
 
 describe('Render options', () => {
   describe('defaults', () => {
@@ -33,7 +34,7 @@ describe('Render options', () => {
         MenuTrigger({
           path: JsPath.empty,
           disabled: false,
-          t: () => 'no-t',
+          t: (() => 'no-t') as TFunction,
           dispatch: () => {},
           renderOptions: {},
         }),
@@ -89,7 +90,7 @@ describe('Render options', () => {
         MenuTrigger({
           path: JsPath.empty,
           disabled: false,
-          t: () => 'no-t',
+          t: (() => 'no-t') as TFunction,
           dispatch: () => {},
           renderOptions: { hideMenuTooltip: true },
         }),

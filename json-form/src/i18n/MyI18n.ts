@@ -62,7 +62,6 @@ export function initMyI18n(lng: string): TFunction {
     {
       resources,
       fallbackLng: 'en',
-      initImmediate: false,
       ns: ['jsonform'],
       defaultNS: 'jsonform',
       lng, // language to use, more information here: https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
