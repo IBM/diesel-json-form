@@ -14,38 +14,41 @@
  * limitations under the License.
  */
 
-import { Cmd, noCmd } from 'tea-cup-core';
+import { Cmd, noCmd, Task } from 'tea-cup-fp';
 import {
-  actionAddElementToArray,
   actionAddPropertyClicked,
   actionApplyProposal,
   actionDeleteValue,
   actionMoveValue,
   actionUpdateValue,
-} from './Actions';
-import { MenuAction } from './ContextMenuActions';
-import { Model } from './Model';
-import { Msg } from './Msg';
+} from './Actions.js';
+import { MenuAction } from './ContextMenuActions.js';
+import { Model, nextPendingId } from './Model.js';
+import { gotUpdatedValue, Msg } from './Msg.js';
+import { SchemaService } from './SchemaService.js';
+import { addElementToArrayTask } from './addElementToArray.js';
 
-export function executeContextMenuAction(
+export default function executeContextMenuAction(
+  schemaService: SchemaService,
   model: Model,
   action: MenuAction,
 ): [Model, Cmd<Msg>] {
   switch (action.tag) {
     case 'delete': {
-      return actionDeleteValue(model, action.path);
+      return actionDeleteValue(schemaService, model, action.path);
     }
     case 'move-down': {
-      return actionMoveValue(model, action.path, 'down');
+      return actionMoveValue(schemaService, model, action.path, 'down');
     }
     case 'move-up': {
-      return actionMoveValue(model, action.path, 'up');
+      return actionMoveValue(schemaService, model, action.path, 'up');
     }
     case 'change-type': {
-      return actionUpdateValue(model, action.path, action.value);
+      return actionUpdateValue(schemaService, model, action.path, action.value);
     }
     case 'proposal': {
       return actionApplyProposal(
+        schemaService,
         model,
         action.path,
         action.value,
@@ -54,7 +57,22 @@ export function executeContextMenuAction(
     }
     case 'add': {
       if (action.isArray) {
-        return actionAddElementToArray(model, action.path);
+        return model.schema
+          .map<[Model, Cmd<Msg>]>((schema) => {
+            const t = addElementToArrayTask(
+              schemaService,
+              schema,
+              model.root,
+              action.path,
+            );
+            const [newModel, newPendingId] = nextPendingId(
+              model,
+              'got-updated-value',
+            );
+            const cmd = Task.attempt(t, gotUpdatedValue(newPendingId));
+            return [newModel, cmd];
+          })
+          .withDefaultSupply(() => noCmd(model));
       } else {
         return actionAddPropertyClicked(model, action.path);
       }

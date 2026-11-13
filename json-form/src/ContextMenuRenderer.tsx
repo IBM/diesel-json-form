@@ -15,10 +15,10 @@
  */
 
 import * as TPM from 'tea-pop-menu';
-import { MenuAction } from './ContextMenuActions';
+import { MenuAction } from './ContextMenuActions.js';
 import React from 'react';
-import { JsonValue, JsonValueType, valueType } from './JsonValue';
-import { just, Maybe, Tuple } from 'tea-cup-core';
+import { JsonValue, JsonValueType, valueType } from './JsonValue.js';
+import { just, Maybe, Tuple } from 'tea-cup-fp';
 import {
   Add,
   ArrowDown,

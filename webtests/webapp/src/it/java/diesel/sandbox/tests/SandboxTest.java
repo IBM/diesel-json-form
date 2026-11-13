@@ -1,15 +1,18 @@
 package diesel.sandbox.tests;
 
 import com.pojosontheweb.selenium.Findr;
+import static com.pojosontheweb.selenium.Findrs.attrEquals;
+import static com.pojosontheweb.selenium.Findrs.textEquals;
+
 import com.pojosontheweb.selenium.ManagedDriverJunit4TestBase;
 import diesel.json.*;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
@@ -19,11 +22,10 @@ import org.openqa.selenium.remote.CapabilityType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static org.hamcrest.text.IsEqualCompressingWhiteSpace.equalToCompressingWhiteSpace;
 
 public class SandboxTest extends ManagedDriverJunit4TestBase {
 
@@ -96,12 +98,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("true")
-                // .assertHasErrors()
-                .clearText()
-                .typeText("123");
-        // .assertHasNoErrors();
+                .setText("123");
 
         sandbox.jsonForm
                 .numberAt(JsPath.empty)
@@ -115,19 +112,18 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
     @Test
     public void customerAge() {
+        String text = "{\n" +
+                "  \"customer\": {\n" +
+                "    \"firstName\": \"\",\n" +
+                "    \"lastName\": \"\",\n" +
+                "    \"amount\": 0,\n" +
+                "    \"age\": 0\n" +
+                "  }\n" +
+                "}";
         sandbox.selectSample(BeanContainingOtherBean);
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("{\n" +
-                        "  \"customer\": {\n" +
-                        "    \"firstName\": \"\",\n" +
-                        "    \"lastName\": \"\",\n" +
-                        "    \"amount\": 0,\n" +
-                        "    \"age\": 0\n" +
-                        "  }\n" +
-                        "}");
-        // .assertHasNoErrors();
+                .setText(text);
         sandbox.jsonForm
                 .numberAt(JsPath.empty.append("customer").append("age"))
                 .assertValue("0")
@@ -165,7 +161,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         FJsonForm f = sandbox.jsonForm;
 
         sandbox.selectSample(ObjectArray);
-        sandbox.jsonEditor.focus().clearText();
+        sandbox.jsonEditor.focus().setText("");
         sandbox.jsonEditor.assertText("");
 
         f
@@ -188,8 +184,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     private void assertErrorInvalidType(String type) {
         sandbox.schemaEditor
                 .focus()
-                .clearText()
-                .typeText("{ \"type\": \"" + type + "\" }");
+                .setText("{ \"type\": \"" + type + "\" }");
         String expectedError = "Invalid type: expected " + type;
         // sandbox.jsonEditor
         // .assertHasErrors()
@@ -323,18 +318,14 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("\"\"");
-        // .assertHasErrors();
+                .setText("\"\"");
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
                 .assertHasError("Invalid format: expected date");
 
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("\"" + date + "\"");
-        // .assertHasNoErrors();
+                .setText("\"" + date + "\"");
 
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
@@ -345,8 +336,6 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
     @Test
     public void typeDateInInputField() {
         sandbox.selectSample("Date");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = simpleDateFormat.format(new Date());
         sandbox.schemaEditor.assertText("{\n" +
                 "  \"type\": \"string\",\n" +
                 "  \"format\": \"date\"\n" +
@@ -354,8 +343,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("\"\"");
+                .setText("\"\"");
         sandbox.jsonForm
                 .dateAt(JsPath.empty)
                 .assertValue("")
@@ -385,8 +373,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         // use intellimirror
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("\"\"");
+                .setText("\"\"");
         // .assertHasErrors();
 
         // assert the form has errors when it string is empty
@@ -400,8 +387,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         // use the intellimirror to input a value without errors
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("\"" + date + "T10:10:10Z\"");
+                .setText("\"" + date + "T10:10:10Z\"");
         // .assertHasNoErrors();
 
         // assert the form has no error
@@ -514,13 +500,12 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "  \"what\": \"schema.animal.Lion\"\n" +
                         "}");
         FObject fObject = f.objectAt(JsPath.empty);
-        fObject.assertEmptyProperties("endangered", "mane", "name", "sound", "type");
+        fObject.assertEmptyProperties("mane", "name", "sound", "type", "endangered");
         fObject.selectPropertyValue("what", "schema.animal.Elephant");
-        fObject.assertEmptyProperties("endangered", "name", "sound", "trunkLength", "tusk", "type");
+        fObject.assertEmptyProperties("trunkLength", "tusk", "name", "sound", "type", "endangered");
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("{\n" +
+                .setText("{\n" +
                         "  \"what\": \"schema.animal.Elephant\",\n" +
                         "  \"endangered\": true,\n" +
                         "  \"name\": \"\",\n" +
@@ -530,7 +515,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                         "  \"tusk\": true\n" +
                         "}");
         fObject.assertProperties("what", "endangered", "name", "sound", "type", "trunkLength", "tusk");
-        sandbox.jsonEditor.focus().clearText();
+        sandbox.jsonEditor.focus().setText("");
         f.clickRootMenu().clickPropose("{ what }");
         fObject.clickAddPropButton("endangered");
         fObject.clickAddPropButton("mane");
@@ -558,7 +543,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
         sandbox.jsonEditor
                 .focus()
-                .clearText();
+                .setText("");
 
         String enumContent = "[\n" +
                 "  \"BAR\",\n" +
@@ -566,14 +551,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 "]";
 
         sandbox.jsonEditor
-                .typeText(enumContent);
-
-        String content = sandbox.jsonEditor.getText();
-
-        Assert.assertTrue(
-                "ERROR : differences between content \"" + content + "\" and input \"" + enumContent
-                        + "\"",
-                equalToCompressingWhiteSpace(enumContent.trim()).matches(content.trim()));
+                .setText(enumContent)
+                .assertText(enumContent);
 
         FArray fArray = form.arrayAt(JsPath.empty);
         fArray.assertLength(2);
@@ -582,27 +561,20 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         stringCell1.assertValue("FOO");
         stringCell1.setValue("BAR");
         stringCell1.assertValue("BAR");
-        // No error possible, we can only set a valid value here : looks strange I can
-        // set an unsupported value but no error
-        // even jsonEditor is not updated
-        content = sandbox.jsonEditor.getText();
-        String newEnumContent = "[\n" +
+        sandbox.jsonEditor.assertText("[\n" +
                 "  \"BAR\",\n" +
                 "  \"BAR\"\n" +
-                "]";
-        Assert.assertTrue(
-                "ERROR : differences between content \"" + content + "\" and input \"" + newEnumContent
-                        + "\"",
-                equalToCompressingWhiteSpace(newEnumContent.trim()).matches(content.trim()));
+                "]");
 
-        newEnumContent = "[\n" +
+        String newEnumContent = "[\n" +
                 "  \"BAR\",\n" +
                 "  \"TEAM\"\n" +
                 "]";
 
         sandbox.jsonEditor
                 .focus()
-                .replaceText(newEnumContent);
+                .setText(newEnumContent)
+                .assertText(newEnumContent);
 
         String expectedError = "Invalid value: should be one of \"FOO\" | \"BAR\"";
         fArray
@@ -616,8 +588,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         FJsonForm f = sandbox.jsonForm;
         sandbox.schemaEditor
                 .focus()
-                .clearText()
-                .typeText("{\n" +
+                .setText("{\n" +
                         "  \"type\": \"object\",\n" +
                         "  \"properties\": {\n" +
                         "    \"name\": { \"type\": \"string\" },\n" +
@@ -630,13 +601,11 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
         FObject fObject = f.objectAt(JsPath.empty);
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("{}");
-        fObject.assertEmptyProperties("children", "name");
+                .setText("{}");
+        fObject.assertEmptyProperties("name", "children");
         sandbox.jsonEditor
                 .focus()
-                .clearText()
-                .typeText("{\n" +
+                .setText("{\n" +
                         "  \"name\": \"Elizabeth\",\n" +
                         "  \"children\": [\n" +
                         "    {\n" +
@@ -718,8 +687,8 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
     @Test
     public void testNumberEmptyField() {
-        sandbox.schemaEditor.replaceText("{\"type\":\"number\"}");
-        sandbox.jsonEditor.replaceText("123");
+        sandbox.schemaEditor.setText("{\"type\":\"number\"}");
+        sandbox.jsonEditor.setText("123");
         FNumber num = sandbox.jsonForm.numberAt(JsPath.empty);
 
         num
@@ -730,7 +699,7 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
                 .findInput()
                 .sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE);
 
-        num.assertHasError("Invalid type: expected number");
+        num.assertHasError("Not a valid number");
 
         num.findInput().sendKeys("1");
 
@@ -739,17 +708,129 @@ public class SandboxTest extends ManagedDriverJunit4TestBase {
 
     @Test
     public void testNumberInvalid() {
-        sandbox.schemaEditor.replaceText("{\"type\":\"number\"}");
-        sandbox.jsonEditor.replaceText("123");
+        sandbox.schemaEditor.setText("{\"type\":\"number\"}");
+        doTestInvalidNumber();
+    }
+
+    @Test
+    public void testNumberInvalidNoSchema() {
+        doTestInvalidNumber();
+    }
+
+    private void doTestInvalidNumber() {
+        sandbox.jsonEditor.setText("123");
         FNumber num = sandbox.jsonForm.numberAt(JsPath.empty);
 
         num.assertValue("123").assertNoError();
 
         num
                 .setValue("abcdef")
-                .assertHasError("Invalid type: expected number");
+                .assertHasError("Not a valid number");
+
+        sandbox.jsonEditor.assertText("123");
 
         num.setValue("333").assertNoError();
+    }
+
+    @Test
+    public void testCustomRenderer() {
+        sandbox.selectSample("RendererRating");
+        sandbox.jsonEditor.setText("{\n" + //
+                "  \"name\": \"\",\n" + //
+                "  \"rating\": 0\n" + //
+                "}");
+
+        findRatings()
+                .where(ratingChecked(false))
+                .count(5)
+                .eval();
+
+        clickRating(2);
+
+        assertRating(0, true);
+        assertRating(1, true);
+        assertRating(2, true);
+        assertRating(3, false);
+        assertRating(4, false);
+
+        sandbox.jsonEditor.assertText("{\n" + //
+                "  \"name\": \"\",\n" + //
+                "  \"rating\": 3\n" + //
+                "}");
+    }
+
+    private Findr.ListFindr findRatings() {
+        return $$(".rating .rating-item");
+    }
+
+    private void clickRating(int index) {
+        findRatings().at(index).click();
+    }
+
+    private Predicate<WebElement> ratingChecked(boolean checked) {
+        return attrEquals("data-checked", "" + checked);
+    }
+
+    private void assertRating(int index, boolean checked) {
+        findRatings()
+                .at(index)
+                .where(ratingChecked(checked))
+                .eval();
+    }
+
+    @Test
+    public void testRendererAccessSchema1() {
+        sandbox.selectSample("Renderer1");
+        assertMyConfigProp("Config prop is undefined");
+        sandbox.jsonEditor.setText("\"yalla\"");
+        assertMyStringValue("yalla");
+        clickConcat();
+        assertMyStringValue("yallaX");
+        sandbox.jsonEditor.assertText("\"yallaX\"");
+    }
+
+    @Test
+    public void testRendererAccessSchema2() {
+        sandbox.selectSample("Renderer2");
+        assertMyConfigProp("Config prop set to 123");
+    }
+
+    private void clickConcat() {
+        $(".my-string button")
+                .where(textEquals("Concat !"))
+                .click();
+    }
+
+    private void assertMyConfigProp(String expected) {
+        $(".my-string p")
+                .where(textEquals(expected))
+                .eval();
+    }
+
+    private void assertMyStringValue(String expected) {
+        $(".my-string .my-value")
+                .where(textEquals(expected))
+                .eval();
+    }
+
+    @Test
+    public void testProposeSubProp() {
+        sandbox.selectSample(BeanContainingOtherBean);
+        sandbox.jsonForm
+                .objectAt(JsPath.empty)
+                .clickAddPropButton("customer");
+        sandbox.jsonForm
+                .objectAt(JsPath.empty)
+                .clickPropertyMenu("customer")
+                .clickPropose("{ firstName, lastName, amount, age }");
+        sandbox.jsonEditor.assertText("{\n" + //
+                "  \"customer\": {\n" + //
+                "    \"firstName\": \"\",\n" + //
+                "    \"lastName\": \"\",\n" + //
+                "    \"amount\": 0,\n" + //
+                "    \"age\": 0\n" + //
+                "  }\n" + //
+                "}");
     }
 
 }

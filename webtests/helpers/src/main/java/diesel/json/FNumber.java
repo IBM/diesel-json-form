@@ -1,6 +1,7 @@
 package diesel.json;
 
 import com.pojosontheweb.selenium.Findr;
+import com.pojosontheweb.selenium.Retry;
 
 import static com.pojosontheweb.selenium.Findrs.*;
 
@@ -33,8 +34,11 @@ public class FNumber extends FJsonValue {
     }
 
     public FNumber setValue(String value) {
-        findInput().clear();
-        findInput().sendKeys(value);
+        Retry.retry()
+                .add(() -> findInput().clear())
+                .add(() -> findInput().sendKeys(value))
+                .add(() -> assertValue(value))
+                .eval();
         return this;
     }
 }

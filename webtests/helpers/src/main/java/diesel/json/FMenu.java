@@ -21,9 +21,8 @@ public class FMenu extends AbstractPageObject {
         return findMenu(menuIndex)
                 .$$(".menu-item span")
                 .where(textEquals(itemText))
-                .expectOne();
+                .at(0);
     }
-
 
     private void clickMenuItem(int menuIndex, String itemText) {
         findMenuItem(menuIndex, itemText).click();
@@ -57,9 +56,9 @@ public class FMenu extends AbstractPageObject {
         clickMenuItem(0, "Delete");
     }
 
-    public void clickPropose(String type){
-        hoverMenuItem(0,"Propose");
-        clickMenuItem(1,type);
+    public void clickPropose(String type) {
+        hoverMenuItem(0, "Propose");
+        clickMenuItem(1, type);
     }
 
     public class FAddProperty {

@@ -24,5 +24,6 @@
   },
   "icon.openMenu": "打开菜单",
   "icon.expand": "展开",
-  "icon.collapse": "折叠"
+  "icon.collapse": "折叠",
+  "invalid.number": "不是有效号码"
 }

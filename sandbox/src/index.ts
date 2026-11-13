@@ -16,33 +16,59 @@
 
 import './style.css';
 import '@diesel-parser/json-form/dist/JsonEditor.css';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import * as JsonForm from '@diesel-parser/json-form';
 import { RendererFactory } from '@diesel-parser/json-form';
 
-import { editor1, editor2 } from './text-editor';
 import { MyStringRenderer } from './MyStringRenderer';
 import { RatingRenderer } from './RatingRenderer';
 import { MyObjectRenderer } from './MyObjectRenderer';
 import { initialSchema, initialValue, samples } from './initdata';
+import { JsonEditor, parseJsonValueWithDefault } from './editor';
 
 const MyRendererFactory = new RendererFactory();
 MyRendererFactory.addRenderer('MyStringRenderer', MyStringRenderer);
 MyRendererFactory.addRenderer('RatingRenderer', RatingRenderer);
 MyRendererFactory.addRenderer('MyObjectRenderer', MyObjectRenderer);
 
-editor1.getModel()?.onDidChangeContent(() => {
-  sendJsonStr();
-});
+const myworker = new Worker('myworker.bundle.js');
+const workerClient = new JsonForm.WorkerClient(myworker);
+
+const editor2 = new JsonEditor(
+  document.getElementById('editor2')!,
+  JSON.stringify(initialValue, null, '  '),
+  () => {
+    console.log('ed2 change');
+    if (syncPanesCb.checked) {
+      sendJsonStr();
+    }
+  },
+);
+
+const editor1 = new JsonEditor(
+  document.getElementById('editor1')!,
+  JSON.stringify(initialSchema, null, '  '),
+  (value) => {
+    console.log('ed1 change');
+    editor2.schema = parseJsonValueWithDefault(value);
+    sendJsonStr();
+  },
+);
+
+// for webtests
+// @ts-ignore
+window['editor1'] = editor1;
+// @ts-ignore
+window['editor2'] = editor2;
 
 function getSchema() {
-  const value = editor1.getValue();
-  return JsonForm.parseJsonValue(value).toMaybe();
+  return JsonForm.parseJsonValue(editor1.value).toMaybe();
 }
 
 function getValue() {
-  const v = editor2.getValue();
-  return JsonForm.parseJsonValue(v).toMaybe().withDefault(JsonForm.jvNull);
+  return JsonForm.parseJsonValue(editor2.value)
+    .toMaybe()
+    .withDefault(JsonForm.jvNull);
 }
 
 function sendJsonStr() {
@@ -55,13 +81,6 @@ function sendJsonStr() {
 const syncPanesCb: HTMLInputElement = document.getElementById(
   'syncPanes',
 ) as HTMLInputElement;
-
-editor2.getModel()?.onDidChangeContent(() => {
-  console.log('ed2 change');
-  if (syncPanesCb.checked) {
-    sendJsonStr();
-  }
-});
 
 const sampleSchemaSelect = document.getElementById(
   'sampleSchemaSelect',
@@ -77,7 +96,7 @@ samples
   .forEach((e) => sampleSchemaSelect.appendChild(e));
 
 sampleSchemaSelect.addEventListener('change', () => {
-  editor1.setValue(sampleSchemaSelect.value);
+  editor1.value = sampleSchemaSelect.value;
   sendJsonStr();
 });
 
@@ -133,21 +152,22 @@ function initJsonForm(
   strictMode: boolean,
   debounceMs: number,
 ) {
-  ReactDOM.render(
+  const root = createRoot(jsonForm!);
+  root.render(
     JsonForm.JsonEditor({
       schema,
       value,
       language: navigator.language,
       onChange: (value: JsonForm.JsonValue) => {
-        console.log('value changed');
+        console.log('FORM value changed', value);
         if (syncPanesCb.checked) {
-          editor2.setValue(JsonForm.stringify(value, '  '));
+          JsonForm.stringify(value, '  ').forEach((s) => (editor2.value = s));
         }
       },
       strictMode,
       rendererFactory: MyRendererFactory,
       debounceMs,
+      schemaService: workerClient,
     }),
-    jsonForm,
   );
 }

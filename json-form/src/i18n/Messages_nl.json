@@ -24,5 +24,6 @@
   },
   "icon.openMenu": "Menu openen",
   "icon.expand": "Uitvouwen",
-  "icon.collapse": "Samenvouwen"
+  "icon.collapse": "Samenvouwen",
+  "invalid.number": "Geen geldig nummer"
 }

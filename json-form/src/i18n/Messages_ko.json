@@ -24,5 +24,6 @@
   },
   "icon.openMenu": "메뉴 열기",
   "icon.expand": "펼치기",
-  "icon.collapse": "접기"
+  "icon.collapse": "접기",
+  "invalid.number": "유효한 번호가 아닙니다."
 }

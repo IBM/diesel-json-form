@@ -19,7 +19,7 @@ import {
   createTypesMenu,
   MenuAction,
   MenuPropertyProps,
-} from './ContextMenuActions';
+} from './ContextMenuActions.js';
 import {
   JsonValue,
   jvArray,
@@ -28,10 +28,11 @@ import {
   jvNumber,
   jvObject,
   jvString,
-} from './JsonValue';
-import { JsPath } from './JsPath';
+} from './JsonValue.js';
+import { JsPath } from './JsPath.js';
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
-import { MenuOptions } from './RenderOptions';
+import { MenuOptions } from './RenderOptions.js';
+import { describe, test, expect } from 'vitest';
 
 describe('Change type menu', () => {
   test('[SM: ON, P: 1, V: valid] ' + 'no types menu', () => {
@@ -98,6 +99,32 @@ describe('Change type menu', () => {
         jvObject(),
         jvArray(),
       ]);
+      expect(typesMenu).toStrictEqual(expectedTypesMenu);
+    },
+  );
+
+  test(
+    '[SM: ON, P: string enum + null, V: null] ' +
+      'change-type to string uses first enum value as the proposed value',
+    () => {
+      const proposals: ReadonlyArray<JsonValue> = [
+        jvString('FOO'),
+        jvString('BAR'),
+        jvNull,
+      ];
+      const typesMenu = buildTypesMenuStrictMode(proposals, jvNull);
+      const expectedTypesMenu = buildExpectedTypesMenu([jvString('FOO')]);
+      expect(typesMenu).toStrictEqual(expectedTypesMenu);
+    },
+  );
+
+  test(
+    '[SM: ON, P: null + string enum, V: null] ' +
+      'change-type to string falls back to empty string when first proposal is not a string',
+    () => {
+      const proposals: ReadonlyArray<JsonValue> = [jvNull, jvString('FOO')];
+      const typesMenu = buildTypesMenuStrictMode(proposals, jvNull);
+      const expectedTypesMenu = buildExpectedTypesMenu([jvString('')]);
       expect(typesMenu).toStrictEqual(expectedTypesMenu);
     },
   );

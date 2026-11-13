@@ -15,7 +15,8 @@
  */
 
 import { item, Menu, menu, MenuItem } from 'tea-pop-menu';
-import { JsPath } from './JsPath';
+import { JsPath } from './JsPath.js';
+import { just, maybeOf, nothing } from 'tea-cup-fp';
 import {
   getValueAt,
   indexOfPathInParent,
@@ -26,12 +27,12 @@ import {
   jvNumber,
   jvObject,
   jvString,
-} from './JsonValue';
+} from './JsonValue.js';
 import {
   isMenuOptionHidden,
   MenuOptionFilter,
   MenuOptions,
-} from './RenderOptions';
+} from './RenderOptions.js';
 
 export type MenuAction =
   | { tag: 'delete'; path: JsPath }
@@ -138,7 +139,17 @@ export function createTypesMenu(
             case 'jv-object':
               return buildChangeTypeItem(jvObject());
             case 'jv-string':
-              return buildChangeTypeItem(jvString(''));
+              return buildChangeTypeItem(
+                maybeOf(proposals[0])
+                  .andThen((p) => {
+                    if (p.tag === 'jv-string') {
+                      return just(p);
+                    } else {
+                      return nothing;
+                    }
+                  })
+                  .withDefaultSupply(() => jvString('')),
+              );
           }
         })
     );

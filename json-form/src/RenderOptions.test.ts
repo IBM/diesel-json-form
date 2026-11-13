@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 import { render } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { JsPath } from './JsPath';
+import { JsPath } from './JsPath.js';
 import {
   MenuTrigger,
   RendererFactory,
   ViewJsonValue,
-} from './renderer/Renderer';
-import { ViewJsonEditor } from './JsonEditor';
-import { initialModel } from './Model';
-import { nothing } from 'tea-cup-core';
-import { jvArray, jvNull, jvObject } from './JsonValue';
+} from './renderer/Renderer.js';
+import { ViewJsonEditor } from './JsonEditor.js';
+import { initialModel } from './Model.js';
+import { nothing } from 'tea-cup-fp';
+import { jvArray, jvNull, jvObject } from './JsonValue.js';
+import { defaultSchemaService } from './SchemaService.js';
+import { describe, test, expect } from 'vitest';
+import { TFunction } from 'i18next';
 
 describe('Render options', () => {
   describe('defaults', () => {
@@ -33,12 +35,14 @@ describe('Render options', () => {
         MenuTrigger({
           path: JsPath.empty,
           disabled: false,
-          t: () => 'no-t',
+          t: (() => 'no-t') as TFunction,
           dispatch: () => {},
           renderOptions: {},
         }),
       );
-      expect(container.querySelector('button')).not.toHaveAttribute('style');
+      expect(
+        Object.keys(container.querySelector('button')!.style).length,
+      ).toEqual(0);
     });
     test('menu document root', () => {
       const { container } = render(
@@ -47,6 +51,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: {},
+          schemaService: defaultSchemaService,
         }),
       );
       expect(container.querySelectorAll('.doc-root')).toHaveLength(1);
@@ -61,6 +66,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: {},
+          instanceId: '',
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(1);
@@ -75,6 +81,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: {},
+          instanceId: '',
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(1);
@@ -87,14 +94,13 @@ describe('Render options', () => {
         MenuTrigger({
           path: JsPath.empty,
           disabled: false,
-          t: () => 'no-t',
+          t: (() => 'no-t') as TFunction,
           dispatch: () => {},
           renderOptions: { hideMenuTooltip: true },
         }),
       );
-      expect(container.querySelector('button')).toHaveAttribute(
-        'style',
-        'overflow: hidden;',
+      expect(container.querySelector('button')!.style.overflow).toEqual(
+        'hidden',
       );
     });
     test('hide menu document root', () => {
@@ -104,6 +110,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: { hideDocRoot: true },
+          schemaService: defaultSchemaService,
         }),
       );
       expect(container.querySelectorAll('.doc-root')).toHaveLength(0);
@@ -118,6 +125,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: { hideCollapsiblePanel: true },
+          instanceId: '',
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(0);
@@ -132,6 +140,7 @@ describe('Render options', () => {
           dispatch: () => {},
           rendererFactory: new RendererFactory(),
           renderOptions: { hideCollapsiblePanel: true },
+          instanceId: '',
         }),
       );
       expect(container.querySelectorAll('.prop-expand')).toHaveLength(0);

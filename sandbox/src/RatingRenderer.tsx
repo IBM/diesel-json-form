@@ -6,7 +6,7 @@ import {
   RendererViewArgs,
   ViewErrors,
 } from '@diesel-parser/json-form';
-import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-core';
+import { Cmd, just, Maybe, noCmd, nothing } from 'tea-cup-fp';
 import * as React from 'react';
 import { JsValidationError } from '@diesel-parser/json-schema-facade-ts';
 
@@ -41,6 +41,7 @@ export const RatingRenderer: Renderer<Model, Msg> = {
         <div
           key={index}
           className={'rating-item'}
+          data-checked={checked}
           onMouseEnter={() => dispatch({ tag: 'mouse-enter', index })}
           onMouseLeave={() => dispatch({ tag: 'mouse-leave' })}
           onClick={() => dispatch({ tag: 'rating-clicked', index })}

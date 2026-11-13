@@ -24,5 +24,6 @@
   },
   "icon.openMenu": "開啟功能表",
   "icon.expand": "展開",
-  "icon.collapse": "收合"
+  "icon.collapse": "收合",
+  "invalid.number": "不是有效號碼"
 }

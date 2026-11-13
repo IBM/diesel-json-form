@@ -1,8 +1,6 @@
 // const eslint = require('@eslint/js');
 const tseslint = require('typescript-eslint');
 const prettierRecommended = require('eslint-plugin-prettier/recommended');
-const reactRecommended = require('eslint-plugin-react/configs/recommended');
-const reactHooks = require('eslint-plugin-react-hooks');
 
 module.exports = [
   {
@@ -11,14 +9,14 @@ module.exports = [
       '**/build/',
       '**/dist/',
       '**/target/',
-      '**/webpack.config.js',
+      '**/*webpack.config.js',
       '**/.DS_Store',
       '**/.vscode/',
       'eslint.config.js',
+      '**/public/',
     ],
   },
   prettierRecommended,
-  reactRecommended,
   ...tseslint.config(
     // eslint.configs.recommended,
     ...tseslint.configs.recommended,
@@ -31,9 +29,6 @@ module.exports = [
     },
   },
   {
-    plugins: {
-      'react-hooks': reactHooks,
-    },
     languageOptions: {
       ecmaVersion: 2018,
       sourceType: 'module',
@@ -53,7 +48,6 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-object-literal-type-assertion': 'off',
       '@typescript-eslint/ban-ts-comment': 'off', // TODO @sgregoire: due to images
-      ...reactHooks.configs.recommended.rules,
     },
   },
 ];
