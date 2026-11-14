@@ -6,7 +6,7 @@
   "type": "module",
   "dependencies": {
     "@diesel-parser/json-schema-facade-ts": "^0.17.1",
-    "i18next": "^26.7.1",
+    "i18next": "^27.0.0",
     "tea-pop-core": "^6.0.1",
     "tea-pop-menu": "^6.0.1"
   },
