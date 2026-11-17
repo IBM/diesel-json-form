@@ -75,7 +75,6 @@ const styleDecorations = StateField.define<Style[]>({
       const newFrom = tx.changes.mapPos(from, -1, MapMode.TrackBefore);
       const newTo = tx.changes.mapPos(to, 0, MapMode.TrackDel);
       if (newTo == null || newFrom == null) {
-        debugger;
         return [];
       }
       //   console.log('from', from, 'to', to, 'newFrom', newFrom, 'newTo', newTo);
