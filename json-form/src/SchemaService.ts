@@ -74,14 +74,57 @@ function doValidate(
     .withDefaultSupply(() => Promise.reject('Broken schema or instance'));
 }
 
+class ValidationResultCache {
+  private data?: [string, string, JsFacade.JsValidationResult];
+
+  getValidationResult(
+    schema: string,
+    value: string,
+  ): JsFacade.JsValidationResult | undefined {
+    if (this.data) {
+      if (schema === this.data[0]) {
+        if (value === this.data[1]) {
+          return this.data[2];
+        }
+      }
+    }
+    return undefined;
+  }
+
+  setValidationResult(
+    schema: string,
+    value: string,
+    result: JsFacade.JsValidationResult,
+  ): void {
+    this.data = [schema, value, result];
+  }
+}
+
 class JsFacadeSchemaService implements SchemaService {
+  private cache = new ValidationResultCache();
+
   async validate(
     schema: JsonValue,
     instance: JsonValue,
   ): Promise<ValidationResult> {
-    return doValidate(schema, instance).then(
-      (vr) => new JsFacadeValidationResult(vr),
-    );
+    const schemaStr = JSON.stringify(schema);
+    const instanceStr = JSON.stringify(instance);
+    const cached = this.cache.getValidationResult(schemaStr, instanceStr);
+    if (cached) {
+      console.log('validate CACHE hit', schema, instance, cached);
+      return Promise.resolve(new JsFacadeValidationResult(cached));
+    } else {
+      return doValidate(schema, instance).then((vr) => {
+        console.log(
+          'validate CACHE miss, adding to cache',
+          schema,
+          instance,
+          vr,
+        );
+        this.cache.setValidationResult(schemaStr, instanceStr, vr);
+        return new JsFacadeValidationResult(vr);
+      });
+    }
   }
 
   async propose(
@@ -89,11 +132,23 @@ class JsFacadeSchemaService implements SchemaService {
     instance: JsonValue,
     path: JsPath,
   ): Promise<readonly JsonValue[]> {
-    return doValidate(schema, instance).then((r) =>
-      Promise.resolve(
-        JsFacade.propose(r, path.format(), -1).map(fromFacadeValue),
-      ),
-    );
+    const schemaStr = JSON.stringify(schema);
+    const instanceStr = JSON.stringify(instance);
+    const cached = this.cache.getValidationResult(schemaStr, instanceStr);
+    if (cached) {
+      console.log('propose CACHE hit', schema, instance, cached);
+      return Promise.resolve(
+        JsFacade.propose(cached, path.format(), -1).map(fromFacadeValue),
+      );
+    } else {
+      return doValidate(schema, instance).then((r) => {
+        console.log('propose CACHE miss', schema, instance, r);
+        this.cache.setValidationResult(schemaStr, instanceStr, r);
+        return Promise.resolve(
+          JsFacade.propose(r, path.format(), -1).map(fromFacadeValue),
+        );
+      });
+    }
   }
 }
 
