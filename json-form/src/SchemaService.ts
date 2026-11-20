@@ -110,16 +110,9 @@ class JsFacadeSchemaService implements SchemaService {
     const instanceStr = JSON.stringify(instance);
     const cached = this.cache.getValidationResult(schemaStr, instanceStr);
     if (cached) {
-      console.log('validate CACHE hit', schema, instance, cached);
       return Promise.resolve(new JsFacadeValidationResult(cached));
     } else {
       return doValidate(schema, instance).then((vr) => {
-        console.log(
-          'validate CACHE miss, adding to cache',
-          schema,
-          instance,
-          vr,
-        );
         this.cache.setValidationResult(schemaStr, instanceStr, vr);
         return new JsFacadeValidationResult(vr);
       });
@@ -135,13 +128,11 @@ class JsFacadeSchemaService implements SchemaService {
     const instanceStr = JSON.stringify(instance);
     const cached = this.cache.getValidationResult(schemaStr, instanceStr);
     if (cached) {
-      console.log('propose CACHE hit', schema, instance, cached);
       return Promise.resolve(
         JsFacade.propose(cached, path.format(), -1).map(fromFacadeValue),
       );
     } else {
       return doValidate(schema, instance).then((r) => {
-        console.log('propose CACHE miss', schema, instance, r);
         this.cache.setValidationResult(schemaStr, instanceStr, r);
         return Promise.resolve(
           JsFacade.propose(r, path.format(), -1).map(fromFacadeValue),
