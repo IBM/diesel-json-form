@@ -18,7 +18,6 @@
 import './style.scss';
 import { samples } from './initdata';
 import {
-  defaultSchemaService,
   getValueAt,
   JsPath,
   JvNumber,
@@ -36,6 +35,7 @@ import {
   CarbonGridObjectRenderer,
   carbonRenderer,
   IconElement,
+  WorkerClient,
 } from '@diesel-parser/json-form';
 
 import '@carbon/web-components/es/index.js';
@@ -44,6 +44,14 @@ import { CDSCheckbox, CDSComboBox } from '@carbon/web-components/es';
 import { h } from './MyJSXFactory';
 import { version } from '@diesel-parser/json-form/package.json';
 import { TypedJsonSchemaService } from './TypedJsonSchemaService';
+
+import workerUrl from '/js/worker/JsonFormSchemaWorker.bundle.js?url';
+
+const worker = new Worker(workerUrl);
+
+// console.log('worker=' + worker);
+
+const workerSchemaService = new WorkerClient(worker);
 
 const about = document.getElementById('about');
 if (about) {
@@ -303,7 +311,7 @@ renderer.addCustomRenderer('ArrayTable', CarbonTableArrayRenderer.newInstance);
 
 renderer.addCustomRenderer('GridObject', CarbonGridObjectRenderer.newInstance);
 
-jsonForm.initialize(renderer, defaultSchemaService, schema, value);
+jsonForm.initialize(renderer, workerSchemaService, schema, value);
 
 sampleSchemaSelect.addEventListener('cds-dropdown-selected', () => {
   taSchema.value = sampleSchemaSelect.value;
@@ -327,7 +335,7 @@ schemaSelect.addEventListener('cds-dropdown-selected', () => {
       break;
     }
     default: {
-      jsonForm.schemaService = defaultSchemaService;
+      jsonForm.schemaService = workerSchemaService;
       break;
     }
   }

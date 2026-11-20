@@ -11,6 +11,7 @@
         "strict": true,
         "module": "esnext",
         "outDir": "dist",
+        "sourceRoot": "src",
         "declaration": true,
         "skipLibCheck": true,
         "esModuleInterop": false,
@@ -20,7 +21,7 @@
         "jsxFragmentFactory": "Fragment"
     },
     "include": [
-        "src",
+        "src"
     ],
     "exclude": [
         "node_modules",

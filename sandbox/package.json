@@ -7,14 +7,15 @@
   "scripts": {
     "start": "vite --port 3000",
     "start-webpack": "webpack serve",
-    "build": "vite build",
+    "build": "vite build && npm run build-json-form-schema-worker",
     "build-webpack": "webpack",
     "test": "vitest --run",
     "preview": "vite preview",
     "prettify": "prettier --write .",
     "lint": "eslint '**/*.{js,ts}'",
     "lint:fix": "eslint '**/*.{js,ts}' --fix",
-    "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'"
+    "gh-pages": "gh-pages -d dist -m 'sandbox [ci skip]'",
+    "build-json-form-schema-worker": "vite build --config vite.worker.config.ts"
   },
   "dependencies": {
     "@carbon/ibm-products-web-components": "^0.40.0",
