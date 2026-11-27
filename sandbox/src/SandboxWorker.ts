@@ -1,7 +1,5 @@
-import {
-  defaultSchemaService,
-  SchemaServiceWorker,
-} from '@diesel-parser/json-form';
+import { defaultSchemaService } from '@diesel-parser/json-form/dist/SchemaService';
+import { SchemaServiceWorker } from '@diesel-parser/json-form/dist/worker/SchemaServiceWorker';
 
 const myWorker = new SchemaServiceWorker(defaultSchemaService);
 
